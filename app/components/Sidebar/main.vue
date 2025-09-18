@@ -1,7 +1,7 @@
 <template>
   <!-- ========== HEADER ========== -->
   <header
-    class="sticky top-4 inset-x-0 flex md:flex-nowrap z-50 justify-center items-center w-full before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-[26px] before:bg-gray-200/30 before:backdrop-blur-md"
+    class="sticky top-4 inset-x-0 flex md:flex-nowrap z-50 justify-center items-center before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-[26px] before:bg-gray-200/30 before:backdrop-blur-md"
   >
     <nav
       class="relative max-w-5xl w-full flex flex-wrap md:flex-nowrap basis-full items-center justify-between py-2 ps-5 pe-2 md:py-0 mx-2 lg:mx-auto"
