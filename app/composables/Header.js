@@ -1,9 +1,14 @@
 export default function useHeader() {
-  const menu = [
-    { name: 'Dashboard', href: '#' },
-    { name: 'Events', href: '#' },
-    { name: 'Analytics', href: '#' },
-    { name: 'Settings', href: '#' },
-  ];
-    return { menu };
+  const menu =ref( [
+    { name: "Home", path: "/" },
+    { name: "About", path: "/" },
+    { name: "Events", path: "/" },
+  ])
+  const openMenu = ref(false);
+
+  const toggleMenu = () => {
+    openMenu.value = !openMenu.value;
+    
+  };
+  return { menu, toggleMenu, openMenu };
 }

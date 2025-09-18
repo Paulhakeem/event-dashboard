@@ -8,13 +8,10 @@
     >
       <div class="flex items-center">
         <!-- Logo -->
-        <a
-          class="flex-none rounded-md text-xl inline-block font-semibold focus:outline-hidden focus:opacity-80"
-          href="../templates/agency/index.html"
-          aria-label="Preline"
-        >
-          <p>Event</p>
-        </a>
+        <div class="flex items-center text-xl">
+          <Icon name="mdi:emoji-panda" class="w-8 h-8 text-gray-200" />
+          <p class="text-gray-200 font-semibold">Event</p>
+        </div>
         <!-- End Logo -->
 
         <div class="ms-1 sm:ms-2"></div>
@@ -52,10 +49,12 @@
         class="hs-collapse overflow-hidden transition-all duration-300 basis-full grow md:block"
         aria-labelledby="hs-navbar-floating-dark-collapse"
       >
-        <div 
-          class="flex  md:flex-row md:items-center md:justify-end gap-y-3 py-2 md:py-0 md:ps-7"
+        <div
+          class="flex md:flex-row md:items-center md:justify-end gap-y-3 py-2 md:py-0 md:ps-7"
         >
-          <NuxtLink v-for="(item, idx) in menu" :key="idx"
+          <NuxtLink
+            v-for="(item, idx) in menu"
+            :key="idx"
             class="pe-3 ps-px sm:px-3 md:py-4 text-sm text-white hover:text-neutral-300 focus:outline-hidden focus:text-neutral-300"
             aria-current="page"
             >{{ item.name }}</NuxtLink
@@ -69,10 +68,5 @@
 </template>
 
 <script setup>
-const menu = ref([
-  { name: "Home", href: "#", current: true },
-  { name: "Stories", href: "#", current: false },
-  { name: "Reviews", href: "#", current: false },
-  { name: "Approach", href: "#", current: false },
-]);
+const { menu } = Header();
 </script>
