@@ -14,7 +14,7 @@
     "composables": "~/app/composables",
     "utils": "~/app/lib/utils",
     "ui": "~/app/components/ui",
-    "lib": "~/lib"
+    "lib": "~/app/lib"
   },
   "iconLibrary": "lucide"
 }

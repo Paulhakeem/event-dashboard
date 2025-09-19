@@ -1,14 +1,38 @@
 <template>
   <section class="">
     <div class="md:hidden lg:hidden">
-      <div class="flex justify-between items-center w-full">
+      <div class="grid grid-cols-2 items-center w-full ">
         <Icon
           class="cursor-pointer left-2 top-2 text-gray-200"
           size="30"
           name="material-symbols:menu"
           @click="toggleMenu"
         />
+        <!-- Button Group -->
+        <div class="flex gap-6">
+          <div class="md:ps-3">
+            <NuxtLink
+              to="/login"
+              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+              href="#"
+            >
+              Login
+            </NuxtLink>
+          </div>
+          <div class="flex items-center">
+            <div class="md:ps-3">
+              <NuxtLink
+                to="/signup"
+                class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+              >
+                Sign Up
+              </NuxtLink>
+            </div>
+            <!-- End Button Group -->
+          </div>
+        </div>
       </div>
+
       <Transition
         enter-active-class="transition duration-500 ease-out"
         enter-from-class="opacity-0 -translate-y-5"

@@ -12,10 +12,10 @@ export default defineNuxtConfig({
     prefix: "",
     componentDir: "./app/components/ui",
   },
-  components: {
-    dirs: [
-      "~/components", // auto-import your own components
-      { path: "~/app/components/ui", global: false , extensions: [".vue"]}, // disable auto-import for shadcn-vue
-    ],
-  },
+  // components: {
+  //   dirs: [
+  //     "~/components", // auto-import your own components
+  //     { path: "~/app/components/ui", global: false , extensions: [".vue"]}, // disable auto-import for shadcn-vue
+  //   ],
+  // },
 });
