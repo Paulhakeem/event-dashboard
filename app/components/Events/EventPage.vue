@@ -6,10 +6,10 @@
       class="flex flex-wrap justify-center items-center gap-12 md:gap-14 lg:gap-20"
     >
       <div v-for="(event, idx) in eventPosters" :key="idx" class="text-center">
-        <img
+        <NuxtImg
           class="rounded-xl size:44 md:size-48 lg:size-80 mx-auto"
           :src="event.url"
-          alt="Avatar"
+          alt="Event Poster"
         />
         <div class="mt-2 sm:mt-4 text-start">
           <div class="flex gap-4 items-center mb-1 sm:mb-2">

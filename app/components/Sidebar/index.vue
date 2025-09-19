@@ -14,7 +14,6 @@
             <NuxtLink
               to="/login"
               class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-              href="#"
             >
               Login
             </NuxtLink>
