@@ -20,22 +20,24 @@
       <!-- Button Group -->
       <div class="md:order-3 flex items-center gap-x-3">
         <div class="md:ps-3">
-          <a
+          <NuxtLink
+            to="/login"
             class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
             href="#"
           >
             Login
-          </a>
+          </NuxtLink>
         </div>
       </div>
       <div class="md:order-3 flex items-center gap-x-3">
         <div class="md:ps-3">
-          <a
+          <NuxtLink
+            to="/Signup"
             class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
             href="#"
           >
-           Sign Up
-          </a>
+            Sign Up
+          </NuxtLink>
         </div>
       </div>
       <!-- End Button Group -->
@@ -52,7 +54,8 @@
           <NuxtLink
             v-for="(item, idx) in menu"
             :key="idx"
-            class="pe-3 ps-px sm:px-3 md:py-4 text-sm text-white hover:text-neutral-300 focus:outline-hidden focus:text-neutral-300"
+            :to="item.path"
+            class="pe-3 ps-px cursor-pointer sm:px-3 md:py-4 text-sm text-white hover:text-neutral-300 focus:outline-hidden focus:text-neutral-300"
             aria-current="page"
             >{{ item.name }}</NuxtLink
           >
