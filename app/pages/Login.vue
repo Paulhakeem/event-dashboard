@@ -1,10 +1,9 @@
 <template>
-  <!-- Hire Us -->
   <div
-    class="bg-[#020f31] max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto"
+    class="bg-[#020f31] h-screen max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto"
   >
     <!-- Grid -->
-    <div class="grid md:grid-cols-2 items-center pt-10">
+    <div class="grid md:grid-cols-2 items-center pt-20 md:pt-22 lg:pt-24">
       <div
         class="bg-[url('/images/party.jpg')] h-screen bg-no-repeat bg-center bg-cover items-center mx-auto relative rounded-lg"
       >

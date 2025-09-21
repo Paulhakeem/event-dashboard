@@ -1,5 +1,4 @@
 <template>
-  <!-- ========== HEADER ========== -->
   <header
     class="sticky top-4 inset-x-0 flex md:flex-nowrap z-50 justify-center items-center before:absolute before:inset-0 before:max-w-5xl before:mx-2 lg:before:mx-auto before:rounded-[26px] before:bg-gray-200/30 before:backdrop-blur-md"
   >
@@ -23,7 +22,6 @@
           <NuxtLink
             to="/login"
             class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-            href="#"
           >
             Login
           </NuxtLink>
@@ -32,9 +30,8 @@
       <div class="md:order-3 flex items-center gap-x-3">
         <div class="md:ps-3">
           <NuxtLink
-            to="/Signup"
+            to="/signup"
             class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-            href="#"
           >
             Sign Up
           </NuxtLink>

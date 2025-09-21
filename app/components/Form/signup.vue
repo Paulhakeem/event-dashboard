@@ -5,8 +5,8 @@
       class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 dark:border-neutral-700"
     >
       <p>
-        <NuxtLink to="/signup" class="text-sm text-[#9c4e8b] underline cursor-pointer"
-          >Don't have an account? Sign up</NuxtLink
+        <NuxtLink to="/login" class="text-sm text-[#9c4e8b] underline cursor-pointer"
+          >Have an account? Login</NuxtLink
         >
       </p>
       <form>
@@ -91,7 +91,7 @@
           type="submit"
           class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white disabled:opacity-50 disabled:pointer-events-none"
         >
-          Login
+        Signup
         </button>
       </div>
     </div>
