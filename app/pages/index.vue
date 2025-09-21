@@ -31,6 +31,9 @@
     </header>
     <main>
       <events-event-page />
+      <section class="bg-[#020f31]">
+        <subscribe />
+      </section>
     </main>
   </div>
 </template>
