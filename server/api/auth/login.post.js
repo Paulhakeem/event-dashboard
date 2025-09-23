@@ -25,15 +25,20 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid email or password",
     });
   }
+  const config = useRuntimeConfig();
+  
+  if (!config.SecretStr) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "JWT secret is not configured",
+    });
+  }
   // generate a JWT token
   const token = jwt.sign(
     { userId: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
-  );
-  return (
-    { message: "Login successful", token, user },
-    "jwt_secret",
+    config.secretStr,
     { expiresIn: "1d" }
   );
+
+  return { token, user };
 });

@@ -2,13 +2,20 @@ import mongoose from "mongoose";
 
 let isConnected = false; // track the connection status
 
-export const connectToDatabase = async () => {
-  if (isConnected) return; // if already connected, return
+const connectDB = async () => {
+  const config = useRuntimeConfig();
 
-  await mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  isConnected = true; // set the connection status to true
-  console.log("Connected to MongoDB");
+  if (isConnected) return; // already connected, skip
+
+  try {
+    await mongoose.connect(config.mongoUrl);
+
+    isConnected = true;
+    console.log("✅ Connected to MongoDB");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err.message);
+    throw err; // let Nitro handle it
+  }
 };
+
+export default connectDB;

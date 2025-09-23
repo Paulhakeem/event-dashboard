@@ -12,6 +12,11 @@ export default defineNuxtConfig({
     prefix: "",
     componentDir: "./app/components/ui",
   },
+  runtimeConfig: {
+    // 🔒 Server-only (safe)
+    mongoUrl: process.env.CONNECTION_STR,
+    secretStr: process.env.SECRET_STR,
+  },
   // components: {
   //   dirs: [
   //     "~/components", // auto-import your own components

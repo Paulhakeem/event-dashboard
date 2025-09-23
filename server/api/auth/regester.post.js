@@ -4,9 +4,18 @@ import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { username, email, password, role } = body;
+  const { firstName, lastName, email, password, role } = body;
 
   await connectDB();
+
+  // validation
+  if (!firstName || !lastName || !email || !password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "All fields are required",
+    });
+  }
+
 
   // prevent multiple admin accounts
   if (role === "admin") {
@@ -18,21 +27,30 @@ export default defineEventHandler(async (event) => {
       });
     }
   }
+
+
   // check if user already exists
-  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+  const existingUser = await User.findOne({ email })
   if (existingUser) {
     throw createError({
       statusCode: 400,
-      statusMessage: "User already exists",
+      statusMessage: "name or email already taken",
     });
   }
 
   // hash the password
   const hashedPassword = await bcrypt.hash(password, 10);
-  const newUser = new User({ username, email, password: hashedPassword, role });
+  const newUser = new User({
+    firstName,
+    lastName,
+    email,
+    password: hashedPassword,
+    role,
+  });
+
+  await newUser.save();
 
   return {
     message: "User registered successfully",
-    user: await newUser.save(),
   };
 });
