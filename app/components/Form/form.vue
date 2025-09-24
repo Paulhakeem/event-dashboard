@@ -12,6 +12,7 @@
         >
       </p>
       <form>
+        <p class="text-red-500 text-sm italic">{{ errorMessage }}</p>
         <div class="mt-6 grid gap-4 lg:gap-6">
           <div>
             <label
@@ -43,7 +44,7 @@
       <!-- End Grid -->
 
       <!-- Checkbox -->
-      <select v-model="role">
+      <select v-model="role" class="mt-4 p-2 border border-gray-300 rounded-lg">
         <option value="user">User</option>
         <option value="admin">Admin</option>
       </select>
@@ -55,7 +56,7 @@
           type="submit"
           class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white disabled:opacity-50 disabled:pointer-events-none"
         >
-         {{ isLoading ? "Logging In..." : "Log In" }}
+          {{ isLoading ? "Logging In..." : "Log In" }}
         </button>
       </div>
     </div>
@@ -65,5 +66,35 @@
 </template>
 
 <script setup>
-const { email, password, role, login, isLoading } = LoginAuth();
+const email = ref("");
+const password = ref("");
+const role = ref("user" || "admin");
+const { setUser } = LoginAuth();
+const isLoading = ref(false);
+const errorMessage = ref("");
+
+const login = async () => {
+  try {
+    isLoading.value = true;
+    const data = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: {
+        email: email.value,
+        password: password.value,
+        role: role.value,
+      },
+    });
+    setUser(data.user);
+    if (data.user.role === "admin") {
+      navigateTo("/admin/dashboard");
+    } else {
+      navigateTo("/user/dashboard");
+    }
+  } catch (error) {
+    errorMessage.value =
+      error.data?.message || "Login failed. Please check your credentials.";
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>

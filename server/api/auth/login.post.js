@@ -5,7 +5,8 @@ import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { email, password } = body;
+  const { email, password, role } = body;
+  const config = useRuntimeConfig();
 
   await connectDB();
 
@@ -25,9 +26,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid email or password",
     });
   }
-  const config = useRuntimeConfig();
-  
-  if (!config.SecretStr) {
+
+  if (!config.secretStr) {
     throw createError({
       statusCode: 500,
       statusMessage: "JWT secret is not configured",
@@ -35,10 +35,14 @@ export default defineEventHandler(async (event) => {
   }
   // generate a JWT token
   const token = jwt.sign(
-    { userId: user._id, role: user.role },
+    { id: user._id, role: user.role, email: user.email },
     config.secretStr,
     { expiresIn: "1d" }
   );
 
-  return { token, user };
+  return {
+    message: "Login successful",
+    token,
+    user: { id: user._id, email: user.email, role: user.role },
+  };
 });
