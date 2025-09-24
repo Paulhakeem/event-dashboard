@@ -1,9 +1,9 @@
 <template>
   <section class="">
-    <div class="md:hidden lg:hidden">
+    <div class="pb-4 md:hidden lg:hidden">
       <div class="grid grid-cols-2 items-center w-full ">
         <Icon
-          class="cursor-pointer left-2 top-2 text-gray-200"
+          class="cursor-pointer left-2 top-2 text-gray-500"
           size="30"
           name="material-symbols:menu"
           @click="toggleMenu"

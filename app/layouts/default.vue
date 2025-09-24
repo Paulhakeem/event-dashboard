@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="absolute z-10 flex items-center justify-center mt-8 ml-10">
+    <div class="z-10 flex items-center justify-center ml-10 z-50">
       <Sidebar />
     </div>
 

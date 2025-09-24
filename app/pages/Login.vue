@@ -5,7 +5,7 @@
     <!-- Grid -->
     <div class="grid md:grid-cols-2 items-center pt-20 md:pt-22 lg:pt-24">
       <div
-        class="bg-[url('/images/party.jpg')] h-screen bg-no-repeat bg-center bg-cover items-center mx-auto relative rounded-lg"
+        class="bg-[url('/images/party.jpg')] lg:h-screen bg-no-repeat bg-center bg-cover items-center mx-auto relative rounded-lg"
       >
         <div class="absolute inset-0 bg-black/30"></div>
         <div class="justify-center items-center relative p-8 sm:p-16 lg:p-24">
