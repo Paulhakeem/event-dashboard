@@ -12,7 +12,7 @@
           class="md:pl-8 lg:pl-10 md:pt-8 lg:pt-10 text-center md:text-left lg:text-left"
         >
           <h1 class="text-white text-4xl md:text-5xl lg:text-5xl font-semibold">
-            Event <span class="text-[#9c4e8b] font-bold">p'ing</span>
+            DJ <span class="text-[#9c4e8b] font-bold">KIDD</span>
           </h1>
           <p
             class="text-gray-200 pt-4 pb-6 w-[300px] md:w-[500px] lg:w-[600px]"
