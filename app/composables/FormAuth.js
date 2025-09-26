@@ -46,6 +46,8 @@ export default function useFormAuth() {
         }),
       });
 
+      if (!res.ok) throw new Error(data.message || "Failed to sign up");
+      
       const data = await res.json();
       // check if user is admin
       if (role.value === "admin" && res.ok) {
@@ -53,8 +55,6 @@ export default function useFormAuth() {
       } else {
         navigateTo("/user/dashboard");
       }
-
-      if (!res.ok) throw new Error(data.message || "Failed to sign up");
 
       firstName.value = "";
       lastName.value = "";
