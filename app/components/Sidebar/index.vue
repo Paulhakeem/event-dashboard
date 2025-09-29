@@ -1,7 +1,7 @@
 <template>
   <section class="">
     <div class="pb-4 md:hidden lg:hidden">
-      <div class="grid grid-cols-2 items-center w-full ">
+      <div class="grid grid-cols-2 items-center w-full">
         <Icon
           class="cursor-pointer left-2 top-2 text-gray-500"
           size="30"
@@ -9,7 +9,8 @@
           @click="toggleMenu"
         />
         <!-- Button Group -->
-        <div class="flex gap-6">
+        <!-- if user not login -->
+        <div v-if="!user" class="flex gap-6">
           <div class="md:ps-3">
             <NuxtLink
               to="/login"
@@ -27,7 +28,18 @@
                 Sign Up
               </NuxtLink>
             </div>
+
             <!-- End Button Group -->
+          </div>
+        </div>
+        <div v-else class="flex gap-6">
+          <div class="md:ps-3">
+            <NuxtLink
+              to="/login"
+              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+            >
+              Logout
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -73,4 +85,6 @@
 
 <script setup>
 const { menu, openMenu, toggleMenu } = Header();
+
+const { user } = useAuth();
 </script>

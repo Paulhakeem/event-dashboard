@@ -51,4 +51,9 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const { user } = useAuth();
+onMounted(() => {
+  console.log(user);
+});
+</script>

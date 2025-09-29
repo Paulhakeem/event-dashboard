@@ -31,7 +31,7 @@
                 aria-label="Dropdown"
               >
                 <span class="">
-                  <Icon name="meteor-icons:chevron-down" class="text-xl"/>
+                  <Icon name="meteor-icons:chevron-down" class="text-xl" />
                 </span>
 
                 <span class="absolute -top-0.5 -end-0.5">
@@ -60,9 +60,10 @@
             data-hs-accordion-always-open
           >
             <ul
-              v-for="(menu, idx) in sidebarMenu"
-              :key="idx"
+              v-for="menu in sidebarMenu"
+              :key="menu.name"
               class="flex flex-col space-y-1"
+              @click="itemSelected(menu)"
             >
               <li>
                 <a
@@ -84,10 +85,14 @@
 </template>
 
 <script setup>
-const sidebarMenu = ref([
-  { name: "Dashboard", icon: "material-symbols:home-outline-rounded" },
-  { name: "Users", icon: "majesticons:users" },
-  { name: "Events", icon: "material-symbols:event" },
-  { name: "Statistics", icon: "tabler:graph-filled" },
-]);
+const props = defineProps({
+  modelValue: Object,
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const { sidebarMenu } = dashboardSidebar();
+
+const itemSelected = (menu) => {
+  emit("update:modelValue", menu);
+};
 </script>
