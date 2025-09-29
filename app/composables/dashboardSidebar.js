@@ -3,7 +3,7 @@ import Events from "@/components/Dashboard/Events.vue";
 import Graph from "@/components/Dashboard/Graph.vue";
 
 export const dashboardSidebar = () => {
-  const sidebarMenu = ref([
+  const sidebarMenu = [
     {
       name: "Dashboard",
       icon: "material-symbols:home-outline-rounded",
@@ -12,7 +12,7 @@ export const dashboardSidebar = () => {
     { name: "Users", icon: "majesticons:users", component: Users },
     { name: "Events", icon: "material-symbols:event", component: Events },
     { name: "Statistics", icon: "tabler:graph-filled", component: Events },
-  ]);
+  ];
 
   return { sidebarMenu };
 };
