@@ -25,7 +25,7 @@
           </NuxtLink>
         </div>
       </div>
-      <div class="md:order-3 flex items-center gap-x-3">
+      <div v-if="!user" class="md:order-3 flex items-center gap-x-3">
         <div class="md:ps-3">
           <NuxtLink
             to="/signup"
@@ -63,6 +63,5 @@
 
 <script setup>
 const { menu } = Header();
-const {user, logout} = useAuth()
-
+const { user } = useAuth();
 </script>

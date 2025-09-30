@@ -6,6 +6,7 @@ export default function useFormAuth() {
   const isLoading = ref(false);
   const errorMessage = ref("");
   const role = ref("user" || "admin");
+  const { setAuth } = useAuth();
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,14 +46,15 @@ export default function useFormAuth() {
           role: role.value,
         }),
       });
-
+      
       const data = await res.json();
-      console.log(data);
+
       if (!res.ok) throw new Error(data.message || "Failed to sign up");
 
       // save token
       if (data.token) {
         localStorage.setItem("token", data.token);
+        setAuth(data);
       }
       // check if user is admin
       if (role.value === "admin" && res.ok) {

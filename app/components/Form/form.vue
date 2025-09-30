@@ -69,7 +69,7 @@
 const email = ref("");
 const password = ref("");
 const role = ref("user" || "admin");
-const { setUser } = LoginAuth();
+const { setAuth } = useAuth();
 const isLoading = ref(false);
 const errorMessage = ref("");
 
@@ -84,7 +84,7 @@ const login = async () => {
         role: role.value,
       },
     });
-    setUser(data.user);
+    setAuth(data);
     if (data.user.role === "admin") {
       navigateTo("/admin/dashboard");
     } else {
