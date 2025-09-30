@@ -46,9 +46,14 @@ export default function useFormAuth() {
         }),
       });
 
-      if (!res.ok) throw new Error(data.message || "Failed to sign up");
-      
       const data = await res.json();
+      console.log(data);
+      if (!res.ok) throw new Error(data.message || "Failed to sign up");
+
+      // save token
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
       // check if user is admin
       if (role.value === "admin" && res.ok) {
         navigateTo("/admin/dashboard");

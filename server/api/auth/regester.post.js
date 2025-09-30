@@ -1,13 +1,14 @@
 import bcrypt from "bcryptjs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
+import jwt from "jsonwebtoken";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { firstName, lastName, email, password, role } = body;
 
   await connectDB();
-
+  const config = useRuntimeConfig();
   // validation
   if (!firstName || !lastName || !email || !password) {
     throw createError({
@@ -15,7 +16,6 @@ export default defineEventHandler(async (event) => {
       statusMessage: "All fields are required",
     });
   }
-
 
   // prevent multiple admin accounts
   if (role === "admin") {
@@ -28,9 +28,8 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-
   // check if user already exists
-  const existingUser = await User.findOne({ email })
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw createError({
       statusCode: 400,
@@ -50,7 +49,23 @@ export default defineEventHandler(async (event) => {
 
   await newUser.save();
 
+  // create JWT token
+  const token = jwt.sign(
+    { id: newUser._id, email: newUser.email, role: newUser.role },
+    config.secretStr, // comes from .env
+    { expiresIn: "1d" }
+  );
+
+  // return user + token
   return {
     message: "User registered successfully",
+    token,
+    user: {
+      id: newUser._id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      email: newUser.email,
+      role: newUser.role,
+    },
   };
 });

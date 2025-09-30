@@ -52,8 +52,4 @@
 </template>
 
 <script setup>
-const { user } = useAuth();
-onMounted(() => {
-  console.log(user);
-});
 </script>

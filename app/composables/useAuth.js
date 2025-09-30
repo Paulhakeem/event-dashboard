@@ -1,30 +1,31 @@
 export const useAuth = () => {
-  const user = useState("user", () => null);
-  const token = useState("token", () => null);
+  const user = ref(null);
+  const token = ref(null);
+  if (!token.value && process.client) {
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+    if (savedToken) token.value = savedToken;
+    if (savedUser) user.value = JSON.parse(savedUser);
+  }
 
-  const login = (userData, jwt) => {
-    user.value = userData;
-    token.value = jwt;
-    localStorage.setItem("token", jwt);
-    localStorage.setItem("user", JSON.stringify(userData));
+  const setAuth = (data) => {
+    token.value = data.token;
+    user.value = data.user;
+
+    if (process.client) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
   };
 
   const logout = () => {
-    (user.value = null), (token.value = null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    token.value = null;
+    user.value = null;
+    if (process.client) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
   };
 
-  //   restore from localstorage on refresh
-  if (process.client && !user.value && localStorage.getItem("useer")) {
-    user.value = JSON.parse(localStorage.getItem("user"));
-    token.value = localStorage.getItem("token");
-  }
-
-  return {
-    user,
-    token,
-    login,
-    logout,
-  };
+  return { user, token, setAuth, logout };
 };
