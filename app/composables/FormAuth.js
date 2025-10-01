@@ -55,7 +55,6 @@ export default function useFormAuth() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         setAuth(data);
-        await fetchUser()
       }
       // check if user is admin
       if (role.value === "admin" && res.ok) {
