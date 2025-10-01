@@ -6,7 +6,7 @@ export default function useFormAuth() {
   const isLoading = ref(false);
   const errorMessage = ref("");
   const role = ref("user" || "admin");
-  const { setAuth } = useAuth();
+  const { setAuth, fetchUser } = useAuth();
 
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,6 +55,7 @@ export default function useFormAuth() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         setAuth(data);
+        await fetchUser()
       }
       // check if user is admin
       if (role.value === "admin" && res.ok) {
