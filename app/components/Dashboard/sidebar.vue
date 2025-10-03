@@ -13,7 +13,7 @@
           <div
             class="flex-none rounded-xl text-xl inline-block font-semibold focus:outline-hidden focus:opacity-80"
           >
-            <h1>Admin</h1>
+            <h1>{{ user.role }}</h1>
           </div>
           <!-- End Logo -->
 
@@ -91,6 +91,7 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const { sidebarMenu } = dashboardSidebar();
+const {user}= useAuth()
 
 const itemSelected = (menu) => {
   emit("update:modelValue", menu);
