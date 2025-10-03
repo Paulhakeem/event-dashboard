@@ -51,7 +51,13 @@ export default defineEventHandler(async (event) => {
 
   // create JWT token
   const token = jwt.sign(
-    { id: newUser._id, email: newUser.email, role: newUser.role },
+    {
+      id: newUser._id,
+      fname: newUser.firstName,
+      sname: newUser.lastName,
+      email: newUser.email,
+      role: newUser.role,
+    },
     config.secretStr, // comes from .env
     { expiresIn: "1d" }
   );

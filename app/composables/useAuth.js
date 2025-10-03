@@ -30,25 +30,6 @@ export const useAuth = () => {
       localStorage.setItem("user", JSON.stringify(data.user ?? {}));
     }
   };
-
-  const fetchUser = async () => {
-    if (!token.value) return;
-
-    try {
-      const res = await $fetch("/api/auth/user", {
-        headers: { Authorization: `Bearer ${token.value}` },
-      });
-      user.value = res.user;
-      console.log(res);
-      if (process.client) {
-        localStorage.setItem("user", JSON.stringify(res.user));
-      }
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-      logout();
-    }
-  };
-
   const logout = () => {
     token.value = null;
     user.value = null;
@@ -59,5 +40,5 @@ export const useAuth = () => {
     navigateTo("/");
   };
 
-  return { user, token, setAuth, logout, fetchUser };
+  return { user, token, setAuth, logout };
 };

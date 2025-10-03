@@ -37,7 +37,7 @@
             <li
               v-for="post in posts"
               :key="post.id"
-              class="relative rounded-md p-3 hover:bg-gray-100"
+              class="relative rounded-md p-3"
             >
               <!-- Show component if provided -->
               <component

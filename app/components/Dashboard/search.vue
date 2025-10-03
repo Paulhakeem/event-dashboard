@@ -30,7 +30,9 @@
       </button>
 
       <!-- Profile-->
-      <div class="hs-dropdown [--placement:bottom-right] relative inline-flex">
+
+      <div class="hs-dropdown [--placement:bottom-right] relative inline-flex items-center gap-2">
+        <p>{{ user.firstName }} {{ user.lastName }}</p>
         <button
           id="hs-dropdown-account"
           type="button"
@@ -52,4 +54,5 @@
 </template>
 
 <script setup>
+const { user } = useAuth();
 </script>
