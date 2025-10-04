@@ -9,7 +9,7 @@
         <p
           class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
         >
-          10.3k
+          0.0
         </p>
       </div>
       <div>

@@ -10,7 +10,7 @@
           <p
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            $126,238.49
+            ksh 00.0
           </p>
         </div>
         <div>
@@ -18,7 +18,7 @@
             class="py-[5px] px-1.5 inline-flex items-center gap-x-1 text-xs font-medium rounded-md bg-teal-100 text-teal-800 dark:bg-teal-500/10 dark:text-teal-500"
           >
             <Icon name="solar:arrow-up-linear" class="text-lg" />
-            25%
+            0%
           </span>
         </div>
       </div>

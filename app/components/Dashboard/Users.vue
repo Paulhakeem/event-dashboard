@@ -156,7 +156,7 @@
                 <td class="size-px whitespace-nowrap">
                   <div class="px-6 py-3">
                     <span class="text-sm text-gray-500 dark:text-neutral-500">{{
-                      person.joined
+                     formatDate( person.joinedAt)
                     }}</span>
                   </div>
                 </td>
@@ -199,4 +199,13 @@
 
 <script setup>
 const { users } = totalUsers();
+// format date
+const formatDate=(date)=> {
+  if(!date) return ""
+  return new Date(date).toLocaleDateString("en-US", {
+    year: 'numeric',
+    month: "long",
+    day: 'numeric'
+  })
+}
 </script>

@@ -15,11 +15,11 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            72,540
+            {{ users.length }}
           </h3>
           <span class="flex items-center gap-x-1 text-green-600">
             <Icon name="streamline:graph-arrow-increase" />
-            <span class="inline-block text-sm"> 1.7% </span>
+            <span class="inline-block text-sm"> 0.5% </span>
           </span>
         </div>
       </div>
@@ -33,7 +33,7 @@
       <div class="p-4 md:p-5">
         <div class="flex items-center gap-x-2">
           <p class="text-xs uppercase text-gray-500 dark:text-neutral-500">
-            Events
+            Events Booked
           </p>
         </div>
 
@@ -41,7 +41,7 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            29.4%
+            0.0%
           </h3>
         </div>
       </div>
@@ -63,11 +63,11 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            56.8%
+            0.0%
           </h3>
           <span class="flex items-center gap-x-1 text-red-600">
             <Icon name="streamline:graph-arrow-decrease" />
-            <span class="inline-block text-sm"> 1.7% </span>
+            <span class="inline-block text-sm"> -0.0% </span>
           </span>
         </div>
       </div>
@@ -81,7 +81,7 @@
       <div class="p-4 md:p-5">
         <div class="flex items-center gap-x-2">
           <p class="text-xs uppercase text-gray-500 dark:text-neutral-500">
-          Total Events
+            Total Events
           </p>
         </div>
 
@@ -89,7 +89,7 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            2,913
+            0
           </h3>
         </div>
       </div>
@@ -98,4 +98,6 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const { users } = totalUsers()
+</script>

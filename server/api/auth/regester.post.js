@@ -72,6 +72,7 @@ export default defineEventHandler(async (event) => {
       lastName: newUser.lastName,
       email: newUser.email,
       role: newUser.role,
+      createdAt: newUser.joinedAt,
     },
   };
 });
