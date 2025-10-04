@@ -94,7 +94,7 @@
                     <span
                       class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
                     >
-                      events
+                      events att
                     </span>
                   </div>
                 </th>
@@ -126,7 +126,7 @@
                       <div class="grow">
                         <span
                           class="block text-sm font-semibold text-gray-800 dark:text-neutral-200"
-                          >{{ person.name }}</span
+                          >{{ person.firstName }} {{ person.lastName }}</span
                         >
                         <span
                           class="block text-sm text-gray-500 dark:text-neutral-500"
