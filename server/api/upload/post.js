@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const [fields, files] = await form.parse(event.node.req);
-  const { title, description, location, date } = fields;
+  const { title, description, location, date, price } = fields;
   const imagePath = files.image?.[0].filepath?.replace("public", "") || "";
 
   if (!title || !description || !location || !date) {
