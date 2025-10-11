@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center w-full">
+  <form class="flex flex-wrap items-center justify-center gap-8 w-full">
     <label
       for="dropzone-file"
       class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
@@ -29,6 +29,18 @@
       </div>
       <input id="dropzone-file" type="file" class="hidden" />
     </label>
-  </div>
+    <div class="w-full md:w-1/2">
+      <input placeholder="Event Title" class="w-full mb-3 border p-2 rounded bg-white" />
+      <textarea
+        placeholder="Description"
+        class="w-full mb-3 border p-2 rounded bg-white"
+      />
+      <input type="date" class="w-full mb-3 border p-2 rounded bg-white" />
+      <input placeholder="Location" class="w-full mb-3 border p-2 rounded bg-white" />
+       <input type="number" class="w-full mb-3 border p-2 rounded bg-white" />
+      <button class="w-full bg-[#9c4e8b] text-white p-2 rounded">
+        Create Event
+      </button>
+    </div>
+  </form>
 </template>
-
