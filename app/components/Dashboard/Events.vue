@@ -55,11 +55,13 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 
 // Import your component
 import createEvent from "./createEvent.vue";
+import totalEvents from "../Dashboard/getEvents.vue";
 
 const categories = ref({
   Events: [
     {
       id: 1,
+      component: totalEvents, // ✅ reference the imported component
     },
   ],
   "Create Event": [

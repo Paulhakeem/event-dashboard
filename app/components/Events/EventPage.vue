@@ -21,7 +21,7 @@
             </div>
           </div>
           <h3
-            class="text-sm font-medium text-gray-800 sm:text-base lg:text-lg dark:text-neutral-200"
+            class="text-sm font-medium text-gray-800 sm:text-base lg:text-lg dark:text-neutral-200 first-letter:capitalize"
           >
             {{ event.title }}
           </h3>
