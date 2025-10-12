@@ -1,7 +1,7 @@
 <template>
   <header>
     <nav
-      class=" flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-0 mx-2 md:w-[40em] lg:w-[50em] lg:mx-auto"
+      class="flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-0 mx-2 md:w-[40em] lg:w-[50em] lg:mx-auto"
     >
       <div class="flex items-center">
         <!-- Logo -->
@@ -39,7 +39,11 @@
       <div v-if="user" class="md:order-3 flex items-center gap-x-3">
         <div class="md:ps-3 flex gap-8">
           <NuxtLink
-            to="/dashboard/admin"
+            :to="
+              user && user.role === 'admin'
+                ? '/admin/dashboard'
+                : '/user/dashboard'
+            "
             class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
           >
             Dashboard

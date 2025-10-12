@@ -1,9 +1,9 @@
 <template>
   <section class="">
     <div class="pb-4 md:hidden lg:hidden">
-      <div class="grid grid-cols-2 items-center w-full">
+      <div class="grid grid-cols-3 items-center w-full">
         <Icon
-          class="cursor-pointer left-2 top-2 text-gray-500"
+          class="cursor-pointer text-gray-500"
           size="30"
           name="material-symbols:menu"
           @click="toggleMenu"
@@ -32,14 +32,26 @@
             <!-- End Button Group -->
           </div>
         </div>
-        <div v-else class="flex gap-6">
-          <div class="md:ps-3">
+        <!-- End Button Group -->
+        <div v-if="user" class="md:order-3 flex items-center gap-x-3">
+          <div class="md:ps-3 flex gap-8">
             <NuxtLink
-              to="/login"
+              :to="
+                user && user.role === 'admin'
+                  ? '/admin/dashboard'
+                  : '/user/dashboard'
+              "
               class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
             >
-              Logout
+              Dashboard
             </NuxtLink>
+            <!-- logout -->
+            <button
+              @click="useAuth().logout()"
+              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-gray-200 font-medium text-sm text-nowrap text-gray-700 rounded-lg focus:outline-hidden"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </div>

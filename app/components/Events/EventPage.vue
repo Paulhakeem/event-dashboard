@@ -7,7 +7,7 @@
     >
       <div v-for="event in eventPosters" :key="event" class="text-center">
         <NuxtImg
-          class="rounded-xl size:32 md:size-32 lg:size-72 mx-auto"
+          class="rounded-xl size:32 md:size-44 lg:size-72 mx-auto"
           :src="event.image"
           alt="Event Poster"
         />
