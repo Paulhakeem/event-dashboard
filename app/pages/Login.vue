@@ -1,9 +1,9 @@
 <template>
   <div
-    class="bg-[#020f31] h-screen max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto"
+    class="bg-[#020f31] h-screen max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto lg:max-w-screen-xl lg:h-auto xl:h-auto"
   >
     <!-- Grid -->
-    <div class="grid md:grid-cols-2 items-center pt-20 md:pt-22 lg:pt-24">
+    <div class="grid md:grid-cols-2 items-center pt-20 md:pt-22 lg:pt-18">
       <div
         class="bg-[url('/images/party.jpg')] lg:h-screen bg-no-repeat bg-center bg-cover items-center mx-auto relative rounded-lg"
       >

@@ -89,7 +89,7 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            0
+            {{ events.length }}
           </h3>
         </div>
       </div>
@@ -100,4 +100,5 @@
 
 <script setup>
 const { users } = totalUsers()
+const {events} = totalEvents()
 </script>
