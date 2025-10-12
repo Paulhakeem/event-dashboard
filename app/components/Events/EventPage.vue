@@ -5,23 +5,19 @@
     <div
       class="flex flex-wrap justify-center items-center gap-12 md:gap-14 lg:gap-20"
     >
-      <div v-for="(event, idx) in eventPosters" :key="idx" class="text-center">
+      <div v-for="event in eventPosters" :key="event" class="text-center">
         <NuxtImg
-          class="rounded-xl size:44 md:size-48 lg:size-80 mx-auto"
-          :src="event.url"
+          class="rounded-xl size:32 md:size-32 lg:size-72 mx-auto"
+          :src="event.image"
           alt="Event Poster"
         />
         <div class="mt-2 sm:mt-4 text-start">
-          <div class="flex gap-4 items-center mb-1 sm:mb-2">
-            <h3
-              class="text-sm font-normal text-[#9c4e8b] sm:text-base lg:text-lg dark:text-neutral-200"
-            >
-              {{ event.about }}
-            </h3>
-            <div
-              class="text-xs text-gray-600 sm:text-base lg:text-lg dark:text-neutral-400"
-            >
-              {{ event.date }}
+          <div class="flex gap-4 justify-between items-center mb-1 sm:mb-2">
+            <p class="text-sm text-gray-500 first-letter:capitalized">
+              📍 {{ event.location }}
+            </p>
+            <div class="text-xs text-gray-600">
+              {{ new Date(event.date).toLocaleDateString() }}
             </div>
           </div>
           <h3
@@ -32,12 +28,12 @@
           <p
             class="text-xs text-gray-600 sm:text-sm lg:text-base dark:text-neutral-400"
           >
-            {{ event.descrip }}
+            {{ event.description }}
           </p>
           <button
             class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded cursor-pointer transition"
           >
-            Buy Ticket - ksh{{ event.Price }}
+            Buy Ticket - ksh{{ event.price }}
           </button>
         </div>
       </div>

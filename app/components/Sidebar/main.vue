@@ -36,6 +36,23 @@
         </div>
       </div>
       <!-- End Button Group -->
+      <div v-if="user" class="md:order-3 flex items-center gap-x-3">
+        <div class="md:ps-3">
+          <NuxtLink
+            to="/dashboard/admin"
+            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+          >
+            Dashboard
+          </NuxtLink>
+          <!-- logout -->
+          <button
+            @click="useAuth().logout()"
+            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-gray-200 font-medium text-sm text-nowrap text-gray-700 rounded-lg focus:outline-hidden"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
       <!-- Collapse -->
       <div

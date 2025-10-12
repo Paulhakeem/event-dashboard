@@ -1,77 +1,23 @@
 export default function useEventFunctions() {
-  const eventPosters = ref([
-    {
-      url: "/images/poster.jpg",
-      about: "about",
-      title: "Event 1",
-      descrip: "Description for Event 1",
-      Price: 2000,
-      date: "2023-12-25",
-    },
-    {
-      url: "/images/poster1.jpg",
-      about: "about 1",
-      title: "Event 1",
-      descrip: "Description for Event 2",
-      Price: 3000,
-      date: "2023-11-20",
-    },
-    {
-      url: "/images/poster2.jpg",
-      about: "about 2",
-      title: "Event 2",
-      descrip: "Description for Event 3",
-      Price: 4000,
-      date: "2023-10-15",
-    },
-    {
-      url: "/images/poster3.jpg",
-      about: "about 3",
-      title: "Event 3",
-      descrip: "Description for Event 4",
-      Price: 5000,
-      date: "2023-09-10",
-    },
-    {
-      url: "/images/poster4.jpg",
-      about: "about 4",
-      title: "Event 4",
-      descrip: "Description for Event 5",
-      Price: 6000,
-      date: "2023-08-05",
-    },
-    {
-      url: "/images/poster5.jpg",
-      about: "about 5",
-      title: "Event 5",
-      descrip: "Description for Event 6",
-      Price: 7000,
-      date: "2023-07-01",
-    },
-    {
-      url: "/images/poster6.jpg",
-      about: "about 6",
-      title: "Event 6",
-      descrip: "Description for Event 7",
-      Price: 8000,
-      date: "2023-06-25",
-    },
-    {
-      url: "/images/poster7.jpg",
-      about: "about 7",
-      title: "Event 7",
-      descrip: "Description for Event 8",
-      Price: 9000,
-      date: "2023-05-20",
-    },
-    {
-      url: "/images/poster8.jpg",
-      about: "about 8",
-      title: "Event 8",
-      descrip: "Description for Event 8",
-      Price: 500,
-      date: "2023-05-29",
-    },
-  ]);
-  return { eventPosters };
+  const eventPosters = ref([]);
+
+  const pendings = ref(true);
+
+  const errorMessage = ref("");
+
+  onMounted(async () => {
+    try {
+      const res = await $fetch("/api/events");
+      if (res.success) {
+        eventPosters.value = res.events || [];
+        console.log(res);
+      }
+    } catch (error) {
+      errorMessage.value = error.message;
+    } finally {
+      pendings.value = false;
+    }
+  });
+
+  return { eventPosters, pendings, errorMessage };
 }

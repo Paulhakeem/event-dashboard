@@ -40,10 +40,7 @@
               class="relative rounded-md p-3"
             >
               <!-- Show component if provided -->
-              <component
-                v-if="post.component"
-                :is="post.component"
-              />
+              <component v-if="post.component" :is="post.component" />
             </li>
           </ul>
         </TabPanel>
@@ -63,10 +60,6 @@ const categories = ref({
   Events: [
     {
       id: 1,
-      title: "Does drinking coffee make you smarter?",
-      date: "5h ago",
-      commentCount: 5,
-      shareCount: 2,
     },
   ],
   "Create Event": [
@@ -78,10 +71,6 @@ const categories = ref({
   "Popular Events": [
     {
       id: 1,
-      title: "Ask Me Anything: 10 answers to your questions about coffee",
-      date: "2d ago",
-      commentCount: 9,
-      shareCount: 5,
     },
   ],
 });

@@ -1,5 +1,8 @@
 <template>
-  <form @submit.prevent="submitEvent" class="flex flex-wrap items-center justify-center gap-8 w-full">
+  <form
+    @submit.prevent="submitEvent"
+    class="flex flex-wrap items-center justify-center gap-8 w-full"
+  >
     <label
       for="dropzone-file"
       class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500"
@@ -27,7 +30,12 @@
           SVG, PNG, JPG or GIF (MAX. 800x400px)
         </p>
       </div>
-      <input id="dropzone-file" @change="onFileChange" type="file" class="hidden" />
+      <input
+        id="dropzone-file"
+        @change="onFileChange"
+        type="file"
+        class="hidden"
+      />
     </label>
     <div class="w-full md:w-1/2">
       <input
@@ -56,8 +64,8 @@
         type="number"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
-      <button class="w-full bg-[#9c4e8b] text-white p-2 rounded">
-        Create Event
+      <button class="w-full bg-[#9c4e8b] text-white p-2 rounded cursor-pointer" :disabled="isLoading">
+        {{ isLoading ? "Creating..." : "Create Event" }}
       </button>
     </div>
   </form>
@@ -72,6 +80,7 @@ const date = ref("");
 const location = ref("");
 const price = ref(0);
 const image = ref(null);
+const isLoading = ref(false);
 
 const onFileChange = (event) => {
   const file = event.target.files[0];
@@ -81,6 +90,8 @@ const onFileChange = (event) => {
 };
 
 const submitEvent = async () => {
+  if (isLoading.value) return; // Prevent multiple submissions
+  isLoading.value = true;
   const formData = new FormData();
   formData.append("title", title.value);
   formData.append("description", description.value);
@@ -92,7 +103,7 @@ const submitEvent = async () => {
   }
 
   try {
-    const response = await fetch("/api/post", {
+    const response = await $fetch("/api/upload/post", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token.value}`,
@@ -100,21 +111,24 @@ const submitEvent = async () => {
       body: formData,
     });
 
-    if (!response.ok) {
-      alert(data.message || "Failed to upload event");
+    // Assuming the response is already parsed as JSON by $fetch
+    if (!response || response.error) {
+      alert(response.message || "Failed to upload event");
+    } else {
+      alert("Event created successfully!");
+      // Reset form fields
+      title.value = "";
+      description.value = "";
+      date.value = "";
+      location.value = "";
+      price.value = 0;
+      image.value = null;
     }
-
-    const data = await response.json();
-    alert("Event created successfully!");
-    // Reset form fields
-    title.value = "";
-    description.value = "";
-    date.value = "";
-    location.value = "";
-    price.value = 0;
-    image.value = null;
   } catch (error) {
     console.error("Error creating event:", error);
+    alert("An error occurred while creating the event.");
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>

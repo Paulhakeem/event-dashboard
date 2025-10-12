@@ -30,7 +30,18 @@
       </div>
     </header>
     <main>
-      <events-event-page />
+      <!-- skeleton page component -->
+      <!-- check if eventPoster length -->
+       <div v-if="!eventPosters.length" class="flex justify-center items-center mt-10">
+        <skeleton-card/>
+        <skeleton-card/>
+        <skeleton-card/>
+        <skeleton-card/>
+      </div>
+
+
+      <!-- Event Page Component -->
+      <events-event-page v-else />
       <section class="bg-[#020f31]">
         <subscribe />
       </section>
@@ -38,4 +49,6 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const { eventPosters } = EventFunctions();
+</script>

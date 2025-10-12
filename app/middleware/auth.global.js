@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // Logged-in user → block login/signup/home
-  if (user.value && ["/login", "/signup", "/"].includes(to.path)) {
+  if (user.value && ["/login", "/signup"].includes(to.path)) {
     return user.value.role === "admin"
       ? navigateTo("/admin/dashboard")
       : navigateTo("/user/dashboard");

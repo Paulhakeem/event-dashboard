@@ -39,8 +39,28 @@ export default defineEventHandler(async (event) => {
   });
 
   const [fields, files] = await form.parse(event.node.req);
-  const { title, description, location, date, price } = fields;
-  const imagePath = files.image?.[0].filepath?.replace("public", "") || "";
+
+  // Convert all form fields to strings (Formidable returns arrays)
+  const title = String(
+    Array.isArray(fields.title) ? fields.title[0] : fields.title || ""
+  );
+  const description = String(
+    Array.isArray(fields.description)
+      ? fields.description[0]
+      : fields.description || ""
+  );
+  const location = String(
+    Array.isArray(fields.location) ? fields.location[0] : fields.location || ""
+  );
+  const date = String(
+    Array.isArray(fields.date) ? fields.date[0] : fields.date || ""
+  );
+  const price = Number(
+    Array.isArray(fields.price) ? fields.price[0] : fields.price || 0
+  );
+
+  const imagePath =
+    files.image?.[0].filepath?.replace(/\\/g, "/")?.split("public/")[1] || "";
 
   if (!title || !description || !location || !date) {
     throw createError({
@@ -53,6 +73,7 @@ export default defineEventHandler(async (event) => {
     title,
     description,
     location,
+    price,
     date: new Date(date),
     image: imagePath,
     createdBy: user._id,
