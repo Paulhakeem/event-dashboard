@@ -36,34 +36,49 @@
         class="hidden"
         @change="onFileChange"
       />
+      <div v-if="previewImage" class="mt-3">
+        <img
+          :src="previewImage"
+          alt="Preview"
+          class="w-64 h-40 object-cover rounded-lg"
+        />
+      </div>
     </label>
+
     <div class="w-full md:w-1/2">
       <input
-        v-model="title"
+        v-model="form.title"
         placeholder="Event Title"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
       <textarea
-        v-model="description"
+        v-model="form.description"
         rows="4"
         placeholder="Description"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
       <input
-        v-model="date"
+        v-model="form.date"
         type="date"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
       <input
-        v-model="location"
+        v-model="form.location"
         placeholder="Location"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
       <input
-        v-model="price"
+        v-model="form.price"
         type="number"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
+      <div v-if="preview" class="mt-3">
+        <img
+          :src="preview"
+          alt="Preview"
+          class="w-64 h-40 object-cover rounded-lg"
+        />
+      </div>
       <button
         class="w-full bg-[#9c4e8b] text-white p-2 rounded cursor-pointer"
         :disabled="isLoading"
@@ -105,7 +120,7 @@ const uploadToCloudinary = async () => {
   if (!file.value) return null;
   const formData = new FormData();
   formData.append("file", file.value);
-  formData.append("upload_preset", "your_upload_preset");
+  formData.append("upload_preset", config.public.cloundinaryPresetName);
 
   try {
     const response = await fetch(
@@ -142,6 +157,7 @@ const submitEvent = async () => {
       body: JSON.stringify(form),
     });
     alert("Event created successfully!");
+    console.log("Event created:", response);
 
     // Reset form
     form.title = "";
@@ -149,7 +165,6 @@ const submitEvent = async () => {
     form.date = "";
     form.location = "";
     form.price = 0;
-    
   } catch (error) {
     console.error("Error submitting event:", error);
   } finally {
