@@ -32,9 +32,9 @@
       </div>
       <input
         id="dropzone-file"
-        @change="onFileChange"
         type="file"
         class="hidden"
+        @change="onFileChange"
       />
     </label>
     <div class="w-full md:w-1/2">
@@ -64,7 +64,10 @@
         type="number"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
-      <button class="w-full bg-[#9c4e8b] text-white p-2 rounded cursor-pointer" :disabled="isLoading">
+      <button
+        class="w-full bg-[#9c4e8b] text-white p-2 rounded cursor-pointer"
+        :disabled="isLoading"
+      >
         {{ isLoading ? "Creating..." : "Create Event" }}
       </button>
     </div>
@@ -73,60 +76,82 @@
 
 <script setup>
 const { token } = useAuth();
+const config = useRuntimeConfig();
 
-const title = ref("");
-const description = ref("");
-const date = ref("");
-const location = ref("");
-const price = ref(0);
-const image = ref(null);
+const form = reactive({
+  title: "",
+  description: "",
+  date: "",
+  location: "",
+  price: 0,
+  image: null,
+});
+
 const isLoading = ref(false);
+const previewImage = ref(null);
+const file = ref(null);
 
+// when admin selects an image
 const onFileChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    image.value = file;
+  const selectedFile = event.target.files[0];
+  if (selectedFile) {
+    file.value = selectedFile;
+    previewImage.value = URL.createObjectURL(selectedFile);
   }
 };
 
-const submitEvent = async () => {
-  if (isLoading.value) return; // Prevent multiple submissions
-  isLoading.value = true;
+// upload to cloudinary
+const uploadToCloudinary = async () => {
+  if (!file.value) return null;
   const formData = new FormData();
-  formData.append("title", title.value);
-  formData.append("description", description.value);
-  formData.append("date", date.value);
-  formData.append("location", location.value);
-  formData.append("price", price.value);
-  if (image.value) {
-    formData.append("image", image.value);
-  }
+  formData.append("file", file.value);
+  formData.append("upload_preset", "your_upload_preset");
 
   try {
-    const response = await $fetch("/api/upload/post", {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${config.public.cloudinaryCloudName}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    const data = await response.json();
+    return data.secure_url; // return the URL of the uploaded image
+  } catch (error) {
+    console.error("Error uploading to Cloudinary:", error);
+    return null;
+  }
+};
+
+// submit event form
+const submitEvent = async () => {
+  try {
+    isLoading.value = true;
+    const imageUrl = await uploadToCloudinary();
+    if (!imageUrl) {
+      throw new Error("Image upload failed");
+    }
+    form.image = imageUrl;
+
+    const response = await fetch("/api/upload/post", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token.value}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
-      body: formData,
+      body: JSON.stringify(form),
     });
+    alert("Event created successfully!");
 
-    // Assuming the response is already parsed as JSON by $fetch
-    if (!response || response.error) {
-      alert(response.message || "Failed to upload event");
-    } else {
-      alert("Event created successfully!");
-      // Reset form fields
-      title.value = "";
-      description.value = "";
-      date.value = "";
-      location.value = "";
-      price.value = 0;
-      image.value = null;
-    }
+    // Reset form
+    form.title = "";
+    form.description = "";
+    form.date = "";
+    form.location = "";
+    form.price = 0;
+    
   } catch (error) {
-    console.error("Error creating event:", error);
-    alert("An error occurred while creating the event.");
+    console.error("Error submitting event:", error);
   } finally {
     isLoading.value = false;
   }
