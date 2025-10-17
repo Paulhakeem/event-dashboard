@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   // Configure Cloudinary
 
   cloudinary.config({
-    cloud_name: config.public.cloudinaryCloudName,
+    cloud_name: config.cloudinaryCloudName,
     api_key: config.cloudinary.apiKey,
     api_secret: config.cloudinary.apiSecret,
   });

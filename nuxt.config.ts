@@ -13,14 +13,16 @@ export default defineNuxtConfig({
     componentDir: "./app/components/ui",
   },
   runtimeConfig: {
-    cloudinary: {
-      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
-      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
-      cloundinaryPresetName: process.env.CLOUNDINARY_PRESET_NAME,
-    },
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+    cloundinaryPresetName: process.env.CLOUNDINARY_PRESET_NAME,
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     // 🔒 Server-only (safe)
     mongoUrl: process.env.CONNECTION_STR,
     secretStr: process.env.SECRET_STR,
+    public: {
+      // 🌍 Client-available (unsafe)
+      cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    },
   },
 });
