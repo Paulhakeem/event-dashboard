@@ -11,7 +11,6 @@ export const totalEvents = () => {
         },
       });
       events.value = res.events;
-      console.log(res.events);
     } catch (err) {
       window.alert(err);
     } finally {

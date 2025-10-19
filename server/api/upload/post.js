@@ -58,6 +58,12 @@ export default defineEventHandler(async (event) => {
 
   // ☁️ Upload image to Cloudinary
   const imageFile = files.image[0];
+  if (imageFile > 10 * 1024 * 1024) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Image size should be less than 10MB",
+    });
+  }
   const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {
     folder: "events",
     use_filename: true,

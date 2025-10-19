@@ -11,7 +11,6 @@ export const totalUsers = () => {
         },
       });
       users.value = res.users;
-      console.log(res.users);
     } catch (error) {
       window.alert(err);
     }

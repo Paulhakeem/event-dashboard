@@ -5,7 +5,7 @@
     <div
       class="flex flex-wrap justify-center items-center gap-12 md:gap-14 lg:gap-20"
     >
-      <div v-for="event in eventPosters" :key="event" class="text-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+      <div v-for="event in eventPosters" :key="event" class="text-center w-full cursor-pointer sm:w-1/2 md:w-1/3 lg:w-1/4">
         <NuxtImg
           class="rounded-xl size:32 md:size-44 lg:size-72 mx-auto object-cover"
           :src="event.image"

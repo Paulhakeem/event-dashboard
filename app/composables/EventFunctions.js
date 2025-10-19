@@ -10,7 +10,6 @@ export default function useEventFunctions() {
       const res = await $fetch("/api/events");
       if (res.success) {
         eventPosters.value = res.events || [];
-        console.log(res);
       }
     } catch (error) {
       errorMessage.value = error.message;
