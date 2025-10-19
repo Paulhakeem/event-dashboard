@@ -147,8 +147,11 @@ const submitEvent = async () => {
     previewImage.value = null;
     file.value = null;
   } catch (err) {
-    console.error("Error submitting event:", err);
-    alert("❌ " + err.message);
+    const message =
+      err.res?.statusMessage ||
+      err.message ||
+      "Something went wrong while creating the event.  Please try again.";
+    alert("❌ " + message);
   } finally {
     isLoading.value = false;
   }
