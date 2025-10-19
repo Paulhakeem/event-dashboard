@@ -88,7 +88,6 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
 const { token } = useAuth();
 const config = useRuntimeConfig();
 
@@ -114,75 +113,42 @@ const onFileChange = (event) => {
   }
 };
 
-// ✅ Upload image to Cloudinary
-const uploadToCloudinary = async () => {
-  if (!file.value) return null;
-  // get signature from backend
-  const signRes = await $fetch("/api/cloudinary/cloudinary-signature");
-  const { timestamp, signature, apikey } = await signRes.json();
-
-  const formData = new FormData();
-  formData.append("file", file.value);
-  formData.append("apikey", apikey);
-  formData.append("timestamp", timestamp);
-  formData.append("signature", signature);
-  formData.append("upload_preset", config.cloundinaryPresetName);
-
-  try {
-    const res = await $fetch(
-      `https://api.cloudinary.com/v1_1/${config.cloudinaryCloudName}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error.message || "Cloudinary upload failed");
-    }
-
-    return data.secure_url;
-  } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    return null;
-  }
-};
-
 // ✅ Submit event form
 const submitEvent = async () => {
   try {
     isLoading.value = true;
-    const imageUrl = await uploadToCloudinary();
 
-    if (!imageUrl) throw new Error("Image upload failed");
-    form.image = imageUrl;
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("description", form.description);
+    formData.append("date", form.date);
+    formData.append("location", form.location);
+    formData.append("price", form.price);
+    formData.append("image", file.value); // 🖼️ add the file
 
     const res = await $fetch("/api/upload/post", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token._value}`,
       },
-      body: form,
+      body: formData,
     });
 
     alert("✅ Event created successfully!");
-    console.log("Event created:", res);
 
-    // Reset
+    // reset form
     Object.assign(form, {
       title: "",
       description: "",
       date: "",
       location: "",
       price: 0,
-      image: null,
     });
     previewImage.value = null;
     file.value = null;
-  } catch (error) {
-    console.error("Error submitting event:", error);
-    alert("❌ Failed to create event");
+  } catch (err) {
+    console.error("Error submitting event:", err);
+    alert("❌ " + err.message);
   } finally {
     isLoading.value = false;
   }
