@@ -2,7 +2,7 @@ export default function useHeader() {
   const menu =ref( [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "Events", path: "/events" },
+    { name: "Events", path: "/eventPage" },
   ])
   const openMenu = ref(false);
 
