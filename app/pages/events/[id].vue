@@ -13,7 +13,7 @@
 
       <!-- Grid -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-12 items-center justify-center lg:items-center"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-12 items-center lg:items-center"
       >
         <div class="aspect-w-16 aspect-h-9 lg:aspect-none">
           <img
