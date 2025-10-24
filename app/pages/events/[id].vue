@@ -1,6 +1,8 @@
 <template>
   <div class="bg-gray-200 select-none">
-    <div class="max-w-5xl px-4 xl:px-0 lg:pt-10 lg:pb-10 mx-auto">
+    <div
+      class="max-w-5xl px-4 xl:px-0 lg:pt-10 lg:pb-10 mx-auto place-content-center"
+    >
       <!-- Title -->
       <div class="max-w-3xl mb-5 md:pt-10 lg:mb-10">
         <h2
@@ -12,8 +14,9 @@
       <!-- End Title -->
 
       <!-- Grid -->
+      <!-- <div class="flex justify-center items-center"> -->
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-12 items-center lg:items-center"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-12 items-center lg:items-center mx-auto"
       >
         <div class="aspect-w-16 aspect-h-9 lg:aspect-none">
           <img
@@ -158,12 +161,12 @@
             </h4>
             <div class="flex gap-4 items-center">
               <div>
-               <Icon name="flowbite:visa-solid" class="text-5xl"/>
+                <Icon name="flowbite:visa-solid" class="text-5xl" />
               </div>
               <!-- paypal -->
               <div>
-               <Icon name="fontisto:paypal" class="text-3xl"/>
-                </div>
+                <Icon name="fontisto:paypal" class="text-3xl" />
+              </div>
             </div>
           </div>
         </div>
@@ -173,21 +176,10 @@
 </template>
 
 <script setup>
-const route = useRoute();
-const event = ref([]);
+// import booking composable
+import { bookingEvent } from '@/composables/bookingEvent';
 
-// fetch event data based on id
-onMounted(async () => {
-  try {
-    const id = route.params.id;
-    const res = await $fetch(`/api/events/${id}`, {
-      method: "GET",
-      params: { id },
-    });
-    console.log("Fetched event data:", res);
-    event.value = res.eventData;
-  } catch (error) {
-    console.log("Error fetching event data:", error);
-  }
-});
+
+
+const { event } = bookingEvent();
 </script>
