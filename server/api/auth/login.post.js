@@ -35,7 +35,13 @@ export default defineEventHandler(async (event) => {
   }
   // generate a JWT token
   const token = jwt.sign(
-    { id: user._id, role: user.role, email: user.email },
+    {
+      id: user._id,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    },
     config.secretStr,
     { expiresIn: "1d" }
   );
@@ -45,9 +51,12 @@ export default defineEventHandler(async (event) => {
     token,
     user: {
       id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       role: user.role,
-      createdAt: user.joinedAt
+
+      createdAt: user.joinedAt,
     },
   };
 });

@@ -1,23 +1,22 @@
 import { Event } from "../../models/Events.js";
-import { User } from "../../models/User.js";
-
+import {  TotalBooking } from "../../models/totalBooking.js";
 import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
 
   const body = await readBody(event);
-  const { eventId, userId, number } = body;
+  const { phone, eventId } = body; // get both
 
-  //   check if userid, eventid and number are provided
-  if (!eventId || !userId || !number) {
+  // make sure both are provided
+  if (!phone || !eventId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Event ID, User ID and phone number",
+      statusMessage: "Event ID and phone number are required",
     });
   }
 
-  // find the event by id
+  // find the event
   const eventData = await Event.findById(eventId);
   if (!eventData) {
     throw createError({
@@ -25,24 +24,19 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Event not found",
     });
   }
-  // find the user by id
-  const userData = await User.findById(userId);
-  if (!userData) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "User not found",
-    });
-  }
 
-  // save booking info to DB
+  // create booking object
   const booking = {
-    event: eventData._id,
-    user: userData._id,
-    number,
+    eventId: eventData._id,
+    phone,
     bookedAt: new Date(),
   };
-  eventData.bookings.push(booking);
-  await eventData.save();
+
+  // push booking into event
+
+  // save booking to Booking collection
+  const newBooking = new TotalBooking(booking);
+  await newBooking.save();
 
   return { message: "Booking successful", booking };
 });

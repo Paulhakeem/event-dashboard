@@ -105,6 +105,7 @@
 
           <!-- user information eg name and email -->
           <dl class="flex sm:flex-row gap-1">
+            <p>{{ error }}</p>
             <dt class="min-w-40">
               <span class="block text-sm text-gray-500 dark:text-neutral-500"
                 >Name:</span
@@ -115,7 +116,7 @@
                 <li
                   class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
                 >
-                  John Doe
+                  {{ user.firstName }} {{ user.lastName }}
                 </li>
               </ul>
             </dd>
@@ -130,7 +131,7 @@
               <ul>
                 <li
                   class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                ></li>
+                ><span>{{user.email}}</span></li>
               </ul>
             </dd>
           </dl>
@@ -140,6 +141,7 @@
             >Phone Number:</label
           >
           <input
+            v-model="phone"
             type="text"
             placeholder="1234 5678 9012 3456"
             class="mt-1 block w-72 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#9c4e8b] focus:border-[#9c4e8b] sm:text-sm"
@@ -147,9 +149,12 @@
           <!-- button for price tag -->
           <div>
             <button
+              @click="submitBooking"
               class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded cursor-pointer transition"
             >
-              Buy Ticket - ksh{{ event?.price }}
+              {{ loading ? "Processing..." : " Buy Ticket" }} ksh{{
+                event?.price
+              }}
             </button>
           </div>
           <!-- choose different method of payment -->
@@ -176,10 +181,12 @@
 </template>
 
 <script setup>
+import useEventBooking from "~/composables/bookingEvent";
+
 // import booking composable
-import { bookingEvent } from '@/composables/bookingEvent';
+const { event, phone, loading, error, successMessage, submitBooking } =
+  useEventBooking();
 
-
-
-const { event } = bookingEvent();
+  const {user} =useAuth()
+  console.log("user info", event)
 </script>
