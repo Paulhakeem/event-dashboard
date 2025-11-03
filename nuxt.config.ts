@@ -4,13 +4,9 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: ["shadcn-nuxt", "@nuxt/icon", "@nuxt/image", "nuxt-charts"],
+  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts"],
   vite: {
     plugins: [tailwindcss()],
-  },
-  shadcn: {
-    prefix: "",
-    componentDir: "./app/components/ui",
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
