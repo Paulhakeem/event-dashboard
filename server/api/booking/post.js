@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (!phone || !eventId) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Event ID and phone number are required",
+      statusMessage: "Event ID, User ID and phone number are required",
     });
   }
 
@@ -68,19 +68,19 @@ export default defineEventHandler(async (event) => {
       to: userData.email,
       subject: `Booking Confirmed for ${eventData.title}`,
       html: `
-        <h2>Hello ${name},</h2>
-        <p>Thank you for booking <strong>${eventData.title}</strong>!</p>
-        <p>📍 Location: ${eventData.location}</p>
-        <p>📅 Date: ${new Date(eventData.date).toLocaleDateString()}</p>
-        <p>💰 Price: $${eventData.price}</p>
+        <h2>Hello ${userData.firstname} ${userData.lastname},</h2>
+        <p>You have successfully booked <strong>${eventData.title}</strong>!</p>
+        <p><strong>Location:</strong> ${eventData.location}</p>
+        <p><strong>Date:</strong> ${new Date(
+          eventData.date
+        ).toLocaleDateString()}</p>
+        <p><strong>Price:</strong> $${eventData.price}</p>
         <br/>
-        <p>We look forward to seeing you there!</p>
+        <p>Thank you for using Event Dashboard!</p>
       `,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    // Send confirmation to user
-    await transporter.sendMail(confirmationMail);
+    await transporter.sendMail(mailOptions);
   } catch (err) {
     throw createError({
       statusCode: 500,

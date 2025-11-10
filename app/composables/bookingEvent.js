@@ -1,9 +1,8 @@
 export default function useEventBooking() {
-   const {user} =useAuth()
   const route = useRoute();
   const id = route.params.id;
   const event = ref([]);
-  const phone = ref('');
+  const phone = ref("");
 
   const loading = ref(false);
   const error = ref(null);
@@ -29,13 +28,18 @@ export default function useEventBooking() {
       alert("Please enter a valid phone number");
       return;
     }
+    const user = localStorage.getItem("user");
+    if (!user) {
+      alert("You must be logged in to book.");
+      return;
+    }
     try {
       loading.value = true;
       const response = await $fetch("/api/booking/post", {
         method: "POST",
         body: {
           eventId: id,
-          userId: user.id,
+          userId: user,
           phone: phone.value,
         },
       });
