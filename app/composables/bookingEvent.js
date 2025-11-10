@@ -1,4 +1,5 @@
 export default function useEventBooking() {
+   const {user} =useAuth()
   const route = useRoute();
   const id = route.params.id;
   const event = ref([]);
@@ -34,6 +35,7 @@ export default function useEventBooking() {
         method: "POST",
         body: {
           eventId: id,
+          userId: user.id,
           phone: phone.value,
         },
       });

@@ -16,6 +16,10 @@ export default defineNuxtConfig({
     // 🔒 Server-only (safe)
     mongoUrl: process.env.CONNECTION_STR,
     secretStr: process.env.SECRET_STR,
+    // email
+    emailUsername: process.env.EMAIL_USERNAME,
+    emailPass: process.env.EMAIL_PASSWORD,
+    service: process.env.SMTP_SERVICE,
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,

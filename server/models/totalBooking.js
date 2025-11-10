@@ -6,6 +6,11 @@ const totalBookingSchema = new mongoose.Schema(
       ref: "Event",
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     phone: {
       type: Number,
       required: true,
