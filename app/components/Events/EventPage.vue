@@ -1,52 +1,58 @@
 <template>
   <!-- Team -->
   <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
-    <!-- Grid -->
     <div
       class="flex flex-wrap justify-center items-center gap-12 md:gap-14 lg:gap-20"
     >
       <div
         v-for="event in eventPosters"
-        :key="event"
-        class="text-center w-full cursor-pointer sm:w-1/2 md:w-1/3 lg:w-1/4"
+        :key="event._id"
+        class="relative w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer group"
       >
         <NuxtLink :to="`/events/${event._id}`">
+          <!-- IMAGE -->
           <NuxtImg
-            class="rounded-xl size:32 md:size-72 lg:size-72 mx-auto object-cover"
+            class="rounded-xl w-full h-72 object-cover"
             :src="event.image"
             alt="Event Poster"
           />
-          <div class="mt-2 sm:mt-4 text-start">
-            <div class="flex gap-4 justify-between items-center mb-1 sm:mb-2">
-              <p class="text-sm text-gray-500 first-letter:capitalized">
-                📍 {{ event.location }}
-              </p>
-              <div class="text-xs text-gray-600">
-                {{ new Date(event.date).toLocaleDateString() }}
-              </div>
-            </div>
+
+          <!-- OVERLAY CONTENT -->
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent rounded-xl p-4 flex flex-col justify-end opacity-100 transition"
+          >
+            <!-- Title -->
             <h3
-              class="text-sm font-medium text-gray-800 sm:text-base lg:text-lg dark:text-neutral-200 first-letter:capitalize"
+              class="text-white text-lg font-semibold first-letter:capitalize"
             >
               {{ event.title }}
             </h3>
+
+            <!-- Location and Date -->
+            <div class="flex justify-between text-gray-200 text-sm mt-1">
+              <p>📍 {{ event.location }}</p>
+              <p>{{ new Date(event.date).toLocaleDateString() }}</p>
+            </div>
+
+            <!-- Description -->
             <p
-              class="text-xs text-gray-600 sm:text-sm lg:text-base dark:text-neutral-400"
+              class="text-gray-300 text-xs mt-1 first-letter:capitalize line-clamp-2"
             >
               {{ event.description }}
             </p>
+
+            <!-- BUTTON -->
             <button
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded cursor-pointer transition"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full"
             >
-              Buy Ticket - ksh{{ event.price }}
+              Buy Ticket - Ksh {{ event.price }}
             </button>
           </div>
         </NuxtLink>
       </div>
-      <!-- End Col -->
     </div>
-    <!-- End Grid -->
   </div>
+
   <!-- End Team -->
 </template>
 <script setup>
