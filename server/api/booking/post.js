@@ -66,9 +66,9 @@ export default defineEventHandler(async (event) => {
     const mailOptions = {
       from: `"Event Dashboard" <${config.emailUsername}>`,
       to: userData.email,
-      subject: `Booking Confirmed for ${eventData.title}`,
+      subject: `Booking Confirmed for ${eventData.title}🤗`,
       html: `
-        <h2>Hello ${userData.firstname} ${userData.lastname},</h2>
+        <h2>Hello</h2>
         <p>You have successfully booked <strong>${eventData.title}</strong>!</p>
         <p><strong>Location:</strong> ${eventData.location}</p>
         <p><strong>Date:</strong> ${new Date(
@@ -76,7 +76,7 @@ export default defineEventHandler(async (event) => {
         ).toLocaleDateString()}</p>
         <p><strong>Price:</strong> $${eventData.price}</p>
         <br/>
-        <p>Thank you for using Event Dashboard!</p>
+        <p>Thank you for booking with us🙏!</p>
       `,
     };
 

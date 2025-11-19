@@ -1,4 +1,5 @@
 export default function useEventBooking() {
+  const {user} = useAuth();
   const route = useRoute();
   const id = route.params.id;
   const event = ref([]);
@@ -28,7 +29,7 @@ export default function useEventBooking() {
       alert("Please enter a valid phone number");
       return;
     }
-    const user = localStorage.getItem("user");
+   
     if (!user) {
       alert("You must be logged in to book.");
       return;
@@ -39,7 +40,7 @@ export default function useEventBooking() {
         method: "POST",
         body: {
           eventId: id,
-          userId: user,
+          userId: user.value.id,
           phone: phone.value,
         },
       });
