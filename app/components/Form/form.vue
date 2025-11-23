@@ -1,69 +1,79 @@
 <template>
-  <div class="relative bg-white">
-    <!-- Card -->
+  <div class="w-full flex justify-center px-4 sm:px-6 lg:px-8 py-10">
     <div
-      class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 dark:border-neutral-700"
+      class="w-full max-w-md bg-white border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
     >
-      <p>
+      <!-- Sign Up Link -->
+      <p class="text-center mb-4">
         <NuxtLink
           to="/signup"
-          class="text-sm text-[#9c4e8b] underline cursor-pointer"
-          >Don't have an account? Sign up</NuxtLink
+          class="text-sm text-[#9c4e8b] underline hover:text-[#7c3a6d]"
         >
+          Don't have an account? Sign up
+        </NuxtLink>
       </p>
-      <form>
-        <p class="text-red-500 text-sm italic">{{ errorMessage }}</p>
-        <div class="mt-6 grid gap-4 lg:gap-6">
-          <div>
-            <label
-              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >Email</label
-            >
-            <input
-              v-model="email"
-              type="email"
-              autocomplete="email"
-              class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            />
-          </div>
-          <!-- End Grid -->
 
-          <div>
-            <label
-              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >Password</label
-            >
-            <input
-              v-model="password"
-              type="password"
-              class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            />
-          </div>
+      <form class="space-y-5">
+        <!-- Error Message -->
+        <p v-if="errorMessage" class="text-red-500 text-sm italic">
+          {{ errorMessage }}
+        </p>
+
+        <!-- Email -->
+        <div>
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
+            Email
+          </label>
+          <input
+            v-model="email"
+            type="email"
+            autocomplete="email"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+          />
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
+            Password
+          </label>
+          <input
+            v-model="password"
+            type="password"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+          />
+        </div>
+
+        <!-- Role Dropdown -->
+        <div>
+          <select
+            v-model="role"
+            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300"
+          >
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <!-- Login Button -->
+        <div>
+          <button
+            @click="login"
+            type="submit"
+            class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
+          >
+            {{ isLoading ? "Logging In..." : "Log In" }}
+          </button>
         </div>
       </form>
-      <!-- End Grid -->
-
-      <!-- Checkbox -->
-      <select v-model="role" class="mt-4 p-2 border border-gray-300 rounded-lg">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-      <!-- End Checkbox -->
-
-      <div class="mt-6 grid">
-        <button
-          @click="login"
-          type="submit"
-          class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {{ isLoading ? "Logging In..." : "Log In" }}
-        </button>
-      </div>
     </div>
-    <!-- End Card -->
   </div>
-  <!-- End Col -->
 </template>
+
 
 <script setup>
 const email = ref("");

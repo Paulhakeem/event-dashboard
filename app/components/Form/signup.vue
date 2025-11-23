@@ -1,97 +1,102 @@
 <template>
-  <div class="relative bg-white">
-    <!-- Card -->
-    <div
-      class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 dark:border-neutral-700"
-    >
-      <p>
-        <NuxtLink
-          to="/login"
-          class="text-sm text-[#9c4e8b] underline cursor-pointer"
-          >Have an account? Login</NuxtLink
-        >
-      </p>
-      <form>
-        <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
-        <div class="mt-6 grid gap-4 lg:gap-6">
-          <!-- Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-            <div>
-              <label
-                for="hs-firstname-hire-us-1"
-                class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-                >First Name</label
-              >
-              <input
-                v-model="firstName"
-                type="text"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              />
-            </div>
+  <div class="relative bg-white px-4 py-8 sm:px-6 lg:px-8">
+  <!-- Card -->
+  <div
+    class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 max-w-xl mx-auto w-full dark:border-neutral-700"
+  >
+    <p class="text-center sm:text-left">
+      <NuxtLink
+        to="/login"
+        class="text-sm text-[#9c4e8b] underline cursor-pointer"
+        >Have an account? Login</NuxtLink
+      >
+    </p>
 
-            <div>
-              <label
-                for="hs-lastname-hire-us-1"
-                class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-                >Last Name</label
-              >
-              <input
-                v-model="lastName"
-                type="text"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              />
-            </div>
-          </div>
-          <!-- End Grid -->
+    <form class="w-full">
+      <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
 
+      <div class="mt-6 grid gap-4 lg:gap-6">
+        
+        <!-- Two-column grid on larger screens -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
           <div>
             <label
+              for="firstname"
               class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >Email</label
+              >First Name</label
             >
             <input
-              v-model="email"
-              type="email"
-              autocomplete="email"
-              class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+              v-model="firstName"
+              id="firstname"
+              type="text"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
-          <!-- End Grid -->
 
           <div>
             <label
+              for="lastname"
               class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >Password</label
+              >Last Name</label
             >
             <input
-              v-model="password"
-              type="password"
-              class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg outline-1 sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+              v-model="lastName"
+              id="lastname"
+              type="text"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
         </div>
-      </form>
-      <!-- End Grid -->
 
-      <!-- Checkbox -->
-      <select v-model="role">
-        <option value="user">User</option>
-        <option value="admin">Admin</option>
-      </select>
-      <!-- End Checkbox -->
+        <div>
+          <label
+            class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+            >Email</label
+          >
+          <input
+            v-model="email"
+            type="email"
+            autocomplete="email"
+            class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+          />
+        </div>
 
-      <div class="mt-6 grid">
-        <button
-          @click="signup"
-          type="submit"
-          class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {{ isLoading ? "Signing Up..." : "Sign Up" }}
-        </button>
+        <div>
+          <label
+            class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+            >Password</label
+          >
+          <input
+            v-model="password"
+            type="password"
+            class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+          />
+        </div>
       </div>
+    </form>
+
+    <!-- Role Dropdown -->
+    <select
+      v-model="role"
+      class="mt-6 p-2 border border-gray-300 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 w-full"
+    >
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <!-- Submit button -->
+    <div class="mt-6 grid">
+      <button
+        @click="signup"
+        type="submit"
+        class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
+      >
+        {{ isLoading ? "Signing Up..." : "Sign Up" }}
+      </button>
     </div>
-    <!-- End Card -->
   </div>
+</div>
+
   <!-- End Col -->
 </template>
 
