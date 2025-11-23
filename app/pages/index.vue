@@ -1,34 +1,41 @@
 <template>
   <div>
-    <header>
-      <!-- background image -->
+<header>
+  <!-- Hero Section -->
+  <div
+    class="relative w-full h-[380px] sm:h-[450px] md:h-[520px] lg:h-[600px] bg-cover bg-center flex items-center px-4"
+    style="background-image: url('/images/event-bg.jpg')"
+  >
+    <!-- Dark overlay for readability -->
+    <div class="absolute inset-0 bg-black/40"></div>
 
-      <div
-        class="relative h-[400px] bg-cover bg-center flex items-center justify-center md:justify-start lg:justify-start px-4"
-        style="background-image: url('/images/event-bg.jpg')"
+    <!-- Content -->
+    <div
+      class="relative z-10 max-w-xl text-center md:text-left space-y-4 md:space-y-6"
+    >
+      <h1
+        class="signature-glow text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight"
       >
-        <!-- Centered sidebar-main -->
-        <div
-          class="md:pl-8 lg:pl-10 md:pt-8 lg:pt-10 text-center md:text-left lg:text-left"
-        >
-          <h1 class="text-white text-4xl md:text-5xl lg:text-5xl font-semibold">
-            DJ <span class="text-[#9c4e8b] font-bold">KIDD</span>
-          </h1>
-          <p
-            class="text-gray-200 pt-4 pb-6 w-[300px] md:w-[500px] lg:w-[600px]"
-          >
-            Organize, track, and engage with your event attendees all in one
-            place. Create and manage events seamlessly with our intuitive
-            dashboard.
-          </p>
-          <button
-            class="ml-auto rounded-md bg-[#9c4e8b] px-3 py-2 items-center text-white cursor-pointer mt-4 hover:bg-blue-700"
-          >
-            Create Event
-          </button>
-        </div>
-      </div>
-    </header>
+        DJ <span class="text-[#9c4e8b] font-bold">KIDD</span>
+      </h1>
+
+      <p style="font-family: 'Poppins', sans-serif;"
+        class="text-gray-200 text-sm font-light sm:text-base md:text-lg lg:text-xl max-w-[90%] mx-auto md:mx-0"
+      >
+        Organize, track, and engage with your event attendees all in one
+        place. Create and manage events seamlessly with our intuitive
+        dashboard.
+      </p>
+
+      <button
+        class="rounded-md bg-[#9c4e8b] px-5 py-3 text-white text-sm sm:text-base font-medium transition hover:bg-[#803c72] cursor-pointer"
+      >
+        Create Event
+      </button>
+    </div>
+  </div>
+</header>
+
     <main>
       <!-- skeleton page component -->
       <!-- check if eventPoster length -->

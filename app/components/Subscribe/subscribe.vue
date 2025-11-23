@@ -1,46 +1,72 @@
 <template>
   <!-- Subscribe -->
   <div class="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-8 lg:py-16 mx-auto">
-    <div class="grid md:grid-cols-2 gap-8">
-      <div class="max-w-md">
-        <h2
-          class="text-2xl font-bold text-gray-200 dark:text-white sm:text-3xl"
-        >
-          Subscribe
-        </h2>
-        <p class="mt-3 text-gray-200 dark:text-neutral-400">
-          Subscribe and start making the most of every engagement.
+    <div class="grid gap-10 md:grid-cols-2 md:items-center">
+      <!-- Left Text -->
+      <div class="text-center md:text-left">
+        <h2 class="text-3xl sm:text-4xl font-bold text-gray-200">Subscribe</h2>
+        <p class="mt-3 text-gray-300">
+          Stay updated with the latest events and exclusive offers. Join our
+          mailing list today!
         </p>
       </div>
 
-      <form>
-        <div class="w-full sm:max-w-lg md:ms-auto">
-          <div class="flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
-            <div class="w-full">
-              <label for="hero-input" class="sr-only">Search</label>
-              <input
-                type="text"
-                id="hero-input"
-                name="hero-input"
-                class="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg text-gray-200 sm:text-sm outline-2"
-                placeholder="Enter your email"
-              />
-            </div>
-            <NuxtLink
-              to="#"
-              class="w-full sm:w-auto whitespace-nowrap py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white"
+      <!-- Form Section -->
+      <form class="w-full">
+        <div class="w-full sm:max-w-lg md:ml-auto">
+          <!-- Input + Button -->
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <input
+              type="email"
+              v-model="email"
+              name="hero-input"
+              class="py-3 px-4 w-full rounded-lg bg-[#1a1a1a] border border-gray-700 text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-[#9c4e8b] outline-none"
+              placeholder="Enter your email"
+            />
+
+            <button
+              @click.prevent="handleSubscribe"
+              class="w-full sm:w-auto py-3 px-6 text-center inline-flex justify-center items-center text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#843f75] transition"
             >
               Subscribe
-            </NuxtLink>
+            </button>
           </div>
-          <p class="mt-3 text-sm text-gray-200 dark:text-neutral-500">
-            No spam, unsubscribe at any time
+          <p v-if="error" class="mt-2 text-sm text-red-500">{{ error }}</p>
+
+          <p v-if="success" class="mt-2 text-sm text-green-400">
+            Successfully subscribed!
+          </p>
+          <p class="mt-3 text-sm text-gray-400">
+            No spam, unsubscribe at any time.
           </p>
         </div>
       </form>
     </div>
   </div>
+
   <!-- End Subscribe -->
 </template>
 
-<script setup></script>
+<script setup>
+const email = ref("");
+const error = ref("");
+const success = ref("");
+
+const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(String(email).toLowerCase());
+};
+const handleSubscribe = () => {
+  error.value = "";
+  success.value = "";
+
+  if (!validateEmail(email.value)) {
+    error.value = "Please enter a valid email address.";
+    return;
+  }
+
+  // Simulate successful subscription
+  success.value = "Thank you for subscribing!";
+  email.value = "";
+};
+</script>
