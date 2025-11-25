@@ -1,7 +1,7 @@
 <template>
-  <div class="w-full flex justify-center px-4 sm:px-6 lg:px-8 py-10">
+  <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900">
     <div
-      class="w-full max-w-md bg-white border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-8 shadow-sm dark:border-neutral-700 dark:bg-neutral-900"
+      class="w-full max-w-md bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl p-6 sm:p-8 shadow"
     >
       <!-- Sign Up Link -->
       <p class="text-center mb-4">
@@ -13,7 +13,7 @@
         </NuxtLink>
       </p>
 
-      <form class="space-y-5">
+      <form class="space-y-5" @submit.prevent="login">
         <!-- Error Message -->
         <p v-if="errorMessage" class="text-red-500 text-sm italic">
           {{ errorMessage }}
@@ -21,38 +21,43 @@
 
         <!-- Email -->
         <div>
-          <label
-            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
-          >
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
             Email
           </label>
           <input
             v-model="email"
             type="email"
+            required
             autocomplete="email"
-            class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 
+            rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b]
+            dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
         </div>
 
         <!-- Password -->
         <div>
-          <label
-            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
-          >
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
             Password
           </label>
           <input
             v-model="password"
             type="password"
-            class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            required
+            autocomplete="current-password"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 
+            rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b]
+            dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
         </div>
 
-        <!-- Role Dropdown -->
+        <!-- Role -->
         <div>
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Role</label>
           <select
             v-model="role"
-            class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 
+            rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
           >
             <option value="user">User</option>
             <option value="admin">Admin</option>
@@ -60,32 +65,37 @@
         </div>
 
         <!-- Login Button -->
-        <div>
-          <button
-            @click="login"
-            type="submit"
-            class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
-          >
-            {{ isLoading ? "Logging In..." : "Log In" }}
-          </button>
-        </div>
+        <button
+          type="submit"
+          :disabled="isLoading"
+          class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold 
+          rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
+        >
+          {{ isLoading ? "Logging In..." : "Log In" }}
+        </button>
       </form>
     </div>
   </div>
 </template>
 
 
+
 <script setup>
+import { ref } from "vue";
+
 const email = ref("");
 const password = ref("");
-const role = ref("user" || "admin");
-const { setAuth } = useAuth();
+const role = ref("user"); // default selection
 const isLoading = ref(false);
 const errorMessage = ref("");
 
+const { setAuth } = useAuth();
+
 const login = async () => {
+  errorMessage.value = "";
+  isLoading.value = true;
+
   try {
-    isLoading.value = true;
     const data = await $fetch("/api/auth/login", {
       method: "POST",
       body: {
@@ -94,17 +104,23 @@ const login = async () => {
         role: role.value,
       },
     });
+
     setAuth(data);
+
     if (data.user.role === "admin") {
       navigateTo("/admin/dashboard");
     } else {
       navigateTo("/user/dashboard");
     }
+
   } catch (error) {
     errorMessage.value =
-      error.data?.message || "Login failed. Please check your credentials.";
+      error?.data?.statusMessage ||
+      error?.data?.message ||
+      "Login failed. Please check your credentials.";
   } finally {
     isLoading.value = false;
   }
 };
 </script>
+
