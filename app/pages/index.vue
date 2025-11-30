@@ -3,7 +3,7 @@
 <header>
   <!-- Hero Section -->
   <div
-    class="relative w-full h-[380px] sm:h-[450px] md:h-[520px] lg:h-[600px] bg-cover bg-center flex items-center px-4"
+    class="relative w-full h-[380px] sm:h-[450px] md:h-[520px] lg:h-[600px] xl:md 2xl:lg bg-cover bg-center flex items-center px-4"
     style="background-image: url('/images/event-bg.jpg')"
   >
     <!-- Dark overlay for readability -->
