@@ -30,20 +30,21 @@
         </div>
 
         <!-- Sidebar Links -->
-        <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+
+        <!-- Sidebar Links -->
+        <nav
+          v-for="item in userSidebarMenu"
+          :key="item.id"
+          @click="itemSelected(item)"
+          class="p-2"
+        >
           <a
             href="#"
             class="flex items-center gap-3 p-3 rounded-lg text-gray-800 bg-gray-100 dark:bg-neutral-700 dark:text-white"
           >
-            <Icon name="ic:baseline-home" class="size-6" /> Dashboard
+            <Icon :name="item.icon" class="w-14" />
+            {{ item.name }}
           </a>
-
-          <button
-            class="flex items-center w-full text-left gap-3 p-3 rounded-lg text-gray-800 hover:bg-gray-100 dark:hover:bg-neutral-700 dark:text-neutral-200"
-          >
-            <Icon name="ic:baseline-account-circle" class="size-6" />
-            Account
-          </button>
         </nav>
       </div>
     </div>
@@ -56,13 +57,18 @@
     ></div>
 
     <!-- Page Content -->
-    <div class="lg:ml-64 px-4 sm:px-6 md:px-8 py-6">
-      <h1 class="text-2xl font-bold dark:text-white">User Dashboard Content</h1>
-    </div>
+    <component :is="currentComponent" />
   </div>
 </template>
 
 <script setup>
+const { userSidebarMenu } = userDashboardBar();
 import { ref } from "vue";
 const openSidebar = ref(false);
+
+const currentComponent = ref(userSidebarMenu[0].component);
+function itemSelected(menu) {
+  currentComponent.value = menu.component;
+  openSidebar.value = false; // Close sidebar on mobile after selection
+}
 </script>

@@ -1,8 +1,10 @@
+import Home from "~/components/User/Home.vue";
+import Profile from "~/components/User/Profile.vue";
+
 export const userDashboardBar = () => {
   const userSidebarMenu = [
-    { name: "Dashboard", icon: "material-symbols:home-outline-rounded" },
-    { name: "Profile", icon: "material-symbols:person-outline-rounded" },
-    { name: "Settings", icon: "material-symbols:settings-outline-rounded" },
+    { name: "Dashboard", icon: "material-symbols:home-outline-rounded", component: Home },
+    { name: "Profile", icon: "material-symbols:person-outline-rounded", component: Profile },
   ];
     return { userSidebarMenu };
 };
