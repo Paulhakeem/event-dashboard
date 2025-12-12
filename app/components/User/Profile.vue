@@ -6,7 +6,7 @@
       <!-- User Photo -->
       <div class="relative">
         <img
-          :src="user.photo"
+          src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80"
           alt="User Profile"
           class="w-32 h-32 rounded-full object-cover border-4 border-gray-300 dark:border-neutral-600"
         />
@@ -14,7 +14,7 @@
 
       <!-- Name -->
       <h2 class="mt-4 text-xl font-semibold text-gray-800 dark:text-white">
-        {{ user.name }}
+        {{ user.firstName }} {{ user.lastName }}
       </h2>
 
       <!-- Email -->
@@ -52,12 +52,7 @@
 </template>
 
 <script setup>
-const user = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  photo:
-    "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80",
-};
+const { user } = useAuth();
 
 const editProfile = () => {};
 </script>
