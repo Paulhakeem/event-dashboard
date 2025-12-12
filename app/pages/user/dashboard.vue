@@ -38,13 +38,17 @@
           @click="itemSelected(item)"
           class="p-2"
         >
-          <a
-            href="#"
-            class="flex items-center gap-3 p-3 rounded-lg text-gray-800 bg-gray-100 dark:bg-neutral-700 dark:text-white"
+          <NuxtLink
+            class="flex items-center gap-3 p-3 rounded-lg text-gray-800 cursor-pointer"
+            :class="
+              currentComponent === item.component
+                ? 'bg-gray-500'
+                : 'bg-gray-100'
+            "
           >
             <Icon :name="item.icon" class="w-14" />
             {{ item.name }}
-          </a>
+          </NuxtLink>
         </nav>
       </div>
     </div>
