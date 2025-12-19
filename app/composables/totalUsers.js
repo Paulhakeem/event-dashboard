@@ -12,7 +12,7 @@ export const totalUsers = () => {
       });
       users.value = res.users;
     } catch (error) {
-      window.alert(err);
+      window.alert(error.message);
     }
   });
   return { users };

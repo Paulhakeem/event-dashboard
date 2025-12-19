@@ -30,13 +30,15 @@
       </button>
 
       <!-- Profile-->
-
-      <div class="hs-dropdown [--placement:bottom-right] relative inline-flex items-center gap-2">
+      <div
+        class="hs-dropdown [--placement:bottom-right] relative inline-flex items-center gap-2 cursor-pointer"
+      >
         <p>{{ user.firstName }} {{ user.lastName }}</p>
         <button
+        @click="openProfile"
           id="hs-dropdown-account"
           type="button"
-          class="size-9.5 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:text-white"
+          class="cursor-pointer size-9.5 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:text-white"
           aria-haspopup="menu"
           aria-expanded="false"
           aria-label="Dropdown"
@@ -50,9 +52,29 @@
       </div>
       <!-- End Dropdown -->
     </div>
+
+    <transition name="fade">
+    <div
+     v-if="profile"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50"
+    >
+      <Admin />
+    </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
 const { user } = useAuth();
+const { profile, openProfile } = useAdminMenu();
+
 </script>
+
+<style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>

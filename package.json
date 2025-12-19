@@ -36,6 +36,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@iconify-json/material-symbols": "^1.2.50",
     "@iconify-json/meteor-icons": "^1.2.1",
     "@types/node": "^24.5.2",
     "oxc-parser": "^0.96.0",
