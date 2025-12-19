@@ -42,11 +42,27 @@
             </p>
 
             <!-- BUTTON -->
-            <button
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full"
-            >
-              Buy Ticket - Ksh {{ event.price }}
-            </button>
+            <div class="flex gap-4 items-center text-center">
+              <div
+                class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full"
+              >
+                <p>Regular</p>
+                {{ event.regular }}/-
+              </div>
+              <div
+                class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full"
+              >
+                <p>VIP</p>
+
+                {{ event.vip }}/-
+              </div>
+              <div
+                class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full"
+              >
+                <p>VVIP</p>
+                {{ event.vvip }}/-
+              </div>
+            </div>
           </div>
         </NuxtLink>
       </div>

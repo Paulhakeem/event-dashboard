@@ -47,7 +47,9 @@ export default defineEventHandler(async (event) => {
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
-  const price = Number(fields.price?.[0] || 0);
+  const regular = Number(fields.regular?.[0] || 0);
+  const vip = Number(fields.vip?.[0] || 0);
+  const vvip = Number(fields.vvip?.[0] || 0);
 
   if (!title || !description || !location || !date || !files.image?.[0]) {
     throw createError({
@@ -79,7 +81,9 @@ export default defineEventHandler(async (event) => {
     description,
     location,
     date: new Date(date),
-    price,
+    regular,
+    vip,
+    vvip,
     image: uploadResult.secure_url, // cloudinary URL
     createdBy: user._id,
   });

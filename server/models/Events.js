@@ -6,7 +6,9 @@ const eventSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   location: { type: String, required: true },
   image: { type: String },
-  price: { type: Number, default: 0 },
+  regular: { type: Number, default: 0 },
+  vip: { type: Number, default: 0 },
+  vvip: { type: Number, default: 0 },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -15,4 +17,5 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export const Event = mongoose.models.Event || mongoose.model("Event", eventSchema);
+export const Event =
+  mongoose.models.Event || mongoose.model("Event", eventSchema);

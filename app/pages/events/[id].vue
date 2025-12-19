@@ -131,7 +131,9 @@
               <ul>
                 <li
                   class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                ><span>{{user.email}}</span></li>
+                >
+                  <span>{{ user.email }}</span>
+                </li>
               </ul>
             </dd>
           </dl>
@@ -147,15 +149,30 @@
             class="mt-1 block w-72 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#9c4e8b] focus:border-[#9c4e8b] sm:text-sm"
           />
           <!-- button for price tag -->
-          <div>
-            <button
+          <p class="text-lg font-semibold">{{ loading ? "Processing..." : " Buy Ticket" }}</p>
+          <div class="flex gap-4 items-center text-center">
+            <div
               @click="submitBooking"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded cursor-pointer transition"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
             >
-              {{ loading ? "Processing..." : " Buy Ticket" }} ksh{{
-                event?.price
-              }}
-            </button>
+              <p>Regular</p>
+              {{ event?.regular }}/-
+            </div>
+            <div
+              @click="submitBooking"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
+            >
+              <p>VIP</p>
+
+              {{ event?.vip }}/-
+            </div>
+            <div
+              @click="submitBooking"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
+            >
+              <p>VVIP</p>
+              {{ event?.vvip }}/-
+            </div>
           </div>
           <!-- choose different method of payment -->
           <div class="mt-6">
@@ -187,6 +204,6 @@ import useEventBooking from "~/composables/bookingEvent";
 const { event, phone, loading, error, successMessage, submitBooking } =
   useEventBooking();
 
-  const {user} =useAuth()
-  console.log("user info", event)
+const { user } = useAuth();
+console.log("user info", event);
 </script>

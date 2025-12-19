@@ -1,8 +1,6 @@
 <template>
   <!-- component -->
-
   <div
-    v-if="user.role == 'admin'"
     class="h-screen flex flex-wrap items-center justify-center w-full"
   >
     <div

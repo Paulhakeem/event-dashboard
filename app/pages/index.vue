@@ -4,7 +4,7 @@
   <!-- Hero Section -->
   <div
     class="relative w-full h-[380px] sm:h-[450px] md:h-[520px] lg:h-[600px] xl:md 2xl:lg bg-cover bg-center flex items-center px-4"
-    style="background-image: url('/images/event-bg.jpg')"
+    style="background-image: url('/images/dj.jpg')"
   >
     <!-- Dark overlay for readability -->
     <div class="absolute inset-0 bg-black/40"></div>
@@ -16,7 +16,7 @@
       <h1
         class="signature-glow text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight"
       >
-        DJ <span class="text-[#9c4e8b] font-bold">KIDD</span>
+        Let's <span class="text-[#9c4e8b] font-bold">Book</span>
       </h1>
 
       <p style="font-family: 'Poppins', sans-serif;"

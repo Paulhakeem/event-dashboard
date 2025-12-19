@@ -70,12 +70,36 @@
         placeholder="Location"
         class="w-full mb-3 border p-2 rounded bg-white"
       />
-      <input
-        v-model="form.price"
-        type="number"
-        placeholder="Price"
-        class="w-full mb-3 border p-2 rounded bg-white"
-      />
+      <!-- prices -->
+      <div class="flex gap-4 mb-4">
+      <div>
+        <label class="block mb-1 font-medium">Regular(Ksh)</label>
+        <input
+          v-model.number="form.regular"
+          type="number"
+          min="0"
+          placeholder="Regular Price"
+          class="w-full border p-2 rounded bg-white">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">VIP(Ksh)</label>
+        <input
+          v-model.number="form.vip"
+          type="number"
+          min="0"
+          placeholder="Regular Price"
+          class="w-full border p-2 rounded bg-white">
+      </div>
+      <div>
+        <label class="block mb-1 font-medium">VVIP(Ksh)</label>
+        <input
+          v-model.number="form.vvip"
+          type="number"
+          min="0"
+          placeholder="Regular Price"
+          class="w-full border p-2 rounded bg-white">
+      </div>
+      </div>
 
       <button
         class="w-full bg-[#9c4e8b] text-white p-2 rounded cursor-pointer"
@@ -96,7 +120,9 @@ const form = reactive({
   description: "",
   date: "",
   location: "",
-  price: 0,
+  regular : "",
+  vip: "",
+  vvip: "",
   image: null,
 });
 
@@ -123,7 +149,9 @@ const submitEvent = async () => {
     formData.append("description", form.description);
     formData.append("date", form.date);
     formData.append("location", form.location);
-    formData.append("price", form.price);
+    formData.append("regular", form.regular);
+    formData.append("vip", form.vip);
+    formData.append("vvip", form.vvip);
     formData.append("image", file.value); // 🖼️ add the file
 
     const res = await $fetch("/api/upload/post", {
@@ -142,7 +170,9 @@ const submitEvent = async () => {
       description: "",
       date: "",
       location: "",
-      price: 0,
+      regular: 0,
+      vip: 0,
+      vvip: 0,
     });
     previewImage.value = null;
     file.value = null;

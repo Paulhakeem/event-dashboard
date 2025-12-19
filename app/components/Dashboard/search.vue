@@ -35,7 +35,7 @@
       >
         <p>{{ user.firstName }} {{ user.lastName }}</p>
         <button
-        @click="openProfile"
+          @click="openProfile"
           id="hs-dropdown-account"
           type="button"
           class="cursor-pointer size-9.5 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:text-white"
@@ -54,12 +54,25 @@
     </div>
 
     <transition name="fade">
-    <div
-     v-if="profile"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-50"
-    >
-      <Admin />
-    </div>
+      <div
+        v-if="profile"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        @click.self="profile = false"
+      >
+        <!-- Modal Content -->
+        <div class="relative w-full">
+          <!-- Close button -->
+          <button
+            @click="profile = false"
+            class="absolute top-3 right-3 bg-white rounded-full p-1.2 items-center flex hover:text-gray-800 cursor-pointer"
+          >
+            <Icon name="material-symbols:close" class="text-2xl" />
+            <span class="sr-only">Close modal</span>
+          </button>
+
+          <Admin />
+        </div>
+      </div>
     </transition>
   </div>
 </template>
@@ -67,14 +80,15 @@
 <script setup>
 const { user } = useAuth();
 const { profile, openProfile } = useAdminMenu();
-
 </script>
 
 <style scoped>
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s ease;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
 }
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>
