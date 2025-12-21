@@ -35,7 +35,7 @@
         <div class="mt-4 flex justify-between px-8">
           <div class="text-gray-200 border bg-[#9c4e8b] px-5 py-2 rounded">
             <p>Phone No:</p>
-            <span class="font-semibold"> +254 712345678 </span>
+            <span class="font-semibold"> {{ user.adminNumber }}</span>
           </div>
           <div class="text-gray-200 border bg-[#9c4e8b] px-5 py-2 rounded">
             <p>Total Event Booked</p>

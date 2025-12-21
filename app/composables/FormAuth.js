@@ -5,6 +5,7 @@ export default function useFormAuth() {
   const password = ref("");
   const isLoading = ref(false);
   const errorMessage = ref("");
+  const adminNumber = ref(0);
   const role = ref("user" || "admin");
   const { setAuth, fetchUser } = useAuth();
 
@@ -43,6 +44,7 @@ export default function useFormAuth() {
           lastName: lastName.value,
           email: email.value,
           password: password.value,
+          adminNumber: adminNumber.value,
           role: role.value,
         }),
       });
@@ -68,6 +70,7 @@ export default function useFormAuth() {
       email.value = "";
       password.value = "";
       isLoading.value = false;
+      adminNumber.value = "";
       return data;
     } catch (error) {
       errorMessage.value = error.message;
@@ -82,6 +85,7 @@ export default function useFormAuth() {
     isLoading,
     errorMessage,
     validateEmail,
+    adminNumber,
     role,
     signup,
   };

@@ -1,106 +1,127 @@
 <template>
   <div class="relative bg-white px-4 py-8 sm:px-6 lg:px-8">
-  <!-- Card -->
-  <div
-    class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 max-w-xl mx-auto w-full dark:border-neutral-700"
-  >
-    <p class="text-center sm:text-left">
-      <NuxtLink
-        to="/login"
-        class="text-sm text-[#9c4e8b] underline cursor-pointer"
-        >Have an account? Login</NuxtLink
-      >
-    </p>
-
-    <form class="w-full">
-      <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
-
-      <div class="mt-6 grid gap-4 lg:gap-6">
-        
-        <!-- Two-column grid on larger screens -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-          <div>
-            <label
-              for="firstname"
-              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >First Name</label
-            >
-            <input
-              v-model="firstName"
-              id="firstname"
-              type="text"
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
-            />
-          </div>
-
-          <div>
-            <label
-              for="lastname"
-              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-              >Last Name</label
-            >
-            <input
-              v-model="lastName"
-              id="lastname"
-              type="text"
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label
-            class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-            >Email</label
-          >
-          <input
-            v-model="email"
-            type="email"
-            autocomplete="email"
-            class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
-          />
-        </div>
-
-        <div>
-          <label
-            class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-            >Password</label
-          >
-          <input
-            v-model="password"
-            type="password"
-            class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
-          />
-        </div>
-      </div>
-    </form>
-
-    <!-- Role Dropdown -->
-    <select
-      v-model="role"
-      class="mt-6 p-2 border border-gray-300 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 w-full"
+    <!-- Card -->
+    <div
+      class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 max-w-xl mx-auto w-full dark:border-neutral-700"
     >
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select>
+      <p class="text-center sm:text-left">
+        <NuxtLink
+          to="/login"
+          class="text-sm text-[#9c4e8b] underline cursor-pointer"
+          >Have an account? Login</NuxtLink
+        >
+      </p>
 
-    <!-- Submit button -->
-    <div class="mt-6 grid">
-      <button
-        @click="signup"
-        type="submit"
-        class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
+      <form class="w-full">
+        <!-- allow user to uload profile image -->
+         <ProfileImage/>
+        <!-- end -->
+        <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
+
+        <div class="mt-6 grid gap-4 lg:gap-6">
+          <!-- Two-column grid on larger screens -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+            <div>
+              <label
+                for="firstname"
+                class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+                >First Name</label
+              >
+              <input
+                v-model="firstName"
+                id="firstname"
+                type="text"
+                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
+              />
+            </div>
+
+            <div>
+              <label
+                for="lastname"
+                class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+                >Last Name</label
+              >
+              <input
+                v-model="lastName"
+                id="lastname"
+                type="text"
+                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+              >Email</label
+            >
+            <input
+              v-model="email"
+              type="email"
+              autocomplete="email"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+              >Password</label
+            >
+            <input
+              v-model="password"
+              type="password"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+            />
+          </div>
+        </div>
+      </form>
+
+      <!-- Role Dropdown -->
+      <select
+        v-model="role"
+        class="mt-6 p-2 border border-gray-300 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 w-full"
       >
-        {{ isLoading ? "Signing Up..." : "Sign Up" }}
-      </button>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <!-- admin input section -->
+      <div v-if="role === 'admin'" class="mt-6">
+        <label
+          class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
+          >Admin Number</label
+        >
+        <input
+          v-model="adminNumber"
+          type="text"
+          class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+        />
+      </div>
+
+      <!-- Submit button -->
+      <div class="mt-6 grid">
+        <button
+          @click="signup"
+          type="submit"
+          class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
+        >
+          {{ isLoading ? "Signing Up..." : "Sign Up" }}
+        </button>
+      </div>
     </div>
   </div>
-</div>
-
-  <!-- End Col -->
 </template>
-
 <script setup>
-const { firstName, lastName, email, password, errorMessage, role, signup, isLoading } =
-  FormAuth();
+const {
+  firstName,
+  lastName,
+  email,
+  password,
+  errorMessage,
+  adminNumber,
+  role,
+  signup,
+  isLoading,
+} = FormAuth();
 </script>

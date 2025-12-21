@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { firstName, lastName, email, password, role } = body;
+  const { firstName, lastName, email, password, adminNumber, role } = body;
 
   await connectDB();
   const config = useRuntimeConfig();
@@ -44,6 +44,7 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
+    adminNumber,
     role,
   });
 
@@ -56,6 +57,7 @@ export default defineEventHandler(async (event) => {
       fname: newUser.firstName,
       sname: newUser.lastName,
       email: newUser.email,
+      adminNumber: newUser.adminNumber,
       role: newUser.role,
     },
     config.secretStr, // comes from .env
@@ -71,6 +73,7 @@ export default defineEventHandler(async (event) => {
       firstName: newUser.firstName,
       lastName: newUser.lastName,
       email: newUser.email,
+      adminNumber: newUser.adminNumber,
       role: newUser.role,
       createdAt: newUser.joinedAt,
     },
