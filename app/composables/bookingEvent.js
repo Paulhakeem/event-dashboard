@@ -57,10 +57,10 @@ export default function useEventBooking() {
     }
 
     const handler = PaystackPop.setup({
-      key: config.paystackPublicKey,
+      key: config.public.paystackPublicKey,
       email: user.value.email,
-      amount: event.value.vip * 100,
-      currency: "Ksh",
+      amount: event.value.vip * 100, 
+      currency: "KES",
 
       metadata: {
         phone: phone.value,
