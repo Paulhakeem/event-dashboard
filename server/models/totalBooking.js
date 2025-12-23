@@ -11,6 +11,11 @@ const totalBookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    eventName: {
+      type: String,
+      required: true,
+      default: "",
+    },
     phone: {
       type: Number,
       required: true,
@@ -19,6 +24,19 @@ const totalBookingSchema = new mongoose.Schema(
     bookedAt: {
       type: Date,
       default: Date.now,
+    },
+    reference: {
+      type: String,
+      unique: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "cancelled"],
+      default: "pending",
+    },
+    amount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

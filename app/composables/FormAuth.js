@@ -1,21 +1,31 @@
+import { ref, watch } from "vue";
+
 export default function useFormAuth() {
+  const { setAuth } = useAuth();
+
+  // form fields
   const firstName = ref("");
   const lastName = ref("");
   const email = ref("");
   const password = ref("");
+  const adminNumber = ref("");
+  const role = ref("user");
+
+  // state
   const isLoading = ref(false);
   const errorMessage = ref("");
-  const adminNumber = ref(0);
-  const role = ref("user" || "admin");
-  const { setAuth, fetchUser } = useAuth();
 
-  const validateEmail = (email) => {
+  // image
+  const previewImage = ref(null); // for UI preview
+  const imageFile = ref(null); // actual File object
+
+  // email validation
+  const validateEmail = (value) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(String(email).toLowerCase());
+    return re.test(value);
   };
 
-  // validate form fields
-  watch([email, password], () => {
+  watch(email, () => {
     if (email.value && !validateEmail(email.value)) {
       errorMessage.value = "Invalid email format.";
     } else {
@@ -23,8 +33,21 @@ export default function useFormAuth() {
     }
   });
 
+  // handle image selection
+  const previewImageFile = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    imageFile.value = file;
+
+    previewImage.value = URL.createObjectURL(file);
+  };
+
+  // signup
   const signup = async () => {
+    errorMessage.value = "";
     isLoading.value = true;
+
     if (
       !firstName.value ||
       !lastName.value ||
@@ -32,48 +55,43 @@ export default function useFormAuth() {
       !password.value
     ) {
       errorMessage.value = "All fields are required.";
+      isLoading.value = false;
       return;
     }
 
     try {
+      const formData = new FormData();
+      formData.append("firstName", firstName.value);
+      formData.append("lastName", lastName.value);
+      formData.append("email", email.value);
+      formData.append("password", password.value);
+      formData.append("adminNumber", adminNumber.value);
+      formData.append("role", role.value);
+
+      if (imageFile.value) {
+        formData.append("profileImage", imageFile.value);
+      }
+
       const res = await fetch("/api/auth/regester", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName: firstName.value,
-          lastName: lastName.value,
-          email: email.value,
-          password: password.value,
-          adminNumber: adminNumber.value,
-          role: role.value,
-        }),
+        body: formData,
       });
-      
+
       const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Signup failed");
 
-      if (!res.ok) throw new Error(data.message || "Failed to sign up");
-
-      // save token
       if (data.token) {
         localStorage.setItem("token", data.token);
         setAuth(data);
       }
-      // check if user is admin
-      if (role.value === "admin" && res.ok) {
-        navigateTo("/admin/dashboard");
-      } else {
-        navigateTo("/user/dashboard");
-      }
 
-      firstName.value = "";
-      lastName.value = "";
-      email.value = "";
-      password.value = "";
+      navigateTo(
+        role.value === "admin" ? "/admin/dashboard" : "/user/dashboard"
+      );
+    } catch (err) {
+      errorMessage.value = err.message;
+    } finally {
       isLoading.value = false;
-      adminNumber.value = "";
-      return data;
-    } catch (error) {
-      errorMessage.value = error.message;
     }
   };
 
@@ -82,11 +100,12 @@ export default function useFormAuth() {
     lastName,
     email,
     password,
-    isLoading,
-    errorMessage,
-    validateEmail,
     adminNumber,
     role,
+    previewImage,
+    isLoading,
+    errorMessage,
+    previewImageFile,
     signup,
   };
 }

@@ -1,3 +1,5 @@
+
+
 <template>
   <div class="bg-gray-200 select-none">
     <div
@@ -149,7 +151,9 @@
             class="mt-1 block w-72 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#9c4e8b] focus:border-[#9c4e8b] sm:text-sm"
           />
           <!-- button for price tag -->
-          <p class="text-lg font-semibold">{{ loading ? "Processing..." : " Buy Ticket" }}</p>
+          <p class="text-lg font-semibold">
+            {{ loading ? "Processing..." : " Buy Ticket" }}
+          </p>
           <div class="flex gap-4 items-center text-center">
             <div
               @click="submitBooking"
@@ -159,7 +163,7 @@
               {{ event?.regular }}/-
             </div>
             <div
-              @click="submitBooking"
+              @click="bookAndPay"
               class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
             >
               <p>VIP</p>
@@ -167,7 +171,7 @@
               {{ event?.vip }}/-
             </div>
             <div
-              @click="submitBooking"
+              @click="handleSubmit"
               class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
             >
               <p>VVIP</p>
@@ -201,7 +205,7 @@
 import useEventBooking from "~/composables/bookingEvent";
 
 // import booking composable
-const { event, phone, loading, error, successMessage, submitBooking } =
+const { event, phone, loading, error, successMessage, bookAndPay } =
   useEventBooking();
 
 const { user } = useAuth();

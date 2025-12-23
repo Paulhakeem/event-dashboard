@@ -1,8 +1,10 @@
 export default function useEventBooking() {
-  const {user} = useAuth();
+  const config = useRuntimeConfig();
+  const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
-  const event = ref([]);
+
+  const event = ref({});
   const phone = ref("");
 
   const loading = ref(false);
@@ -11,48 +13,73 @@ export default function useEventBooking() {
 
   onMounted(async () => {
     try {
-      const res = await $fetch(`/api/events/${id}`, {
-        method: "GET",
-        params: { id },
-      });
+      loading.value = true;
+      const res = await $fetch(`/api/events/${id}`);
       event.value = res.eventData;
     } catch (err) {
-      error.value = err.message;
+      error.value = err?.message || "Failed to load event";
     } finally {
       loading.value = false;
     }
   });
 
-  const submitBooking = async () => {
-    // length check for phone number
-    if (phone.value.toString().length < 10) {
-      alert("Please enter a valid phone number");
+  // 🔐 async helper (NOT passed directly to Paystack)
+  const verifyPayment = async (reference) => {
+    loading.value = true;
+
+    const verifyResponse = await $fetch("/api/booking/verify", {
+      method: "POST",
+      body: {
+        reference,
+        eventId: id,
+        userId: user.value.id,
+        phone: phone.value,
+      },
+    });
+
+    successMessage.value = verifyResponse.message;
+    alert("Payment successful! Check your email.");
+
+    loading.value = false;
+  };
+
+  const bookAndPay = () => {
+    if (!phone.value) {
+      alert("Please enter phone number");
       return;
     }
-   
-    if (!user) {
-      alert("You must be logged in to book.");
+
+    const PaystackPop = window.PaystackPop;
+
+    if (!PaystackPop) {
+      alert("Paystack not loaded yet");
       return;
     }
-    try {
-      loading.value = true;
-      const response = await $fetch("/api/booking/post", {
-        method: "POST",
-        body: {
-          eventId: id,
-          userId: user.value.id,
-          phone: phone.value,
-        },
-      });
-      console.log("Booking response:", response);
-      successMessage.value = response.message;
-      alert(successMessage.value);
-    } catch (err) {
-      alert(err?.message || "Failed to book event");
-      //   error.value = err.message;
-    } finally {
-      loading.value = false;
-    }
+
+    const handler = PaystackPop.setup({
+      key: config.paystackPublicKey,
+      email: user.value.email,
+      amount: event.value.vip * 100,
+      currency: "Ksh",
+
+      metadata: {
+        phone: phone.value,
+        eventId: id,
+        userId: user.value.id,
+        eventName: event.value.name,
+      },
+
+      // ✅ MUST be a plain function
+      callback: function (response) {
+        verifyPayment(response.reference);
+      },
+
+      onClose: function () {
+        alert("Transaction was not completed.");
+      },
+    });
+
+    handler.openIframe();
   };
 
   return {
@@ -61,6 +88,6 @@ export default function useEventBooking() {
     loading,
     error,
     successMessage,
-    submitBooking,
+    bookAndPay,
   };
 }

@@ -1,15 +1,43 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { v2 as cloudinary } from "cloudinary";
+import formidable from "formidable";
+import fs from "fs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
-import jwt from "jsonwebtoken";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { firstName, lastName, email, password, adminNumber, role } = body;
-
-  await connectDB();
   const config = useRuntimeConfig();
-  // validation
+  await connectDB();
+
+  // Cloudinary config
+  cloudinary.config({
+    cloud_name: config.cloudinaryCloudName,
+    api_key: config.cloudinaryApiKey,
+    api_secret: config.cloudinaryApiSecret,
+  });
+
+  // Parse form data
+  const form = formidable({
+    multiples: false,
+    keepExtensions: true,
+  });
+
+  const { fields, files } = await new Promise((resolve, reject) => {
+    form.parse(event.node.req, (err, fields, files) => {
+      if (err) reject(err);
+      resolve({ fields, files });
+    });
+  });
+
+  const firstName = fields.firstName?.toString().trim();
+  const lastName = fields.lastName?.toString().trim();
+  const email = fields.email?.toString().trim();
+  const password = fields.password?.toString().trim();
+  const role = fields.role?.toString().trim() || "user";
+  const adminNumber = fields.adminNumber?.toString().trim();
+
+  // Validation
   if (!firstName || !lastName || !email || !password) {
     throw createError({
       statusCode: 400,
@@ -17,29 +45,54 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // prevent multiple admin accounts
+  // Prevent multiple admins
   if (role === "admin") {
-    const existingAdmin = await User.findOne({ role: "admin" });
-    if (existingAdmin) {
+    const adminExists = await User.findOne({ role: "admin" });
+    if (adminExists) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Admin account already exists",
+        statusMessage: "Admin already exists",
       });
     }
   }
 
-  // check if user already exists
+  // Check existing user
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw createError({
       statusCode: 400,
-      statusMessage: "name or email already taken",
+      statusMessage: "Email already taken",
     });
   }
+  // Upload profile image if provided
+  const imageFile = files.profileImage;
+  let imagePath = null;
 
-  // hash the password
+  if (imageFile) {
+    if (imageFile.size > 5 * 1024 * 1024) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Image size should be less than 5MB",
+      });
+    }
+
+    const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {
+      folder: "profiles",
+      use_filename: true,
+      unique_filename: true,
+    });
+
+    imagePath = uploadResult.secure_url;
+
+    // Remove temp file
+    fs.unlink(imageFile.filepath, () => {});
+  }
+
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
+
   const newUser = new User({
+    profileImage: imagePath,
     firstName,
     lastName,
     email,
@@ -50,7 +103,7 @@ export default defineEventHandler(async (event) => {
 
   await newUser.save();
 
-  // create JWT token
+  // Create JWT
   const token = jwt.sign(
     {
       id: newUser._id,
@@ -60,22 +113,22 @@ export default defineEventHandler(async (event) => {
       adminNumber: newUser.adminNumber,
       role: newUser.role,
     },
-    config.secretStr, // comes from .env
+    config.secretStr,
     { expiresIn: "1d" }
   );
 
-  // return user + token
   return {
     message: "User registered successfully",
     token,
     user: {
       id: newUser._id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      email: newUser.email,
-      adminNumber: newUser.adminNumber,
-      role: newUser.role,
-      createdAt: newUser.joinedAt,
+      profileImage: imagePath,
+      firstName,
+      lastName,
+      email,
+      adminNumber,
+      role,
+      joinedAt: newUser.joinedAt,
     },
   };
 });

@@ -113,7 +113,6 @@
 
 <script setup>
 const { token } = useAuth();
-const config = useRuntimeConfig();
 
 const form = reactive({
   title: "",
