@@ -13,7 +13,6 @@ const totalBookingSchema = new mongoose.Schema(
     },
     eventName: {
       type: String,
-      required: true,
       default: "",
     },
     phone: {
@@ -31,7 +30,14 @@ const totalBookingSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "confirmed", "cancelled"],
+      enum: [
+        "pending",
+        "success",
+        "cancelled",
+        "failed",
+        "refunded",
+        "confirmed",
+      ],
       default: "pending",
     },
     amount: {

@@ -3,6 +3,7 @@ import { TotalBooking } from "~~/server/models/totalBooking.js";
 import nodemailer from "nodemailer";
 import { User } from "~~/server/models/User.js";
 import { paystackClient } from "~~/server/utils/paystack.js";
+import { Event } from "../../models/Events.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -19,11 +20,11 @@ export default defineEventHandler(async (event) => {
   }
 
   //   find the event
-  const bookingRecord = await TotalBooking.findOne(eventId);
-  if (!bookingRecord) {
+  const eventData = await Event.findById(eventId);
+  if (!eventData) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Booking record not found",
+      statusMessage: "Event not found",
     });
   }
 
@@ -43,15 +44,16 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Payment verification failed",
     });
   }
+
   //  save booking
   const booking = {
-    eventId: bookingRecord._id,
-    userId: userData._id,
+    eventId: paystackResponse.data.metadata.eventId,
+    userId: paystackResponse.data.metadata.userId,
     eventName: paystackResponse.data.metadata.eventName,
-    phone: paystackResponse.data.metadata.customer.phone,
+    phone: paystackResponse.data.metadata.phone,
     reference: paystackResponse.data.metadata.reference,
-    status: paystackResponse.data.metadata.status,
-    amount: paystackResponse.data.metadata.amount / 100, // convert to main currency unit
+    status: paystackResponse.data.status,
+    amount: paystackResponse.data.amount / 100,
     bookedAt: new Date(),
   };
 
@@ -68,23 +70,20 @@ export default defineEventHandler(async (event) => {
       },
     });
     // send email to user
-    const mailOptions = {
+   const mailOptions = {
       from: `"Event Dashboard" <${config.emailUsername}>`,
       to: userData.email,
-      subject: `Booking Confirmed for ${booking.eventName}🤗`,
-      html: `<p>Dear ${userData.name},</p>
-        <p>Your booking for the event <strong>${booking.eventName}</strong> has been confirmed.</p>
-        <p>Booking Details:</p>
-        <ul>
-          <li>Event Name: ${booking.eventName}</li>
-            <li>Date: ${new Date(booking.bookedAt).toLocaleDateString()}</li>
-          <li>Phone: ${booking.phone}</li>
-            <li>Amount Paid: Ksh${booking.amount}</li>
-            <li>Reference: ${booking.reference}</li>
-        </ul>
-        
-        <p>Thank you for booking with us!</p>
-        <p>Best regards,<br/>LetsBook Team</p>`,
+      subject: `Booking Confirmed for ${eventData.title}🤗`,
+      html: `
+        <h2>Hello</h2>
+        <p>You have successfully booked <strong>${eventData.title}</strong>!</p>
+        <p><strong>Location:</strong> ${eventData.location}</p>
+        <p><strong>Date:</strong> ${new Date(
+          eventData.date
+        ).toLocaleDateString()}</p>
+        <br/>
+        <p>Thank you for booking with us🙏!</p>
+      `,
     };
     
     await transporter.sendMail(mailOptions);
