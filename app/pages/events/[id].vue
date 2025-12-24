@@ -151,9 +151,6 @@
             class="mt-1 block w-72 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#9c4e8b] focus:border-[#9c4e8b] sm:text-sm"
           />
           <!-- button for price tag -->
-          <p class="text-lg font-semibold">
-            {{ loading ? "Processing..." : " Buy Ticket" }}
-          </p>
           <div class="flex gap-4 items-center text-center">
             <div
               @click="submitBooking"
