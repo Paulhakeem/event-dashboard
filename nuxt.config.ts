@@ -29,7 +29,6 @@ export default defineNuxtConfig({
     // email
     emailUsername: process.env.EMAIL_USERNAME,
     emailPass: process.env.EMAIL_PASSWORD,
-    service: process.env.SMTP_SERVICE,
     // paystack
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     public: {

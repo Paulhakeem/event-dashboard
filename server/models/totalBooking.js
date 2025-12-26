@@ -26,6 +26,7 @@ const totalBookingSchema = new mongoose.Schema(
     },
     reference: {
       type: String,
+      required: true,
       unique: true,
     },
     status: {
