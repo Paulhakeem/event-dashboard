@@ -7,13 +7,13 @@ import { Event } from "../../models/Events.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { eventId, userId, reference } = body;
+  const { eventId, userId, reference, ticketType } = body;
   const config = useRuntimeConfig();
 
-  if (!reference) {
+  if (!reference || !ticketType) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Payment reference is required",
+      statusMessage: "Payment reference and TicketType are required",
     });
   }
 
@@ -29,6 +29,22 @@ export default defineEventHandler(async (event) => {
   const userData = await User.findById(userId);
   if (!userData) {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
+  }
+
+  // ticket type
+  const priceMap ={
+    regular: eventData.regular,
+    vip: eventData.vip,
+    vvip: eventData.vvip
+  }
+
+  const amount = priceMap[ticketType]
+
+  if(!amount){
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid ticket selected"
+    })
   }
 
   // verify with Paystack
@@ -62,7 +78,8 @@ export default defineEventHandler(async (event) => {
     eventName: eventData.title,
     reference: paystackRef,
     status: paystackResponse.data.status,
-    amount: paystackResponse.data.amount / 100,
+    ticketType,
+    amount,
     bookedAt: new Date(),
   };
 

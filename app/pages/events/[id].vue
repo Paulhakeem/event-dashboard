@@ -95,31 +95,14 @@
               </ul>
             </dd>
           </dl>
-          <!-- check if price for regular, vip and vvip exist -->
+          <!-- Ticket selection -->
+           <p>Ticket selection</p>
+          <select v-model="ticketType" class="w-72 p-2 border border-gray-400 rounded-md bg-[#9c4e8b] text-gray-200">
+            <option value="regular" class="hover:bg-whte">Regular - KES {{ event?.regular }}</option>
+            <option value="vip">VIP - KES {{ event?.vip }}</option>
+            <option value="vvip">VVIP - KES {{ event?.vvip }}</option>
+          </select>
 
-          <div class="flex gap-4 items-center text-center">
-            <div
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>Regular</p>
-              {{ event?.regular }}/-
-            </div>
-            <div
-              @click="bookAndPay"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>VIP</p>
-
-              {{ event?.vip }}/-
-            </div>
-            <div
-              @click="bookAndPay"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>VVIP</p>
-              {{ event?.vvip }}/-
-            </div>
-          </div>
           <!-- payment infor -->
           <div class="mt-4 pt-4 border-t border-gray-300">
             <h3 class="text-lg font-medium text-gray-800 dark:text-neutral-200">
@@ -173,6 +156,7 @@
             <div class="flex gap-4 items-center">
               <!-- mpesa payment -->
               <div
+                @click="bookAndPay"
                 class="border border-gray-300 w-42 p-5 text-center items-center rounded-md cursor-pointer"
               >
                 <Icon name="mingcute:phone-fill" class="text-3xl" />
@@ -186,6 +170,10 @@
                 <p class="text-gray-500">Card</p>
               </div>
             </div>
+            <p v-if="error" class="text-red-500">{{ error }}</p>
+            <p v-if="successMessage" class="text-green-500">
+              {{ successMessage }}
+            </p>
           </div>
         </div>
       </div>
@@ -197,7 +185,7 @@
 import useEventBooking from "~/composables/bookingEvent";
 
 // import booking composable
-const { event, phone, loading, error, successMessage, bookAndPay } =
+const { event, phone, loading, error, successMessage, bookAndPay, ticketType } =
   useEventBooking();
 
 const { user } = useAuth();

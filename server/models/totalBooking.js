@@ -36,6 +36,11 @@ const totalBookingSchema = new mongoose.Schema(
       ],
       default: "pending",
     },
+    ticketType: {
+      type: String,
+      enum: ["regular", "vip", "vvip"],
+      required: true,
+    },
     amount: {
       type: Number,
       default: 0,
