@@ -1,5 +1,3 @@
-
-
 <template>
   <div class="bg-gray-200 select-none">
     <div
@@ -97,7 +95,31 @@
               </ul>
             </dd>
           </dl>
+          <!-- check if price for regular, vip and vvip exist -->
 
+          <div class="flex gap-4 items-center text-center">
+            <div
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
+            >
+              <p>Regular</p>
+              {{ event?.regular }}/-
+            </div>
+            <div
+              @click="bookAndPay"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
+            >
+              <p>VIP</p>
+
+              {{ event?.vip }}/-
+            </div>
+            <div
+              @click="bookAndPay"
+              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
+            >
+              <p>VVIP</p>
+              {{ event?.vvip }}/-
+            </div>
+          </div>
           <!-- payment infor -->
           <div class="mt-4 pt-4 border-t border-gray-300">
             <h3 class="text-lg font-medium text-gray-800 dark:text-neutral-200">
@@ -139,56 +161,29 @@
               </ul>
             </dd>
           </dl>
-          <!-- number input for payment -->
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-neutral-300"
-            >Phone Number:</label
-          >
-          <input
-            v-model="phone"
-            type="text"
-            placeholder="1234 5678 9012 3456"
-            class="mt-1 block w-72 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-[#9c4e8b] focus:border-[#9c4e8b] sm:text-sm"
-          />
-          <!-- button for price tag -->
-          <div class="flex gap-4 items-center text-center">
-            <div
-              @click="submitBooking"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>Regular</p>
-              {{ event?.regular }}/-
-            </div>
-            <div
-              @click="bookAndPay"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>VIP</p>
+          <!-- amount to pay -->
 
-              {{ event?.vip }}/-
-            </div>
-            <div
-              @click="handleSubmit"
-              class="mt-3 px-4 py-2 bg-[#9c4e8b] text-white text-sm font-medium rounded w-full cursor-pointer"
-            >
-              <p>VVIP</p>
-              {{ event?.vvip }}/-
-            </div>
-          </div>
           <!-- choose different method of payment -->
           <div class="mt-6">
             <h4
               class="text-md font-medium text-gray-800 dark:text-neutral-200 mb-2"
             >
-              Choose Payment Method:
+              Payment Method:
             </h4>
             <div class="flex gap-4 items-center">
-              <div>
-                <Icon name="flowbite:visa-solid" class="text-5xl" />
+              <!-- mpesa payment -->
+              <div
+                class="border border-gray-300 w-42 p-5 text-center items-center rounded-md cursor-pointer"
+              >
+                <Icon name="mingcute:phone-fill" class="text-3xl" />
+                <p class="text-gray-500">M-Pesa</p>
               </div>
-              <!-- paypal -->
-              <div>
-                <Icon name="fontisto:paypal" class="text-3xl" />
+              <!-- card payment-->
+              <div
+                class="border border-gray-300 w-42 p-5 text-center items-center rounded-md cursor-pointer"
+              >
+                <Icon name="solar:card-linear" class="text-3xl" />
+                <p class="text-gray-500">Card</p>
               </div>
             </div>
           </div>

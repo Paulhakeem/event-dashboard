@@ -5,7 +5,6 @@ export default function useEventBooking() {
   const id = route.params.id;
 
   const event = ref({});
-  const phone = ref("");
 
   const loading = ref(false);
   const error = ref(null);
@@ -33,7 +32,6 @@ export default function useEventBooking() {
         reference,
         eventId: id,
         userId: user.value.id,
-        phone: phone.value,
       },
     });
 
@@ -44,11 +42,6 @@ export default function useEventBooking() {
   };
 
   const bookAndPay = () => {
-    if (!phone.value) {
-      alert("Please enter phone number");
-      return;
-    }
-
     const PaystackPop = window.PaystackPop;
 
     if (!PaystackPop) {
@@ -63,7 +56,6 @@ export default function useEventBooking() {
       currency: "KES",
 
       metadata: {
-        phone: phone.value,
         eventId: id,
         userId: user.value.id,
         eventName: event.value.name,
@@ -84,7 +76,6 @@ export default function useEventBooking() {
 
   return {
     event,
-    phone,
     loading,
     error,
     successMessage,

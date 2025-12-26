@@ -15,11 +15,6 @@ const totalBookingSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    phone: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
     bookedAt: {
       type: Date,
       default: Date.now,

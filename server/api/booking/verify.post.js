@@ -7,7 +7,7 @@ import { Event } from "../../models/Events.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { phone, eventId, userId, reference } = body;
+  const { eventId, userId, reference } = body;
   const config = useRuntimeConfig();
 
   if (!reference) {
@@ -60,7 +60,6 @@ export default defineEventHandler(async (event) => {
     eventId,
     userId,
     eventName: eventData.title,
-    phone,
     reference: paystackRef,
     status: paystackResponse.data.status,
     amount: paystackResponse.data.amount / 100,
@@ -68,6 +67,11 @@ export default defineEventHandler(async (event) => {
   };
 
   const newBooking = await TotalBooking.create(booking);
+
+  // find admin user to CC
+  const admin = await User.findOne({ role: "admin" }).select(
+    "email firstName lastName"
+  );
 
   // send email
   const transporter = nodemailer.createTransport({
@@ -81,11 +85,11 @@ export default defineEventHandler(async (event) => {
   });
 
   await transporter.sendMail({
-    from: `"Event Dashboard" <${config.emailUsername}>`,
+    from: `"LetsBook Events" <${config.emailUsername}>`,
     to: userData.email,
     subject: `Booking Confirmed for ${eventData.title} 🤗`,
     html: `
-      <h2>Hello ${userData.name || ""}</h2>
+      <h2>Hello ${userData.firstName || ""} ${userData.lastName || ""}</h2>
       <p>You have successfully booked <strong>${eventData.title}</strong>!</p>
       <p><strong>Location:</strong> ${eventData.location}</p>
       <p><strong>Date:</strong> ${new Date(
@@ -96,6 +100,32 @@ export default defineEventHandler(async (event) => {
       <p>Thank you for booking with us 🙏</p>
     `,
   });
+
+  // notify admin
+  if (admin) {
+    await transporter.sendMail({
+      from: `"LetsBook Events" <${config.emailUsername}>`,
+      to: admin.email,
+      subject: `New Booking for ${eventData.title} 📢`,
+      html: `
+        <h2>Hello ${admin.firstName || ""} ${admin.lastName || ""}</h2>
+        <p>A new booking has been made for <strong>${
+          eventData.title
+        }</strong>.</p>
+        <p><strong>Booker:</strong> ${userData.firstName || ""} ${
+        userData.lastName || ""
+      }</p> 
+        <p><strong>Email:</strong> ${userData.email}</p>
+         <p><strong>Date:</strong> ${new Date(
+           eventData.date
+         ).toLocaleDateString()}</p>
+          <p><strong>Location:</strong> ${eventData.location}</p>
+        <p><strong>Reference:</strong> ${paystackRef}</p>
+        <br/>
+        <p>Please check the dashboard for more details.</p>
+      `,
+    });
+  }
 
   return {
     message: "Booking verified and saved successfully",
