@@ -1,3 +1,3 @@
 <template>
-  <events-event-page />
+ <events-all-event/>
 </template>
