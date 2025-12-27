@@ -56,6 +56,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 // Import your component
 import createEvent from "./createEvent.vue";
 import totalEvents from "../Dashboard/getEvents.vue";
+import BookedEvents from "./BookedEvents.vue";
 
 const categories = ref({
   Events: [
@@ -70,9 +71,10 @@ const categories = ref({
       component: createEvent, // ✅ reference the imported component
     },
   ],
-  "Popular Events": [
+  "Booked Events": [
     {
       id: 1,
+      component: BookedEvents
     },
   ],
 });

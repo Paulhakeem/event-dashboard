@@ -1,0 +1,69 @@
+<template>
+  <div class="flex flex-col">
+    <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+        <div class="overflow-hidden">
+          <table class="min-w-full text-left text-sm font-light">
+            <thead
+              class="border-b font-medium dark:border-neutral-500 bg-[#9c4e8b]"
+            >
+              <tr>
+                <th scope="col" class="px-6 py-4 text-white">Event</th>
+                <th scope="col" class="px-6 py-4 text-white">Date</th>
+                <th scope="col" class="px-6 py-4 text-white">Price</th>
+                <th scope="col" class="px-6 py-4 text-white">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="event in eventsBooked"
+                :key="event.id"
+                class="border-b dark:border-neutral-500 hover:bg-gray-100"
+              >
+                <td
+                  class="whitespace -nowrap px-6 py-4 font-medium first-letter:capitalize"
+                >
+                  {{ event.eventName }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  {{ new Date(event.bookedAt).toLocaleDateString() }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-green-500 font-semibold">
+                  {{ event.amount }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 font-semibold text-green-500">
+                {{ event.status }}
+                </td>
+              </tr>
+              <tr v-if="loading">
+                <td colspan="4" class="text-center py-4">Loading events...</td>
+              </tr>
+              <tr v-if="!loading && eventsBooked.length === 0">
+                <td colspan="4" class="text-center py-4">No events found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+const loading = ref(true);
+const eventsBooked = ref([]);
+
+onMounted(async () => {
+  try {
+    const res = await $fetch("/api/events/bookedEvents");
+    if (res.success) {
+      console.log(res.bookings);
+      eventsBooked.value = res.bookings;
+    }
+  } catch (error) {
+    console.log(error.message);
+  } finally {
+    loading.value = false;
+  }
+});
+</script>
