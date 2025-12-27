@@ -1,5 +1,8 @@
 <template>
   <div class="flex flex-col">
+    <!-- filter bookings by date -->
+
+     <!-- end -->
     <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
         <div class="overflow-hidden">
@@ -10,7 +13,8 @@
               <tr>
                 <th scope="col" class="px-6 py-4 text-white">Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Date</th>
-                <th scope="col" class="px-6 py-4 text-white">Price</th>
+                <th scope="col" class="px-6 py-4 text-white">Ticket</th>
+                <th scope="col" class="px-6 py-4 text-white">Ticket Type</th>
                 <th scope="col" class="px-6 py-4 text-white">Status</th>
               </tr>
             </thead>
@@ -30,6 +34,9 @@
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 text-green-500 font-semibold">
                   {{ event.amount }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 font-semibold text-green-500">
+                {{ event.ticketType }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-semibold text-green-500">
                 {{ event.status }}

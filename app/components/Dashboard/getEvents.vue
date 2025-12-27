@@ -11,7 +11,9 @@
                 <th scope="col" class="px-6 py-4 text-white">Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Date</th>
                 <th scope="col" class="px-6 py-4 text-white">Location</th>
-                <th scope="col" class="px-6 py-4 text-white">Cost</th>
+                <th scope="col" class="px-6 py-4 text-white">Regular Ticket</th>
+                <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
+                <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
               </tr>
             </thead>
             <tbody>
@@ -31,8 +33,14 @@
                 <td class="whitespace-nowrap px-6 py-4">
                   {{ event.location }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  ksh {{ event.price }}
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                  ksh {{ event.regular }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                  ksh {{ event.vip }}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                  ksh {{ event.vvip }}
                 </td>
               </tr>
               <tr v-if="loading">

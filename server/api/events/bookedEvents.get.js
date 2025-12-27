@@ -5,12 +5,12 @@ export default defineEventHandler(async () => {
   await connectDB();
 
   try {
-    const bookings = await TotalBooking.find().sort({ date: 1 });
+    const bookings = await TotalBooking.find().sort({ bookedAt: -1 });
     return {
       success: true,
       bookings,
     };
   } catch (error) {
     return { success: false, message: error.message };
-  } 
+  }
 });

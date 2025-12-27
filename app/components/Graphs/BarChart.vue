@@ -6,11 +6,11 @@
     <div class="justify-between items-center gap-2">
       <div class="flex flex-wrap justify-between items-center gap-2">
         <div>
-          <h2 class="text-sm text-gray-500 dark:text-neutral-500">Income</h2>
+          <h2 class="text-sm text-gray-500 dark:text-neutral-500">Total Income</h2>
           <p
-            class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
+            class="text-xl sm:text-2xl font-medium text-green-500"
           >
-            ksh 00.0
+            ksh {{ total.total }}
           </p>
         </div>
         <div>
@@ -44,14 +44,8 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-type RevenueDataItem = {
-  month: string;
-  events: number;
-  users: number;
-};
-
-const RevenueData: RevenueDataItem[] = [
+<script setup>
+const RevenueData = [
   { month: "Jan", events: 186, users: 80 },
   { month: "Feb", events: 305, users: 200 },
   { month: "Mar", events: 237, users: 120 },
@@ -72,6 +66,20 @@ const RevenueCategoriesMultple = {
   users: { name: "Users", color: "#9c4e8b" },
 };
 
-const xFormatter = (i: number): string => `${RevenueData[i]?.month}`;
-const yFormatter = (tick: number) => tick.toString();
+const xFormatter = (i) => `${RevenueData[i]?.month}`;
+const yFormatter = (tick) => tick.toString();
+
+// get the total amount earned
+
+const total = ref(0);
+
+onMounted(async () => {
+  try {
+    const res = await $fetch("/api/events/totalAmount");
+    if (res.success) {
+      total.value = res
+      console.log(res);
+    }
+  } catch (error) {}
+});
 </script>
