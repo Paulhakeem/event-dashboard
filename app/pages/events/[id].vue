@@ -189,5 +189,4 @@ const { event, phone, loading, error, successMessage, bookAndPay, ticketType } =
   useEventBooking();
 
 const { user } = useAuth();
-console.log("user info", event);
 </script>

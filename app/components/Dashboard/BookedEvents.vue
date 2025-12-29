@@ -2,7 +2,7 @@
   <div class="flex flex-col">
     <!-- filter bookings by date -->
 
-     <!-- end -->
+    <!-- end -->
     <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
         <div class="overflow-hidden">
@@ -13,9 +13,12 @@
               <tr>
                 <th scope="col" class="px-6 py-4 text-white">Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Date</th>
-                <th scope="col" class="px-6 py-4 text-white">Ticket</th>
-                <th scope="col" class="px-6 py-4 text-white">Ticket Type</th>
+                <th scope="col" class="px-6 py-4 text-white">TotalRevenue</th>
+                <th scope="col" class="px-6 py-4 text-white">Regular</th>
+                <th scope="col" class="px-6 py-4 text-white">VIP</th>
+                <th scope="col" class="px-6 py-4 text-white">VVIP</th>
                 <th scope="col" class="px-6 py-4 text-white">Status</th>
+                <th scope="col" class="px-6 py-4 text-white">Attend</th>
               </tr>
             </thead>
             <tbody>
@@ -32,14 +35,35 @@
                 <td class="whitespace-nowrap px-6 py-4">
                   {{ new Date(event.bookedAt).toLocaleDateString() }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 text-green-500 font-semibold">
-                  {{ event.amount }}
+                <td
+                  class="whitespace-nowrap px-6 py-4 text-green-500 font-semibold"
+                >
+                  {{ event.stats.totalRevenue }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-semibold text-green-500">
-                {{ event.ticketType }}
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-semibold text-green-500"
+                >
+                   {{ event.stats.regular }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-semibold text-green-500">
-                {{ event.status }}
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-semibold text-green-500"
+                >
+                   {{ event.stats.vip }}
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-semibold text-green-500"
+                >
+                  {{ event.stats.vvip }}
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-semibold text-green-500"
+                >
+                  {{ event.status }}
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-semibold text-gray-500"
+                >
+                  {{  event.stats.totalUsers }}
                 </td>
               </tr>
               <tr v-if="loading">
@@ -64,8 +88,8 @@ onMounted(async () => {
   try {
     const res = await $fetch("/api/events/bookedEvents");
     if (res.success) {
-      console.log(res.bookings);
-      eventsBooked.value = res.bookings;
+      console.log(res.mergeBookings);
+      eventsBooked.value = res.mergeBookings;
     }
   } catch (error) {
     console.log(error.message);

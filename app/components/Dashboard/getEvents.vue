@@ -14,6 +14,7 @@
                 <th scope="col" class="px-6 py-4 text-white">Regular Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
+                <th scope="col" class="px-6 py-4 text-white">Delete Event</th>
               </tr>
             </thead>
             <tbody>
@@ -42,6 +43,9 @@
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
                   ksh {{ event.vvip }}
                 </td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                <button @click="removeEvent(event._id)" class="cursor-pointer">delete</button>
+                </td>
               </tr>
               <tr v-if="loading">
                 <td colspan="4" class="text-center py-4">Loading events...</td>
@@ -59,4 +63,12 @@
 
 <script setup>
 const { events, loading } = totalEvents();
+
+const removeEvent = async(id)=> {
+  const res = await $fetch(`/api/events/${id}`, {
+    method: "DELETE"
+  })
+  console.log(res)
+}
+
 </script>

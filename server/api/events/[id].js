@@ -2,22 +2,41 @@ import { Event } from "../../models/Events.js";
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
+  const method = event.node.req.method;
   try {
-    const eventData = await Event.findById(id).exec();
-    if (!eventData) {
+    if (method === "GET") {
+      const eventData = await Event.findById(id).exec();
+      if (!eventData) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Event not found",
+        });
+      }
+      return { success: true, eventData };
+    }
+
+    if (method === "DELETE") {
+      const deleteEvent = await Event.findByIdAndDelete(id);
+      if (!deleteEvent) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Event not found",
+        });
+      }
       return {
-        statusCode: 404,
-        body: { message: "Event not found" },
+        success: true,
+        message: "Event deleted successfully",
       };
     }
-    return {
-      statusCode: 200,
-      eventData,
-    };
+    // methode not found
+    throw createError({
+      statusCode: 405,
+      statusMessage: "Method not allowed",
+    });
   } catch (error) {
     return {
-      statusCode: 500,
-      body: { message: "Internal Server Error", error: error.message },
+      statusCode: error.statusCode || 500,
+      statusMessage: error.message,
     };
   }
 });

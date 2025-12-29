@@ -62,13 +62,13 @@ const categories = ref({
   Events: [
     {
       id: 1,
-      component: totalEvents, // ✅ reference the imported component
+      component: totalEvents, // reference the imported component
     },
   ],
   "Create Event": [
     {
       id: 1,
-      component: createEvent, // ✅ reference the imported component
+      component: createEvent, // reference the imported component
     },
   ],
   "Booked Events": [

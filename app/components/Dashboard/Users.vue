@@ -62,13 +62,12 @@
 
           <!-- Table -->
           <table
-            class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700"
+            class="min-w-full divide-y divide-gray-200"
           >
-            <thead class="bg-gray-50 dark:bg-neutral-800">
+            <thead class="bg-gray-50 text-center justify-center items-center">
               <tr>
                 <th
-                  scope="col"
-                  class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-start"
+                  class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-end"
                 >
                   <div class="flex items-center gap-x-2">
                     <span
@@ -79,7 +78,7 @@
                   </div>
                 </th>
 
-                <th scope="col" class="px-6 py-3 text-start">
+                <th class="px-6 py-3 text-end">
                   <div class="flex items-center gap-x-2">
                     <span
                       class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
@@ -89,7 +88,7 @@
                   </div>
                 </th>
 
-                <th scope="col" class="px-6 py-3 text-start">
+                <th class="px-6 py-3 text-start">
                   <div class="flex items-center gap-x-2">
                     <span
                       class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
@@ -99,7 +98,7 @@
                   </div>
                 </th>
 
-                <th scope="col" class="px-6 py-3 text-start">
+                <th class="px-6 py-3 text-start">
                   <div class="flex items-center gap-x-2">
                     <span
                       class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
@@ -108,8 +107,6 @@
                     </span>
                   </div>
                 </th>
-
-                <th scope="col" class="px-6 py-3 text-end"></th>
               </tr>
             </thead>
 
@@ -156,18 +153,8 @@
                 <td class="size-px whitespace-nowrap">
                   <div class="px-6 py-3">
                     <span class="text-sm text-gray-500 dark:text-neutral-500">{{
-                     formatDate( person.joinedAt)
+                      formatDate(person.joinedAt)
                     }}</span>
-                  </div>
-                </td>
-                <td class="size-px whitespace-nowrap">
-                  <div class="px-6 py-1.5">
-                    <a
-                      class="inline-flex items-center gap-x-1 text-sm text-blue-600 decoration-2 hover:underline focus:outline-hidden focus:underline font-medium dark:text-blue-500"
-                      href="#"
-                    >
-                      Remove
-                    </a>
                   </div>
                 </td>
               </tr>
@@ -200,12 +187,12 @@
 <script setup>
 const { users } = totalUsers();
 // format date
-const formatDate=(date)=> {
-  if(!date) return ""
+const formatDate = (date) => {
+  if (!date) return "";
   return new Date(date).toLocaleDateString("en-US", {
-    year: 'numeric',
+    year: "numeric",
     month: "long",
-    day: 'numeric'
-  })
-}
+    day: "numeric",
+  });
+};
 </script>
