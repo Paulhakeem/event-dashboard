@@ -32,19 +32,19 @@ export default defineEventHandler(async (event) => {
   }
 
   // ticket type
-  const priceMap ={
+  const priceMap = {
     regular: eventData.regular,
     vip: eventData.vip,
-    vvip: eventData.vvip
-  }
+    vvip: eventData.vvip,
+  };
 
-  const amount = priceMap[ticketType]
+  const amount = priceMap[ticketType];
 
-  if(!amount){
+  if (!amount) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Invalid ticket selected"
-    })
+      statusMessage: "Invalid ticket selected",
+    });
   }
 
   // verify with Paystack
@@ -92,8 +92,8 @@ export default defineEventHandler(async (event) => {
 
   // send email
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+    host: config.smtpHost,
+    port: Number(config.smtpPort),
     secure: false,
     auth: {
       user: config.emailUsername,

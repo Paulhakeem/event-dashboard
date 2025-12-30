@@ -47,6 +47,7 @@
             </label>
             <NuxtLink
               to=""
+              @click="openModal"
               class="block mb-2 text-sm font-medium text-[#2478ff] underline cursor-pointer"
             >
               Forget Password
@@ -86,6 +87,9 @@
         </button>
       </form>
     </div>
+  </div>
+  <div v-if="open">
+    <FormForgetPass />
   </div>
 </template>
 
@@ -129,5 +133,11 @@ const login = async () => {
   } finally {
     isLoading.value = false;
   }
+};
+
+const open = ref(false);
+
+const openModal = () => {
+  open.value = !open.value;
 };
 </script>
