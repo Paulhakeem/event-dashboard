@@ -1,4 +1,5 @@
 <template>
+  <FormLoading v-if="isLoading" />
   <div
     class="mt-7 bg-white border border-gray-200 rounded-xl shadow-2xs dark:bg-neutral-900 dark:border-neutral-700"
   >
@@ -73,8 +74,10 @@
 
 <script setup>
 const email = ref("");
+const isLoading = ref(false);
 
 const forgetPassword = async () => {
+  isLoading.value = ref(true);
   try {
     const res = await $fetch("/api/auth/forgot-password", {
       method: "POST",
@@ -87,6 +90,8 @@ const forgetPassword = async () => {
     }
   } catch (error) {
     alert(res.statusMessage);
+  } finally {
+    isLoading.value = false;
   }
 };
 </script>

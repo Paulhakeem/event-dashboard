@@ -1,5 +1,8 @@
 <template>
-  <div
+  <div v-if="open">
+    <FormForgetPass  @close="open = false"/>
+  </div>
+  <div v-else
     class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900"
   >
     <div
@@ -87,9 +90,6 @@
         </button>
       </form>
     </div>
-  </div>
-  <div v-if="open">
-    <FormForgetPass />
   </div>
 </template>
 
