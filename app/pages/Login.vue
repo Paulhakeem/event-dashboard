@@ -7,6 +7,7 @@
       class="items-center gap-10 pt-10 lg:pt-20 max-w-xl mx-auto"
     >
       <Form />
+      <FormForgetPass/>
     </div>
   </div>
 </template>

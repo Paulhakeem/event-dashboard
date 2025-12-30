@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900">
+  <div
+    class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900"
+  >
     <div
       class="w-full max-w-md bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl p-6 sm:p-8 shadow"
     >
@@ -21,7 +23,9 @@
 
         <!-- Email -->
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
             Email
           </label>
           <input
@@ -29,35 +33,43 @@
             type="email"
             required
             autocomplete="email"
-            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 
-            rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b]
-            dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
         </div>
 
         <!-- Password -->
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
-            Password
-          </label>
+          <div class="flex justify-between">
+            <label
+              class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+            >
+              Password
+            </label>
+            <NuxtLink
+              to=""
+              class="block mb-2 text-sm font-medium text-[#2478ff] underline cursor-pointer"
+            >
+              Forget Password
+            </NuxtLink>
+          </div>
           <input
             v-model="password"
             type="password"
             required
             autocomplete="current-password"
-            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 
-            rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b]
-            dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
         </div>
 
         <!-- Role -->
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">Role</label>
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+            >Role</label
+          >
           <select
             v-model="role"
-            class="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 
-            rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
+            class="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
           >
             <option value="user">User</option>
             <option value="admin">Admin</option>
@@ -68,8 +80,7 @@
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold 
-          rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
+          class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
         >
           {{ isLoading ? "Logging In..." : "Log In" }}
         </button>
@@ -77,8 +88,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script setup>
 import { ref } from "vue";
@@ -112,7 +121,6 @@ const login = async () => {
     } else {
       navigateTo("/user/dashboard");
     }
-
   } catch (error) {
     errorMessage.value =
       error?.data?.statusMessage ||
@@ -123,4 +131,3 @@ const login = async () => {
   }
 };
 </script>
-
