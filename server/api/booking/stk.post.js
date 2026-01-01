@@ -1,12 +1,10 @@
-
-import stkpush from "~/server/utils/stkpush";
+import { stkPush } from "~/server/utils/stkPush";
 import connectDB from "~/server/utils/mongoose";
 import { Event } from "~/server/models/Events";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const { phone, eventId, userId } = body;
-  const config = useRuntimeConfig();
 
   if (!phone || !eventId || !userId) {
     throw createError({
@@ -25,7 +23,6 @@ export default defineEventHandler(async (event) => {
   const reference = `EVT-${Date.now()}`;
 
   const response = await stkPush(
-    config,
     phone,
     1, // sandbox amount
     reference
@@ -34,6 +31,6 @@ export default defineEventHandler(async (event) => {
   return {
     message: "STK Push sent",
     reference,
-    checkoutRequestID: response.data.CheckoutRequestID,
+    checkoutRequestID: response.CheckoutRequestID,
   };
 });

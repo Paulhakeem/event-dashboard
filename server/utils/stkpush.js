@@ -1,7 +1,8 @@
 import getMpesaToken from "./mpesa";
 import { Buffer } from "buffer";
 
-export async function stkPush(config, phone, amount, reference) {
+export async function stkPush(phone, amount, reference) {
+  const config = useRuntimeConfig();
   const token = await getMpesaToken();
 
   const timestamp = new Date()
@@ -13,32 +14,32 @@ export async function stkPush(config, phone, amount, reference) {
     config.mpesaShortcode + config.mpesaPasskey + timestamp
   ).toString("base64");
 
-  try {
-    const res = await $fetch(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-      {
-        BusinessShortCode: config.mpesaShortcode,
-        Password: password,
-        Timestamp: timestamp,
-        TransactionType: "CustomerPayBillOnline",
-        Amount: amount,
-        PartyA: phone,
-        PartyB: config.mpesaShortcode,
-        PhoneNumber: phone,
-        CallBackURL: config.mpesaCallbackUrl,
-        AccountReference: reference,
-        TransactionDesc: "Event Booking",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const body = {
+    BusinessShortCode: config.mpesaShortcode,
+    Password: password,
+    Timestamp: timestamp,
+    TransactionType: "CustomerPayBillOnline",
+    Amount: amount,
+    PartyA: phone,
+    PartyB: config.mpesaShortcode,
+    PhoneNumber: phone,
+    CallBackURL: config.mpesaCallbackUrl,
+    AccountReference: reference,
+    TransactionDesc: "Event Booking",
+  };
 
-    return res.data;
+  try {
+    const res = await $fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+      method: "POST",
+      body,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res;
   } catch (err) {
-    console.error("STK Push failed:", err?.response?.data || err.message || err);
+    console.error("STK Push failed:", err?.data || err?.response || err.message || err);
     throw err;
   }
 }
