@@ -31,12 +31,17 @@ export default defineNuxtConfig({
     emailPass: process.env.EMAIL_PASSWORD,
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
-    // paystack
-    paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
+
+    // mpesa
+    mpesaConsumerKey: process.env.MPESA_CONSUMER_KEY,
+    mpesaConsumerSecret: process.env.MPESA_CONSUMER_SECRET,
+    mpesaShortcode: process.env.MPESA_SHORTCODE,
+    mpesaPasskey: process.env.MPESA_PASSKEY,
+    mpesaCallbackUrl: process.env.MPESA_CALLBACK_URL,
+
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
     },
   },
 });
