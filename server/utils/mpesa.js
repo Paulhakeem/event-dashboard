@@ -1,4 +1,5 @@
 import { Buffer } from "buffer";
+import axios from "axios";
 export default async function getMpesaToken() {
   const config = useRuntimeConfig();
   const auth = Buffer.from(
@@ -6,7 +7,7 @@ export default async function getMpesaToken() {
   ).toString("base64");
 
   try {
-    const res = await $fetch(
+    const res = await axios.get(
       "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
       {
         method: "GET",

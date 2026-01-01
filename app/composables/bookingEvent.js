@@ -1,8 +1,8 @@
 export default function useEventBooking() {
-  const config = useRuntimeConfig();
   const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
+  const phone = ref("0792857288");
 
   const event = ref({});
   const ticketType = ref("regular");
@@ -22,76 +22,40 @@ export default function useEventBooking() {
     }
   });
 
-  const verifyPayment = async (reference) => {
-    loading.value = true;
+  const bookAndPay = async () => {
+    if (!phone.value) {
+      alert("Enter phone number");
+      return;
+    }
+
+    // format phone: 07xx → 2547xx
+    const formattedPhone = phone.value.startsWith("0")
+      ? "254" + phone.value.slice(1)
+      : phone.value;
+
     try {
-      const verifyResponse = await $fetch("/api/booking/verify", {
+      loading.value = true;
+
+      await $fetch("/api/booking/stk", {
         method: "POST",
         body: {
-          reference,
+          phone: formattedPhone,
           eventId: id,
           userId: user.value.id,
-          ticketType: ticketType.value,
         },
       });
-      successMessage.value = verifyResponse.message;
-      alert("Payment successful! Check your email.");
+
+      alert("Check your phone and enter M-Pesa PIN 📲");
     } catch (err) {
-      error.value = err?.message || "Payment verification failed";
-      alert(error.value);
+      alert(err?.data?.message || "Failed to initiate payment");
     } finally {
       loading.value = false;
     }
   };
 
-  const bookAndPay = () => {
-    const PaystackPop = window.PaystackPop;
-    if (!PaystackPop) {
-      alert("Paystack not loaded yet");
-      return;
-    }
-
-    if (!ticketType.value) {
-      alert("Please select a ticket type before paying.");
-      return;
-    }
-
-    const amountMap = {
-      regular: event.value.regular,
-      vip: event.value.vip,
-      vvip: event.value.vvip,
-    };
-
-    const amount = (amountMap[ticketType.value] || 0) * 100;
-    if (!amount || amount <= 0) {
-      alert("Invalid ticket price. Please reload the page or contact support.");
-      return;
-    }
-
-    const handler = PaystackPop.setup({
-      key: config.public.paystackPublicKey,
-      email: user.value.email,
-      amount,
-      currency: "KES",
-      metadata: {
-        eventId: id,
-        userId: user.value.id,
-        ticketType: ticketType.value,
-        eventName: event.value.title,
-      },
-      callback: function (response) {
-        verifyPayment(response.reference);
-      },
-      onClose: function () {
-        alert("Transaction was not completed.");
-      },
-    });
-
-    handler.openIframe();
-  };
-
   return {
     event,
+    phone,
     ticketType,
     loading,
     error,

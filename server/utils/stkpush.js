@@ -1,6 +1,6 @@
 import getMpesaToken from "./mpesa";
 import { Buffer } from "buffer";
-
+import axios from "axios";
 export async function stkPush(phone, amount, reference) {
   const config = useRuntimeConfig();
   const token = await getMpesaToken();
@@ -29,7 +29,7 @@ export async function stkPush(phone, amount, reference) {
   };
 
   try {
-    const res = await $fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+    const res = await axios.post("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
       method: "POST",
       body,
       headers: {
