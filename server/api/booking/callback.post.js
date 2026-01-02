@@ -1,5 +1,5 @@
-import connectDB from "../../utils/mongoose";
-import { TotalBooking } from "../../models/totalBooking";
+import connectDB from "~~/server/utils/mongoose";
+import { TotalBooking } from "~~/server/models/totalBooking";
 // import { User } from "~/server/models/User";
 // import { Event } from "~/server/models/Events";
 
