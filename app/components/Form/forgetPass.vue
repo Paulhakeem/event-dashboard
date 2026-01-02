@@ -10,12 +10,13 @@
         </h1>
         <p class="mt-2 text-sm text-gray-600 dark:text-neutral-400">
           Remember your password?
-          <NuxtLink
-            to="/login"
+          <button
+            type="button"
+            @click="$emit('close')"
             class="text-blue-600 decoration-2 hover:underline focus:outline-hidden focus:underline font-medium dark:text-blue-500"
           >
             Login here
-          </NuxtLink>
+          </button>
         </p>
       </div>
 
@@ -73,23 +74,28 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+
+const emit = defineEmits(["close", "sent"]);
+
 const email = ref("");
 const isLoading = ref(false);
 
 const forgetPassword = async () => {
-  isLoading.value = ref(true);
+  isLoading.value = true;
   try {
     const res = await $fetch("/api/auth/forgot-password", {
       method: "POST",
-      body: {
-        email: email.value,
-      },
+      body: { email: email.value },
     });
-    if (res) {
+    if (res?.message) {
       alert(res.message);
     }
+    // notify parent to open reset form
+    emit('sent', email.value);
   } catch (error) {
-    alert(res.statusMessage);
+    const msg = error?.data?.statusMessage || error?.data?.message || 'Request failed.';
+    alert(msg);
   } finally {
     isLoading.value = false;
   }

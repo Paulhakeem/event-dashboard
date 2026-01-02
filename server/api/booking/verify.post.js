@@ -2,7 +2,6 @@ import connectDB from "~~/server/utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking.js";
 import nodemailer from "nodemailer";
 import { User } from "~~/server/models/User.js";
-import { paystackClient } from "~~/server/utils/paystack.js";
 import { Event } from "../../models/Events.js";
 
 export default defineEventHandler(async (event) => {

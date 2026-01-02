@@ -22,15 +22,24 @@ export default defineEventHandler(async (event) => {
 
   const reference = `EVT-${Date.now()}`;
 
-  const response = await stkPush(
-    phone,
-    1, // sandbox amount
-    reference
-  );
+  try {
+    const response = await stkPush(
+      phone,
+      1, // sandbox amount
+      reference
+    );
 
-  return {
-    message: "STK Push sent",
-    reference,
-    checkoutRequestID: response.CheckoutRequestID,
-  };
+    return {
+      message: "STK Push sent",
+      reference,
+      checkoutRequestID: response?.CheckoutRequestID ?? null,
+      raw: response,
+    };
+  } catch (err) {
+    console.error("STK endpoint error:", err?.response?.data ?? err?.message ?? err);
+    throw createError({
+      statusCode: err?.response?.status ?? 500,
+      statusMessage: JSON.stringify(err?.response?.data ?? err?.message ?? "STK Push failed"),
+    });
+  }
 });

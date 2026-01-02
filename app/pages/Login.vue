@@ -3,10 +3,8 @@
     class="bg-gray-200 min-h-screen w-full px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
   >
     <!-- Grid -->
-    <div
-      class="items-center gap-10 pt-10 lg:pt-20 max-w-xl mx-auto"
-    >
-      <Form />
-    </div>
+      <div class="items-center gap-10 pt-10 lg:pt-20 max-w-xl mx-auto">
+        <Form />
+      </div>
   </div>
 </template>

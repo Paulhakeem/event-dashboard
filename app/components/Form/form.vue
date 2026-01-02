@@ -1,6 +1,9 @@
 <template>
-  <div v-if="open">
-    <FormForgetPass  @close="open = false"/>
+  <div v-if="modal === 'forget'">
+    <FormForgetPass @close="modal = 'login'" @sent="openReset" />
+  </div>
+  <div v-else-if="modal === 'reset'">
+    <FormResetPass :initialEmail="sentEmail" @close="modal = 'login'" />
   </div>
   <div v-else
     class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900"
@@ -135,9 +138,15 @@ const login = async () => {
   }
 };
 
-const open = ref(false);
+const modal = ref('login'); // 'login' | 'forget' | 'reset'
+const sentEmail = ref('');
 
 const openModal = () => {
-  open.value = !open.value;
+  modal.value = 'forget';
+};
+
+const openReset = (email) => {
+  sentEmail.value = email || '';
+  modal.value = 'reset';
 };
 </script>

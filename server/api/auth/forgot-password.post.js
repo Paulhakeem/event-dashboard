@@ -23,10 +23,15 @@ export default defineEventHandler(async (event) => {
 
   await user.save();
 
-  // Send email here (nodemailer)
-  await sendResetEmail(email, resetCode);
+  // Send email here (nodemailer) — don't crash if mail fails
+  const sendResult = await sendResetEmail(email, resetCode);
+
+  const message = sendResult?.ok
+    ? "Password reset code sent to your email"
+    : "Password reset code generated. Email sending failed or SMTP not configured.";
 
   return {
-    message: "Password reset code sent to your email",
+    message,
+    _mail: sendResult?.message || null,
   };
 });
