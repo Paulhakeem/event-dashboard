@@ -51,13 +51,12 @@
             >
               Password
             </label>
-            <NuxtLink
-              to=""
+            <button
               @click="openModal"
               class="block mb-2 text-sm font-medium text-[#2478ff] underline cursor-pointer"
             >
               Forget Password
-            </NuxtLink>
+            </button>
           </div>
           <input
             v-model="password"
