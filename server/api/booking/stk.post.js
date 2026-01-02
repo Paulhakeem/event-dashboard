@@ -1,6 +1,6 @@
-import { stkPush } from "../../utils/stkPush";
-import connectDB from "../../utils/mongoose";
-import { Event } from "../../models/Events";
+import { stkPush } from "~~/server/utils/stkPush";
+import connectDB from "~~/server/utils/mongoose";
+import { Event } from "~~/server/models/Events";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -36,10 +36,15 @@ export default defineEventHandler(async (event) => {
       raw: response,
     };
   } catch (err) {
-    console.error("STK endpoint error:", err?.response?.data ?? err?.message ?? err);
+    console.error(
+      "STK endpoint error:",
+      err?.response?.data ?? err?.message ?? err
+    );
     throw createError({
       statusCode: err?.response?.status ?? 500,
-      statusMessage: JSON.stringify(err?.response?.data ?? err?.message ?? "STK Push failed"),
+      statusMessage: JSON.stringify(
+        err?.response?.data ?? err?.message ?? "STK Push failed"
+      ),
     });
   }
 });
