@@ -1,16 +1,16 @@
 import getMpesaToken from "./mpesa";
 import { Buffer } from "buffer";
 import axios from "axios";
-export default async function stkPush(phone, amount, reference) {
+
+export async function stkPush(phone, amount, reference) {
   const config = useRuntimeConfig();
   const token = await getMpesaToken();
 
- const timestamp = new Date()
+  const timestamp = new Date()
     .toISOString()
     .replace(/[^0-9]/g, "")
     .slice(0, 14);
 
-  // Generate STK Password (CORRECT)
   const password = Buffer.from(
     `${config.mpesaShortcode}${config.mpesaPasskey}${timestamp}`
   ).toString("base64");
@@ -41,12 +41,9 @@ export default async function stkPush(phone, amount, reference) {
       }
     );
 
-    console.log(res);
+    return res?.data ?? res;
   } catch (err) {
-    console.error(
-      "STK Push failed:",
-      err?.response?.data ?? err?.message ?? err
-    );
+    console.error("STK Push failed:", err?.response?.data ?? err?.message ?? err);
     throw err;
   }
 }
