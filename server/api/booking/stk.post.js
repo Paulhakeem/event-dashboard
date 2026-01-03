@@ -1,4 +1,4 @@
-import { stkPush } from "~~/server/utils/stkPush";
+import { stkPush } from "~~/server/utils/stkPush.js";
 import connectDB from "~~/server/utils/mongoose";
 import { Event } from "~~/server/models/Events";
 
