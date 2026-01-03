@@ -1,7 +1,7 @@
 import getMpesaToken from "./mpesa";
 import { Buffer } from "buffer";
 import axios from "axios";
-export async function stkPush(phone, amount, reference) {
+export default async function stkPush(phone, amount, reference) {
   const config = useRuntimeConfig();
   const token = await getMpesaToken();
 
