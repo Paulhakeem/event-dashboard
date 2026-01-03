@@ -1,5 +1,5 @@
 
-import { stkPush } from "~~/server/utils/stkPush.js";
+import { stk } from "~~/server/utils/stk";
 import connectDB from "~~/server/utils/mongoose.js";
 import { Event } from "~~/server/models/Events.js";
 
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   const reference = `EVT-${Date.now()}`;
 
   try {
-    const response = await stkPush(
+    const response = await stk(
       phone,
       1, // sandbox amount
       reference
