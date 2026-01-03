@@ -1,6 +1,7 @@
+
 import { stkPush } from "~~/server/utils/stkPush.js";
-import connectDB from "~~/server/utils/mongoose";
-import { Event } from "~~/server/models/Events";
+import connectDB from "~~/server/utils/mongoose.js";
+import { Event } from "~~/server/models/Events.js";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
