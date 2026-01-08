@@ -5,62 +5,43 @@
     <!-- Header -->
     <div class="flex flex-wrap justify-between items-center gap-2">
       <div>
-        <h2 class="text-sm text-gray-500 dark:text-neutral-500">New Users</h2>
-        <p
-          class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
-        >
-          0.0
-        </p>
-      </div>
-      <div>
-        <span
-          class="py-[5px] px-1.5 inline-flex items-center gap-x-1 text-xs font-medium rounded-md bg-red-100 text-red-600 dark:bg-teal-500/10 dark:text-teal-500"
-        >
-          <Icon name="solar:arrow-down-linear" class="text-lg" />
-          0.5%
-        </span>
+        <h2 class="text-sm text-gray-500 dark:text-neutral-500">Type of event</h2>
       </div>
     </div>
     <!-- End Header -->
 
-    <LineChart
-      :data="chartData"
-      :height="300"
-      x-label="Time"
-      y-label="Temperature"
-      :categories="categories"
-      :y-num-ticks="4"
-      :x-num-ticks="7"
-      :x-formatter="xFormatter"
-      :curve-type="CurveType.Basis"
-      :legend-position="LegendPosition.Top"
-      :hide-legend="false"
-      :y-grid-line="true"
-    />
+    <!-- chart graph -->
+   <div class="mt-20 flex items-center justify-center">
+    <div class="flex flex-col md:flex-row items-center gap-8">
+      <!-- Pie chart -->
+      <div
+        class="relative w-48 h-48 md:w-64 md:h-64 rounded-full bg-[conic-gradient(#9d4e8a_0_var(--p1),#3a83f6_var(--p1)_calc(var(--p1)+var(--p2)),#16c851_calc(var(--p1)+var(--p2))_100%)]"
+        style="--p1: 40%; --p2: 35%; --p3: 25%"
+        aria-label="Pie chart showing 3 segments"
+      ></div>
+
+      <!-- Legend -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="inline-block w-3 h-3 rounded-full bg-[#9d4e8a]"></span>
+          <span class="text-gray-700 font-medium text-sm">Entertainment</span>
+          <span class="text-gray-500">40%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="inline-block w-3 h-3 rounded-full bg-[#3a83f6]"></span>
+          <span class="text-gray-700 font-medium text-sm">Arts & Culture</span>
+          <span class="text-gray-500">35%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="inline-block w-3 h-3 rounded-full bg-[#16c851]"></span>
+          <span class="text-gray-700 font-medium text-sm">Tech & Business</span>
+          <span class="text-gray-500">25%</span>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-const chartData = [
-  { month: "Jan", users: 186 },
-  { month: "Feb", users: 305 },
-  { month: "Mar", users: 237 },
-  { month: "Apr", users: 260 },
-  { month: "May", users: 209 },
-  { month: "June", users: 250 },
-  { month: "July", users: 200 },
-  { month: "Aug", users: 150 },
-  { month: "Sep", users: 250 },
-  { month: "Oct", users: 50 },
-  { month: "Nov", users: 100 },
-  { month: "Dec", users: 270 },
-];
-
-const categories: Record<string, BulletLegendItemInterface> = {
-  users: { name: "Users", color: "#3b82f6" },
-};
-
-const xFormatter = (tick: number, _i?: number, _ticks?: number[]): string => {
-  return chartData[tick]?.month ?? "";
-};
 </script>

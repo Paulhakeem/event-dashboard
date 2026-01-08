@@ -33,7 +33,7 @@
       <div class="p-4 md:p-5">
         <div class="flex items-center gap-x-2">
           <p class="text-xs uppercase text-gray-500 dark:text-neutral-500">
-            Events Booked
+           Total Events
           </p>
         </div>
 
@@ -41,7 +41,7 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            0.0%
+           {{ events.length }}
           </h3>
         </div>
       </div>
@@ -55,42 +55,50 @@
       <div class="p-4 md:p-5">
         <div class="flex items-center gap-x-2">
           <p class="text-xs uppercase text-gray-500 dark:text-neutral-500">
-            Avg. Click Rate
+            Event Booking
           </p>
-        </div>
-
-        <div class="mt-1 flex items-center gap-x-2">
-          <h3
-            class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
-          >
-            0.0%
-          </h3>
-          <span class="flex items-center gap-x-1 text-red-600">
-            <Icon name="streamline:graph-arrow-decrease" />
-            <span class="inline-block text-sm"> -0.0% </span>
+          <span class="flex items-center gap-x-1 text-gray-600">
+            <Icon name="pixel:calender-solid"/>
           </span>
         </div>
+
+        <div class="mt-1 flex items-center gap-x-2">
+          <h3
+            class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
+          >
+            {{ eventsBooked.length }}
+          </h3>
+          <p class="flex items-center text-center justify-center gap-x-1 text-red-600 text-xs font-medium">
+          <span>
+              <Icon name="mingcute:arrow-down-line"/> 20% vs last month
+          </span>
+          </p>
+        </div>
       </div>
     </div>
     <!-- End Card -->
 
-    <!-- Card -->
+       <!-- Card -->
     <div
       class="flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-800 dark:border-neutral-700"
     >
       <div class="p-4 md:p-5">
         <div class="flex items-center gap-x-2">
           <p class="text-xs uppercase text-gray-500 dark:text-neutral-500">
-            Total Events
+           Notifications
           </p>
+           <span class="flex items-center gap-x-1 text-gray-600">
+            <Icon name="rivet-icons:bell-solid" />
+          </span>
         </div>
 
         <div class="mt-1 flex items-center gap-x-2">
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            {{ events.length }}
+          0
           </h3>
+         
         </div>
       </div>
     </div>
@@ -101,4 +109,5 @@
 <script setup>
 const { users } = totalUsers()
 const {events} = totalEvents()
+const {eventsBooked} = eventsBooking()
 </script>
