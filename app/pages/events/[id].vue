@@ -1,179 +1,154 @@
 <template>
-  <div class="bg-gray-200 select-none">
-    <div
-      class="max-w-5xl px-4 xl:px-0 lg:pt-10 lg:pb-10 mx-auto place-content-center"
-    >
-      <!-- Title -->
-      <div class="max-w-3xl mb-5 md:pt-10 lg:mb-10">
-        <h2
-          class="text-[#9c4e8b] font-semibold text-2xl md:text-4xl md:leading-tight"
-        >
-          Event Details
-        </h2>
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200">
+      <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
+        <NuxtLink to="/eventPage" class="inline-flex items-center text-[#9c4e8b] hover:text-[#7c3a6d] mb-4 transition">
+          <Icon name="gg:arrow-left" class="mr-2" />
+          Back to Events
+        </NuxtLink>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900">{{ event?.title }}</h1>
+        <p class="text-gray-600 mt-2 text-lg">Book your tickets for an unforgettable experience</p>
       </div>
-      <!-- End Title -->
+    </div>
 
-      <!-- Grid -->
-      <!-- <div class="flex justify-center items-center"> -->
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-10 lg:gap-12 items-center lg:items-center mx-auto"
-      >
-        <div class="aspect-w-16 aspect-h-9 lg:aspect-none">
-          <img
-            class="size-96 object-cover rounded-xl"
-            :src="event?.image"
-            alt="Features Image"
-          />
-        </div>
-        <!-- End Col -->
-        <!-- List -->
-        <div class="space-y-3 sm:items-center">
-          <dl class="flex gap-1">
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Title:</span
-              >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="first-letter:uppercase me-1 inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  {{ event?.title }}
-                </li>
-              </ul>
-            </dd>
-          </dl>
-
-          <dl class="flex sm:flex-row gap-1">
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Description:</span
-              >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  {{ event?.description }}
-                </li>
-              </ul>
-            </dd>
-          </dl>
-
-          <dl class="flex sm:flex-row gap-1">
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Location:</span
-              >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  {{ event?.location }}
-                </li>
-              </ul>
-            </dd>
-          </dl>
-
-          <dl class="flex sm:flex-row gap-1">
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Date:</span
-              >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  {{ new Date(event?.date).toLocaleDateString() }}
-                </li>
-              </ul>
-            </dd>
-          </dl>
-          <!-- Ticket selection -->
-           <p>Ticket selection</p>
-          <select v-model="ticketType" class="w-72 p-2 border border-gray-400 rounded-md bg-[#9c4e8b] text-gray-200">
-            <option value="regular" class="hover:bg-whte">Regular - KES {{ event?.regular }}</option>
-            <option value="vip">VIP - KES {{ event?.vip }}</option>
-            <option value="vvip">VVIP - KES {{ event?.vvip }}</option>
-          </select>
-
-          <!-- payment infor -->
-          <div class="mt-4 pt-4 border-t border-gray-300">
-            <h3 class="text-lg font-medium text-gray-800 dark:text-neutral-200">
-              Mpesa Payment Information
-            </h3>
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Event Image & Details -->
+        <div class="lg:col-span-2">
+          <!-- Image -->
+          <div class="mb-8">
+            <img
+              :src="event?.image"
+              alt="Event"
+              class="w-full h-96 object-cover rounded-2xl shadow-lg"
+            />
           </div>
 
-          <!-- user information eg name and email -->
-          <dl class="flex sm:flex-row gap-1">
-            <p>{{ error }}</p>
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Name:</span
+          <!-- Event Info Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow-md">
+              <p class="text-xs text-gray-500 uppercase">Location</p>
+              <p class="text-sm font-semibold text-gray-900">📍 {{ event?.location }}</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md">
+              <p class="text-xs text-gray-500 uppercase">Date</p>
+              <p class="text-sm font-semibold text-gray-900">📅 {{ new Date(event?.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md">
+              <p class="text-xs text-gray-500 uppercase">Type</p>
+              <p class="text-sm font-semibold text-gray-900">🎭 {{ event?.eventType || 'Event' }}</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-md">
+              <p class="text-xs text-gray-500 uppercase">Status</p>
+              <p
+                :class="{
+                  'text-green-600': event?.status === 'upcoming',
+                  'text-blue-600': event?.status === 'ongoing',
+                  'text-gray-600': event?.status === 'completed',
+                  'text-red-600': event?.status === 'cancelled',
+                }"
+                class="text-sm font-semibold capitalize"
               >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  {{ user.firstName }} {{ user.lastName }}
-                </li>
-              </ul>
-            </dd>
-          </dl>
-          <dl class="flex sm:flex-row gap-1">
-            <dt class="min-w-40">
-              <span class="block text-sm text-gray-500 dark:text-neutral-500"
-                >Email:</span
-              >
-            </dt>
-            <dd>
-              <ul>
-                <li
-                  class="me-1 after:content-[','] inline-flex items-center text-sm text-gray-800 dark:text-neutral-200"
-                >
-                  <span>{{ user.email }}</span>
-                </li>
-              </ul>
-            </dd>
-          </dl>
-          <!-- amount to pay -->
+                {{ event?.status || 'upcoming' }}
+              </p>
+            </div>
+          </div>
 
-          <!-- choose different method of payment -->
-          <div class="mt-6">
-            <h4
-              class="text-md font-medium text-gray-800 dark:text-neutral-200 mb-2"
-            >
-              Payment Method:
-            </h4>
-            <div class="flex gap-4 items-center">
-              <!-- mpesa payment -->
-              <div
-                @click="bookAndPay"
-                class="border border-gray-300 w-42 p-5 text-center items-center rounded-md cursor-pointer"
-              >
-                <Icon name="mingcute:phone-fill" class="text-3xl" />
-                <p class="text-gray-500">M-Pesa</p>
+          <!-- Description -->
+          <div class="bg-white p-8 rounded-2xl shadow-md mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
+            <p class="text-gray-700 leading-relaxed text-lg">
+              {{ event?.description }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Booking Sidebar -->
+        <div class="lg:col-span-1">
+          <!-- Ticket Selection -->
+          <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-4">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Book Your Tickets</h3>
+
+            <!-- Ticket Options -->
+            <div class="space-y-3 mb-8">
+              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'regular' }">
+                <input type="radio" v-model="ticketType" value="regular" class="w-5 h-5 text-[#9c4e8b]" />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">Regular Ticket</p>
+                  <p class="text-sm text-gray-600">Standard access</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.regular }}</span>
+              </label>
+
+              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'vip' }">
+                <input type="radio" v-model="ticketType" value="vip" class="w-5 h-5 text-[#9c4e8b]" />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">VIP Ticket ⭐</p>
+                  <p class="text-sm text-gray-600">Premium experience</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.vip }}</span>
+              </label>
+
+              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'vvip' }">
+                <input type="radio" v-model="ticketType" value="vvip" class="w-5 h-5 text-[#9c4e8b]" />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">VVIP Ticket 👑</p>
+                  <p class="text-sm text-gray-600">Exclusive access</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.vvip }}</span>
+              </label>
+            </div>
+
+            <!-- Tickets Available -->
+            <div class="mb-6 p-3 bg-blue-50 rounded-lg">
+              <p class="text-sm text-blue-700">🎟️ {{ event?.TicketQuantity || 0 }} tickets available</p>
+            </div>
+
+            <!-- User Info -->
+            <div class="space-y-3 mb-6 pb-6 border-b border-gray-200">
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">Your Name</p>
+                <p class="text-gray-900 font-semibold">{{ user.firstName }} {{ user.lastName }}</p>
               </div>
-              <!-- card payment-->
-              <div
-                class="border border-gray-300 w-42 p-5 text-center items-center rounded-md cursor-pointer"
-              >
-                <Icon name="solar:card-linear" class="text-3xl" />
-                <p class="text-gray-500">Card</p>
+              <div>
+                <p class="text-xs text-gray-500 uppercase font-semibold">Email</p>
+                <p class="text-gray-900 font-semibold">{{ user.email }}</p>
               </div>
             </div>
-            <p v-if="error" class="text-red-500">{{ error }}</p>
-            <p v-if="successMessage" class="text-green-500">
+
+            <!-- Payment Methods -->
+            <div class="mb-6">
+              <h4 class="font-semibold text-gray-900 mb-4">Payment Method</h4>
+              <div class="space-y-3">
+                <button
+                  @click="bookAndPay"
+                  class="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+                >
+                  <Icon name="mingcute:phone-fill" class="text-2xl" />
+                  M-Pesa
+                </button>
+                <button
+                  class="w-full flex items-center justify-center gap-3 p-4 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition duration-200 opacity-50 cursor-not-allowed"
+                  disabled
+                >
+                  <Icon name="solar:card-linear" class="text-2xl" />
+                  Card (Coming Soon)
+                </button>
+              </div>
+            </div>
+
+            <!-- Messages -->
+            <div v-if="error" class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4">
+              {{ error }}
+            </div>
+            <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4">
               {{ successMessage }}
-            </p>
+            </div>
           </div>
         </div>
       </div>
