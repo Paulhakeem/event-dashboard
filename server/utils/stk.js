@@ -6,13 +6,16 @@ export async function stk(phone, amount, reference) {
   const config = useRuntimeConfig();
   const token = await getMpesaToken();
 
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[^0-9]/g, "")
-    .slice(0, 14);
+  const timestamp =
+    date.getFullYear() +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    ("0" + date.getDate()).slice(-2) +
+    ("0" + date.getHours()).slice(-2) +
+    ("0" + date.getMinutes()).slice(-2) +
+    ("0" + date.getSeconds()).slice(-2);
 
   const password = Buffer.from(
-    `${config.mpesaShortcode}${config.mpesaPasskey}${timestamp}`
+    `${config.mpesaShortcode}:{config.mpesaPasskey}${timestamp}`
   ).toString("base64");
 
   const body = {
@@ -43,7 +46,10 @@ export async function stk(phone, amount, reference) {
 
     return res?.data ?? res;
   } catch (err) {
-    console.error("STK Push failed:", err?.response?.data ?? err?.message ?? err);
+    console.error(
+      "STK Push failed:",
+      err?.response?.data ?? err?.message ?? err
+    );
     throw err;
   }
 }

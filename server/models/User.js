@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
       return this.role === "admin";
     },
   },
+  resetCode: { type: String },
+  resetCodeExpires: { type: Date },
   joinedAt: { type: Date, default: Date.now },
 });
 export const User = mongoose.models.User || mongoose.model("User", userSchema);
