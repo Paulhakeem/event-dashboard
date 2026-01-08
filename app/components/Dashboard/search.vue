@@ -1,75 +1,77 @@
 <template>
-  <div
-    class="w-full flex items-center justify-end ms-auto md:justify-between gap-x-1 md:gap-x-3"
-  >
-    <div class="hidden md:block">
-      <!-- Search Input -->
+  <div class="w-full flex items-center justify-between gap-4">
+    <!-- Search Input - Desktop Only -->
+    <div class="hidden md:block flex-1 max-w-md">
       <div class="relative">
-        <div
-          class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-3.5"
-        >
-          <Icon name="material-symbols-light:search-rounded" class="text-lg" />
-        </div>
+        <Icon name="material-symbols-light:search-rounded" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
         <input
           type="text"
-          class="py-2 ps-10 pe-16 block w-full bg-white border-gray-200 rounded-lg text-sm focus:outline-hidden focus:border-blue-500 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder:text-neutral-400 dark:focus:ring-neutral-600"
-          placeholder="Search"
+          placeholder="Search events, users..."
+          class="w-full pl-10 pr-4 py-2.5 bg-white border-2 border-gray-300 rounded-lg text-sm text-gray-800 placeholder-gray-500 transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:border-[#9c4e8b] focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
         />
       </div>
-      <!-- End Search Input -->
     </div>
 
-    <!-- notification icon -->
-    <div class="flex flex-row items-center justify-end gap-1">
+    <!-- Right Actions -->
+    <div class="flex items-center justify-end gap-3">
+      <!-- Notifications Button -->
       <button
         type="button"
-        class="size-9.5 relative inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
+        class="relative p-2.5 inline-flex justify-center items-center text-gray-600 hover:text-[#9c4e8b] hover:bg-gray-100 rounded-lg transition duration-200 focus:outline-none focus:bg-gray-100"
       >
-        <Icon name="si:notifications-line" class="text-xl" />
+        <Icon name="si:notifications-line" class="text-2xl" />
+        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         <span class="sr-only">Notifications</span>
       </button>
 
-      <!-- Profile-->
-      <div
-        class="hs-dropdown [--placement:bottom-right] relative inline-flex items-center gap-2 cursor-pointer"
-      >
-        <p>{{ user.firstName }} {{ user.lastName }}</p>
+      <!-- Profile Section -->
+      <div class="flex items-center gap-3 pl-3 border-l border-gray-200">
+        <!-- User Info - Desktop -->
+        <div class="hidden sm:block text-right">
+          <p class="text-sm font-semibold text-gray-900">{{ user.firstName }} {{ user.lastName }}</p>
+          <p class="text-xs text-gray-500 capitalize">{{ user.role }}</p>
+        </div>
+
+        <!-- Profile Button -->
         <button
           @click="openProfile"
-          id="hs-dropdown-account"
-          type="button"
-          class="cursor-pointer size-9.5 inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none dark:text-white"
-          aria-haspopup="menu"
-          aria-expanded="false"
-          aria-label="Dropdown"
+          class="relative group p-0.5 rounded-full hover:bg-gray-100 transition duration-200 focus:outline-none"
         >
           <img
-            class="shrink-0 size-9.5 rounded-full"
+            class="w-10 h-10 rounded-full object-cover border-2 border-transparent group-hover:border-[#9c4e8b] transition"
             src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=320&h=320&q=80"
-            alt="Avatar"
+            alt="User Avatar"
           />
         </button>
       </div>
-      <!-- End Dropdown -->
     </div>
 
-    <transition name="fade">
+    <!-- Profile Modal -->
+    <transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
       <div
         v-if="profile"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
         @click.self="profile = false"
       >
         <!-- Modal Content -->
-        <div class="relative w-full">
-          <!-- Close button -->
+        <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+          <!-- Close Button -->
           <button
             @click="profile = false"
-            class="absolute top-3 right-3 bg-white rounded-full p-1.2 items-center flex hover:text-gray-800 cursor-pointer"
+            class="absolute top-4 right-4 z-10 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition duration-200"
           >
-            <Icon name="material-symbols:close" class="text-2xl" />
+            <Icon name="material-symbols:close" class="text-2xl text-gray-700" />
             <span class="sr-only">Close modal</span>
           </button>
 
+          <!-- Admin Component -->
           <Admin />
         </div>
       </div>
