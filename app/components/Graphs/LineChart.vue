@@ -5,7 +5,7 @@
     <!-- Header -->
     <div class="flex flex-wrap justify-between items-center gap-2">
       <div>
-        <h2 class="text-sm text-gray-500 dark:text-neutral-500">Type of event</h2>
+        <h2 class="text-sm text-gray-500 dark:text-neutral-500">Event popularity</h2>
       </div>
     </div>
     <!-- End Header -->

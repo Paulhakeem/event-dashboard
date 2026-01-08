@@ -50,6 +50,9 @@ export default defineEventHandler(async (event) => {
   const regular = Number(fields.regular?.[0] || 0);
   const vip = Number(fields.vip?.[0] || 0);
   const vvip = Number(fields.vvip?.[0] || 0);
+  const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
+  const status = String(fields.status?.[0] || "upcoming");
+  const eventType = String(fields.eventType?.[0] || "other");
 
   if (!title || !description || !location || !date || !files.image?.[0]) {
     throw createError({
@@ -84,6 +87,9 @@ export default defineEventHandler(async (event) => {
     regular,
     vip,
     vvip,
+    TicketQuantity,
+    status,
+    eventType,
     image: uploadResult.secure_url, // cloudinary URL
     createdBy: user._id,
   });

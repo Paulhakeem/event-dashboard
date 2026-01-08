@@ -14,6 +14,7 @@
                 <th scope="col" class="px-6 py-4 text-white">Regular Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
+                <th scope="col" class="px-6 py-4 text-white">Cancel Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Delete Event</th>
               </tr>
             </thead>
@@ -43,8 +44,15 @@
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
                   ksh {{ event.vvip }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium">
-                <button @click="removeEvent(event._id)" class="cursor-pointer">delete</button>
+                <td class="whitespace-nowrap px-6 py-4 font-medium text-red-500">
+                <button class="cursor-pointer">
+                 Cancel
+                </button>
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium text-red-500">
+                <button @click="removeEvent(event._id)" class="cursor-pointer">
+                  <Icon name="vaadin:close"/>
+                </button>
                 </td>
               </tr>
               <tr v-if="loading">
