@@ -1,85 +1,69 @@
 <template>
-  <header>
-    <nav
-      class="flex flex-wrap md:flex-nowrap items-center justify-between py-2 md:py-0 mx-2 md:w-[40em] lg:w-[50em] lg:mx-auto"
-    >
-      <div class="flex items-center">
+  <header class="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
         <!-- Logo -->
-        <div class="flex items-center text-xl">
-          <Icon name="mdi:emoji-panda" class="w-8 h-8 text-gray-500" />
-          <p class="text-gray-500 font-semibold">Event</p>
+        <div class="flex items-center gap-3 flex-shrink-0 mr-16">
+          <Icon name="mdi:emoji-panda" class="w-8 h-8 text-[#9c4e8b]" />
+          <p class="text-gray-900 font-bold text-lg">Event</p>
         </div>
-        <!-- End Logo -->
 
-        <div class="ms-1 sm:ms-2"></div>
-      </div>
-
-      <!-- Button Group -->
-      <div v-if="!user" class="md:order-3 flex items-center gap-x-3">
-        <div class="md:ps-3">
-          <NuxtLink
-            to="/login"
-            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-          >
-            Login
-          </NuxtLink>
-        </div>
-      </div>
-      <div v-if="!user" class="md:order-3 flex items-center gap-x-3">
-        <div class="md:ps-3">
-          <NuxtLink
-            to="/signup"
-            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-          >
-            Sign Up
-          </NuxtLink>
-        </div>
-      </div>
-      <!-- End Button Group -->
-      <div v-if="user" class="md:order-3 flex items-center gap-x-3">
-        <div class="md:ps-3 flex gap-8">
-          <NuxtLink
-            :to="
-              user && user.role === 'admin'
-                ? '/admin/dashboard'
-                : '/user/dashboard'
-            "
-            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-          >
-            Dashboard
-          </NuxtLink>
-          <!-- logout -->
-          <button
-            @click="useAuth().logout()"
-            class="group inline-flex items-center gap-x-2 py-2 px-3 bg-gray-200 font-medium text-sm text-nowrap text-gray-700 rounded-lg focus:outline-hidden"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-
-      <!-- Collapse -->
-      <div
-        class="hs-collapse overflow-hidden transition-all duration-300 basis-full grow md:block"
-        aria-labelledby="hs-navbar-floating-dark-collapse"
-      >
-        <div
-          class="flex md:flex-row md:items-center md:justify-end gap-y-3 py-2 md:py-0 md:ps-7"
-        >
+        <!-- Center Menu -->
+        <div class="hidden md:flex md:items-center md:gap-12">
           <NuxtLink
             v-for="(item, idx) in menu"
             :key="idx"
             :to="item.path"
-            class="pe-3 ps-px cursor-pointer sm:px-3 md:py-4 text-sm text-gray-500 hover:text-[#9c4e8b] focus:outline-hidden focus:text-[#9c4e8b]"
-            aria-current="page"
-            >{{ item.name }}</NuxtLink
+            class="text-gray-700 hover:text-[#9c4e8b] font-medium text-sm transition duration-200 relative group px-2"
           >
+            {{ item.name }}
+            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#9c4e8b] group-hover:w-full transition-all duration-300"></span>
+          </NuxtLink>
+        </div>
+
+        <!-- Right Side Auth Buttons -->
+        <div class="flex items-center gap-3">
+          <!-- Not Logged In -->
+          <template v-if="!user">
+            <NuxtLink
+              to="/login"
+              class="py-2 px-4 text-[#9c4e8b] font-semibold text-sm border-2 border-[#9c4e8b] rounded-lg hover:bg-[#9c4e8b]/5 transition"
+            >
+              Login
+            </NuxtLink>
+            <NuxtLink
+              to="/signup"
+              class="py-2 px-4 bg-[#9c4e8b] text-white font-semibold text-sm rounded-lg hover:bg-[#7c3a6d] transition shadow-md"
+            >
+              Sign Up
+            </NuxtLink>
+          </template>
+
+          <!-- Logged In -->
+          <template v-else>
+            <NuxtLink
+              :to="
+                user && user.role === 'admin'
+                  ? '/admin/dashboard'
+                  : '/user/dashboard'
+              "
+              class="py-2 px-4 bg-[#9c4e8b] text-white font-semibold text-sm rounded-lg hover:bg-[#7c3a6d] transition shadow-md"
+            >
+              <Icon name="gg:dashboard" class="inline mr-1" />
+              Dashboard
+            </NuxtLink>
+            <button
+              @click="useAuth().logout()"
+              class="py-2 px-4 text-red-700 font-semibold text-sm border-2 border-red-300 rounded-lg hover:bg-red-50 transition"
+            >
+              <Icon name="mdi:logout" class="inline mr-1" />
+              Logout
+            </button>
+          </template>
         </div>
       </div>
-      <!-- End Collapse -->
     </nav>
   </header>
-  <!-- ========== END HEADER ========== -->
 </template>
 
 <script setup>

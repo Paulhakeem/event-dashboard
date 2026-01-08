@@ -1,54 +1,57 @@
 <template>
-  <section class="">
+  <section>
+    <!-- Mobile Navigation -->
     <div class="pb-4 md:hidden lg:hidden">
-      <div class="grid grid-cols-3 items-center w-full">
-        <Icon
-          class="cursor-pointer text-gray-500"
-          size="30"
-          name="material-symbols:menu"
-          @click="toggleMenu"
-        />
-        <!-- Button Group -->
-        <!-- if user not login -->
-        <div v-if="!user" class="flex gap-6">
-          <div class="md:ps-3">
+      <div class="bg-white border-b border-gray-200 px-4 py-3">
+        <div class="flex items-center justify-between">
+          <!-- Menu Toggle -->
+          <button
+            @click="toggleMenu"
+            class="p-2 rounded-lg hover:bg-gray-100 transition"
+          >
+            <Icon
+              class="text-gray-700"
+              size="28"
+              name="material-symbols:menu"
+            />
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center text-lg">
+            <Icon name="mdi:emoji-panda" class="w-7 h-7 text-[#9c4e8b]" />
+            <p class="text-gray-900 font-bold ml-2">Event</p>
+          </div>
+
+          <!-- Auth Buttons -->
+          <div v-if="!user" class="flex gap-2">
             <NuxtLink
               to="/login"
-              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+              class="py-2 px-3 bg-[#9c4e8b] text-white text-xs font-semibold rounded-lg hover:bg-[#7c3a6d] transition"
             >
               Login
             </NuxtLink>
+            <NuxtLink
+              to="/signup"
+              class="py-2 px-3 bg-gray-200 text-gray-900 text-xs font-semibold rounded-lg hover:bg-gray-300 transition"
+            >
+              Sign Up
+            </NuxtLink>
           </div>
-          <div class="flex items-center">
-            <div class="md:ps-3">
-              <NuxtLink
-                to="/signup"
-                class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
-              >
-                Sign Up
-              </NuxtLink>
-            </div>
 
-            <!-- End Button Group -->
-          </div>
-        </div>
-        <!-- End Button Group -->
-        <div v-if="user" class="md:order-3 flex items-center gap-x-3">
-          <div class="md:ps-3 flex gap-8">
+          <div v-else class="flex gap-2">
             <NuxtLink
               :to="
                 user && user.role === 'admin'
                   ? '/admin/dashboard'
                   : '/user/dashboard'
               "
-              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-[#9c4e8b] font-medium text-sm text-nowrap text-gray-200 rounded-lg focus:outline-hidden"
+              class="py-2 px-3 bg-[#9c4e8b] text-white text-xs font-semibold rounded-lg hover:bg-[#7c3a6d] transition"
             >
               Dashboard
             </NuxtLink>
-            <!-- logout -->
             <button
               @click="useAuth().logout()"
-              class="group inline-flex items-center gap-x-2 py-2 px-3 bg-gray-200 font-medium text-sm text-nowrap text-gray-700 rounded-lg focus:outline-hidden"
+              class="py-2 px-3 bg-red-100 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-200 transition"
             >
               Logout
             </button>
@@ -56,39 +59,71 @@
         </div>
       </div>
 
+      <!-- Mobile Menu -->
       <Transition
-        enter-active-class="transition duration-500 ease-out"
-        enter-from-class="opacity-0 -translate-y-5"
-        enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition duration-300 ease-in"
-        leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-5"
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0 -translate-x-full"
+        enter-to-class="opacity-100 translate-x-0"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100 translate-x-0"
+        leave-to-class="opacity-0 -translate-x-full"
       >
         <div
           v-if="openMenu"
-          class="fixed w-2/3 h-screen bg-[#9c4e8b] shadow-lg top-0 left-0 z-40 p-4"
+          class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-[#9c4e8b] to-[#7c3a6d] shadow-2xl z-50 p-6 overflow-y-auto"
         >
-          <div class="float-right mb-8">
+          <!-- Close Button -->
+          <button
+            @click="toggleMenu"
+            class="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-lg transition"
+          >
             <Icon
-              class="cursor-pointer text-gray-200"
-              size="30"
+              class="text-white"
+              size="28"
               name="material-symbols:close"
-              @click="toggleMenu"
             />
+          </button>
+
+          <!-- Logo -->
+          <div class="flex items-center mb-12 mt-2">
+            <Icon name="mdi:emoji-panda" class="w-8 h-8 text-white" />
+            <p class="text-white font-bold ml-3 text-xl">Event</p>
           </div>
-          <ul class="space-y-6">
-            <li v-for="(item, idx) in menu" :key="idx">
-              <NuxtLink
-                :to="item.path"
-                class="text-gray-200 hover:border-b hover:border-b-[#d8f3f4] text-sm font-medium tracking-wide uppercase"
-                aria-current="page"
-                >{{ item.name }}</NuxtLink
-              >
-            </li>
-          </ul>
+
+          <!-- Menu Items -->
+          <nav class="space-y-3">
+            <NuxtLink
+              v-for="(item, idx) in menu"
+              :key="idx"
+              :to="item.path"
+              class="flex items-center gap-3 text-white px-4 py-3 rounded-lg hover:bg-white/20 transition font-medium"
+              @click="toggleMenu"
+            >
+              <Icon name="gg:chevron-right" />
+              {{ item.name }}
+            </NuxtLink>
+          </nav>
         </div>
       </Transition>
+
+      <!-- Mobile Overlay -->
+      <Transition
+        enter-active-class="transition duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="openMenu"
+          @click="toggleMenu"
+          class="fixed inset-0 bg-black/50 z-40"
+        ></div>
+      </Transition>
     </div>
+
+    <!-- Desktop Navigation -->
     <div class="hidden md:block lg:block">
       <SidebarMain />
     </div>
