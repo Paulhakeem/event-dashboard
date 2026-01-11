@@ -57,10 +57,8 @@
                 <td
                   class="whitespace-nowrap px-6 py-4 font-medium text-gray-500"
                 >
-                  <button
-                    class="cursor-pointer"
-                  >
-                   <Icon name="solar:pen-bold" />
+                  <button @click="openEdit(event)" class="cursor-pointer">
+                    <Icon name="solar:pen-bold" />
                   </button>
                 </td>
                 <td
@@ -86,29 +84,83 @@
       </div>
     </div>
   </div>
+
+  <!-- edit event modal -->
+  <div
+    v-if="editingEvent"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+  >
+    <div class="w-full max-w-2xl rounded bg-white p-6">
+      <h3 class="mb-4 text-lg font-medium">Edit Event</h3>
+      <div class="grid gap-3 md:grid-cols-2">
+        <input
+          v-model="editForm.title"
+          placeholder="Title"
+          class="border p-2"
+        />
+        <input v-model="editForm.date" type="date" class="border p-2" />
+        <input
+          v-model="editForm.location"
+          placeholder="Location"
+          class="border p-2"
+        />
+        <input
+          v-model.number="editForm.regular"
+          placeholder="Regular price"
+          class="border p-2"
+        />
+        <input
+          v-model.number="editForm.vip"
+          placeholder="VIP price"
+          class="border p-2"
+        />
+        <input
+          v-model.number="editForm.vvip"
+          placeholder="VVIP price"
+          class="border p-2"
+        />
+        <select v-model="editForm.status" class="border p-2">
+          <option value="upcoming">📅 Upcoming</option>
+          <option value="ongoing">🔴 Ongoing</option>
+          <option value="completed">✅ Completed</option>
+          <option value="cancelled">❌ Cancelled</option>
+        </select>
+        <select v-model="editForm.eventType" class="border p-2">
+          <option value="other">Select Event Type</option>
+          <option value="Entertainment">🎵 Entertainment</option>
+          <option value="Arts & Culture">🛠️ Arts & Culture</option>
+          <option value="Tech & Business">💻 Tech & Business</option>
+          <option value="other">📌 Other</option>
+        </select>
+        <textarea
+          v-model="editForm.description"
+          placeholder="Description"
+          class="col-span-2 border p-2"
+        ></textarea>
+      </div>
+      <div class="mt-4 flex justify-end gap-2">
+        <button @click="closeEdit" class="rounded border px-4 py-2">
+          Cancel
+        </button>
+        <button
+          @click="submitUpdate"
+          class="rounded bg-[#9c4e8b] px-4 py-2 text-white"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
 const { events, loading } = totalEvents();
-
-const form = ref({
-  status: "",
-});
-
-const removeEvent = async (id) => {
-  const res = await $fetch(`/api/events/${id}`, {
-    method: "DELETE",
-  });
-  console.log(res);
-};
-
-const UpdateEvent = async (id) => {
-  const res = await $fetch(`/api/events/${id}`, {
-    method: "PATCH",
-    body: {
-      status: form.value.status,
-    },
-  });
-  console.log(res);
-};
+const {
+  editingEvent,
+  editForm,
+  removeEvent,
+  openEdit,
+  closeEdit,
+  submitUpdate,
+} = updateEvent(events);
 </script>

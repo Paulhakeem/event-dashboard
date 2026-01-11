@@ -1,9 +1,11 @@
 import { Event } from "../../models/Events.js";
+import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
   const method = event.node.req.method;
   try {
+    await connectDB();
     if (method === "GET") {
       const eventData = await Event.findById(id).exec();
       if (!eventData) {
@@ -29,15 +31,35 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    //  CANCEL EVENT
+    // Update event fields
     if (method === "PATCH") {
       const body = await readBody(event);
-      const { status } = body;
-      const updatedEvent = await Event.findByIdAndUpdate(
-        id,
-        { status },
-        { new: true }
-      );
+      const allowed = [
+        "image",
+        "title",
+        "description",
+        "date",
+        "location",
+        "TicketQuantity",
+        "regular",
+        "vip",
+        "vvip",
+        "status",
+        "eventType",
+      ];
+      const update = {};
+      for (const key of allowed) {
+        if (Object.prototype.hasOwnProperty.call(body, key)) {
+          update[key] = body[key];
+        }
+      }
+      if (Object.keys(update).length === 0) {
+        throw createError({ statusCode: 400, statusMessage: "No valid fields to update" });
+      }
+      const updatedEvent = await Event.findByIdAndUpdate(id, update, {
+        new: true,
+        runValidators: true,
+      });
       if (!updatedEvent) {
         throw createError({
           statusCode: 404,
@@ -46,7 +68,7 @@ export default defineEventHandler(async (event) => {
       }
       return {
         success: true,
-        message: `Event status updated to ${status}`,
+        message: `Event updated successfully`,
         updatedEvent,
       };
     }
