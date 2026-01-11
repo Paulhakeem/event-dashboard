@@ -55,22 +55,22 @@
                   {{ event.status }}
                 </td>
                 <td
-                  class="whitespace-nowrap px-6 py-4 font-medium text-red-500"
-                >
-                  <button
-                    @click="UpdateEvent(event._id)"
-                    class="cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                </td>
-                <td
                   class="whitespace-nowrap px-6 py-4 font-medium text-gray-500"
                 >
                   <button
                     class="cursor-pointer"
                   >
-                    <Icon name="solar:pen-bold" />
+                   <Icon name="solar:pen-bold" />
+                  </button>
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-medium text-red-500"
+                >
+                  <button
+                    @click="removeEvent(event._id)"
+                    class="cursor-pointer"
+                  >
+                    <Icon name="vaadin:close" />
                   </button>
                 </td>
               </tr>
