@@ -28,7 +28,30 @@ export default defineEventHandler(async (event) => {
         message: "Event deleted successfully",
       };
     }
-    // methode not found
+
+    //  CANCEL EVENT
+    if (method === "PATCH") {
+      const body = await readBody(event);
+      const { status } = body;
+      const updatedEvent = await Event.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true }
+      );
+      if (!updatedEvent) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Event not found",
+        });
+      }
+      return {
+        success: true,
+        message: `Event status updated to ${status}`,
+        updatedEvent,
+      };
+    }
+
+    // Method not allowed
     throw createError({
       statusCode: 405,
       statusMessage: "Method not allowed",

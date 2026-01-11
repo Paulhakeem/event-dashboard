@@ -1,9 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-5xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
-        <p class="text-gray-600 text-lg">Fill in the details below to create and publish your event</p>
+        <p class="text-gray-600 text-lg">
+          Fill in the details below to create and publish your event
+        </p>
       </div>
 
       <!-- Form -->
@@ -22,14 +26,23 @@
                 alt="Preview"
                 class="w-full h-full object-cover rounded-xl"
               />
-              <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-xl transition flex items-center justify-center">
+              <div
+                class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-xl transition flex items-center justify-center"
+              >
                 <p class="text-white font-semibold">Click to change image</p>
               </div>
             </div>
-            <div v-else class="flex flex-col items-center justify-center pt-5 pb-6">
-              <Icon name="mdi:cloud-upload" class="text-5xl text-gray-400 mb-3" />
+            <div
+              v-else
+              class="flex flex-col items-center justify-center pt-5 pb-6"
+            >
+              <Icon
+                name="mdi:cloud-upload"
+                class="text-5xl text-gray-400 mb-3"
+              />
               <p class="mb-2 text-sm text-gray-600">
-                <span class="font-semibold">Click to upload</span> or drag and drop
+                <span class="font-semibold">Click to upload</span> or drag and
+                drop
               </p>
               <p class="text-xs text-gray-500">
                 SVG, PNG, JPG or GIF (MAX. 800x400px)
@@ -51,7 +64,9 @@
           <div class="space-y-5">
             <!-- Title -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Title *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Event Title *</label
+              >
               <input
                 v-model="form.title"
                 required
@@ -62,7 +77,9 @@
 
             <!-- Description -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Description *</label
+              >
               <textarea
                 v-model="form.description"
                 required
@@ -75,7 +92,9 @@
             <!-- Location and Date Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Location *</label
+                >
                 <input
                   v-model="form.location"
                   required
@@ -84,7 +103,9 @@
                 />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Date *</label
+                >
                 <input
                   v-model="form.date"
                   required
@@ -96,16 +117,18 @@
 
             <!-- Event Type -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Type *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Event Type *</label
+              >
               <select
                 v-model="form.eventType"
                 required
                 class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium cursor-pointer transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
               >
                 <option value="other">Select Event Type</option>
-                <option value="concert">🎵 Entertainment</option>
-                <option value="workshop">🛠️ Arts & Culture</option>
-                <option value="webinar">💻 Tech & Business</option>
+                <option value="Entertainment">🎵 Entertainment</option>
+                <option value="Arts & Culture">🛠️ Arts & Culture</option>
+                <option value="Tech & Business">💻 Tech & Business</option>
                 <option value="other">📌 Other</option>
               </select>
             </div>
@@ -114,14 +137,23 @@
 
         <!-- Pricing & Tickets -->
         <div class="bg-white rounded-2xl shadow-md p-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Pricing & Tickets</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">
+            Pricing & Tickets
+          </h2>
           <div class="space-y-5">
             <!-- Ticket Prices -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-4">Ticket Prices (Ksh) *</label>
+              <label class="block text-sm font-semibold text-gray-700 mb-4"
+                >Ticket Prices (Ksh) *</label
+              >
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">Regular</label>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >Regular</label
+                  >
                   <input
                     v-model.number="form.regular"
                     required
@@ -131,8 +163,13 @@
                     class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
                   />
                 </div>
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">⭐ VIP</label>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >⭐ VIP</label
+                  >
                   <input
                     v-model.number="form.vip"
                     required
@@ -142,8 +179,13 @@
                     class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
                   />
                 </div>
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">👑 VVIP</label>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >👑 VVIP</label
+                  >
                   <input
                     v-model.number="form.vvip"
                     required
@@ -159,7 +201,9 @@
             <!-- Ticket Quantity & Status Row -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Total Ticket Quantity *</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Total Ticket Quantity *</label
+                >
                 <input
                   v-model.number="form.TicketQuantity"
                   required
@@ -171,7 +215,9 @@
               </div>
 
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Event Status *</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Event Status *</label
+                >
                 <select
                   v-model="form.status"
                   required
@@ -194,7 +240,11 @@
             :disabled="isLoading"
             class="flex-1 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-bold py-4 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
           >
-            <Icon v-if="isLoading" name="mdi:loading" class="inline mr-2 animate-spin" />
+            <Icon
+              v-if="isLoading"
+              name="mdi:loading"
+              class="inline mr-2 animate-spin"
+            />
             {{ isLoading ? "Creating Event..." : "Create Event" }}
           </button>
           <button

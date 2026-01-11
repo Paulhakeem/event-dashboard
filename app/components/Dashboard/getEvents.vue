@@ -14,7 +14,9 @@
                 <th scope="col" class="px-6 py-4 text-white">Regular Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
-                <th scope="col" class="px-6 py-4 text-white">Cancel Event</th>
+                <th scope="col" class="px-6 py-4 text-white">Event Type</th>
+                <th scope="col" class="px-6 py-4 text-white">Status</th>
+                <th scope="col" class="px-6 py-4 text-white">Edit Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Delete Event</th>
               </tr>
             </thead>
@@ -44,15 +46,32 @@
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
                   ksh {{ event.vvip }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium text-red-500">
-                <button class="cursor-pointer">
-                 Cancel
-                </button>
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                  {{ event.eventType }}
                 </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium text-red-500">
-                <button @click="removeEvent(event._id)" class="cursor-pointer">
-                  <Icon name="vaadin:close"/>
-                </button>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-medium text-green-500"
+                >
+                  {{ event.status }}
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-medium text-red-500"
+                >
+                  <button
+                    @click="UpdateEvent(event._id)"
+                    class="cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </td>
+                <td
+                  class="whitespace-nowrap px-6 py-4 font-medium text-gray-500"
+                >
+                  <button
+                    class="cursor-pointer"
+                  >
+                    <Icon name="solar:pen-bold" />
+                  </button>
                 </td>
               </tr>
               <tr v-if="loading">
@@ -72,11 +91,24 @@
 <script setup>
 const { events, loading } = totalEvents();
 
-const removeEvent = async(id)=> {
-  const res = await $fetch(`/api/events/${id}`, {
-    method: "DELETE"
-  })
-  console.log(res)
-}
+const form = ref({
+  status: "",
+});
 
+const removeEvent = async (id) => {
+  const res = await $fetch(`/api/events/${id}`, {
+    method: "DELETE",
+  });
+  console.log(res);
+};
+
+const UpdateEvent = async (id) => {
+  const res = await $fetch(`/api/events/${id}`, {
+    method: "PATCH",
+    body: {
+      status: form.value.status,
+    },
+  });
+  console.log(res);
+};
 </script>
