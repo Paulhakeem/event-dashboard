@@ -54,7 +54,7 @@ export default defineEventHandler(async (event) => {
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
 
-  if (!title || !description || !location || !date || !files.image?.[0]) {
+  if (!title || !description || !location || !date || !TicketQuantity || !eventType || !status || !files.image?.[0]) {
     throw createError({
       statusCode: 400,
       statusMessage: "All fields are required",
