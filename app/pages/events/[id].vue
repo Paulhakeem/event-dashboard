@@ -1,14 +1,23 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100"
+  >
     <!-- Header -->
     <div class="bg-white border-b border-gray-200">
       <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
-        <NuxtLink to="/eventPage" class="inline-flex items-center text-[#9c4e8b] hover:text-[#7c3a6d] mb-4 transition">
+        <NuxtLink
+          to="/eventPage"
+          class="inline-flex items-center text-[#9c4e8b] hover:text-[#7c3a6d] mb-4 transition"
+        >
           <Icon name="gg:arrow-left" class="mr-2" />
           Back to Events
         </NuxtLink>
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900">{{ event?.title }}</h1>
-        <p class="text-gray-600 mt-2 text-lg">Book your tickets for an unforgettable experience</p>
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+          {{ event?.title }}
+        </h1>
+        <p class="text-gray-600 mt-2 text-lg">
+          Book your tickets for an unforgettable experience
+        </p>
       </div>
     </div>
 
@@ -30,15 +39,27 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-4 rounded-lg shadow-md">
               <p class="text-xs text-gray-500 uppercase">Location</p>
-              <p class="text-sm font-semibold text-gray-900">📍 {{ event?.location }}</p>
+              <p class="text-sm font-semibold text-gray-900">
+                📍 {{ event?.location }}
+              </p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow-md">
               <p class="text-xs text-gray-500 uppercase">Date</p>
-              <p class="text-sm font-semibold text-gray-900">📅 {{ new Date(event?.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}</p>
+              <p class="text-sm font-semibold text-gray-900">
+                📅
+                {{
+                  new Date(event?.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }}
+              </p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow-md">
               <p class="text-xs text-gray-500 uppercase">Type</p>
-              <p class="text-sm font-semibold text-gray-900">🎭 {{ event?.eventType || 'Event' }}</p>
+              <p class="text-sm font-semibold text-gray-900">
+                🎭 {{ event?.eventType || "Event" }}
+              </p>
             </div>
             <div class="bg-white p-4 rounded-lg shadow-md">
               <p class="text-xs text-gray-500 uppercase">Status</p>
@@ -51,14 +72,16 @@
                 }"
                 class="text-sm font-semibold capitalize"
               >
-                {{ event?.status || 'upcoming' }}
+                {{ event?.status || "upcoming" }}
               </p>
             </div>
           </div>
 
           <!-- Description -->
           <div class="bg-white p-8 rounded-2xl shadow-md mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">About This Event</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+              About This Event
+            </h2>
             <p class="text-gray-700 leading-relaxed text-lg">
               {{ event?.description }}
             </p>
@@ -69,54 +92,97 @@
         <div class="lg:col-span-1">
           <!-- Ticket Selection -->
           <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-4">
-            <h3 class="text-2xl font-bold text-gray-900 mb-6">Book Your Tickets</h3>
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">
+              Book Your Tickets
+            </h3>
 
             <!-- Ticket Options -->
             <div class="space-y-3 mb-8">
-              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'regular' }">
-                <input type="radio" v-model="ticketType" value="regular" class="w-5 h-5 text-[#9c4e8b]" />
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'regular',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="regular"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
                 <div class="ml-3 flex-1">
                   <p class="font-semibold text-gray-900">Regular Ticket</p>
                   <p class="text-sm text-gray-600">Standard access</p>
                 </div>
-                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.regular }}</span>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.regular }}</span
+                >
               </label>
 
-              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'vip' }">
-                <input type="radio" v-model="ticketType" value="vip" class="w-5 h-5 text-[#9c4e8b]" />
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'vip',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="vip"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
                 <div class="ml-3 flex-1">
                   <p class="font-semibold text-gray-900">VIP Ticket ⭐</p>
                   <p class="text-sm text-gray-600">Premium experience</p>
                 </div>
-                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.vip }}</span>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.vip }}</span
+                >
               </label>
 
-              <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{ 'border-[#9c4e8b] bg-purple-50': ticketType === 'vvip' }">
-                <input type="radio" v-model="ticketType" value="vvip" class="w-5 h-5 text-[#9c4e8b]" />
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'vvip',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="vvip"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
                 <div class="ml-3 flex-1">
                   <p class="font-semibold text-gray-900">VVIP Ticket 👑</p>
                   <p class="text-sm text-gray-600">Exclusive access</p>
                 </div>
-                <span class="text-lg font-bold text-[#9c4e8b]">Ksh {{ event?.vvip }}</span>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.vvip }}</span
+                >
               </label>
             </div>
 
             <!-- Tickets Available -->
             <div class="mb-6 p-3 bg-blue-50 rounded-lg">
-              <p class="text-sm text-blue-700">🎟️ {{ event?.TicketQuantity || 0 }} tickets available</p>
+              <p class="text-sm text-blue-700">
+                🎟️ {{ event?.TicketQuantity || 0 }} tickets available
+              </p>
             </div>
 
             <!-- User Info -->
             <div class="space-y-3 mb-6 pb-6 border-b border-gray-200">
               <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Your Name</p>
-                <p class="text-gray-900 font-semibold">{{ user.firstName }} {{ user.lastName }}</p>
+                <p class="text-xs text-gray-500 uppercase font-semibold">
+                  Your Name
+                </p>
+                <p class="text-gray-900 font-semibold">
+                  {{ user.firstName }} {{ user.lastName }}
+                </p>
               </div>
               <div>
-                <p class="text-xs text-gray-500 uppercase font-semibold">Email</p>
+                <p class="text-xs text-gray-500 uppercase font-semibold">
+                  Email
+                </p>
                 <p class="text-gray-900 font-semibold">{{ user.email }}</p>
               </div>
             </div>
@@ -124,13 +190,20 @@
             <!-- Payment Methods -->
             <div class="mb-6">
               <h4 class="font-semibold text-gray-900 mb-4">Payment Method</h4>
+              <input
+                v-model="phone"
+                type="tel"
+                placeholder="07XXXXXXXX"
+                class="w-full px-4 mb-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9c4e8b] focus:outline-none"
+              />
+
               <div class="space-y-3">
                 <button
                   @click="bookAndPay"
-                  class="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+                  class="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 cursor-pointer"
                 >
                   <Icon name="mingcute:phone-fill" class="text-2xl" />
-                  M-Pesa
+                 {{ loading ? "Processing..." : "Pay with Mobile Money" }}
                 </button>
                 <button
                   class="w-full flex items-center justify-center gap-3 p-4 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition duration-200 opacity-50 cursor-not-allowed"
@@ -143,10 +216,16 @@
             </div>
 
             <!-- Messages -->
-            <div v-if="error" class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4">
+            <div
+              v-if="error"
+              class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-4"
+            >
               {{ error }}
             </div>
-            <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4">
+            <div
+              v-if="successMessage"
+              class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4"
+            >
               {{ successMessage }}
             </div>
           </div>

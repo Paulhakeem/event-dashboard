@@ -3,6 +3,7 @@ import { TotalBooking } from "~~/server/models/totalBooking.js";
 import nodemailer from "nodemailer";
 import { User } from "~~/server/models/User.js";
 import { Event } from "../../models/Events.js";
+import { paystack } from "~~/server/utils/paystack";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -47,7 +48,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // verify with Paystack
-  const paystackResponse = await paystackClient.transaction.verify(reference);
+  const paystackResponse = await paystack.transaction.verify(reference);
 
   if (!paystackResponse.status || paystackResponse.data.status !== "success") {
     throw createError({

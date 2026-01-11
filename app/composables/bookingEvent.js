@@ -2,10 +2,12 @@ export default function useEventBooking() {
   const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
-  const phone = ref("0792857288");
+  const phone = ref("");
 
   const event = ref({});
+  // selected ticket type (single value) and available options
   const ticketType = ref("regular");
+
   const loading = ref(false);
   const error = ref(null);
   const successMessage = ref(null);
@@ -23,8 +25,18 @@ export default function useEventBooking() {
   });
 
   const bookAndPay = async () => {
-    if (!phone.value) {
-      alert("Enter phone number");
+    if (!user.value) {
+      alert("Please login first");
+      return;
+    }
+
+    if (!phone.value || phone.value.length < 10) {
+      alert("Please enter a valid phone number");
+      return;
+    }
+
+    if (!window.PaystackPop) {
+      alert("Payment service not loaded. Please refresh.");
       return;
     }
 
@@ -33,30 +45,72 @@ export default function useEventBooking() {
       ? "254" + phone.value.slice(1)
       : phone.value;
 
-    try {
-      loading.value = true;
+    // generate unique Paystack reference
+    const reference = `EVT-${id}-${Date.now()}`;
 
-      await $fetch("/api/booking/stk", {
-        method: "POST",
-        body: {
-          phone: formattedPhone,
-          eventId: id,
-          userId: user.value.id,
-        },
-      });
+    // select ticket price safely
+    const amount =
+      ticketType.value === "vip"
+        ? event.value?.vip
+        : ticketType.value === "vvip"
+        ? event.value?.vvip
+        : event.value?.regular;
 
-      alert("Check your phone and enter M-Pesa PIN 📲");
-    } catch (err) {
-      alert(err?.data?.message || "Failed to initiate payment");
-    } finally {
-      loading.value = false;
+    if (!amount) {
+      alert("Ticket price not available");
+      return;
     }
+
+    const handler = window.PaystackPop.setup({
+      key: useRuntimeConfig().public.paystackPublicKey,
+      email: user.value.email,
+      amount: amount * 100,
+      currency: "KES",
+      ref: reference,
+
+      metadata: {
+        eventId: id,
+        userId: user.value.id,
+        ticketType: ticketType.value,
+        phone: formattedPhone,
+      },
+
+      callback: async (response) => {
+        try {
+          loading.value = true;
+
+          const res = await $fetch("/api/booking/verify", {
+            method: "POST",
+            body: {
+              phone: formattedPhone,
+              eventId: id,
+              userId: user.value.id,
+              ticketType: ticketType.value,
+              reference: response.reference,
+            },
+          });
+
+          successMessage.value = res.message;
+          alert("Payment successful 🎉 Check your email");
+        } catch (err) {
+          alert(err?.data?.message || "Payment verification failed");
+        } finally {
+          loading.value = false;
+        }
+      },
+
+      onClose: () => {
+        alert("Payment cancelled");
+      },
+    });
+
+    handler.openIframe();
   };
 
   return {
     event,
-    phone,
     ticketType,
+    phone,
     loading,
     error,
     successMessage,
