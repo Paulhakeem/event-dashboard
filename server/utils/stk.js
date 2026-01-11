@@ -16,7 +16,7 @@ export async function stk(phone, amount, reference) {
     ("0" + date.getSeconds()).slice(-2);
 
   const password = Buffer.from(
-    `${config.mpesaShortcode}${config.mpesaPasskey}${timestamp}`
+    `${config.mpesaConsumerKey}${config.mpesaConsumerSecret}${timestamp}`
   ).toString("base64");
 
   const body = {
