@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 import { paystack } from "~~/server/utils/paystack";
 import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
-import { generateQr } from "~~/server/utils/generateQr";
+import { generateQrCode } from "~~/server/utils/generateQr";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -117,8 +117,8 @@ export default defineEventHandler(async (event) => {
     eventId,
     userId,
   });
-  const qrImage = await generateQr(qrData);
-  const ticket = await Ticket.create({
+  const qrImage = await generateQrCode(qrData);
+  await Ticket.create({
     ticketCode,
     eventId,
     userId,
@@ -156,7 +156,7 @@ export default defineEventHandler(async (event) => {
 
       <br/>
        <h3>🎟️ Ticket Code</h3>
-    <p style="font-size:18px"><strong>${ticket}</strong></p>
+    <p style="font-size:18px"><strong>${ticketCode}</strong></p>
 
     <img src="${qrImage}" alt="QR Code"/>
 

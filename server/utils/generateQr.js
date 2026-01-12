@@ -1,13 +1,6 @@
-import QrCode from "qrcode";
+import QRCode from "qrcode";
 
-export const generateQr = async (data) => {
-  try {
-    const qrDataUrl = await QrCode.toDataURL(data, {
-      width: 200,
-      height: 200,
-    });
-    return qrDataUrl;
-  } catch (error) {
-    throw new Error("Error generating QR code");
-  }
-};
+export async function generateQrCode(data) {
+  return await QRCode.toDataURL(data);
+}
+
