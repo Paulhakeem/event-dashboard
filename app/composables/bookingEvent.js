@@ -1,17 +1,17 @@
 export default function useEventBooking() {
+  const config = useRuntimeConfig();
   const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
-  const phone = ref("");
 
   const event = ref({});
-  // selected ticket type (single value) and available options
-  const ticketType = ref("regular");
+  const ticketType = ref("regular"); 
 
   const loading = ref(false);
   const error = ref(null);
   const successMessage = ref(null);
 
+  /* -------------------- LOAD EVENT -------------------- */
   onMounted(async () => {
     try {
       loading.value = true;
@@ -24,83 +24,81 @@ export default function useEventBooking() {
     }
   });
 
-  const bookAndPay = async () => {
+  /* -------------------- VERIFY PAYMENT -------------------- */
+  const verifyPayment = async (reference) => {
+    try {
+      loading.value = true;
+
+      const verifyResponse = await $fetch("/api/booking/verify", {
+        method: "POST",
+        body: {
+          reference,
+          eventId: id,
+          userId: user.value.id,
+          ticketType: ticketType.value, // ✅ REQUIRED
+        },
+      });
+
+      successMessage.value = verifyResponse.message;
+      alert("Payment successful 🎉 Check your email");
+
+    } catch (err) {
+      alert(err?.data?.statusMessage || "Payment verification failed");
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  /* -------------------- PAYSTACK POPUP -------------------- */
+  const bookAndPay = () => {
     if (!user.value) {
       alert("Please login first");
       return;
     }
 
-    if (!phone.value || phone.value.length < 10) {
-      alert("Please enter a valid phone number");
+    const PaystackPop = window.PaystackPop;
+    if (!PaystackPop) {
+      alert("Paystack not loaded yet");
       return;
     }
 
-    if (!window.PaystackPop) {
-      alert("Payment service not loaded. Please refresh.");
-      return;
-    }
+    /* -------- PRICE SELECTION -------- */
+    const priceMap = {
+      regular: event.value.regular,
+      vip: event.value.vip,
+      vvip: event.value.vvip,
+    };
 
-    // format phone: 07xx → 2547xx
-    const formattedPhone = phone.value.startsWith("0")
-      ? "254" + phone.value.slice(1)
-      : phone.value;
-
-    // generate unique Paystack reference
-    const reference = `EVT-${id}-${Date.now()}`;
-
-    // select ticket price safely
-    const amount =
-      ticketType.value === "vip"
-        ? event.value?.vip
-        : ticketType.value === "vvip"
-        ? event.value?.vvip
-        : event.value?.regular;
+    const amount = priceMap[ticketType.value];
 
     if (!amount) {
-      alert("Ticket price not available");
+      alert("Invalid ticket selected");
       return;
     }
 
-    const handler = window.PaystackPop.setup({
-      key: useRuntimeConfig().public.paystackPublicKey,
+    /* -------- UNIQUE REFERENCE -------- */
+    const reference = `EVT-${id}-${Date.now()}`;
+
+    const handler = PaystackPop.setup({
+      key: config.public.paystackPublicKey,
       email: user.value.email,
-      amount: amount * 100,
+      amount: amount * 100, // kobo
       currency: "KES",
+
       ref: reference,
 
       metadata: {
         eventId: id,
         userId: user.value.id,
         ticketType: ticketType.value,
-        phone: formattedPhone,
       },
 
-      callback: async (response) => {
-        try {
-          loading.value = true;
-
-          const res = await $fetch("/api/booking/verify", {
-            method: "POST",
-            body: {
-              phone: formattedPhone,
-              eventId: id,
-              userId: user.value.id,
-              ticketType: ticketType.value,
-              reference: response.reference,
-            },
-          });
-
-          successMessage.value = res.message;
-          alert("Payment successful 🎉 Check your email");
-        } catch (err) {
-          alert(err?.data?.message || "Payment verification failed");
-        } finally {
-          loading.value = false;
-        }
+      callback: function (response) {
+        verifyPayment(response.reference);
       },
 
-      onClose: () => {
-        alert("Payment cancelled");
+      onClose: function () {
+        alert("Transaction cancelled");
       },
     });
 
@@ -110,7 +108,6 @@ export default function useEventBooking() {
   return {
     event,
     ticketType,
-    phone,
     loading,
     error,
     successMessage,

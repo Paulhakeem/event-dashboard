@@ -190,12 +190,6 @@
             <!-- Payment Methods -->
             <div class="mb-6">
               <h4 class="font-semibold text-gray-900 mb-4">Payment Method</h4>
-              <input
-                v-model="phone"
-                type="tel"
-                placeholder="07XXXXXXXX"
-                class="w-full px-4 mb-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9c4e8b] focus:outline-none"
-              />
 
               <div class="space-y-3">
                 <button
@@ -203,7 +197,7 @@
                   class="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 cursor-pointer"
                 >
                   <Icon name="mingcute:phone-fill" class="text-2xl" />
-                 {{ loading ? "Processing..." : "Pay with Mobile Money" }}
+                  {{ loading ? "Processing..." : "Pay with Mobile Money" }}
                 </button>
                 <button
                   class="w-full flex items-center justify-center gap-3 p-4 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition duration-200 opacity-50 cursor-not-allowed"
@@ -239,7 +233,7 @@
 import useEventBooking from "~/composables/bookingEvent";
 
 // import booking composable
-const { event, phone, loading, error, successMessage, bookAndPay, ticketType } =
+const { event, loading, error, successMessage, bookAndPay, ticketType } =
   useEventBooking();
 
 const { user } = useAuth();

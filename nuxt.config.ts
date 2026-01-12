@@ -33,12 +33,12 @@ export default defineNuxtConfig({
     smtpPort: process.env.SMTP_PORT,
 
     // Paystack
-    paystackPublicKey: process.env.PAYSTACK_PUBLIC_KEY,
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
 
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      paystackPublicKey: process.env.NUXT_PUBLIC_PAYSTACK_PUBLIC_KEY
     },
   },
 });
