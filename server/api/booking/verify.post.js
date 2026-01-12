@@ -1,9 +1,12 @@
-import connectDB from "~~/server/utils/mongoose";
+import connectDB from "../../utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
 import nodemailer from "nodemailer";
 import { paystack } from "~~/server/utils/paystack";
+import { Ticket } from "~~/server/models/Ticket";
+import { generateTicketCode } from "~~/server/utils/generateTicketCode";
+import { generateQr } from "~~/server/utils/generateQr";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -107,6 +110,23 @@ export default defineEventHandler(async (event) => {
     bookedAt: new Date(),
   });
 
+  // -------------------- GENERATE TICKET -------------------- */
+  const ticketCode = generateTicketCode();
+  const qrData = JSON.stringify({
+    ticketCode,
+    eventId,
+    userId,
+  });
+  const qrImage = await generateQr(qrData);
+  const ticket = await Ticket.create({
+    ticketCode,
+    eventId,
+    userId,
+    bookingId: booking._id,
+    ticketType,
+    amount: expectedAmount,
+  });
+
   /* -------------------- EMAIL SETUP -------------------- */
   const transporter = nodemailer.createTransport({
     host: config.smtpHost,
@@ -135,7 +155,14 @@ export default defineEventHandler(async (event) => {
       <p><strong>Reference:</strong> ${paystackData.reference}</p>
 
       <br/>
-      <p>Thank you for booking with us 🙏</p>
+       <h3>🎟️ Ticket Code</h3>
+    <p style="font-size:18px"><strong>${ticket}</strong></p>
+
+    <img src="${qrImage}" alt="QR Code"/>
+
+    <p>Please present this QR code at the entrance.</p>
+
+    <p>Thank you for booking with us 🙏</p>
     `,
   });
 
