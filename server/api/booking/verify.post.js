@@ -112,12 +112,7 @@ export default defineEventHandler(async (event) => {
 
   // -------------------- GENERATE TICKET -------------------- */
   const ticketCode = generateTicketCode();
-  const qrData = JSON.stringify({
-    ticketCode,
-    eventId,
-    userId,
-  });
-  const qrImage = await generateQrCode(qrData);
+
   await Ticket.create({
     ticketCode,
     eventId,
@@ -126,6 +121,9 @@ export default defineEventHandler(async (event) => {
     ticketType,
     amount: expectedAmount,
   });
+
+  /* -------------------- GENERATE QR CODE -------------------- */
+  const qrImageBuffer = await generateQrCode(ticketCode);
 
   /* -------------------- EMAIL SETUP -------------------- */
   const transporter = nodemailer.createTransport({
@@ -158,12 +156,19 @@ export default defineEventHandler(async (event) => {
        <h3>🎟️ Ticket Code</h3>
     <p style="font-size:18px"><strong>${ticketCode}</strong></p>
 
-    <img src="${qrImage}" alt="QR Code"/>
+    <img src="cid:ticketqr" alt="QR Code" width="200"/>
 
     <p>Please present this QR code at the entrance.</p>
 
     <p>Thank you for booking with us 🙏</p>
     `,
+    attachments: [
+      {
+        filename: "ticket-qr.png",
+        content: qrImageBuffer,
+        cid: "ticketqr", // same cid value as in the html img src
+      },
+    ],
   });
 
   /* -------------------- EMAIL ADMIN -------------------- */
