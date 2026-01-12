@@ -31,6 +31,9 @@
                 v-model="firstName"
                 id="firstname"
                 type="text"
+                placeholder="First name"
+                aria-label="First name"
+                required
                 class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
               />
             </div>
@@ -45,6 +48,9 @@
                 v-model="lastName"
                 id="lastname"
                 type="text"
+                placeholder="Last name"
+                aria-label="Last name"
+                required
                 class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
               />
             </div>
@@ -58,7 +64,10 @@
             <input
               v-model="email"
               type="email"
+              placeholder="you@example.com"
+              aria-label="Email address"
               autocomplete="email"
+              required
               class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
             />
           </div>
@@ -71,6 +80,10 @@
             <input
               v-model="password"
               type="password"
+              placeholder="Create a strong password"
+              aria-label="Password"
+              required
+              minlength="6"
               class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
             />
           </div>
@@ -80,11 +93,17 @@
       <!-- Role Dropdown -->
       <select
         v-model="role"
+        aria-label="Select role"
         class="mt-6 p-2 border border-gray-300 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 w-full"
       >
         <option value="user">User</option>
-        <option value="admin">Admin</option>
+        <option v-if="!adminExists" value="admin">Admin</option>
       </select>
+
+      <p class="text-sm text-neutral-500 mt-2">
+        <span v-if="adminExists">Admin account already exists — only <strong>User</strong> registration is available.</span>
+        <span v-else>Choose <strong>Admin</strong> only if you have an admin number (you will be asked below).</span>
+      </p>
 
       <!-- admin input section -->
       <div v-if="role === 'admin'" class="mt-6">
@@ -95,8 +114,11 @@
         <input
           v-model="adminNumber"
           type="text"
+          placeholder="Enter admin number"
+          aria-label="Admin number"
           class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
+        <p class="text-sm text-neutral-500 mt-2">Admin number is required to register as an Admin.</p>
       </div>
 
       <!-- Submit button -->
@@ -113,6 +135,7 @@
   </div>
 </template>
 <script setup>
+import { ref, onMounted } from 'vue';
 const {
   firstName,
   lastName,
@@ -124,4 +147,16 @@ const {
   signup,
   isLoading,
 } = FormAuth();
+
+const adminExists = ref(false);
+
+onMounted(async () => {
+  try {
+    const res = await $fetch('/api/auth/admin-exists');
+    adminExists.value = !!res?.exists;
+    if (adminExists.value && role.value === 'admin') role.value = 'user';
+  } catch (e) {
+    adminExists.value = false;
+  }
+});
 </script>

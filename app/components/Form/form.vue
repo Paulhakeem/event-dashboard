@@ -39,6 +39,8 @@
             type="email"
             required
             autocomplete="email"
+            placeholder="you@example.com"
+            aria-label="Email address"
             class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
         </div>
@@ -63,23 +65,10 @@
             type="password"
             required
             autocomplete="current-password"
+            placeholder="Your password"
+            aria-label="Password"
             class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
           />
-        </div>
-
-        <!-- Role -->
-        <div>
-          <label
-            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
-            >Role</label
-          >
-          <select
-            v-model="role"
-            class="w-full px-4 py-3 border border-gray-300 dark:border-neutral-700 rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
         </div>
 
         <!-- Login Button -->
@@ -100,9 +89,9 @@ import { ref } from "vue";
 
 const email = ref("");
 const password = ref("");
-const role = ref("user"); // default selection
 const isLoading = ref(false);
 const errorMessage = ref("");
+// login should always allow selecting admin so existing admins can sign in
 
 const { setAuth } = useAuth();
 
@@ -116,7 +105,6 @@ const login = async () => {
       body: {
         email: email.value,
         password: password.value,
-        role: role.value,
       },
     });
 
@@ -148,4 +136,6 @@ const openReset = (email) => {
   sentEmail.value = email || '';
   modal.value = 'reset';
 };
+
+ 
 </script>
