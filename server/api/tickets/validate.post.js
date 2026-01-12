@@ -1,36 +1,29 @@
-import connectDB from "../../utils/mongoose.js";
-import { Ticket } from "../../models/Ticket.js";
+import connectDB from "~~/server/utils/mongoose";
+import { Ticket } from "~~/server/models/Ticket";
 
-// This endpoint validates a ticket by its ticketCode
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { ticketCode } = body;
+  const { ticketCode } = await readBody(event);
+
   await connectDB();
-  if (!ticketCode) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "ticketCode is required",
-    });
-  }
 
   const ticket = await Ticket.findOne({ ticketCode });
+
   if (!ticket) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Ticket not found",
-    });
+    throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
   }
+
   if (ticket.used) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Ticket has already been used",
+      statusMessage: "Ticket already used",
     });
   }
-  // Mark the ticket as used
+
   ticket.used = true;
   await ticket.save();
+
   return {
-    message: "Ticket validated successfully",
+    message: "Ticket valid ✅ Entry allowed",
     ticket,
   };
 });
