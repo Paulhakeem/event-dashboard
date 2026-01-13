@@ -198,6 +198,13 @@ export default defineEventHandler(async (event) => {
         doc.text("Ref", leftX, yStart + 24);
         doc.text(details.reference, rightX, yStart + 24, { width: 96 });
 
+        // Purchaser info
+        doc.text("Name", leftX, yStart + 36);
+        doc.text(details.name || '-', rightX, yStart + 36, { width: 96 });
+
+        doc.text("Email", leftX, yStart + 48);
+        doc.text(details.email || '-', rightX, yStart + 48, { width: 96 });
+
         // Tear dashed line
         doc.moveTo(12, 236).lineTo(208, 236);
         doc.dash(2, { space: 3 });
