@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 const TicketSchema = new mongoose.Schema({
  ticketCode: { type: String, required: true, unique: true },
- eventId: { type: mongoose.Schema.Types.ObjectId, ref: 'Events', required: true },
- userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+ eventName: { type: String, required: true },
+ userEmail: { type: String, required: true },
  bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'TotalBooking', required: true },
  ticketType: { type: String, required: true },
  amount: { type: Number, required: true },

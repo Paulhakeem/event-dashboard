@@ -1,5 +1,5 @@
-import connectDB from "~~/server/utils/mongoose";
-import { Ticket } from "~~/server/models/Ticket";
+import connectDB from "../../utils/mongoose.js";
+import { Ticket } from "../../models/Ticket.js";
 
 export default defineEventHandler(async (event) => {
   const { ticketCode } = await readBody(event);
