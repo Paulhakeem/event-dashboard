@@ -136,84 +136,56 @@ export default defineEventHandler(async (event) => {
   function generateTicketPdfBuffer(details) {
     return new Promise((resolve, reject) => {
       try {
-        // very small ticket: 220 x 350 points (~3" x 4.8")
-        const doc = new PDFDocument({ size: [220, 350], margin: 12 });
+        // refreshed compact ticket: 210 x 300 points (~3" x 4.2")
+        const doc = new PDFDocument({ size: [210, 300], margin: 12 });
         const chunks = [];
         doc.on("data", (chunk) => chunks.push(chunk));
         doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-        // white background
-        doc.rect(0, 0, 220, 350).fill("#ffffff");
+        // Base
+        doc.rect(0, 0, 210, 300).fill('#ffffff');
 
-        // Header bar
+        // Left accent strip
         doc.save();
-        doc.rect(0, 0, 220, 48).fill("#0b5fff");
-        doc.fillColor("#ffffff").fontSize(12).font("Helvetica-Bold").text("LetsBook", 12, 12);
-        doc.fontSize(8).font("Helvetica").text("Event Ticket", 12, 26);
+        doc.roundedRect(6, 10, 34, 280, 6).fill('#9c4e8b');
+        doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(10).text('LB', 14, 34, { width: 18, align: 'center' });
         doc.restore();
 
-        // Event title (centered)
-        doc.fillColor("#111827").fontSize(11).font("Helvetica-Bold").text(details.eventTitle, 12, 58, {
-          width: 196,
-          align: "center",
-        });
+        // Header area
+        doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(12).text(details.eventTitle, 52, 14, { width: 146 });
+        doc.font('Helvetica').fontSize(8).fillColor('#6b7280').text(details.eventDate, 52, 32);
+        doc.text(details.location, 52, 44);
 
-        // Small event meta
-        doc.fontSize(8).font("Helvetica").fillColor("#374151").text(`${details.eventDate} • ${details.location}`, 12, 78, {
-          width: 196,
-          align: "center",
-        });
+        // Divider
+        doc.moveTo(52, 64).lineTo(196, 64).strokeColor('#e6e6e6').stroke();
 
-        // Decorative divider
-        doc.moveTo(12, 95).lineTo(208, 95);
-        doc.dash(3, { space: 2 });
-        doc.strokeColor('#e5e7eb').stroke();
-        if (typeof doc.undash === 'function') doc.undash();
+        // Ticket code block
+        doc.roundedRect(52, 72, 118, 56, 6).fill('#f8fafc');
+        doc.fillColor('#111827').font('Courier-Bold').fontSize(16).text(details.ticketCode, 52, 90, { width: 118, align: 'center' });
 
-        // Ticket code box
-        doc.strokeColor('#111827');
-        doc.roundedRect(18, 104, 184, 56, 6).stroke();
-        doc.font("Courier-Bold").fontSize(14).fillColor("#111827").text(details.ticketCode, 18, 122, {
-          width: 184,
-          align: "center",
-        });
-
-        // Barcode-like small text
-        doc.font("Courier").fontSize(7).fillColor("#374151").text(details.ticketCode.split("").join(" "), 12, 166, {
-          width: 196,
-          align: "center",
-        });
-
-        // Info grid
-        doc.font("Helvetica").fontSize(8).fillColor("#111827");
-        const leftX = 14;
-        const rightX = 110;
-        const yStart = 186;
-        doc.text("Type", leftX, yStart);
-        doc.text(details.ticketType.toUpperCase(), rightX, yStart);
-
-        doc.text("Amount", leftX, yStart + 12);
-        doc.text(`KES ${details.amount}`, rightX, yStart + 12);
-
-        doc.text("Ref", leftX, yStart + 24);
-        doc.text(details.reference, rightX, yStart + 24, { width: 96 });
+        // Ticket type badge
+        doc.roundedRect(52, 132, 62, 20, 6).fill('#eef2ff');
+        doc.fillColor('#4f46e5').font('Helvetica-Bold').fontSize(9).text(details.ticketType.toUpperCase(), 52, 136, { width: 62, align: 'center' });
 
         // Purchaser info
-        doc.text("Name", leftX, yStart + 36);
-        doc.text(details.name || '-', rightX, yStart + 36, { width: 96 });
+        doc.fillColor('#111827').font('Helvetica').fontSize(9).text('Name', 52, 160);
+        doc.font('Helvetica-Bold').text(details.name || '-', 100, 160, { width: 96 });
 
-        doc.text("Email", leftX, yStart + 48);
-        doc.text(details.email || '-', rightX, yStart + 48, { width: 96 });
+        doc.font('Helvetica').fontSize(9).text('Email', 52, 176);
+        doc.font('Helvetica-Bold').fontSize(8).text(details.email || '-', 100, 176, { width: 96 });
 
-        // Tear dashed line
-        doc.moveTo(12, 236).lineTo(208, 236);
-        doc.dash(2, { space: 3 });
-        doc.strokeColor('#9ca3af').stroke();
+        // Right perforated stub
+        doc.moveTo(170, 10).lineTo(170, 290).dash(2, { space: 3 }).strokeColor('#e5e7eb').stroke();
         if (typeof doc.undash === 'function') doc.undash();
 
-        // Footer notes
-        doc.fontSize(7).fillColor("#6b7280").text("Present this ticket at the entrance.", 12, 244, { width: 196, align: "center" });
-        doc.fontSize(7).text("Thank you for booking with LetsBook Events.", 12, 258, { width: 196, align: "center" });
+        doc.font('Helvetica').fontSize(8).fillColor('#374151').text('AMOUNT', 174, 26, { width: 32, align: 'center' });
+        doc.font('Helvetica-Bold').fontSize(10).text(`KES ${details.amount}`, 174, 40, { width: 32, align: 'center' });
+
+        doc.font('Helvetica').fontSize(7).fillColor('#6b7280').text('REF', 174, 66, { width: 32, align: 'center' });
+        doc.font('Helvetica').fontSize(7).text(details.reference, 172, 76, { width: 36, align: 'center' });
+
+        // Footer small note
+        doc.font('Helvetica').fontSize(7).fillColor('#6b7280').text('Present this ticket at the entrance.', 52, 220, { width: 110, align: 'center' });
 
         doc.end();
       } catch (err) {
@@ -311,5 +283,6 @@ export default defineEventHandler(async (event) => {
   return {
     message: "Booking verified and saved successfully",
     booking,
+    ticketPdfBase64: pdfBuffer.toString("base64"),
   };
 });

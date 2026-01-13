@@ -216,11 +216,19 @@
             >
               {{ error }}
             </div>
-            <div
-              v-if="successMessage"
-              class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4"
-            >
-              {{ successMessage }}
+            <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <p class="font-semibold">{{ successMessage }}</p>
+                  <p class="text-xs text-green-700">We've emailed your ticket — you can also download it here.</p>
+                </div>
+                <div class="ml-4 flex-shrink-0">
+                  <button @click="downloadTicket" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-green-200 text-green-700 rounded-lg hover:bg-green-50">
+                    <Icon name="ic:round-download" />
+                    Download Ticket
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -233,7 +241,7 @@
 import useEventBooking from "~/composables/bookingEvent";
 
 // import booking composable
-const { event, loading, error, successMessage, bookAndPay, ticketType } =
+const { event, loading, error, successMessage, bookAndPay, ticketType, downloadTicket } =
   useEventBooking();
 
 const { user } = useAuth();

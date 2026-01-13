@@ -10,6 +10,8 @@ export default function useEventBooking() {
   const loading = ref(false);
   const error = ref(null);
   const successMessage = ref(null);
+  const ticketPdfBase64 = ref(null);
+  const ticketPdfUrl = ref(null);
 
   /* -------------------- LOAD EVENT -------------------- */
   onMounted(async () => {
@@ -40,12 +42,44 @@ export default function useEventBooking() {
       });
 
       successMessage.value = verifyResponse.message;
+      if (verifyResponse.ticketPdfBase64) {
+        ticketPdfBase64.value = verifyResponse.ticketPdfBase64;
+        try {
+          const binary = atob(verifyResponse.ticketPdfBase64);
+          const len = binary.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+          const blob = new Blob([bytes], { type: "application/pdf" });
+          ticketPdfUrl.value = URL.createObjectURL(blob);
+        } catch (e) {
+          console.warn("Failed to build ticket PDF URL", e);
+        }
+      }
       alert("Payment successful 🎉 Check your email");
 
     } catch (err) {
       alert(err?.data?.statusMessage || "Payment verification failed");
     } finally {
       loading.value = false;
+    }
+  };
+
+  const downloadTicket = () => {
+    if (!ticketPdfUrl.value && ticketPdfBase64.value) {
+      const binary = atob(ticketPdfBase64.value);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      ticketPdfUrl.value = URL.createObjectURL(blob);
+    }
+    if (ticketPdfUrl.value) {
+      const a = document.createElement("a");
+      a.href = ticketPdfUrl.value;
+      a.download = `${event.value.title || 'ticket'}-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     }
   };
 
@@ -116,6 +150,8 @@ export default function useEventBooking() {
     loading,
     error,
     successMessage,
+    ticketPdfUrl,
     bookAndPay,
+    downloadTicket,
   };
 }
