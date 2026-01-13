@@ -1,5 +1,5 @@
-import connectDB from "~~/server/utils/mongoose";
-import { TotalBooking } from "~~/server/models/totalBooking";
+import connectDB from "../../utils/mongoose.js";
+import { TotalBooking } from "../../models/totalBooking.js";
 
 export default defineEventHandler(async () => {
   await connectDB();
@@ -8,12 +8,12 @@ export default defineEventHandler(async () => {
     // get all bookings
     const bookings = await TotalBooking.find().sort({ bookedAt: 1 }).lean();
 
-    // get stats per events
+    // get stats per events (group by eventName & userEmail)
     const stats = await TotalBooking.aggregate([
       {
         $group: {
-          _id: "$eventId",
-          uniqueUsers: { $addToSet: "$userId" },
+          _id: "$eventName",
+          uniqueUsers: { $addToSet: "$userEmail" },
           totalRevenue: { $sum: "$amount" },
           regular: {
             $sum: { $cond: [{ $eq: ["$ticketType", "regular"] }, 1, 0] },
@@ -29,7 +29,7 @@ export default defineEventHandler(async () => {
       {
         $project: {
           _id: 0,
-          eventId: "$_id",
+          eventName: "$_id",
           totalUsers: { $size: "$uniqueUsers" },
           totalRevenue: 1,
           regular: 1,
@@ -39,15 +39,16 @@ export default defineEventHandler(async () => {
       },
     ]);
 
-    // converts stats to a map
+    // converts stats to a map keyed by eventName
     const statsMap = {};
     stats.forEach((s) => {
-      statsMap[s.eventId.toString()] = s;
+      statsMap[s.eventName] = s;
     });
-    //  Merge stats into each booking
+
+    // Merge stats into each booking (bookings now contain eventName)
     const mergeBookings = bookings.map((b) => ({
       ...b,
-      stats: statsMap[b.eventId.toString()] || {
+      stats: statsMap[b.eventName] || {
         totalUsers: 0,
         totalRevenue: 0,
         regular: 0,

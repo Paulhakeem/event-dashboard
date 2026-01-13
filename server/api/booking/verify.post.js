@@ -12,26 +12,26 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const body = await readBody(event);
 
-  const { eventId, userId, reference, ticketType } = body;
+  const { reference, ticketType, eventName, userEmail } = body;
 
   /* -------------------- BASIC VALIDATION -------------------- */
-  if (!eventId || !userId || !reference || !ticketType) {
+  if (!eventName || !userEmail || !reference || !ticketType) {
     throw createError({
       statusCode: 400,
-      statusMessage: "eventId, userId, reference and ticketType are required",
+      statusMessage: "eventName, userEmail, reference and ticketType are required",
     });
   }
 
   await connectDB();
 
   /* -------------------- FIND EVENT -------------------- */
-  const eventData = await Event.findById(eventId);
+  const eventData = await Event.findOne({ title: eventName });
   if (!eventData) {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
 
   /* -------------------- FIND USER -------------------- */
-  const userData = await User.findById(userId);
+  const userData = await User.findOne({ email: userEmail });
   if (!userData) {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
@@ -76,8 +76,8 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- METADATA VALIDATION -------------------- */
   if (
-    paystackData.metadata?.eventId !== String(eventId) ||
-    paystackData.metadata?.userId !== String(userId) ||
+    paystackData.metadata?.eventName !== String(eventName) ||
+    paystackData.metadata?.userEmail !== String(userEmail) ||
     paystackData.metadata?.ticketType !== ticketType
   ) {
     throw createError({
@@ -98,11 +98,21 @@ export default defineEventHandler(async (event) => {
     };
   }
 
+  /* -------------------- DECREMENT TICKET QUANTITY ATOMICALLY -------------------- */
+  const updatedEvent = await Event.findOneAndUpdate(
+    { _id: eventData._id, TicketQuantity: { $gt: 0 } },
+    { $inc: { TicketQuantity: -1 } },
+    { new: true }
+  );
+
+  if (!updatedEvent) {
+    throw createError({ statusCode: 400, statusMessage: "Tickets sold out" });
+  }
+
   /* -------------------- SAVE BOOKING -------------------- */
   const booking = await TotalBooking.create({
-    eventId,
-    userId,
     eventName: eventData.title,
+    userEmail: userData.email,
     reference: paystackData.reference,
     status: paystackData.status,
     ticketType,
@@ -115,8 +125,8 @@ export default defineEventHandler(async (event) => {
 
   await Ticket.create({
     ticketCode,
-    eventId,
-    userId,
+    eventId: eventData._id,
+    userId: userData._id,
     bookingId: booking._id,
     ticketType,
     amount: expectedAmount,

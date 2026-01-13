@@ -1,5 +1,5 @@
-import connectDB from "~~/server/utils/mongoose";
-import { TotalBooking } from "~~/server/models/totalBooking";
+import connectDB from "../../utils/mongoose.js";
+import { TotalBooking } from "../../models/totalBooking.js";
 
 export default defineEventHandler(async () => {
   await connectDB();

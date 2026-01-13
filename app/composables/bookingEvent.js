@@ -33,8 +33,8 @@ export default function useEventBooking() {
         method: "POST",
         body: {
           reference,
-          eventId: id,
-          userId: user.value.id,
+          eventName: event.value.title,
+          userEmail: user.value.email,
           ticketType: ticketType.value, // ✅ REQUIRED
         },
       });
@@ -78,6 +78,11 @@ export default function useEventBooking() {
 
     /* -------- UNIQUE REFERENCE -------- */
     const reference = `EVT-${id}-${Date.now()}`;
+    // Prevent opening payment if no tickets left
+    if (event.value.TicketQuantity <= 0) {
+      alert('Tickets sold out for this event');
+      return;
+    }
 
     const handler = PaystackPop.setup({
       key: config.public.paystackPublicKey,
@@ -88,8 +93,8 @@ export default function useEventBooking() {
       ref: reference,
 
       metadata: {
-        eventId: id,
-        userId: user.value.id,
+        eventName: event.value.title,
+        userEmail: user.value.email,
         ticketType: ticketType.value,
       },
 

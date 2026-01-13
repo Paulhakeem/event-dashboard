@@ -1,19 +1,13 @@
 import mongoose from "mongoose";
 const totalBookingSchema = new mongoose.Schema(
   {
-    eventId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Event",
-      required: true,
-    },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
     eventName: {
       type: String,
-      default: "",
+      required: true,
+    },
+    userEmail: {
+      type: String,
+      required: true,
     },
     bookedAt: {
       type: Date,
