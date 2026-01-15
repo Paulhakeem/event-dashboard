@@ -219,7 +219,7 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- EMAIL USER -------------------- */
   await transporter.sendMail({
-    from: `"LetsBook Events" <${config.emailUsername}>`,
+    from: `"B.M.E Events" <${config.emailUsername}>`,
     to: userData.email,
     subject: `Booking Confirmed – ${eventData.title} 🎉`,
     html: `
@@ -255,7 +255,7 @@ export default defineEventHandler(async (event) => {
 
   if (admin) {
     await transporter.sendMail({
-      from: `"LetsBook Events" <${config.emailUsername}>`,
+      from: `"B.M.E Events" <${config.emailUsername}>`,
       to: admin.email,
       subject: `New Booking – ${eventData.title}`,
       html: `

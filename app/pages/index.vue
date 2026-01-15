@@ -5,7 +5,7 @@
       style="background-image: url('/images/dj.jpg')"
     >
       <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-transparent"></div>
+      <div class="absolute inset-0 bg-linear-to-r from-black/70 via-black/60 to-transparent"></div>
 
       <!-- Content -->
       <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -14,7 +14,7 @@
           <div class="space-y-6 text-center md:text-left">
             <div class="space-y-3">
               <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-                Let's <span class="text-[#9c4e8b] block md:inline">Book</span>
+                B.M.E <span class="text-[#9c4e8b] block md:inline">Events</span>
               </h1>
               <p class="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed max-w-md mx-auto md:mx-0">
                 Discover, book, and manage amazing events all in one place. 
