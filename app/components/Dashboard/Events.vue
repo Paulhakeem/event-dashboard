@@ -1,5 +1,6 @@
 <template>
   <div class="w-full px-2 sm:px-0">
+   <DashboardPendingEvent/>
     <TabGroup>
       <!-- Tabs -->
       <TabList class="flex space-x-1 rounded-xl bg-[#9c4e8b] p-1">
@@ -15,7 +16,7 @@
               'ring-white/60 ring-offset-2 focus:outline-none focus:ring-2',
               selected
                 ? 'bg-white shadow'
-                : 'text-blue-100 hover:bg-white/[0.12] hover:text-white',
+                : 'text-blue-100 hover:bg-white/12 hover:text-white',
             ]"
           >
             {{ category }}
@@ -50,7 +51,6 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 
 // Import your component
@@ -74,7 +74,7 @@ const categories = ref({
   "Booked Events": [
     {
       id: 1,
-      component: BookedEvents
+      component: BookedEvents,
     },
   ],
 });

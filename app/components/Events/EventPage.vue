@@ -11,7 +11,7 @@
       <!-- Events Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="event in eventPosters"
+          v-for="event in filteredEventPosters"
           :key="event._id"
           class="group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 bg-white"
         >
@@ -105,7 +105,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="eventPosters.length === 0" class="text-center py-12">
+      <div v-if="filteredEventPosters.length === 0" class="text-center py-12">
         <p class="text-2xl text-gray-600">No events available at the moment</p>
       </div>
     </div>
@@ -113,4 +113,9 @@
 </template>
 <script setup>
 const { eventPosters } = EventFunctions();
+
+// Computed property to filter out pending events
+const filteredEventPosters = computed(() => {
+  return eventPosters.value.filter((event) => event.status !== "pending");
+});
 </script>

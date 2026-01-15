@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+import toast from "nuxt-toast";
 export default defineNuxtConfig({
   app: {
     head: {
@@ -14,7 +15,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts"],
+  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-toast"],
   vite: {
     plugins: [tailwindcss()],
   },
@@ -38,7 +39,8 @@ export default defineNuxtConfig({
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      paystackPublicKey: process.env.NUXT_PUBLIC_PAYSTACK_PUBLIC_KEY
+      paystackPublicKey: process.env.NUXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
     },
   },
+
 });

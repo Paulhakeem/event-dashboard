@@ -47,13 +47,13 @@
                   @click="itemSelected(menu)"
                   class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-lg
                     transition duration-200 
-                    hover:bg-gradient-to-r hover:from-[#9c4e8b]/10 hover:to-transparent
+                    hover:bg-linear-to-r hover:from-[#9c4e8b]/10 hover:to-transparent
                     hover:text-[#9c4e8b] hover:border-l-4 hover:border-[#9c4e8b]
-                    focus:outline-none focus:bg-gradient-to-r focus:from-[#9c4e8b]/15 focus:to-transparent
-                    active:bg-gradient-to-r active:from-[#9c4e8b]/20 active:to-transparent"
+                    focus:outline-none focus:bg-linear-to-r focus:from-[#9c4e8b]/15 focus:to-transparent
+                    active:bg-linear-to-r active:from-[#9c4e8b]/20 active:to-transparent"
                 >
-                  <Icon :name="menu.icon" class="text-lg flex-shrink-0" />
-                  <span class="flex-grow text-left">{{ menu.name }}</span>
+                  <Icon :name="menu.icon" class="text-lg shrink-0" />
+                  <span class="grow text-left">{{ menu.name }}</span>
                   <Icon name="material-symbols:arrow-right-rounded" class="text-lg opacity-0 group-hover:opacity-100 transition duration-200" />
                 </button>
               </li>
@@ -62,9 +62,9 @@
         </div>
 
         <!-- Footer Section -->
-        <div class="sticky bottom-0 bg-gradient-to-b from-transparent to-white border-t border-gray-200 p-4">
+        <div class="sticky bottom-0 bg-linear-to-b from-transparent to-white border-t border-gray-200 p-4">
           <div class="flex items-center gap-3 px-2 py-3 bg-gray-50 rounded-lg">
-            <div class="flex-shrink-0">
+            <div class="shrink-0">
               <img
                 class="w-10 h-10 rounded-full object-cover"
                 src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=320&h=320&q=80"

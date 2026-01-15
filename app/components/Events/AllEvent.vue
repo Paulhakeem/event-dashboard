@@ -1,6 +1,6 @@
 <template>
   <!-- Events Section -->
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="mb-12 text-center">
@@ -11,7 +11,7 @@
       <!-- Events Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="event in events"
+          v-for="event in filteredEvents"
           :key="event._id"
           class="group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 bg-white"
         >
@@ -47,7 +47,7 @@
               </div>
 
               <!-- Gradient Overlay -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"></div>
+              <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"></div>
             </div>
 
             <!-- Content -->
@@ -96,7 +96,7 @@
               </div>
 
               <!-- CTA Button -->
-              <button class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200">
+              <button class="w-full bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200">
                 View & Book
               </button>
             </div>
@@ -117,6 +117,11 @@ const events = ref([]);
 const pendings = ref(true);
 
 const errorMessage = ref("");
+
+// Computed property to filter out pending events
+const filteredEvents = computed(() => {
+  return events.value.filter((event) => event.status !== "pending");
+});
 
 onMounted(async () => {
   try {

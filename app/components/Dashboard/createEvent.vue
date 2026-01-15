@@ -223,6 +223,7 @@
                   required
                   class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium cursor-pointer transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
                 >
+                  <option value="pending">⏳ Pending</option>
                   <option value="upcoming">📅 Upcoming</option>
                   <option value="ongoing">🔴 Ongoing</option>
                   <option value="completed">✅ Completed</option>

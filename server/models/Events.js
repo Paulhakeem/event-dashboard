@@ -12,7 +12,7 @@ const eventSchema = new mongoose.Schema({
   vvip: { type: Number, default: 0 },
   status: {
     type: String,
-    enum: ["upcoming", "ongoing", "completed", "cancelled"],
+    enum: ["upcoming", "ongoing", "completed", "cancelled", "pending"],
     default: "upcoming",
   },
   eventType: {
