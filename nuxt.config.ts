@@ -1,6 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
-import toast from "nuxt-toast";
 export default defineNuxtConfig({
   app: {
     head: {
@@ -15,7 +14,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-toast"],
+  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts"],
   vite: {
     plugins: [tailwindcss()],
   },

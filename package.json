@@ -30,7 +30,6 @@
     "nodemailer": "^7.0.12",
     "nuxt": "^4.1.2",
     "nuxt-charts": "^0.2.4",
-    "nuxt-toast": "^1.4.0",
     "paystack": "^2.0.1",
     "pdfkit": "^0.13.0",
     "reka-ui": "^2.5.0",

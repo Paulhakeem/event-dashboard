@@ -21,7 +21,6 @@ export default function usePendingEvent() {
       pendingEvents.value = events.filter(
         (event) => event.status === "pending"
       );
-      console.log(res)
     } catch (err) {
       console.error(err);
       error.value = "Failed to fetch pending events";

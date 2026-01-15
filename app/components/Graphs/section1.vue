@@ -94,7 +94,7 @@
           <h3
             class="text-xl sm:text-2xl font-medium text-gray-800 dark:text-neutral-200"
           >
-            0
+           {{ cancelledEvents.length }}
           </h3>
         </div>
       </div>
@@ -107,4 +107,5 @@
 const { users } = totalUsers();
 const { events } = totalEvents();
 const { eventsBooked } = eventsBooking();
+const { cancelledEvents } = fetchCancelledEvents();
 </script>
