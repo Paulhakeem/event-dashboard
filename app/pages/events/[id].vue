@@ -98,6 +98,72 @@
 
             <!-- Ticket Options -->
             <div class="space-y-3 mb-8">
+              <!-- Early Birds -->
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'earlyBirds',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="earlyBirds"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">Early Birds Ticket</p>
+                  <p class="text-sm text-gray-600">50-Tickets</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.earlyBirds }}</span
+                >
+              </label>
+
+              <!-- Advanced Ticket -->
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'Advanced',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="Advanced"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">Advanced Ticket</p>
+                  <p class="text-sm text-gray-600">250-Tickets</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.Advanced }}</span
+                >
+              </label>
+              <!-- At Door Ticket -->
+              <label
+                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
+                :class="{
+                  'border-[#9c4e8b] bg-purple-50': ticketType === 'AtDoor',
+                }"
+              >
+                <input
+                  type="radio"
+                  v-model="ticketType"
+                  value="AtDoor"
+                  class="w-5 h-5 text-[#9c4e8b]"
+                />
+                <div class="ml-3 flex-1">
+                  <p class="font-semibold text-gray-900">At Door Ticket</p>
+                  <p class="text-sm text-gray-600">500-Tickets</p>
+                </div>
+                <span class="text-lg font-bold text-[#9c4e8b]"
+                  >Ksh {{ event?.AtDoor }}</span
+                >
+              </label>
+
+              <!-- Regular Ticket -->
               <label
                 class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
                 :class="{
@@ -118,7 +184,7 @@
                   >Ksh {{ event?.regular }}</span
                 >
               </label>
-
+              <!-- vip -->
               <label
                 class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
                 :class="{
@@ -192,13 +258,15 @@
               <h4 class="font-semibold text-gray-900 mb-4">Payment Method</h4>
 
               <div class="space-y-3">
+                <!-- mpesa payment -->
                 <button
                   @click="bookAndPay"
-                  class="w-full flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 cursor-pointer"
+                  class="w-full flex items-center justify-center gap-3 p-4 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 cursor-pointer"
                 >
                   <Icon name="mingcute:phone-fill" class="text-2xl" />
                   {{ loading ? "Processing..." : "Pay with Mobile Money" }}
                 </button>
+                <!-- card payment -->
                 <button
                   class="w-full flex items-center justify-center gap-3 p-4 border-2 border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition duration-200 opacity-50 cursor-not-allowed"
                   disabled
@@ -216,14 +284,22 @@
             >
               {{ error }}
             </div>
-            <div v-if="successMessage" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4">
+            <div
+              v-if="successMessage"
+              class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm mb-4"
+            >
               <div class="flex items-center justify-between">
                 <div class="flex-1">
                   <p class="font-semibold">{{ successMessage }}</p>
-                  <p class="text-xs text-green-700">We've emailed your ticket — you can also download it here.</p>
+                  <p class="text-xs text-green-700">
+                    We've emailed your ticket — you can also download it here.
+                  </p>
                 </div>
-                <div class="ml-4 flex-shrink-0">
-                  <button @click="downloadTicket" class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-green-200 text-green-700 rounded-lg hover:bg-green-50">
+                <div class="ml-4 shrink-0">
+                  <button
+                    @click="downloadTicket"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-green-200 text-green-700 rounded-lg hover:bg-green-50"
+                  >
                     <Icon name="ic:round-download" />
                     Download Ticket
                   </button>
@@ -241,8 +317,15 @@
 import useEventBooking from "~/composables/bookingEvent";
 
 // import booking composable
-const { event, loading, error, successMessage, bookAndPay, ticketType, downloadTicket } =
-  useEventBooking();
+const {
+  event,
+  loading,
+  error,
+  successMessage,
+  bookAndPay,
+  ticketType,
+  downloadTicket,
+} = useEventBooking();
 
 const { user } = useAuth();
 </script>

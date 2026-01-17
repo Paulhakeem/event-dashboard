@@ -5,7 +5,7 @@ export default function useEventBooking() {
   const id = route.params.id;
 
   const event = ref({});
-  const ticketType = ref("regular"); 
+  const ticketType = ref("earlyBirds"); 
 
   const loading = ref(false);
   const error = ref(null);
@@ -37,7 +37,7 @@ export default function useEventBooking() {
           reference,
           eventName: event.value.title,
           userEmail: user.value.email,
-          ticketType: ticketType.value, // ✅ REQUIRED
+          ticketType: ticketType.value, // REQUIRED
         },
       });
 
@@ -98,6 +98,9 @@ export default function useEventBooking() {
 
     /* -------- PRICE SELECTION -------- */
     const priceMap = {
+      earlyBirds: event.value.earlyBirds,
+      AtDoor: event.value.AtDoor,
+      Advanced: event.value.Advanced,
       regular: event.value.regular,
       vip: event.value.vip,
       vvip: event.value.vvip,
