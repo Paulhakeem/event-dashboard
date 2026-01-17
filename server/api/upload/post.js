@@ -51,6 +51,9 @@ export default defineEventHandler(async (event) => {
   const vip = Number(fields.vip?.[0] || 0);
   const vvip = Number(fields.vvip?.[0] || 0);
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
+  const earlyBirds = Number(fields.earlyBirds?.[0] || 0);
+  const Advance = Number(fields.Advance?.[0] || 0);
+  const atDoor = Number(fields.AtDoor?.[0] || 0);
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
 
@@ -84,6 +87,9 @@ export default defineEventHandler(async (event) => {
     description,
     location,
     date: new Date(date),
+    earlyBirds,
+    Advance,
+    AtDoor: atDoor,
     regular,
     vip,
     vvip,

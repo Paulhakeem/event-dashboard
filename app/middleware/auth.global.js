@@ -1,15 +1,15 @@
-// middleware/auth.global.js
 export default defineNuxtRouteMiddleware((to) => {
   const { user } = useAuth();
 
+  // Define public routes
   const publicPages = ["/", "/events", "/about", "/login", "/signup"];
 
-  // Guest → block private pages
+  // ✅ Guest users → block private pages
   if (!user.value && !publicPages.includes(to.path)) {
-    return navigateTo("/");
+    return navigateTo("/login"); // redirect to login instead of home
   }
 
-  // Logged-in user → block login/signup/home
+  // Logged-in users → block login/signup
   if (user.value && ["/login", "/signup"].includes(to.path)) {
     return user.value.role === "admin"
       ? navigateTo("/admin/dashboard")
@@ -17,12 +17,16 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // Protect admin routes
-  if (to.path.startsWith("/admin") && user.value?.role !== "admin") {
-    return navigateTo("/user/dashboard");
+  if (to.path.startsWith("/admin")) {
+    if (!user.value || user.value.role !== "admin") {
+      return navigateTo("/login"); // force re-authentication
+    }
   }
 
   // Protect user routes
-  if (to.path.startsWith("/user") && user.value?.role !== "user") {
-    return navigateTo("/admin/dashboard");
+  if (to.path.startsWith("/user")) {
+    if (!user.value || user.value.role !== "user") {
+      return navigateTo("/login");
+    }
   }
 });

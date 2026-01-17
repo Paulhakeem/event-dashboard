@@ -1,6 +1,6 @@
 <template>
   <!-- Events Section -->
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="mb-12 text-center">
@@ -75,6 +75,20 @@
               </p>
 
               <!-- Tickets Info -->
+              <div class="grid grid-cols-3 gap-2 mb-4">
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">Early Birds</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.earlyBirds }}</p>
+                </div>
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">Advance</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.Advance }}</p>
+                </div>
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">At Door</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.AtDoor }}</p>
+                </div>
+              </div>
               <div class="grid grid-cols-3 gap-2 mb-4">
                 <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
                   <p class="text-xs font-semibold text-[#9c4e8b]">Regular</p>

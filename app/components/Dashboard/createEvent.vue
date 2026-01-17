@@ -152,6 +152,54 @@
                 >
                   <label
                     class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >Early Birds</label
+                  >
+                  <input
+                    v-model.number="form.earlyBirds"
+                    required
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                  />
+                </div>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >Advance</label
+                  >
+                  <input
+                    v-model.number="form.Advance"
+                    required
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                  />
+                </div>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
+                    >At the Door</label
+                  >
+                  <input
+                    v-model.number="form.AtDoor"
+                    required
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                  />
+                </div>
+                <div
+                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
+                >
+                  <label
+                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
                     >Regular</label
                   >
                   <input
@@ -239,7 +287,7 @@
           <button
             type="submit"
             :disabled="isLoading"
-            class="flex-1 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-bold py-4 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+            class="flex-1 bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-bold py-4 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
           >
             <Icon
               v-if="isLoading"
@@ -269,6 +317,9 @@ const form = reactive({
   date: "",
   location: "",
   eventType: "other",
+  earlyBirds: "",
+  Advance: "",
+  AtDoor: "",
   regular: "",
   vip: "",
   vvip: "",
@@ -301,6 +352,9 @@ const submitEvent = async () => {
     formData.append("date", form.date);
     formData.append("location", form.location);
     formData.append("eventType", form.eventType);
+    formData.append("earlyBirds", form.earlyBirds);
+    formData.append("Advance", form.Advance);
+    formData.append("AtDoor", form.AtDoor);
     formData.append("regular", form.regular);
     formData.append("vip", form.vip);
     formData.append("vvip", form.vvip);
@@ -325,6 +379,9 @@ const submitEvent = async () => {
       date: "",
       location: "",
       eventType: "other",
+      earlyBirds: 0,
+      Advance: 0,
+      AtDoor: 0,
       regular: 0,
       vip: 0,
       vvip: 0,

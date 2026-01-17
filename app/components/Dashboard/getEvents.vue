@@ -89,56 +89,187 @@
   <Transition name="modal">
     <div
       v-if="editingEvent"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-y-auto"
     >
       <div class="w-full max-w-2xl rounded bg-white p-6">
         <h3 class="mb-4 text-lg font-medium">Edit Event</h3>
-        <div class="grid gap-3 md:grid-cols-2">
-          <input
-            v-model="editForm.title"
-            placeholder="Title"
-            class="border p-2"
-          />
-          <input v-model="editForm.date" type="date" class="border p-2" />
-          <input
-            v-model="editForm.location"
-            placeholder="Location"
-            class="border p-2"
-          />
-          <input
-            v-model.number="editForm.regular"
-            placeholder="Regular price"
-            class="border p-2"
-          />
-          <input
-            v-model.number="editForm.vip"
-            placeholder="VIP price"
-            class="border p-2"
-          />
-          <input
-            v-model.number="editForm.vvip"
-            placeholder="VVIP price"
-            class="border p-2"
-          />
-          <select v-model="editForm.status" class="border p-2">
-            <option value="upcoming">📅 Upcoming</option>
-            <option value="ongoing">🔴 Ongoing</option>
-            <option value="completed">✅ Completed</option>
-            <option value="pending">⏳ Pending</option>
-            <option value="cancelled">❌ Cancelled</option>
-          </select>
-          <select v-model="editForm.eventType" class="border p-2">
-            <option value="other">Select Event Type</option>
-            <option value="Entertainment">🎵 Entertainment</option>
-            <option value="Arts & Culture">🛠️ Arts & Culture</option>
-            <option value="Tech & Business">💻 Tech & Business</option>
-            <option value="other">📌 Other</option>
-          </select>
-          <textarea
-            v-model="editForm.description"
-            placeholder="Description"
-            class="col-span-2 border p-2"
-          ></textarea>
+        <div
+          class="grid gap-4 md:grid-cols-2 bg-white shadow-lg rounded-lg p-6"
+        >
+          <!-- Title -->
+          <div class="flex flex-col">
+            <label for="title" class="text-sm font-medium text-gray-700 mb-1"
+              >Event Title</label
+            >
+            <input
+              id="title"
+              v-model="editForm.title"
+              placeholder="Enter event title"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <!-- Date -->
+          <div class="flex flex-col">
+            <label for="date" class="text-sm font-medium text-gray-700 mb-1"
+              >Date</label
+            >
+            <input
+              id="date"
+              v-model="editForm.date"
+              type="date"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <!-- Location -->
+          <div class="flex flex-col">
+            <label for="location" class="text-sm font-medium text-gray-700 mb-1"
+              >Location</label
+            >
+            <input
+              id="location"
+              v-model="editForm.location"
+              placeholder="Enter location"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <!-- early birds-->
+          <div class="flex flex-col">
+            <label for="earlybirds" class="text-sm font-medium text-gray-700 mb-1"
+              >Early Birds</label
+            >
+            <input
+              id="regular"
+              v-model.number="editForm.earlyBirds"
+              placeholder="Early Birds"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+            />
+          </div>
+          <!-- Advance-->
+          <div class="flex flex-col">
+            <label for="advance" class="text-sm font-medium text-gray-700 mb-1"
+              >Advance</label
+            >
+            <input
+              id="regular"
+              v-model.number="editForm.Advance"
+              placeholder="Advance"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+            />
+          </div>
+          <!-- atDoor-->
+          <div class="flex flex-col">
+            <label for="atDoor" class="text-sm font-medium text-gray-700 mb-1"
+              >At Door</label
+            >
+            <input
+              id="regular"
+              v-model.number="editForm.AtDoor"
+              placeholder="at Door"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+            />
+          </div>
+          <!-- regular ticket -->
+          <div class="flex flex-col">
+            <label for="regular" class="text-sm font-medium text-gray-700 mb-1"
+              >💵 Regular Price</label
+            >
+            <input
+              id="regular"
+              v-model.number="editForm.regular"
+              placeholder="Regular price"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
+            />
+          </div>
+
+          <!-- VIP Price -->
+          <div class="flex flex-col">
+            <label for="vip" class="text-sm font-medium text-gray-700 mb-1"
+              >🌟 VIP Price</label
+            >
+            <input
+              id="vip"
+              v-model.number="editForm.vip"
+              placeholder="VIP price"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
+            />
+          </div>
+
+          <!-- VVIP Price -->
+          <div class="flex flex-col">
+            <label for="vvip" class="text-sm font-medium text-gray-700 mb-1"
+              >👑 VVIP Price</label
+            >
+            <input
+              id="vvip"
+              v-model.number="editForm.vvip"
+              placeholder="VVIP price"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition"
+            />
+          </div>
+
+          <!-- Status -->
+          <div class="flex flex-col">
+            <label for="status" class="text-sm font-medium text-gray-700 mb-1"
+              >Event Status</label
+            >
+            <select
+              id="status"
+              v-model="editForm.status"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+              <option value="upcoming">📅 Upcoming</option>
+              <option value="ongoing">🔴 Ongoing</option>
+              <option value="completed">✅ Completed</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="cancelled">❌ Cancelled</option>
+            </select>
+          </div>
+
+          <!-- Event Type -->
+          <div class="flex flex-col">
+            <label
+              for="eventType"
+              class="text-sm font-medium text-gray-700 mb-1"
+              >Event Type</label
+            >
+            <select
+              id="eventType"
+              v-model="editForm.eventType"
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+              <option value="other">📌 Select Event Type</option>
+              <option value="Entertainment">🎵 Entertainment</option>
+              <option value="Arts & Culture">🎨 Arts & Culture</option>
+              <option value="Tech & Business">💻 Tech & Business</option>
+              <option value="other">📌 Other</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div class="flex flex-col col-span-2">
+            <label
+              for="description"
+              class="text-sm font-medium text-gray-700 mb-1"
+              >Description</label
+            >
+            <textarea
+              id="description"
+              v-model="editForm.description"
+              placeholder="Event description..."
+              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition h-32"
+            ></textarea>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="col-span-2 bg-indigo-600 text-white font-semibold py-3 rounded-md hover:bg-indigo-700 transition"
+          >
+            Save Event
+          </button>
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <button @click="closeEdit" class="rounded border px-4 py-2">

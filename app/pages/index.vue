@@ -14,7 +14,7 @@
           <div class="space-y-6 text-center md:text-left">
             <div class="space-y-3">
               <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-                B.M.E <span class="text-[#9c4e8b] block md:inline">Events</span>
+                Velora <span class="text-[#9c4e8b] block md:inline">Events</span>
               </h1>
               <p class="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed max-w-md mx-auto md:mx-0">
                 Discover, book, and manage amazing events all in one place. 

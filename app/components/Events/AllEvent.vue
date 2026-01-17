@@ -77,6 +77,18 @@
               <!-- Tickets Info -->
               <div class="grid grid-cols-3 gap-2 mb-4">
                 <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">Early Birds</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.earlyBirds }}</p>
+                </div>
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">Advance</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.Advance }}</p>
+                </div>
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
+                  <p class="text-xs font-semibold text-[#9c4e8b]">At Door</p>
+                  <p class="text-sm font-bold text-gray-900">Ksh {{ event.AtDoor }}</p>
+                </div>
+                <div class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition">
                   <p class="text-xs font-semibold text-[#9c4e8b]">Regular</p>
                   <p class="text-sm font-bold text-gray-900">Ksh {{ event.regular }}</p>
                 </div>

@@ -38,6 +38,9 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- TICKET PRICE MAP -------------------- */
   const priceMap = {
+    earlyBirds: eventData.earlyBirds,
+    Advance: eventData.Advance,
+    AtDoor: eventData.AtDoor,
     regular: eventData.regular,
     vip: eventData.vip,
     vvip: eventData.vvip,
