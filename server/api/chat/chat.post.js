@@ -28,5 +28,7 @@ export default defineEventHandler(async (event) => {
     completion.choices?.[0]?.message?.content?.trim() ||
     "Sorry, I couldn’t generate a response.";
 
-  return { reply };
+  return {
+    reply,
+  };
 });

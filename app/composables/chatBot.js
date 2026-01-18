@@ -31,7 +31,6 @@ export const useChatBot = () => {
 
     const userText = newMessage.value;
 
-    // push user message
     messages.value.push({
       sender: "user",
       text: userText,
@@ -40,7 +39,7 @@ export const useChatBot = () => {
     newMessage.value = "";
     await scrollToBottom();
 
-    // add typing indicator
+    // ✅ declare OUTSIDE try
     const typingIndex =
       messages.value.push({
         sender: "bot",
@@ -60,10 +59,9 @@ export const useChatBot = () => {
         },
       });
 
-      // replace typing with real reply
       messages.value.splice(typingIndex, 1, {
         sender: "bot",
-        text: res.reply,
+        text: res?.reply || "No response from bot.",
       });
     } catch (err) {
       messages.value.splice(typingIndex, 1, {
