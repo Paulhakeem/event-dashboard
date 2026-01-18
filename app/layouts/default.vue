@@ -7,5 +7,6 @@
     </div>
 
     <slot />
+    <ChatBotChat/>
   </div>
 </template>
