@@ -1,7 +1,7 @@
 <template>
   <!-- Chat Icon -->
   <!-- Chat Icon -->
-  <div ref="chatIcon" class="fixed bottom-5 right-5 cursor-pointer z-50">
+  <div ref="chatIcon" class="fixed bottom-5 right-5 cursor-pointer">
     <div class="relative">
       <Icon
         name="mdi:chat"
@@ -27,8 +27,8 @@
       class="bg-linear-to-r from-[#16c851] to-[#0ea44f] text-white p-3 font-semibold text-lg flex items-center justify-between"
     >
       <span class="items-center flex">
-        <Icon name="mdi:chat" class="text-lg mr-2" />
-        Chatbot</span>
+        <Icon name="mdi:chat" class="text-lg mr-2" /> Velora Chatbot</span
+      >
       <button class="text-sm opacity-80 hover:opacity-100">
         <Icon name="mdi:close" class="text-lg" />
       </button>
