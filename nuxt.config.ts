@@ -34,6 +34,8 @@ export default defineNuxtConfig({
 
     // Paystack
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
+    // opneAI
+    openAiApiKey: process.env.OPENAI_API_KEY,
 
     public: {
       // 🌍 Client-available (unsafe)
