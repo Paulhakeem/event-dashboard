@@ -4,10 +4,10 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const config = useRuntimeConfig();
 
-  if (!body.message || !Array.isArray(body.message)) {
+  if (!body.messages || !Array.isArray(body.messages)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Message is required",
+      statusMessage: "Messages array is required",
     });
   }
 
@@ -16,10 +16,9 @@ export default defineEventHandler(async (event) => {
   });
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+    model: "gpt-4o-mini", // ✅ valid model
     messages: [
       { role: "system", content: "You are a helpful assistant." },
-
       ...body.messages,
     ],
   });
@@ -28,7 +27,5 @@ export default defineEventHandler(async (event) => {
     completion.choices?.[0]?.message?.content?.trim() ||
     "Sorry, I couldn’t generate a response.";
 
-  return {
-    reply,
-  };
+  return { reply };
 });

@@ -54,6 +54,7 @@
                 : 'bg-gray-200 text-gray-800'
             "
           >
+            <p class="text-lg font-semibold text-[#16c851]">{{ msg.sender === "user" ? "You " : "Bot " }}</p>
             {{ msg.text }}
           </div>
         </div>

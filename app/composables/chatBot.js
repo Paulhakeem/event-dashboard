@@ -1,3 +1,4 @@
+// composables/useChatBot.js
 import { ref, nextTick } from "vue";
 
 export const useChatBot = () => {
@@ -30,21 +31,13 @@ export const useChatBot = () => {
     if (!newMessage.value.trim()) return;
 
     const userText = newMessage.value;
-
-    messages.value.push({
-      sender: "user",
-      text: userText,
-    });
-
+    messages.value.push({ sender: "user", text: userText });
     newMessage.value = "";
     await scrollToBottom();
 
-    // ✅ declare OUTSIDE try
+    // Add typing indicator
     const typingIndex =
-      messages.value.push({
-        sender: "bot",
-        text: "Typing...",
-      }) - 1;
+      messages.value.push({ sender: "bot", text: "Typing..." }) - 1;
 
     try {
       const res = await $fetch("/api/chat/chat", {
