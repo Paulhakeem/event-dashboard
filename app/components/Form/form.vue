@@ -37,7 +37,6 @@
           <input
             v-model="email"
             type="email"
-            required
             autocomplete="email"
             placeholder="you@example.com"
             aria-label="Email address"
@@ -63,7 +62,6 @@
           <input
             v-model="password"
             type="password"
-            required
             autocomplete="current-password"
             placeholder="Your password"
             aria-label="Password"

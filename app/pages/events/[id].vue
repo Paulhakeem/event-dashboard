@@ -138,7 +138,7 @@
                   <p class="text-sm text-gray-600">250-Tickets</p>
                 </div>
                 <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.Advanced }}</span
+                  >Ksh {{ event?.Advance }}</span
                 >
               </label>
               <!-- At Door Ticket -->
