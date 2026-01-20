@@ -1,10 +1,12 @@
 <template>
   <div class="w-full flex items-center justify-center px-4 py-10">
     <div class="w-full lg:w-3/4">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <!-- Flex container instead of grid -->
+      <div class="flex flex-col lg:flex-row gap-8">
+        
         <!-- Recent Activity Card -->
         <div
-          class="bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 w-full min-h-[250px] flex flex-col justify-between"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 min-h-[250px] flex flex-col justify-between"
         >
           <!-- Header -->
           <div class="flex items-center justify-between">
@@ -12,7 +14,7 @@
               Recent Activity
             </h2>
             <span
-              class="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-[#16c851] to-[#9d4e8a] text-white shadow-md"
+              class="flex items-center justify-center w-12 h-12 rounded-full bg-linear-to-r from-[#16c851] to-[#9d4e8a] text-white shadow-md"
             >
               <Icon name="mdi:history" class="text-2xl" />
             </span>
@@ -35,7 +37,7 @@
 
         <!-- Upcoming Events Card -->
         <div
-          class="bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 w-full min-h-[250px] flex flex-col justify-between"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 min-h-[250px] flex flex-col justify-between"
         >
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold text-gray-700 dark:text-white">
@@ -55,9 +57,9 @@
             <p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
               No upcoming events
             </p>
-            <P class="text-base text-gray-500 dark:text-gray-400 mt-2">
+            <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
               Browse events and get your tickets now!
-            </P>
+            </p>
             <!-- Footer (Optional CTA) -->
             <div class="mt-6 text-center">
               <button
@@ -69,9 +71,11 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+</script>
