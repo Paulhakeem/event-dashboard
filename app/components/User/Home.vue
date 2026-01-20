@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4 sm:px-6 md:px-8 py-8 lg:ml-64"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:px-6 md:px-8 py-8 lg:ml-12"
   >
     <!-- Tickets Purchased -->
     <div
@@ -83,6 +83,7 @@
       </p>
     </div>
   </div>
+  <UserDashboard />
 </template>
 
 <script setup></script>

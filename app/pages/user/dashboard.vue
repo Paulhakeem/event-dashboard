@@ -14,7 +14,7 @@
 
     <!-- Sidebar -->
     <div
-      class="fixed inset-y-0 left-0 z-80 w-64 bg-white dark:bg-neutral-800 border-r border-gray-200 dark:border-neutral-700 transform transition-transform duration-300 lg:translate-x-0"
+      class="fixed inset-y-0 left-0 z-80 bg-white dark:bg-neutral-800 border-r border-gray-200 dark:border-neutral-700 transform transition-transform duration-300 lg:translate-x-0 "
       :class="openSidebar ? 'translate-x-0' : '-translate-x-full'"
     >
       <div class="h-full flex flex-col">
@@ -47,7 +47,6 @@
             "
           >
             <Icon :name="item.icon" class="w-14" />
-            {{ item.name }}
           </NuxtLink>
         </nav>
       </div>
