@@ -53,7 +53,8 @@
             </span>
           </div>
           <div class="text-center mt-6 flex-1 flex flex-col justify-center">
-            <Icon
+           <div v-if="booking?.length > 0" class="text-center mt-6 flex-1 flex flex-col justify-center">
+             <Icon
               name="mdi:calendar-clock"
               class="text-6xl text-gray-300 dark:text-gray-600 mx-auto"
             />
@@ -63,15 +64,17 @@
             <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
               Browse events and get your tickets now!
             </p>
+           </div>
+           <UserUpcomingEv v-else/>
             <!-- Footer (Optional CTA) -->
-            <div class="mt-6 text-center">
+            <NuxtLink to="/eventPage" class="mt-6 text-center">
               <button
-                class="py-1.5 px-2.5 inline-flex items-center gap-x-1.5 text-sm text-gray-800 bg-gray-100 hover:text-cyan-700 rounded-lg focus:outline-hidden focus:text-cyan-700 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400"
+                class="py-1.5 px-2.5 inline-flex items-center gap-x-1.5 text-sm text-gray-800 bg-gray-100 hover:text-cyan-700 rounded-lg focus:outline-hidden focus:text-cyan-700 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400 cursor-pointer"
               >
                 <Icon name="mdi:arrow-right-circle" class="text-lg" />
                 Explore events
               </button>
-            </div>
+            </NuxtLink>
           </div>
         </div>
       </div>
