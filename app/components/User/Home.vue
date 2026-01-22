@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:px-6 md:px-8 py-8"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-6 sm:px-6 md:px-8 py-8"
   >
     <!-- Tickets Purchased -->
     <div
@@ -56,7 +56,9 @@
           <Icon name="mdi:account-check" class="text-xl" />
         </span>
       </div>
-      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">0</p>
+      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">
+        {{booking.length}}
+      </p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Events you’ve joined
       </p>
@@ -86,4 +88,7 @@
   <UserDashboard />
 </template>
 
-<script setup></script>
+<script setup>
+const {booking}=useBookingData()
+const {totalSpent} = useTotalSpent()
+</script>
