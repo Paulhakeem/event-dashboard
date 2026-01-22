@@ -16,7 +16,7 @@
           <Icon name="mdi:ticket" class="text-xl" />
         </span>
       </div>
-      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">0</p>
+      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ booking?.length }}</p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Total tickets bought
       </p>
@@ -28,7 +28,7 @@
     >
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
-          Upcoming Events
+          Pending Events
         </h2>
         <span
           class="flex items-center justify-center bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 rounded-full size-8"
@@ -36,7 +36,7 @@
           <Icon name="mdi:calendar" class="text-xl" />
         </span>
       </div>
-      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">0</p>
+      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">0</p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Events you plan to attend
       </p>
@@ -56,8 +56,8 @@
           <Icon name="mdi:account-check" class="text-xl" />
         </span>
       </div>
-      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">
-        {{booking.length}}
+      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+        {{ booking?.length }}
       </p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Events you’ve joined
@@ -79,7 +79,10 @@
         </span>
       </div>
 
-      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100">$0</p>
+      <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+        <span class="text-sm">ksh</span>
+        {{ totalSpent }}
+      </p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Amount spent on tickets
       </p>
@@ -89,6 +92,8 @@
 </template>
 
 <script setup>
-const {booking}=useBookingData()
-const {totalSpent} = useTotalSpent()
+const { booking } = useBookingData();
+const totalSpent = computed(() => {
+  return booking.value.reduce((total, b) => total + (b.amount || 0), 0);
+});
 </script>
