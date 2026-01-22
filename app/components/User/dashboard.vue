@@ -18,9 +18,12 @@
               <Icon name="mdi:history" class="text-2xl" />
             </span>
           </div>
-          <UserRecentAct />
+          
           <!-- Body -->
-          <!-- <div class="text-center mt-6 flex-1 flex flex-col justify-center">
+          <div
+            v-if="booking?.length > 0"
+            class="text-center mt-6 flex-1 flex flex-col justify-center"
+          >
             <Icon
               name="svg-spinners:clock"
               class="text-6xl text-gray-300 dark:text-gray-600 mx-auto"
@@ -31,7 +34,8 @@
             <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
               Your recent activities will appear here
             </p>
-          </div> -->
+          </div>
+          <UserRecentAct v-else/>
         </div>
 
         <!-- Upcoming Events Card -->
