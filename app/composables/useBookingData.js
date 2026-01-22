@@ -9,6 +9,7 @@ export default function useBookingData(){
       },
     });
     booking.value = res.bookings;
+    console.log(res.bookings)
   });
 
   return {

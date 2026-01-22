@@ -3,13 +3,12 @@
     <div class="w-full lg:w-3/4">
       <!-- Flex container instead of grid -->
       <div class="flex flex-col lg:flex-row gap-8">
-        
         <!-- Recent Activity Card -->
         <div
-          class="flex-1 bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 min-h-[250px] flex flex-col justify-between"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition transform hover:-translate-y-1 min-h-[250px] justify-between"
         >
           <!-- Header -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-semibold text-gray-700 dark:text-white">
               Recent Activity
             </h2>
@@ -19,9 +18,9 @@
               <Icon name="mdi:history" class="text-2xl" />
             </span>
           </div>
-
+          <UserRecentAct />
           <!-- Body -->
-          <div class="text-center mt-6 flex-1 flex flex-col justify-center">
+          <!-- <div class="text-center mt-6 flex-1 flex flex-col justify-center">
             <Icon
               name="svg-spinners:clock"
               class="text-6xl text-gray-300 dark:text-gray-600 mx-auto"
@@ -32,7 +31,7 @@
             <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
               Your recent activities will appear here
             </p>
-          </div>
+          </div> -->
         </div>
 
         <!-- Upcoming Events Card -->
@@ -71,11 +70,9 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-</script>
+<script setup></script>
