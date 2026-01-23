@@ -7,16 +7,19 @@ export default defineEventHandler(async (event) => {
 
   // 🔐 Protect this route only
   const user = requireAuth(event);
+  if (!user?.email) {
+    return { success: false, message: "Unauthorized" };
+  }
 
   try {
-    const bookings = await Ticket.find({userEmail: user.email})
+    const tickets = await Ticket.find({ userEmail: user?.email })
       .populate("eventName")
-      .sort({ bookedAt: -1 })
+      .sort({ createdAt: -1 })
       .lean();
 
     return {
       success: true,
-      bookings,
+      tickets,
     };
   } catch (error) {
     return {
