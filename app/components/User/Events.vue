@@ -10,8 +10,18 @@
       </p>
     </div>
   </div>
-
-  <!-- Events List -->
+  <!-- Dropdown -->
+   <div class="flex justify-start space-x-4 mt-6">
+    <UserEventsDropdown />
+    <UserEventsCateEvent />
+    </div>
+     <!-- Selected component (full width) -->
+    <div class="mt-4 ">
+      <component v-if="selectedItem.component" :is="selectedItem.component" class="w-full" />
+    </div>
 </template>
 
-<script setup></script>
+<script setup>
+const { selectedItem } = userDropdown()
+</script>
+
