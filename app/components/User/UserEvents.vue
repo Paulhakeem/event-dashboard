@@ -37,17 +37,5 @@
 </template>
 
 <script setup>
-const events = ref([]);
-onMounted(async () => {
-  try {
-    const res = await $fetch("/api/events/fetch");
-    if (res.success) {
-      events.value = res.events || [];
-    }
-  } catch (error) {
-    errorMessage.value = error.message;
-  } finally {
-    pendings.value = false;
-  }
-});
+const {events} =  userUpcomingEvents();
 </script>

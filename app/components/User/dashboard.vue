@@ -18,10 +18,25 @@
               <Icon name="mdi:history" class="text-2xl" />
             </span>
           </div>
-          
-          <!-- Body -->
+
+          <!-- Loading state -->
           <div
-            v-if="booking?.length > 0"
+            v-if="loading"
+            class="flex flex-col items-center justify-center py-10 space-y-3"
+          >
+            <!-- Spinner -->
+            <Icon
+              name="svg-spinners:90-ring-with-bg"
+              class="text-2xl text-indigo-500 animate-spin"
+            />
+            <!-- Text -->
+            <p class="text-gray-600 text-lg font-medium">
+              Loading your data...
+            </p>
+          </div>
+
+          <div
+            v-else-if="booking?.length === 0"
             class="text-center mt-6 flex-1 flex flex-col justify-center"
           >
             <Icon
@@ -35,7 +50,8 @@
               Your recent activities will appear here
             </p>
           </div>
-          <UserRecentAct v-else/>
+
+          <UserRecentAct v-else />
         </div>
 
         <!-- Upcoming Events Card -->
@@ -53,28 +69,48 @@
             </span>
           </div>
           <div class="text-center mt-6 flex-1 flex flex-col justify-center">
-           <div v-if="booking?.length > 0" class="text-center mt-6 flex-1 flex flex-col justify-center">
-             <Icon
-              name="mdi:calendar-clock"
-              class="text-6xl text-gray-300 dark:text-gray-600 mx-auto"
-            />
-            <p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              No upcoming events
-            </p>
-            <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
-              Browse events and get your tickets now!
-            </p>
-           </div>
-          <UserEvents v-else/>
-            <!-- Footer (Optional CTA) -->
-            <NuxtLink to="/eventPage" class="mt-6 text-center">
-              <button
-                class="py-1.5 px-2.5 inline-flex items-center gap-x-1.5 text-sm text-gray-800 bg-gray-100 hover:text-cyan-700 rounded-lg focus:outline-hidden focus:text-cyan-700 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400 cursor-pointer"
-              >
-                <Icon name="mdi:arrow-right-circle" class="text-lg" />
-                Explore events
-              </button>
-            </NuxtLink>
+            <!-- Loading state -->
+            <!-- Loading state -->
+            <div
+              v-if="eventsLoading"
+              class="flex flex-col items-center justify-center py-10 space-y-3"
+            >
+              <Icon
+                name="svg-spinners:90-ring-with-bg"
+                class="w-12 h-12 text-indigo-500 animate-spin"
+              />
+              <p class="text-gray-600 text-lg font-medium">
+                Loading your events...
+              </p>
+            </div>
+
+            <!-- Empty state -->
+            <div
+              v-else-if="events?.length === 0"
+              class="text-center mt-6 flex-1 flex flex-col justify-center"
+            >
+              <Icon
+                name="mdi:calendar-clock"
+                class="text-6xl text-gray-300 dark:text-gray-600 mx-auto"
+              />
+              <p class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                No upcoming events
+              </p>
+              <p class="text-base text-gray-500 dark:text-gray-400 mt-2">
+                Browse events and get your tickets now!
+              </p>
+              <NuxtLink to="/eventPage" class="mt-6 text-center">
+                <button
+                  class="py-1.5 px-2.5 inline-flex items-center gap-x-1.5 text-sm text-gray-800 bg-gray-100 hover:text-cyan-700 rounded-lg focus:outline-hidden focus:text-cyan-700 dark:bg-neutral-700 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400 cursor-pointer"
+                >
+                  <Icon name="mdi:arrow-right-circle" class="text-lg" />
+                  Explore events
+                </button>
+              </NuxtLink>
+            </div>
+
+            <!-- Events list -->
+            <UserEvents v-else />
           </div>
         </div>
       </div>
@@ -83,4 +119,6 @@
 </template>
 
 <script setup>
+const { booking, loading } = useBookingData();
+const { events, eventsLoading } = userUpcomingEvents();
 </script>

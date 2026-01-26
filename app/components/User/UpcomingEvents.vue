@@ -1,6 +1,19 @@
 <template>
   <div class="bg-white w-full p-6 rounded-lg shadow">
-    <div v-if="loading" class="text-center text-gray-500">Loading...</div>
+    <!-- Loading state -->
+    <div
+      v-if="loading"
+      class="flex flex-col items-center justify-center py-10 space-y-3"
+    >
+      <!-- Spinner -->
+      <Icon
+        name="svg-spinners:90-ring-with-bg"
+        class="text-2xl text-indigo-500 animate-spin"
+      />
+      <!-- Text -->
+      <p class="text-gray-600 text-lg font-medium">Loading your data...</p>
+    </div>
+    <!-- error  -->
     <div v-else>
       <div v-if="events.length === 0" class="text-center text-gray-500">
         No upcoming events.
