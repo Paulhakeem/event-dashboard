@@ -44,9 +44,8 @@
 
     <!-- Page Content -->
     <main class="flex-1 md:ml-20 p-6">
-      <!-- Mobile toggle button -->
       <button
-        class="md:hidden mb-4 px-3 py-2 bg-[#9d4e8a] text-white rounded"
+        class="md:hidden fixed top-4 left-4 z-50 px-3 py-2 bg-[#9d4e8a] text-white rounded flex items-center gap-2"
         @click="sidebarOpen = !sidebarOpen"
       >
         <Icon :name="sidebarOpen ? 'mdi:close' : 'mdi:menu'" class="text-xl" />
