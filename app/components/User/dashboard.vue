@@ -65,7 +65,7 @@
               Browse events and get your tickets now!
             </p>
            </div>
-           <UserUpcomingEv v-else/>
+          <UserEvents v-else/>
             <!-- Footer (Optional CTA) -->
             <NuxtLink to="/eventPage" class="mt-6 text-center">
               <button
@@ -82,4 +82,5 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+</script>

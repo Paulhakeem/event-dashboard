@@ -1,7 +1,7 @@
-import UserUpcomingEv from ".././components/User/UpcomingEv.vue";
+import UpcomingEvents from "~/components/User/UpcomingEvents.vue";
 export const userDropdown = () => {
   const items = [
-    { name: "Upcoming Events", component: UserUpcomingEv },
+    { name: "Upcoming Events", component: UpcomingEvents },
     { name: "This Week" },
     { name: "All Upcoming Events" },
   ];

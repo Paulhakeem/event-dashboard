@@ -1,7 +1,7 @@
 import Home from "~/components/User/Home.vue";
 import Profile from "~/components/User/Profile.vue";
 import Tickets from "~/components/User/Tickets.vue";
-import Events from "~/components/User/Events.vue";
+import UserEventsList from "~/components/User/UserEventsList.vue";
 
 export const userDashboardBar = () => {
   const userSidebarMenu = [
@@ -13,7 +13,7 @@ export const userDashboardBar = () => {
     {
       name: "Events",
       icon: "material-symbols:event-note-outline",
-      component: Events,
+      component: UserEventsList,
     },
     {
       name: "Tickets",
