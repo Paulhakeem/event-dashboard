@@ -78,8 +78,9 @@ onMounted(async () => {
     const res = await $fetch("/api/events/totalAmount");
     if (res.success) {
       total.value = res
-      console.log(res);
     }
-  } catch (error) {}
+  } catch (error) {
+    alert("Error fetching total amount");
+  }
 });
 </script>

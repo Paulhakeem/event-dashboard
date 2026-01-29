@@ -28,7 +28,7 @@
     >
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
-          Pending Events
+          Free Registrations
         </h2>
         <span
           class="flex items-center justify-center bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 rounded-full size-8"
@@ -38,7 +38,7 @@
       </div>
       <p class="mt-4 text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">0</p>
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Events you plan to attend
+        No registrations
       </p>
     </div>
 
