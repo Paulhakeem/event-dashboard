@@ -57,8 +57,16 @@
 </template>
 
 <script setup>
+
+
+
 import { ref, onMounted, onUnmounted } from "vue";
 const { userSidebarMenu } = userDashboardBar();
+
+// middlware
+definePageMeta({
+  middleware: "auth",
+});
 
 const currentComponent = ref(userSidebarMenu[0].component);
 const sidebarOpen = ref(false);
