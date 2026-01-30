@@ -45,17 +45,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Prevent multiple admins
-  if (role === "admin") {
-    const adminExists = await User.findOne({ role: "admin" });
-    if (adminExists) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Admin already exists",
-      });
-    }
-  }
-
   // Check existing user
   const existingUser = await User.findOne({ email });
   if (existingUser) {

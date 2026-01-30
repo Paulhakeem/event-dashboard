@@ -1,5 +1,14 @@
 <template>
   <!-- Card -->
+  <admin-create-modal
+    :show="showModal"
+    @close="showModal = false"
+    class="overflow-y-auto"
+    v-if="user.role === 'admin'"
+  >
+    <admin-create-new-admin />
+  </admin-create-modal>
+
   <div class="flex flex-col">
     <div
       class="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
@@ -50,6 +59,7 @@
                 </button>
 
                 <button
+                  @click="showModal = true"
                   class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white cursor-pointer hover:bg-[#cb35a3] focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   <icon name="tdesign:add" class="w-42" />
@@ -61,14 +71,10 @@
           <!-- End Header -->
 
           <!-- Table -->
-          <table
-            class="min-w-full divide-y divide-gray-200"
-          >
+          <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50 text-center justify-center items-center">
               <tr>
-                <th
-                  class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-end"
-                >
+                <th class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-end">
                   <div class="flex items-center gap-x-2">
                     <span
                       class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
@@ -186,6 +192,7 @@
 
 <script setup>
 const { users } = totalUsers();
+const { user } = useAuth();
 // format date
 const formatDate = (date) => {
   if (!date) return "";
@@ -195,4 +202,6 @@ const formatDate = (date) => {
     day: "numeric",
   });
 };
+
+const showModal = ref(false);
 </script>
