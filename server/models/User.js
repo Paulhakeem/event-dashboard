@@ -6,13 +6,7 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ["admin", "user"], default: "user" },
-  adminNumber: {
-    type: String,
-    required: function () {
-      return this.role === "admin";
-    },
-  },
+  role: { type: String, enum: ["admin", "organiser", "user"], default: "user" },
   resetCode: { type: String },
   resetCodeExpires: { type: Date },
   joinedAt: { type: Date, default: Date.now },

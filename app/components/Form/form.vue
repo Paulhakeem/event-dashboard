@@ -5,7 +5,8 @@
   <div v-else-if="modal === 'reset'">
     <FormResetPass :initialEmail="sentEmail" @close="modal = 'login'" />
   </div>
-  <div v-else
+  <div
+    v-else
     class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900"
   >
     <div
@@ -91,7 +92,7 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 // login should always allow selecting admin so existing admins can sign in
 
-const { setAuth } = useAuth();
+const { setAuth, user } = useAuth();
 
 const login = async () => {
   errorMessage.value = "";
@@ -109,9 +110,11 @@ const login = async () => {
     setAuth(data);
 
     if (data.user.role === "admin") {
-      navigateTo("/admin/dashboard");
+      navigateTo(`/admin/${user.value.id}`);
+    } else if (data.user.role === "organiser") {
+      navigateTo(`/organiser/${user.value.id}`);
     } else {
-      navigateTo("/user/dashboard");
+      navigateTo(`/user/${user.value.id}`);
     }
   } catch (error) {
     errorMessage.value =
@@ -123,17 +126,15 @@ const login = async () => {
   }
 };
 
-const modal = ref('login'); // 'login' | 'forget' | 'reset'
-const sentEmail = ref('');
+const modal = ref("login"); // 'login' | 'forget' | 'reset'
+const sentEmail = ref("");
 
 const openModal = () => {
-  modal.value = 'forget';
+  modal.value = "forget";
 };
 
 const openReset = (email) => {
-  sentEmail.value = email || '';
-  modal.value = 'reset';
+  sentEmail.value = email || "";
+  modal.value = "reset";
 };
-
- 
 </script>

@@ -24,6 +24,7 @@
     "formidable": "^3.5.4",
     "izitoast": "^1.4.0",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "lucide-vue-next": "^0.544.0",
     "mongodb": "^7.0.0",
     "mongoose": "^8.21.0",

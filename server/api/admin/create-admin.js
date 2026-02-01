@@ -43,18 +43,19 @@ export default defineEventHandler(async (event) => {
   // 🔐 Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
+
   // 👤 Create admin
   const admin = await User.create({
     firstName,
     lastName,
     email,
     password: hashedPassword,
-    role: "admin",
+    role: "organiser",
   });
 
   return {
     success: true,
-    message: "Admin created successfully",
+    message: "organiser created successfully",
     admin: {
       id: admin._id,
       firstName: admin.firstName,

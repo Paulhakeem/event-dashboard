@@ -1,4 +1,5 @@
 export default function useCreateAdmin() {
+  const { token } = useAuth();
   // form fields
   const firstName = ref("");
   const lastName = ref("");
@@ -39,6 +40,9 @@ export default function useCreateAdmin() {
     try {
       await $fetch("/api/admin/create-admin", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
         body: {
           firstName: firstName.value,
           lastName: lastName.value,
@@ -46,6 +50,11 @@ export default function useCreateAdmin() {
           password: password.value,
         },
       });
+
+      firstName.value = "";
+      lastName.value = "";
+      email.value = "";
+      password.value = "";
       isLoading.value = false;
     } catch (error) {
       errorMessage.value =
