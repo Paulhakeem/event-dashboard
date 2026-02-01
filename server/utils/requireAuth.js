@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-
+import { createError } from "h3";
 export function requireAuth(event) {
   const config = useRuntimeConfig();
   const authHeader = event.node.req.headers.authorization;
@@ -15,6 +15,7 @@ export function requireAuth(event) {
 
   try {
     const decoded = jwt.verify(token, config.secretStr);
+    event.context.user = decoded
     return decoded; // return user payload
   } catch (err) {
     throw createError({
