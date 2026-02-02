@@ -5,6 +5,7 @@ import formidable from "formidable";
 import fs from "fs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
+import nodemailer from "nodemailer";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -79,6 +80,10 @@ export default defineEventHandler(async (event) => {
 
   // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
+  // Generate verification code
+  const verificationCode = Math.floor(
+    100000 + Math.random() * 900000,
+  ).toString();
 
   const newUser = new User({
     profileImage: imagePath,
@@ -86,11 +91,11 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
+    emailVerificationCode: verificationCode,
+    emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins
     adminNumber,
     role,
   });
-
-  await newUser.save();
 
   // Create JWT
   const token = jwt.sign(
@@ -103,8 +108,31 @@ export default defineEventHandler(async (event) => {
       role: newUser.role,
     },
     config.secretStr,
-    { expiresIn: "1d" }
+    { expiresIn: "1d" },
   );
+
+  // Email transport
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: config.emailUsername,
+      pass: config.emailPass,
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"Event Dashboard" <${config.emailUsername}>`,
+    to: email,
+    subject: "Verify your email",
+    html: `
+      <h2>Email Verification</h2>
+      <p>Your verification code is:</p>
+      <h1>${verificationCode}</h1>
+      <p>This code expires in 10 minutes.</p>
+    `,
+  });
 
   return {
     message: "User registered successfully",

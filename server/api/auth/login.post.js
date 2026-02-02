@@ -18,6 +18,14 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid credentials",
     });
   }
+
+  if (!user.isEmailVerified) {
+  throw createError({
+    statusCode: 403,
+    statusMessage: "Please verify your email before logging in",
+  });
+}
+
   // compare the password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {

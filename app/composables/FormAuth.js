@@ -84,10 +84,8 @@ export default function useFormAuth() {
         localStorage.setItem("token", data.token);
         setAuth(data);
       }
-
-      navigateTo(
-        role.value === "admin" ? "/admin/dashboard" : "/user/dashboard"
-      );
+      // redirect user to verify page with email
+      navigateTo({ path: "/verifyEmail", query: { email: email.value } });
     } catch (err) {
       errorMessage.value = err.message;
     } finally {
