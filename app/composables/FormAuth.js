@@ -8,7 +8,6 @@ export default function useFormAuth() {
   const lastName = ref("");
   const email = ref("");
   const password = ref("");
-  const adminNumber = ref("");
   const role = ref("user");
 
   // state
@@ -65,7 +64,6 @@ export default function useFormAuth() {
       formData.append("lastName", lastName.value);
       formData.append("email", email.value);
       formData.append("password", password.value);
-      formData.append("adminNumber", adminNumber.value);
       formData.append("role", role.value);
 
       if (imageFile.value) {
@@ -78,7 +76,7 @@ export default function useFormAuth() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Signup failed");
+      if (!res.ok) throw new Error(data.message || "Verify email failed");
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -98,7 +96,6 @@ export default function useFormAuth() {
     lastName,
     email,
     password,
-    adminNumber,
     role,
     previewImage,
     isLoading,

@@ -100,27 +100,6 @@
         <option v-if="!adminExists" value="admin">Admin</option>
       </select>
 
-      <p class="text-sm text-neutral-500 mt-2">
-        <span v-if="adminExists">Admin account already exists — only <strong>User</strong> registration is available.</span>
-        <span v-else>Choose <strong>Admin</strong> only if you have an admin number (you will be asked below).</span>
-      </p>
-
-      <!-- admin input section -->
-      <div v-if="role === 'admin'" class="mt-6">
-        <label
-          class="block mb-2 text-sm text-gray-700 font-medium dark:text-white"
-          >Admin Number</label
-        >
-        <input
-          v-model="adminNumber"
-          type="text"
-          placeholder="Enter admin number"
-          aria-label="Admin number"
-          class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
-        />
-        <p class="text-sm text-neutral-500 mt-2">Admin number is required to register as an Admin.</p>
-      </div>
-
       <!-- Submit button -->
       <div class="mt-6 grid">
         <button
@@ -128,7 +107,7 @@
           type="submit"
           class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
         >
-          {{ isLoading ? "Signing Up..." : "Sign Up" }}
+          {{ isLoading ? "Sending veryfication code..." : "Verify email" }}
         </button>
       </div>
     </div>
@@ -142,7 +121,6 @@ const {
   email,
   password,
   errorMessage,
-  adminNumber,
   role,
   signup,
   isLoading,

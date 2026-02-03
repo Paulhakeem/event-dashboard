@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware((to) => {
   const { user } = useAuth();
 
   // Define public routes
-  const publicPages = ["/", "/events", "/about", "/login", "/signup"];
+  const publicPages = ["/", "/events", "/about", "/login", "/signup","/verifyEmail"];
 
   // ✅ Guest users → block private pages
   if (!user.value && !publicPages.includes(to.path)) {

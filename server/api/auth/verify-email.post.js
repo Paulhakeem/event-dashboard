@@ -1,18 +1,22 @@
-import connectDB from "../../utils/mongoose";
-import { User } from "../../models/User";
+import { User } from "../../models/User.js";
+import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
-  const { email, code } = await readBody(event);
 
+  const body = await readBody(event);
+  const { email, code } = body;
+
+  /* ---------- VALIDATION ---------- */
   if (!email || !code) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Email and code are required",
+      statusMessage: "Email and verification code are required",
     });
   }
 
-  const user = await User.findOne({ email });
+  /* ---------- FIND USER ---------- */
+  const user = await User.findOne({ email: email.toLowerCase() });
 
   if (!user) {
     throw createError({
@@ -22,9 +26,12 @@ export default defineEventHandler(async (event) => {
   }
 
   if (user.isEmailVerified) {
-    return { message: "Email already verified" };
+    return {
+      message: "Email already verified",
+    };
   }
 
+  /* ---------- CHECK CODE ---------- */
   if (
     user.emailVerificationCode !== code ||
     user.emailVerificationExpires < Date.now()
@@ -35,6 +42,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  /* ---------- VERIFY USER ---------- */
   user.isEmailVerified = true;
   user.emailVerificationCode = undefined;
   user.emailVerificationExpires = undefined;
@@ -42,7 +50,6 @@ export default defineEventHandler(async (event) => {
   await user.save();
 
   return {
-    success: true,
-    message: "Email verified successfully",
+    message: "Email verified successfully. You can now login.",
   };
 });

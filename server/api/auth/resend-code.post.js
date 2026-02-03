@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   const code = Math.floor(100000 + Math.random() * 900000).toString();
 
   user.emailVerificationCode = code;
-  user.emailVerificationExpires = Date.now() + 10 * 60 * 1000;
+  user.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000)
   await user.save();
 
   const transporter = nodemailer.createTransport({

@@ -1,8 +1,8 @@
 <script setup>
+const {user} = useAuth()
 import { ref } from "vue"
 const email = useRoute().query.email
 const code = ref("")
-const role = ref("user")
 const loading = ref(false)
 
 const verify = async () => {
@@ -12,7 +12,7 @@ const verify = async () => {
       method: "POST",
       body: { email, code: code.value },
     })
-    navigateTo(role.value === "admin" ? "/admin/dashboard" : "/user/dashboard")
+    navigateTo(user.role.value === "admin" ? "/admin/dashboard" : "/user/dashboard")
   } catch (err) {
     alert("Verification failed")
   } finally {

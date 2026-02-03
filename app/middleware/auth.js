@@ -1,7 +1,7 @@
 // logout user if token expire
 import { jwtDecode } from "jwt-decode";
 
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware((to) => {
   const { token, logout } = useAuth();
 
   if (!token.value) {
