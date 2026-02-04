@@ -1,33 +1,52 @@
 <script setup>
-const {user} = useAuth()
 import { ref } from "vue"
-const email = useRoute().query.email
+
+const route = useRoute()
+const email = route.query.email
 const code = ref("")
 const loading = ref(false)
+const error = ref("")
 
 const verify = async () => {
+  if (!code.value) {
+    error.value = "Please enter the verification code"
+    return
+  }
+
   loading.value = true
+  error.value = ""
+
   try {
     await $fetch("/api/auth/verify-email", {
       method: "POST",
-      body: { email, code: code.value },
+      body: {
+        email,
+        code: code.value,
+      },
     })
-    navigateTo(user.role.value === "admin" ? "/admin/dashboard" : "/user/dashboard")
+
+    // ✅ Email verified → go to login
+    navigateTo("/login")
   } catch (err) {
-    alert("Verification failed")
+    error.value = err?.data?.message || "Verification failed"
   } finally {
     loading.value = false
   }
 }
 
 const resend = async () => {
-  await $fetch("/api/auth/resend-code", {
-    method: "POST",
-    body: { email },
-  })
-  alert("Code resent")
+  try {
+    await $fetch("/api/auth/resend-code", {
+      method: "POST",
+      body: { email },
+    })
+    alert("Verification code resent")
+  } catch (err) {
+    alert("Failed to resend code")
+  }
 }
 </script>
+
 
 <template>
   <div class="flex items-center justify-center min-h-screen bg-gray-50">

@@ -4,29 +4,39 @@ import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
-  const { email, password, role } = body;
   const config = useRuntimeConfig();
-
   await connectDB();
 
-  // find the user by email
-  const user = await User.findOne({ email });
-  if (!user) {
+  const { email, password } = await readBody(event);
+
+  if (!email || !password) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Invalid credentials",
+      statusMessage: "Email and password are required",
     });
   }
 
-  if (!user.isEmailVerified) {
-  throw createError({
-    statusCode: 403,
-    statusMessage: "Please verify your email before logging in",
-  });
-}
+  // normalize email
+  const normalizedEmail = email.toLowerCase();
 
-  // compare the password
+  // Find user
+  const user = await User.findOne({ email: normalizedEmail }).select("+password");
+  if (!user) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid email or password",
+    });
+  }
+
+  // ✅ Correct verification check
+  if (!user.isEmailVerified) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Please verify your email before logging in",
+    });
+  }
+
+  // Password check
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
     throw createError({
@@ -35,26 +45,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (!config.secretStr) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "JWT secret is not configured",
-    });
-  }
-  // generate a JWT token
+  // JWT
   const token = jwt.sign(
     {
       id: user._id,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
       email: user.email,
+      role: user.role,
     },
     config.secretStr,
     { expiresIn: "1d" }
   );
 
   return {
+    success: true,
     message: "Login successful",
     token,
     user: {
@@ -63,7 +66,7 @@ export default defineEventHandler(async (event) => {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      createdAt: user.joinedAt,
+      joinedAt: user.joinedAt,
     },
   };
 });

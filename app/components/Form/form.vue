@@ -84,16 +84,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-
 const email = ref("");
 const password = ref("");
-const isLoading = ref(false);
 const errorMessage = ref("");
-// login should always allow selecting admin so existing admins can sign in
-
-const { setAuth, user } = useAuth();
-
+const isLoading = ref(false);
+const { setAuth } = useAuth();
 const login = async () => {
   errorMessage.value = "";
   isLoading.value = true;
@@ -106,21 +101,27 @@ const login = async () => {
         password: password.value,
       },
     });
-
+    console.log(data);
     setAuth(data);
 
+  
+
     if (data.user.role === "admin") {
-      navigateTo(`/admin/${user.value.id}`);
+      navigateTo(`/admin/${data.user.id}`);
     } else if (data.user.role === "organiser") {
-      navigateTo(`/organiser/${user.value.id}`);
+      navigateTo(`/organiser/${data.user.id}`);
     } else {
-      navigateTo(`/user/${user.value.id}`);
+      navigateTo(`/user/${data.user.id}`);
     }
   } catch (error) {
-    errorMessage.value =
-      error?.data?.statusMessage ||
-      error?.data?.message ||
-      "Login failed. Please check your credentials.";
+    console.log(error);
+    if (error?.data?.statusCode === 403) {
+      errorMessage.value = error.data.statusMessage;
+    } else if (error?.data?.statusCode === 400) {
+      errorMessage.value = error.data.statusMessage;
+    } else {
+      errorMessage.value = "Login failed. Please check your credentials.";
+    }
   } finally {
     isLoading.value = false;
   }
@@ -128,11 +129,9 @@ const login = async () => {
 
 const modal = ref("login"); // 'login' | 'forget' | 'reset'
 const sentEmail = ref("");
-
 const openModal = () => {
   modal.value = "forget";
 };
-
 const openReset = (email) => {
   sentEmail.value = email || "";
   modal.value = "reset";

@@ -76,14 +76,14 @@ export default function useFormAuth() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Verify email failed");
+      if (!res.ok) throw new Error(data.message || "Registration failed");
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        setAuth(data);
-      }
-      // redirect user to verify page with email
-      navigateTo({ path: "/verifyEmail", query: { email: email.value } });
+      // ✅ DO NOT set token here
+      // ✅ Just go to verify email page
+      navigateTo({
+        path: "/verifyEmail",
+        query: { email: email.value },
+      });
     } catch (err) {
       errorMessage.value = err.message;
     } finally {

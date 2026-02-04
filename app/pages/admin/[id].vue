@@ -50,9 +50,6 @@
 </template>
 
 <script setup>
-definePageMeta({
-  middleware: "auth",
-});
 const openMenu = ref(false);
 const { sidebarMenu } = dashboardSidebar();
 const itemSelected = ref(sidebarMenu[0]);
