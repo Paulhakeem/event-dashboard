@@ -50,7 +50,10 @@ export default function useCreateAdmin() {
           password: password.value,
         },
       });
-
+      navigateTo({
+        path: "/verifyEmail",
+        query: { email: email.value },
+      });
       firstName.value = "";
       lastName.value = "";
       email.value = "";
