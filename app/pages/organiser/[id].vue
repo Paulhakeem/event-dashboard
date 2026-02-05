@@ -19,81 +19,16 @@
         >
       </a>
       <ul class="space-y-2 font-medium">
-        <li>
+        <li v-for="menu in sidebar" :key="menu.title">
           <a
             href="#"
             class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
           >
-            <svg
-              class="w-5 h-5 transition duration-75 group-hover:text-fg-brand"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z"
-              />
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z"
-              />
-            </svg>
-            <span class="ms-3">Dashboard</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
-          >
-           <Icon name="mdi:event-add"  class="shrink-0 text-2xl transition duration-75 group-hover:text-fg-brand"/>
-            <span class="flex-1 ms-3 whitespace-nowrap">Create Events</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
-          >
-            <Icon
-              name="carbon:event"
+            <icon
+              :name="menu.icon"
               class="shrink-0 text-2xl transition duration-75 group-hover:text-fg-brand"
             />
-            <span class="flex-1 ms-3 whitespace-nowrap">Track Events</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
-          >
-            <Icon
-              name="tdesign:notification-filled"
-              class="shrink-0 text-2xl transition duration-75 group-hover:text-fg-brand"
-            />
-            <span class="flex-1 ms-3 whitespace-nowrap">Notifications</span>
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
-          >
-            <Icon
-              name="gg:insights"
-              class="shrink-0 text-2xl transition duration-75 group-hover:text-fg-brand"
-            />
-            <span class="flex-1 ms-3 whitespace-nowrap">Insights</span>
+            <span class="ms-3">{{ menu.title }}</span>
           </a>
         </li>
       </ul>
@@ -112,4 +47,8 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import useOrganiserSidebar from "~/composables/organiserSidebar";
+
+const { sidebar } = useOrganiserSidebar();
+</script>
