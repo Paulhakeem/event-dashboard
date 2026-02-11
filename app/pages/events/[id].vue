@@ -98,70 +98,8 @@
 
             <!-- Ticket Options -->
             <div class="space-y-3 mb-8">
-              <!-- Early Birds -->
-              <label
-                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{
-                  'border-[#9c4e8b] bg-purple-50': ticketType === 'earlyBirds',
-                }"
-              >
-                <input
-                  type="radio"
-                  v-model="ticketType"
-                  value="earlyBirds"
-                  class="w-5 h-5 text-[#9c4e8b]"
-                />
-                <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">Early Birds Ticket</p>
-                  <p class="text-sm text-gray-600">50-Tickets</p>
-                </div>
-                <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.earlyBirds }}</span
-                >
-              </label>
-
-              <!-- Advanced Ticket -->
-              <label
-                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{
-                  'border-[#9c4e8b] bg-purple-50': ticketType === 'Advanced',
-                }"
-              >
-                <input
-                  type="radio"
-                  v-model="ticketType"
-                  value="Advanced"
-                  class="w-5 h-5 text-[#9c4e8b]"
-                />
-                <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">Advanced Ticket</p>
-                  <p class="text-sm text-gray-600">250-Tickets</p>
-                </div>
-                <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.Advance }}</span
-                >
-              </label>
-              <!-- At Door Ticket -->
-              <label
-                class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-[#9c4e8b] cursor-pointer transition"
-                :class="{
-                  'border-[#9c4e8b] bg-purple-50': ticketType === 'AtDoor',
-                }"
-              >
-                <input
-                  type="radio"
-                  v-model="ticketType"
-                  value="AtDoor"
-                  class="w-5 h-5 text-[#9c4e8b]"
-                />
-                <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">At Door Ticket</p>
-                  <p class="text-sm text-gray-600">500-Tickets</p>
-                </div>
-                <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.AtDoor }}</span
-                >
-              </label>
+              <!-- (Legacy ticket types removed) -->
+              <!-- Regular / VIP / VVIP are shown below. If a price is not configured the option will be disabled. -->
 
               <!-- Regular Ticket -->
               <label
@@ -174,6 +112,7 @@
                   type="radio"
                   v-model="ticketType"
                   value="regular"
+                  :disabled="event?.regular === undefined || event?.regular === null"
                   class="w-5 h-5 text-[#9c4e8b]"
                 />
                 <div class="ml-3 flex-1">
@@ -181,7 +120,7 @@
                   <p class="text-sm text-gray-600">Standard access</p>
                 </div>
                 <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.regular }}</span
+                  >Ksh {{ event?.regular !== undefined && event?.regular !== null ? event?.regular : 'Not set' }}</span
                 >
               </label>
               <!-- vip -->
@@ -195,6 +134,7 @@
                   type="radio"
                   v-model="ticketType"
                   value="vip"
+                  :disabled="event?.vip === undefined || event?.vip === null"
                   class="w-5 h-5 text-[#9c4e8b]"
                 />
                 <div class="ml-3 flex-1">
@@ -202,7 +142,7 @@
                   <p class="text-sm text-gray-600">Premium experience</p>
                 </div>
                 <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.vip }}</span
+                  >Ksh {{ event?.vip !== undefined && event?.vip !== null ? event?.vip : 'Not set' }}</span
                 >
               </label>
 
@@ -216,6 +156,7 @@
                   type="radio"
                   v-model="ticketType"
                   value="vvip"
+                  :disabled="event?.vvip === undefined || event?.vvip === null"
                   class="w-5 h-5 text-[#9c4e8b]"
                 />
                 <div class="ml-3 flex-1">
@@ -223,7 +164,7 @@
                   <p class="text-sm text-gray-600">Exclusive access</p>
                 </div>
                 <span class="text-lg font-bold text-[#9c4e8b]"
-                  >Ksh {{ event?.vvip }}</span
+                  >Ksh {{ event?.vvip !== undefined && event?.vvip !== null ? event?.vvip : 'Not set' }}</span
                 >
               </label>
             </div>

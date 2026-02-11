@@ -147,100 +147,39 @@
                 >Ticket Prices (Ksh) *</label
               >
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >Early Birds</label
-                  >
-                  <input
-                    v-model.number="form.earlyBirds"
-                    required
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
-                  />
-                </div>
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >Advance</label
-                  >
-                  <input
-                    v-model.number="form.Advance"
-                    required
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
-                  />
-                </div>
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >At the Door</label
-                  >
-                  <input
-                    v-model.number="form.AtDoor"
-                    required
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
-                  />
-                </div>
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >Regular</label
-                  >
+                <!-- Regular - optional -->
+                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
+                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">Regular</label>
                   <input
                     v-model.number="form.regular"
-                    required
                     type="number"
                     min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                    placeholder="Leave empty to disable"
+                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
                   />
                 </div>
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >⭐ VIP</label
-                  >
+
+                <!-- VIP - optional -->
+                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
+                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">⭐ VIP</label>
                   <input
                     v-model.number="form.vip"
-                    required
                     type="number"
                     min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                    placeholder="Leave empty to disable"
+                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
                   />
                 </div>
-                <div
-                  class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition"
-                >
-                  <label
-                    class="block text-xs font-semibold text-gray-600 uppercase mb-2"
-                    >👑 VVIP</label
-                  >
+
+                <!-- VVIP - optional -->
+                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
+                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">👑 VVIP</label>
                   <input
                     v-model.number="form.vvip"
-                    required
                     type="number"
                     min="0"
-                    placeholder="0"
-                    class="w-full bg-transparent text-2xl font-bold text-gray-900 outline-none"
+                    placeholder="Leave empty to disable"
+                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
                   />
                 </div>
               </div>
@@ -317,9 +256,6 @@ const form = reactive({
   date: "",
   location: "",
   eventType: "other",
-  earlyBirds: "",
-  Advance: "",
-  AtDoor: "",
   regular: "",
   vip: "",
   vvip: "",
@@ -352,12 +288,10 @@ const submitEvent = async () => {
     formData.append("date", form.date);
     formData.append("location", form.location);
     formData.append("eventType", form.eventType);
-    formData.append("earlyBirds", form.earlyBirds);
-    formData.append("Advance", form.Advance);
-    formData.append("AtDoor", form.AtDoor);
-    formData.append("regular", form.regular);
-    formData.append("vip", form.vip);
-    formData.append("vvip", form.vvip);
+    // optional ticket prices (only append if defined)
+    if (form.regular !== "" && form.regular !== null && form.regular !== undefined) formData.append("regular", form.regular);
+    if (form.vip !== "" && form.vip !== null && form.vip !== undefined) formData.append("vip", form.vip);
+    if (form.vvip !== "" && form.vvip !== null && form.vvip !== undefined) formData.append("vvip", form.vvip);
     formData.append("TicketQuantity", form.TicketQuantity);
     formData.append("status", form.status);
     formData.append("image", file.value); // 🖼️ add the file
@@ -379,12 +313,9 @@ const submitEvent = async () => {
       date: "",
       location: "",
       eventType: "other",
-      earlyBirds: 0,
-      Advance: 0,
-      AtDoor: 0,
-      regular: 0,
-      vip: 0,
-      vvip: 0,
+      regular: "",
+      vip: "",
+      vvip: "",
       TicketQuantity: 0,
       status: "upcoming",
     });

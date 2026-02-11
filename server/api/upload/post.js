@@ -47,17 +47,14 @@ export default defineEventHandler(async (event) => {
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
-  const regular = Number(fields.regular?.[0] || 0);
-  const vip = Number(fields.vip?.[0] || 0);
-  const vvip = Number(fields.vvip?.[0] || 0);
+  const regular = fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
+  const vip = fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
+  const vvip = fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
-  const earlyBirds = Number(fields.earlyBirds?.[0] || 0);
-  const Advance = Number(fields.Advance?.[0] || 0);
-  const atDoor = Number(fields.AtDoor?.[0] || 0);
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
 
-  if (!title || !description || !location || !date || !TicketQuantity || !eventType || !status || !files.image?.[0]) {
+  if (!title || !description || !location || !date || !eventType || !status || !files.image?.[0]) {
     throw createError({
       statusCode: 400,
       statusMessage: "All fields are required",
@@ -87,9 +84,6 @@ export default defineEventHandler(async (event) => {
     description,
     location,
     date: new Date(date),
-    earlyBirds,
-    Advance,
-    AtDoor: atDoor,
     regular,
     vip,
     vvip,

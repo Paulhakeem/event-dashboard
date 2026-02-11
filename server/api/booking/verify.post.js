@@ -38,9 +38,6 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- TICKET PRICE MAP -------------------- */
   const priceMap = {
-    earlyBirds: eventData.earlyBirds,
-    Advance: eventData.Advance,
-    AtDoor: eventData.AtDoor,
     regular: eventData.regular,
     vip: eventData.vip,
     vvip: eventData.vvip,
@@ -48,10 +45,11 @@ export default defineEventHandler(async (event) => {
 
   const expectedAmount = priceMap[ticketType];
 
-  if (!expectedAmount) {
+  // if the selected ticket type is not configured for this event, reject
+  if (expectedAmount === undefined || expectedAmount === null) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Invalid ticket type selected",
+      statusMessage: "Invalid or unavailable ticket type selected",
     });
   }
 

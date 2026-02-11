@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+import { resolve } from 'path';
 export default defineNuxtConfig({
   app: {
     head: {
@@ -17,6 +18,11 @@ export default defineNuxtConfig({
   modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts"],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        'striptags': resolve(__dirname, 'shims/striptags.js')
+      }
+    }
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
