@@ -63,10 +63,12 @@ export default defineEventHandler(async (event) => {
 
   // ☁️ Upload image to Cloudinary
   const imageFile = files.image[0];
-  if (imageFile > 10 * 1024 * 1024) {
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+  const uploadedSize = imageFile?.size ?? 0;
+  if (uploadedSize > MAX_IMAGE_BYTES) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Image size should be less than 10MB",
+      statusMessage: `File size too large. Got ${uploadedSize}. Maximum is ${MAX_IMAGE_BYTES}.`,
     });
   }
   const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {

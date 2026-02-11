@@ -207,68 +207,41 @@ export default defineEventHandler(async (event) => {
     email: userData.email,
   });
 
-  /* -------------------- EMAIL SETUP -------------------- */
-  const transporter = nodemailer.createTransport({
-    host: config.smtpHost,
-    port: Number(config.smtpPort),
-    secure: Number(config.smtpPort) === 465,
-    auth: {
-      user: config.emailUsername,
-      pass: config.emailPass,
-    },
-  });
-
-  /* -------------------- EMAIL USER -------------------- */
-  await transporter.sendMail({
-    from: `"B.M.E Events" <${config.emailUsername}>`,
-    to: userData.email,
-    subject: `Booking Confirmed – ${eventData.title} 🎉`,
-    html: `
-      <h2>Hello ${userData.firstName || ""} ${userData.lastName || ""}</h2>
-      <p>Your booking was successful!</p>
-
-      <p><strong>Event:</strong> ${eventData.title}</p>
-      <p><strong>Ticket Type:</strong> ${ticketType.toUpperCase()}</p>
-      <p><strong>Amount Paid:</strong> KES ${expectedAmount}</p>
-      <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
-      <p><strong>Location:</strong> ${eventData.location}</p>
-      <p><strong>Reference:</strong> ${paystackData.reference}</p>
-
-      <br/>
-       <h3>🎟️ Ticket Code</h3>
-    <p style="font-size:18px"><strong>${ticketCode}</strong></p>
-
-    <p>Your ticket PDF is attached to this email. Please download and present it at the entrance.</p>
-
-    <p>Thank you for booking with us 🙏</p>
-    `,
-    attachments: [
-      {
-        filename: "ticket.pdf",
-        content: pdfBuffer,
-        contentType: "application/pdf",
+  /* -------------------- EMAIL (if SMTP configured) -------------------- */
+  if (config.smtpHost && config.smtpPort && config.emailUsername && config.emailPass) {
+    const transporter = nodemailer.createTransport({
+      host: config.smtpHost,
+      port: Number(config.smtpPort),
+      secure: Number(config.smtpPort) === 465,
+      auth: {
+        user: config.emailUsername,
+        pass: config.emailPass,
       },
-    ],
-  });
+    });
 
-  /* -------------------- EMAIL ADMIN -------------------- */
-  const admin = await User.findOne({ role: "admin" });
-
-  if (admin) {
+    /* -------------------- EMAIL USER -------------------- */
     await transporter.sendMail({
-      from: `"B.M.E Events" <${config.emailUsername}>`,
-      to: admin.email,
-      subject: `New Booking – ${eventData.title}`,
+      from: `"Volar Events" <${config.emailUsername}>`,
+      to: userData.email,
+      subject: `Booking Confirmed – ${eventData.title} 🎉`,
       html: `
-        <h2>New Booking Alert 📢</h2>
+        <h2>Hello ${userData.firstName || ""} ${userData.lastName || ""}</h2>
+        <p>Your booking was successful!</p>
+
         <p><strong>Event:</strong> ${eventData.title}</p>
-        <p><strong>User:</strong> ${userData.firstName || ""} ${
-        userData.lastName || ""
-      }</p>
-        <p><strong>Email:</strong> ${userData.email}</p>
-        <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
-        <p><strong>Amount:</strong> KES ${expectedAmount}</p>
+        <p><strong>Ticket Type:</strong> ${ticketType.toUpperCase()}</p>
+        <p><strong>Amount Paid:</strong> KES ${expectedAmount}</p>
+        <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
+        <p><strong>Location:</strong> ${eventData.location}</p>
         <p><strong>Reference:</strong> ${paystackData.reference}</p>
+        
+        <br/>
+         <h3>🎟️ Ticket Code</h3>
+      <p style="font-size:18px"><strong>${ticketCode}</strong></p>
+
+      <p>Your ticket PDF is attached to this email. Please download and present it at the entrance.</p>
+
+      <p>Thank you for booking with us 🙏</p>
       `,
       attachments: [
         {
@@ -278,6 +251,37 @@ export default defineEventHandler(async (event) => {
         },
       ],
     });
+
+    /* -------------------- EMAIL ADMIN -------------------- */
+    const admin = await User.findOne({ role: "admin" });
+
+    if (admin) {
+      await transporter.sendMail({
+        from: `"Volar Events" <${config.emailUsername}>`,
+        to: admin.email,
+        subject: `New Booking – ${eventData.title}`,
+        html: `
+          <h2>New Booking Alert 📢</h2>
+          <p><strong>Event:</strong> ${eventData.title}</p>
+          <p><strong>User:</strong> ${userData.firstName || ""} ${
+          userData.lastName || ""
+        }</p>
+          <p><strong>Email:</strong> ${userData.email}</p>
+          <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
+          <p><strong>Amount:</strong> KES ${expectedAmount}</p>
+          <p><strong>Reference:</strong> ${paystackData.reference}</p>
+        `,
+        attachments: [
+          {
+            filename: "ticket.pdf",
+            content: pdfBuffer,
+            contentType: "application/pdf",
+          },
+        ],
+      });
+    }
+  } else {
+    console.warn("SMTP not configured; skipping booking notification emails.");
   }
 
   /* -------------------- RESPONSE -------------------- */

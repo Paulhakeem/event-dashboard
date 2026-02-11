@@ -26,22 +26,26 @@ export default defineEventHandler(async (event) => {
   user.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000)
   await user.save();
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: config.emailUsername,
-      pass: config.emailPass,
-    },
-  });
+  if (config.emailUsername && config.emailPass) {
+    const transporter = nodemailer.createTransport({
+      host: config.smtpHost,
+      port: Number(config.smtpPort),
+      secure: Number(config.smtpPort) === 465,
+      auth: {
+        user: config.emailUsername,
+        pass: config.emailPass,
+      },
+    });
 
-  await transporter.sendMail({
-    from: `"Event Dashboard" <${config.emailUsername}>`,
-    to: email,
-    subject: "Resend verification code",
-    html: `<h2>Your new verification code</h2><h1>${code}</h1>`,
-  });
+    await transporter.sendMail({
+      from: `"Volar Events" <${config.emailUsername}>`,
+      to: email,
+      subject: "Resend verification code",
+      html: `<h2>Your new verification code</h2><h1>${code}</h1>`,
+    });
+  } else {
+    console.warn("SMTP credentials missing; logged verification code instead:", code);
+  }
 
   return {
     success: true,

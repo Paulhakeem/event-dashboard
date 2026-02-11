@@ -5,8 +5,9 @@ export default function getBookingEvents() {
   onMounted(async () => {
     try {
       const res = await $fetch("/api/events/bookedEvents");
-      if (res.success) {
-        eventsBooked.value = res.mergeBookings;
+      if (res?.success) {
+        // use deduplicated events summary
+        eventsBooked.value = res.events;
       }
     } catch (error) {
      alert("Failed to fetch booked events.");

@@ -45,21 +45,10 @@ export default defineEventHandler(async () => {
       statsMap[s.eventName] = s;
     });
 
-    // Merge stats into each booking (bookings now contain eventName)
-    const mergeBookings = bookings.map((b) => ({
-      ...b,
-      stats: statsMap[b.eventName] || {
-        totalUsers: 0,
-        totalRevenue: 0,
-        regular: 0,
-        vip: 0,
-        vvip: 0,
-      },
-    }));
-
+    // Return a de-duplicated events summary (top-level stats per event)
     return {
       success: true,
-      mergeBookings,
+      events: stats,
     };
   } catch (error) {
     return { success: false, message: error.message };

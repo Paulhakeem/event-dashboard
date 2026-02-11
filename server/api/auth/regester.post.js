@@ -118,27 +118,31 @@ export default defineEventHandler(async (event) => {
   await newUser.save();
 
   /* ---------- SEND EMAIL ---------- */
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: config.emailUsername,
-      pass: config.emailPass,
-    },
-  });
+  if (config.emailUsername && config.emailPass) {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: config.emailUsername,
+        pass: config.emailPass,
+      },
+    });
 
-  await transporter.sendMail({
-    from: `"Velora Events" <${config.emailUsername}>`,
-    to: email,
-    subject: "Verify your email",
-    html: `
-      <h2>Email Verification</h2>
-      <p>Your verification code:</p>
-      <h1>${verificationCode}</h1>
-      <p>Expires in 10 minutes</p>
-    `,
-  });
+    await transporter.sendMail({
+      from: `"Velora Events" <${config.emailUsername}>`,
+      to: email,
+      subject: "Verify your email",
+      html: `
+        <h2>Email Verification</h2>
+        <p>Your verification code:</p>
+        <h1>${verificationCode}</h1>
+        <p>Expires in 10 minutes</p>
+      `,
+    });
+  } else {
+    console.warn("SMTP credentials missing; logged verification code instead:", verificationCode);
+  }
 
   /* ---------- RESPONSE (NO TOKEN YET) ---------- */
   return {
