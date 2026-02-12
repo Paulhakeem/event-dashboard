@@ -22,11 +22,15 @@
         <li v-for="menu in sidebar" :key="menu.title">
           <a
             href="#"
-            class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
+            @click.prevent="selectMenu(menu)"
+            :class="[
+              'flex items-center px-2 py-1.5 text-body rounded-base group',
+              activeName === menu.component ? 'bg-neutral-tertiary text-fg-brand' : 'hover:bg-neutral-tertiary hover:text-fg-brand'
+            ]"
           >
             <icon
               :name="menu.icon"
-              class="shrink-0 text-2xl transition duration-75 group-hover:text-fg-brand"
+              class="shrink-0 text-2xl transition duration-75"
             />
             <span class="ms-3">{{ menu.title }}</span>
           </a>
@@ -37,18 +41,37 @@
   <!-- body -->
   <div class="p-4 sm:ml-64 mt-14">
     <main class="flex-1 p-6 space-y-6 overflow-y-auto">
-      <organiser-section />
-      <OrganiserIncomeChart />
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <OrganiserActivities />
-        <OrganiserTopEvents />
-      </div>
+      <component :is="currentComponent" />
     </main>
   </div>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue';
 import useOrganiserSidebar from "~/composables/organiserSidebar";
 
+// organiser components
+import OrganiserDashboard from '~/components/organiser/Dashboard.vue';
+import OrganiserCreateEvents from '~/components/organiser/CreateEvents.vue';
+import OrganiserTrackEvents from '~/components/organiser/TrackEvents.vue';
+import OrganiserNotifications from '~/components/organiser/Notifications.vue';
+import OrganiserInsights from '~/components/organiser/Insights.vue';
+
 const { sidebar } = useOrganiserSidebar();
+
+const componentsMap = {
+  OrganiserDashboard,
+  OrganiserCreateEvents,
+  OrganiserTrackEvents,
+  OrganiserNotifications,
+  OrganiserInsights,
+};
+
+const activeName = ref(sidebar.value?.[0]?.component || 'OrganiserDashboard');
+const currentComponent = computed(() => componentsMap[activeName.value] || OrganiserDashboard);
+
+function selectMenu(menu) {
+  activeName.value = menu.component;
+}
+
 </script>
