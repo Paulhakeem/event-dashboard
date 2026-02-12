@@ -10,7 +10,7 @@
           <p
             class="text-xl sm:text-2xl font-medium text-green-500"
           >
-            ksh {{ total.total }}
+            KES {{ (total.total || 0).toLocaleString() }}
           </p>
         </div>
         <div>
@@ -45,6 +45,10 @@
 </template>
 
 <script setup>
+// import { ref, onMounted } from "vue";
+// import { BarChart as BarChartLib } from "vue-echarts";
+import { LegendPosition } from "vue-charts";
+
 const RevenueData = [
   { month: "Jan", events: 186, users: 80 },
   { month: "Feb", events: 305, users: 200 },
@@ -70,17 +74,17 @@ const xFormatter = (i) => `${RevenueData[i]?.month}`;
 const yFormatter = (tick) => tick.toString();
 
 // get the total amount earned
-
-const total = ref(0);
+const total = ref({ total: 0 });
 
 onMounted(async () => {
   try {
     const res = await $fetch("/api/events/totalAmount");
-    if (res.success) {
-      total.value = res
+    if (res?.success) {
+      total.value = { total: res.total || 0 };
     }
   } catch (error) {
-    alert("Error fetching total amount");
+    console.error("Error fetching total amount:", error);
+    total.value = { total: 0 };
   }
 });
 </script>

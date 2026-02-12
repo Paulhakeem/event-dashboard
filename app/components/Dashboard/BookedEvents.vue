@@ -18,12 +18,11 @@
         <thead class="bg-gradient-to-r from-purple-700 to-[#16c851] text-white">
           <tr>
             <th scope="col" class="px-6 py-4">Event</th>
-            <th scope="col" class="px-6 py-4">Date</th>
             <th scope="col" class="px-6 py-4">Revenue</th>
             <th scope="col" class="px-6 py-4">Regular</th>
             <th scope="col" class="px-6 py-4">VIP</th>
             <th scope="col" class="px-6 py-4">VVIP</th>
-            <th scope="col" class="px-6 py-4">Status</th>
+            <th scope="col" class="px-6 py-4">Attendees</th>
           </tr>
         </thead>
         <tbody>
@@ -35,9 +34,8 @@
             <td class="px-6 py-4 font-medium capitalize">
               {{ event.eventName }}
             </td>
-            <td class="px-6 py-4">-</td>
             <td class="px-6 py-4 text-green-600 font-semibold">
-              KES {{ event.totalRevenue?.toLocaleString() || 0 }}
+              KES {{ (event.totalRevenue || 0).toLocaleString() }}
             </td>
             <td class="px-6 py-4 text-gray-700 font-semibold">
               {{ event.regular || 0 }}
@@ -48,23 +46,19 @@
             <td class="px-6 py-4 text-gray-700 font-semibold">
               {{ event.vvip || 0 }}
             </td>
-            <td>
-              <span
-                class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
-              >
-                {{ event.status }}
-              </span>
+            <td class="px-6 py-4 text-gray-500 font-semibold">
+              {{ event.totalUsers || 0 }}
             </td>
           </tr>
 
           <!-- Loading / Empty states -->
           <tr v-if="loading">
-            <td colspan="8" class="text-center py-6 text-gray-500">
+            <td colspan="6" class="text-center py-6 text-gray-500">
               Loading events...
             </td>
           </tr>
           <tr v-if="!loading && eventsBooked.length === 0">
-            <td colspan="8" class="text-center py-6 text-gray-500">
+            <td colspan="6" class="text-center py-6 text-gray-500">
               No events found.
             </td>
           </tr>
