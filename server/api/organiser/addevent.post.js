@@ -37,65 +37,83 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, statusMessage: "Forbidden" });
   }
 
-    // 🧾 Parse form data (text + image)
-  const form = new formidable.Formidable({
-    multiples: false,
-    keepExtensions: true,
-  });
-
+  // 🧾 Parse form data (text + image)
+  // 🧾 Parse form data (text + image)
+  const form = formidable({ multiples: false });
   const [fields, files] = await form.parse(event.node.req);
 
   const title = String(fields.title?.[0] || "");
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
-  const regular = fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
-  const vip = fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
-  const vvip = fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
+  const regular =
+    fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
+  const vip =
+    fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
+  const vvip =
+    fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
 
-  if (!title || !description || !location || !date || !eventType || !status || !files.image?.[0]) {
+  if (
+    !title ||
+    !description ||
+    !location ||
+    !date ||
+    !eventType ||
+    !status ||
+    !files.image?.[0]
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "All fields are required",
     });
   }
 
-    // ☁️ Upload image to Cloudinary
+  // ☁️ Upload image to Cloudinary
   const imageFile = files.image[0];
-    const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
-    const uploadedSize = imageFile?.size ?? 0;
-    if (uploadedSize > MAX_IMAGE_BYTES) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Image size exceeds 10MB limit",
-      });
-    }
-
-    const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {
-      folder: "events",
-      use_filename: true,
-      unique_filename: true,
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
+  const uploadedSize = imageFile?.size ?? 0;
+  if (uploadedSize > MAX_IMAGE_BYTES) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Image size exceeds 10MB limit",
     });
+  }
 
-    // remove temp file
-    fs.unlink(imageFile.filepath, () => {});
+  const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {
+    folder: "events",
+    use_filename: true,
+    unique_filename: true,
+  });
 
-    // 💾 Save event in MongoDB
-    const newEvent = new Event({
-      ...fields,
-      image: uploadResult.secure_url,
-      role: user.role,
-    });
+  // remove temp file
+  fs.unlink(imageFile.filepath, () => {});
 
-    await newEvent.save();
+  // 💾 Save event in MongoDB
+  const newEvent = new Event({
+    title,
+    description,
+    location,
+    date,
+    regular,
+    vip,
+    vvip,
+    TicketQuantity,
+    status,
+    eventType,
+    image: uploadResult.secure_url,
+    role: user.role,
+    createdBy: user._id,
+  });
 
-    return {
-      message: "Event created successfully",
-      event: newEvent,
-      eventType,
-      image: uploadResult.secure_url,
-    };
+  await newEvent.save();
+
+  return {
+    message: "Event created successfully",
+    event: newEvent,
+    eventType,
+    image: uploadResult.secure_url,
+  };
 });
