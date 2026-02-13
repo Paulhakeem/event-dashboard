@@ -65,7 +65,7 @@ export const orgCreateEvent = () => {
         body: formData,
       });
 
-      alert("Event created successfully!");
+      alert("✅ " + response.message);
       // Reset form
       Object.assign(form, {
         title: "",

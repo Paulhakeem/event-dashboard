@@ -1,5 +1,6 @@
 import { User } from "../../models/User.js";
 import { Event } from "../../models/Events.js";
+import { Notification } from "../../models/Notification.js";
 import connectDB from "../../utils/mongoose.js";
 import jwt from "jsonwebtoken";
 import formidable from "formidable";
@@ -53,7 +54,8 @@ export default defineEventHandler(async (event) => {
   const vvip =
     fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
-  const status = String(fields.status?.[0] || "upcoming");
+  // Force events created by organisers to be pending approval by admin
+  const status = "pending";
   const eventType = String(fields.eventType?.[0] || "other");
 
   if (
@@ -110,10 +112,33 @@ export default defineEventHandler(async (event) => {
 
   await newEvent.save();
 
-  return {
-    message: "Event created successfully",
-    event: newEvent,
-    eventType,
-    image: uploadResult.secure_url,
-  };
+  // Create an admin notification for this new pending event
+  try {
+    const notification = new Notification({
+      title: "New event pending approval",
+      message: `${user.firstName || "An organiser"} ${user.lastName || ""} submitted the event \"${title}\" for approval."`,
+      recipientRole: "admin",
+      event: newEvent._id,
+      meta: { organiser: user._id },
+    });
+    await notification.save();
+
+    return {
+      message: "Event created successfully and pending admin approval",
+      event: newEvent,
+      notification,
+      eventType,
+      image: uploadResult.secure_url,
+    };
+  } catch (err) {
+    // Return success for event creation even if notification fails
+    return {
+      message: "Event created but failed to notify admins",
+      event: newEvent,
+      error: err?.message || String(err),
+      eventType,
+      image: uploadResult.secure_url,
+    };
+  }
 });
+
