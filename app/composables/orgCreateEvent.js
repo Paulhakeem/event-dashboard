@@ -1,5 +1,5 @@
 export const orgCreateEvent = () => {
-  const {} = useAuth();
+  const {token} = useAuth();
 
   const form = reactive({
     title: "",
