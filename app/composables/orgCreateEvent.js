@@ -1,5 +1,5 @@
 export const orgCreateEvent = () => {
-  const {token} = useAuth();
+  const { token } = useAuth();
 
   const form = reactive({
     title: "",
@@ -20,7 +20,7 @@ export const orgCreateEvent = () => {
   const file = ref(null);
 
   //   Handle image selection and preview
-  const handleImageChange = (event) => {
+  const onFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
       file.value = selectedFile;
@@ -60,7 +60,7 @@ export const orgCreateEvent = () => {
       const response = await $fetch("/api/organiser/addevent", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token.value}`,
+          Authorization: `Bearer ${token._value}`,
         },
         body: formData,
       });
@@ -90,5 +90,13 @@ export const orgCreateEvent = () => {
     } finally {
       isLoading.value = false;
     }
+  };
+
+  return {
+    form,
+    isLoading,
+    previewImage,
+    onFileChange,
+    submitEvent,
   };
 };

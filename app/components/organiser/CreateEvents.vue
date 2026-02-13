@@ -5,7 +5,7 @@
       <!-- Form Column -->
       <div class="lg:col-span-2">
         <div class="mb-6">
-          <h1 class="text-3xl font-extrabold text-gray-900">Create an Event</h1>
+          <h1 class="text-3xl font-bold text-[#9d4e8a]">Create an Event</h1>
           <p class="mt-2 text-gray-600">Quickly create and publish events with a beautiful preview.</p>
         </div>
 
@@ -137,86 +137,5 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
-import useAuth from '~/composables/useAuth';
-
-const { token } = useAuth();
-
-const form = reactive({
-  title: "",
-  description: "",
-  date: "",
-  location: "",
-  eventType: "other",
-  regular: "",
-  vip: "",
-  vvip: "",
-  TicketQuantity: 0,
-  status: "upcoming",
-  image: null,
-});
-
-const isLoading = ref(false);
-const previewImage = ref(null);
-const file = ref(null);
-
-const onFileChange = (event) => {
-  const selectedFile = event.target.files[0];
-  if (selectedFile) {
-    file.value = selectedFile;
-    previewImage.value = URL.createObjectURL(selectedFile);
-  }
-};
-
-const clearForm = () => {
-  Object.assign(form, {
-    title: "",
-    description: "",
-    date: "",
-    location: "",
-    eventType: "other",
-    regular: "",
-    vip: "",
-    vvip: "",
-    TicketQuantity: 0,
-    status: "upcoming",
-  });
-  previewImage.value = null;
-  file.value = null;
-};
-
-const submitEvent = async () => {
-  try {
-    isLoading.value = true;
-
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("description", form.description);
-    formData.append("date", form.date);
-    formData.append("location", form.location);
-    formData.append("eventType", form.eventType);
-    if (form.regular !== "" && form.regular !== null && form.regular !== undefined) formData.append("regular", form.regular);
-    if (form.vip !== "" && form.vip !== null && form.vip !== undefined) formData.append("vip", form.vip);
-    if (form.vvip !== "" && form.vvip !== null && form.vvip !== undefined) formData.append("vvip", form.vvip);
-    formData.append("TicketQuantity", form.TicketQuantity);
-    formData.append("status", form.status);
-    formData.append("image", file.value);
-
-    await $fetch("/api/upload/post", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token._value}`,
-      },
-      body: formData,
-    });
-
-    alert("✅ Event created successfully!");
-    clearForm();
-  } catch (err) {
-    const message = err.res?.statusMessage || err.message || "Something went wrong";
-    alert("❌ " + message);
-  } finally {
-    isLoading.value = false;
-  }
-};
+const { form, isLoading, previewImage, onFileChange, submitEvent } = orgCreateEvent();
 </script>

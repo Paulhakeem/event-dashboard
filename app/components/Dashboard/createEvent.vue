@@ -1,248 +1,137 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8"
-  >
-    <div class="max-w-5xl mx-auto">
-      <!-- Header -->
-      <div class="mb-8">
-        <p class="text-gray-600 text-lg">
-          Fill in the details below to create and publish your event
-        </p>
-      </div>
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-      <!-- Form -->
-      <form @submit.prevent="submitEvent" class="space-y-8">
-        <!-- Image Upload Section -->
-        <div class="bg-white rounded-2xl shadow-md p-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Event Image</h2>
-          <label
-            for="dropzone-file"
-            class="flex flex-col items-center justify-center w-full h-64 border-3 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition duration-300 group"
-          >
-            <!-- Image Preview -->
-            <div v-if="previewImage" class="relative w-full h-full">
-              <img
-                :src="previewImage"
-                alt="Preview"
-                class="w-full h-full object-cover rounded-xl"
-              />
-              <div
-                class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-xl transition flex items-center justify-center"
-              >
-                <p class="text-white font-semibold">Click to change image</p>
-              </div>
-            </div>
-            <div
-              v-else
-              class="flex flex-col items-center justify-center pt-5 pb-6"
-            >
-              <Icon
-                name="mdi:cloud-upload"
-                class="text-5xl text-gray-400 mb-3"
-              />
-              <p class="mb-2 text-sm text-gray-600">
-                <span class="font-semibold">Click to upload</span> or drag and
-                drop
-              </p>
-              <p class="text-xs text-gray-500">
-                SVG, PNG, JPG or GIF (MAX. 800x400px)
-              </p>
-            </div>
-
-            <input
-              id="dropzone-file"
-              type="file"
-              class="hidden"
-              @change="onFileChange"
-            />
-          </label>
+      <!-- Form Column -->
+      <div class="lg:col-span-2">
+        <div class="mb-6">
+          <h1 class="text-3xl font-bold text-[#9d4e8a]">Create an Event</h1>
+          <p class="mt-2 text-gray-600">Quickly create and publish events with a beautiful preview.</p>
         </div>
 
-        <!-- Basic Information -->
-        <div class="bg-white rounded-2xl shadow-md p-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Event Details</h2>
-          <div class="space-y-5">
-            <!-- Title -->
+        <form @submit.prevent="submitEvent" class="space-y-6">
+          <div class="bg-white rounded-2xl shadow p-6">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Event Image</label>
+            <label for="dropzone-file" class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-purple-400 transition">
+              <template v-if="previewImage">
+                <img :src="previewImage" class="object-cover w-full h-full" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end p-4">
+                  <span class="text-white text-sm">Preview - click to change</span>
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex flex-col items-center justify-center">
+                  <Icon name="mdi:cloud-upload" class="text-4xl text-gray-400" />
+                  <p class="text-sm text-gray-500 mt-2">Click to upload or drag & drop</p>
+                </div>
+              </template>
+              <input id="dropzone-file" type="file" class="hidden" @change="onFileChange" />
+            </label>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow p-6 space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
-                >Event Title *</label
-              >
-              <input
-                v-model="form.title"
-                required
-                placeholder="e.g. Summer Music Festival"
-                class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-              />
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Title *</label>
+              <input v-model="form.title" required placeholder="Summer Music Festival" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
             </div>
 
-            <!-- Description -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
-                >Description *</label
-              >
-              <textarea
-                v-model="form.description"
-                required
-                rows="4"
-                placeholder="Describe your event..."
-                class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm resize-none"
-              />
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+              <textarea v-model="form.description" rows="4" required placeholder="Describe your event" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none resize-none"></textarea>
             </div>
 
-            <!-- Location and Date Row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Location *</label
-                >
-                <input
-                  v-model="form.location"
-                  required
-                  placeholder="Event location"
-                  class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-                />
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
+                <input v-model="form.location" required placeholder="Nairobi, Kenya" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Date *</label
-                >
-                <input
-                  v-model="form.date"
-                  required
-                  type="date"
-                  class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium cursor-pointer transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-                />
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
+                <input v-model="form.date" required type="date" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
               </div>
             </div>
 
-            <!-- Event Type -->
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
-                >Event Type *</label
-              >
-              <select
-                v-model="form.eventType"
-                required
-                class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium cursor-pointer transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-              >
-                <option value="other">Select Event Type</option>
-                <option value="Entertainment">🎵 Entertainment</option>
-                <option value="Arts & Culture">🛠️ Arts & Culture</option>
-                <option value="Tech & Business">💻 Tech & Business</option>
-                <option value="other">📌 Other</option>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Type</label>
+              <select v-model="form.eventType" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none">
+                <option value="other">Select type</option>
+                <option value="Entertainment">Entertainment</option>
+                <option value="Arts & Culture">Arts & Culture</option>
+                <option value="Tech & Business">Tech & Business</option>
               </select>
             </div>
           </div>
-        </div>
 
-        <!-- Pricing & Tickets -->
-        <div class="bg-white rounded-2xl shadow-md p-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">
-            Pricing & Tickets
-          </h2>
-          <div class="space-y-5">
-            <!-- Ticket Prices -->
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-4"
-                >Ticket Prices (Ksh) *</label
-              >
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Regular - optional -->
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">Regular</label>
-                  <input
-                    v-model.number="form.regular"
-                    type="number"
-                    min="0"
-                    placeholder="Leave empty to disable"
-                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
-                  />
-                </div>
-
-                <!-- VIP - optional -->
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">⭐ VIP</label>
-                  <input
-                    v-model.number="form.vip"
-                    type="number"
-                    min="0"
-                    placeholder="Leave empty to disable"
-                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
-                  />
-                </div>
-
-                <!-- VVIP - optional -->
-                <div class="border-2 border-gray-300 rounded-lg p-4 hover:border-[#9c4e8b] transition">
-                  <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">👑 VVIP</label>
-                  <input
-                    v-model.number="form.vvip"
-                    type="number"
-                    min="0"
-                    placeholder="Leave empty to disable"
-                    class="w-full bg-transparent text-md font-bold text-gray-900 outline-none"
-                  />
-                </div>
+          <div class="bg-white rounded-2xl shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Pricing & Tickets</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="p-4 border rounded-lg">
+                <label class="block text-xs text-gray-600 mb-2">Regular</label>
+                <input v-model.number="form.regular" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
+              </div>
+              <div class="p-4 border rounded-lg">
+                <label class="block text-xs text-gray-600 mb-2">VIP</label>
+                <input v-model.number="form.vip" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
+              </div>
+              <div class="p-4 border rounded-lg">
+                <label class="block text-xs text-gray-600 mb-2">VVIP</label>
+                <input v-model.number="form.vvip" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
               </div>
             </div>
 
-            <!-- Ticket Quantity & Status Row -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Total Ticket Quantity *</label
-                >
-                <input
-                  v-model.number="form.TicketQuantity"
-                  required
-                  type="number"
-                  min="0"
-                  placeholder="Number of tickets available"
-                  class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-                />
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Total Tickets</label>
+                <input v-model.number="form.TicketQuantity" required type="number" min="0" class="w-full p-3 border rounded-lg" />
               </div>
-
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Event Status *</label
-                >
-                <select
-                  v-model="form.status"
-                  required
-                  class="w-full border-2 border-gray-300 p-3 rounded-lg bg-white text-gray-800 font-medium cursor-pointer transition duration-200 hover:border-[#9c4e8b] focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:ring-offset-0 shadow-sm"
-                >
-                  <option value="pending">⏳ Pending</option>
-                  <option value="upcoming">📅 Upcoming</option>
-                  <option value="ongoing">🔴 Ongoing</option>
-                  <option value="completed">✅ Completed</option>
-                  <option value="cancelled">❌ Cancelled</option>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <select v-model="form.status" class="w-full p-3 border rounded-lg">
+                  <option value="pending">Pending</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
             </div>
+
+            <div class="mt-6 flex gap-4">
+              <button type="submit" :disabled="isLoading" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60">
+                <Icon v-if="isLoading" name="mdi:loading" class="inline mr-2 animate-spin" />
+                {{ isLoading ? 'Creating Event...' : 'Create Event' }}
+              </button>
+              <button type="reset" @click="clearForm" class="px-6 py-3 border rounded-lg">Clear</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Preview Column -->
+      <aside class="lg:col-span-1">
+        <div class="sticky top-20 space-y-4">
+          <div class="bg-white rounded-2xl shadow p-6">
+            <div class="h-40 rounded-lg overflow-hidden bg-gray-100">
+              <img v-if="previewImage" :src="previewImage" class="w-full h-full object-cover" />
+              <div v-else class="w-full h-full flex items-center justify-center text-gray-400">Preview</div>
+            </div>
+            <h3 class="mt-4 text-lg font-bold">{{ form.title || 'Untitled Event' }}</h3>
+            <p class="text-sm text-gray-500 mt-2">{{ form.date ? new Date(form.date).toDateString() : 'Date not set' }}</p>
+            <p class="mt-3 text-gray-700 text-sm">{{ form.description ? form.description.slice(0, 120) + (form.description.length > 120 ? '...' : '') : 'No description yet' }}</p>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow p-4">
+            <h4 class="text-sm font-semibold text-gray-700">Tickets</h4>
+            <div class="mt-3 space-y-2">
+              <div class="flex justify-between text-sm"><span>Regular</span><span>{{ form.regular || '—' }}</span></div>
+              <div class="flex justify-between text-sm"><span>VIP</span><span>{{ form.vip || '—' }}</span></div>
+              <div class="flex justify-between text-sm"><span>VVIP</span><span>{{ form.vvip || '—' }}</span></div>
+              <div class="flex justify-between text-sm pt-2 border-t mt-2"><span>Available</span><span>{{ form.TicketQuantity || 0 }}</span></div>
+            </div>
           </div>
         </div>
+      </aside>
 
-        <!-- Submit Button -->
-        <div class="flex gap-4">
-          <button
-            type="submit"
-            :disabled="isLoading"
-            class="flex-1 bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-bold py-4 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-lg"
-          >
-            <Icon
-              v-if="isLoading"
-              name="mdi:loading"
-              class="inline mr-2 animate-spin"
-            />
-            {{ isLoading ? "Creating Event..." : "Create Event" }}
-          </button>
-          <button
-            type="reset"
-            class="px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition duration-200"
-          >
-            Clear
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 </template>

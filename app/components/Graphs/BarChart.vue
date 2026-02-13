@@ -45,9 +45,6 @@
 </template>
 
 <script setup>
-// import { ref, onMounted } from "vue";
-// import { BarChart as BarChartLib } from "vue-echarts";
-import { LegendPosition } from "vue-charts";
 
 const RevenueData = [
   { month: "Jan", events: 186, users: 80 },
