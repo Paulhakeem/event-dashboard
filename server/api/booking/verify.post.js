@@ -30,6 +30,14 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
 
+  /* -------------------- CHECK IF EVENT IS CANCELLED -------------------- */
+  if (eventData.status === "cancelled") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "This event has been cancelled and is no longer available for booking",
+    });
+  }
+
   /* -------------------- FIND USER -------------------- */
   const userData = await User.findOne({ email: userEmail });
   if (!userData) {

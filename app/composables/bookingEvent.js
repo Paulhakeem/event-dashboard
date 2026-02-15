@@ -31,6 +31,13 @@ export default function useEventBooking() {
     try {
       loading.value = true;
 
+      // Check if event is cancelled
+      if (event.value.status === "cancelled") {
+        error.value = "This event has been cancelled and is no longer available for booking";
+        alert(error.value);
+        return;
+      }
+
       const verifyResponse = await $fetch("/api/booking/verify", {
         method: "POST",
         body: {

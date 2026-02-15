@@ -45,14 +45,22 @@
               <li>
                 <button
                   @click="itemSelected(menu)"
-                  class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-lg
+                  class="group w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 rounded-lg
                     transition duration-200 
                     hover:bg-linear-to-r hover:from-[#9c4e8b]/10 hover:to-transparent
                     hover:text-[#9c4e8b] hover:border-l-4 hover:border-[#9c4e8b]
                     focus:outline-none focus:bg-linear-to-r focus:from-[#9c4e8b]/15 focus:to-transparent
                     active:bg-linear-to-r active:from-[#9c4e8b]/20 active:to-transparent"
                 >
-                  <Icon :name="menu.icon" class="text-lg shrink-0" />
+                  <div class="relative">
+                    <Icon :name="menu.icon" class="text-lg shrink-0" />
+                    <div 
+                      v-if="menu.name === 'Notifications' && notificationCount > 0"
+                      class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse"
+                    >
+                      {{ notificationCount > 99 ? '99+' : notificationCount }}
+                    </div>
+                  </div>
                   <span class="grow text-left">{{ menu.name }}</span>
                   <Icon name="material-symbols:arrow-right-rounded" class="text-lg opacity-0 group-hover:opacity-100 transition duration-200" />
                 </button>
@@ -91,9 +99,30 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const { sidebarMenu } = dashboardSidebar();
-const {user}= useAuth()
+const { user, token } = useAuth()
+const notificationCount = ref(0)
 
 const itemSelected = (menu) => {
   emit("update:modelValue", menu);
 };
+
+const fetchNotificationCount = async () => {
+  try {
+    const res = await $fetch("/api/notification/notifications", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    })
+    notificationCount.value = res.notifications?.length || 0
+  } catch (err) {
+    console.error("Failed to fetch notifications:", err)
+  }
+}
+
+onMounted(() => {
+  fetchNotificationCount()
+  // Poll for new notifications every 30 seconds
+  setInterval(fetchNotificationCount, 30000)
+})
 </script>
