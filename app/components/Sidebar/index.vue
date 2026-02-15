@@ -18,8 +18,7 @@
 
           <!-- Logo -->
           <div class="flex items-center text-lg">
-            <Icon name="mdi:emoji-panda" class="w-7 h-7 text-[#9c4e8b]" />
-            <p class="text-gray-900 font-bold ml-2">Event</p>
+           <img src="/logo/VELORA.png" alt="Logo" class="h-20 w-auto object-contain" />
           </div>
 
           <!-- Auth Buttons -->

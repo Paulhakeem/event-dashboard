@@ -4,8 +4,9 @@
       <div class="flex items-center justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center gap-3 flex-shrink-0 mr-16">
-          <Icon name="mdi:emoji-panda" class="w-8 h-8 text-[#9c4e8b]" />
-          <p class="text-gray-900 font-bold text-lg">Event</p>
+          <!-- adding logo -->
+
+          <img src="/logo/VELORA.png" alt="Logo" class="h-20 w-auto object-contain" />
         </div>
 
         <!-- Center Menu -->
@@ -17,7 +18,9 @@
             class="text-gray-700 hover:text-[#9c4e8b] font-medium text-sm transition duration-200 relative group px-2"
           >
             {{ item.name }}
-            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#9c4e8b] group-hover:w-full transition-all duration-300"></span>
+            <span
+              class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#9c4e8b] group-hover:w-full transition-all duration-300"
+            ></span>
           </NuxtLink>
         </div>
 
