@@ -46,28 +46,14 @@
 
 <script setup>
 
-const RevenueData = [
-  { month: "Jan", events: 186, users: 80 },
-  { month: "Feb", events: 305, users: 200 },
-  { month: "Mar", events: 237, users: 120 },
-  { month: "Apr", events: 73, users: 190 },
-  { month: "May", events: 209, users: 130 },
-  { month: "June", events: 214, users: 140 },
-  { month: "June", events: 204, users: 190 },
-  { month: "July", events: 224, users: 200 },
-  { month: "Aug", events: 154, users: 110 },
-  { month: "Sep", events: 214, users: 100 },
-  { month: "Oct", events: 214, users: 50 },
-  { month: "Nov", events: 200, users: 214 },
-  { month: "Dec", events: 214, users: 180 },
-];
+const RevenueData = ref([]);
 
 const RevenueCategoriesMultple = {
   events: { name: "Events", color: "#3b82f6" },
   users: { name: "Users", color: "#9c4e8b" },
 };
 
-const xFormatter = (i) => `${RevenueData[i]?.month}`;
+const xFormatter = (i) => `${RevenueData.value[i]?.month || ''}`;
 const yFormatter = (tick) => tick.toString();
 
 // get the total amount earned
@@ -82,6 +68,19 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error fetching total amount:", error);
     total.value = { total: 0 };
+  }
+  // fetch monthly stats for events and users
+  try {
+    const stats = await $fetch('/api/stats/monthly');
+    if (stats?.success && Array.isArray(stats.monthly)) {
+      RevenueData.value = stats.monthly.map((m) => ({
+        month: m.month,
+        events: m.events || 0,
+        users: m.users || 0,
+      }));
+    }
+  } catch (err) {
+    console.error('Failed to load monthly stats', err);
   }
 });
 </script>
