@@ -1,4 +1,5 @@
 import { User } from "../../models/User.js";
+import { TotalBooking } from "../../models/totalBooking.js";
 import jwt from "jsonwebtoken";
 import connectDB from "~~/server/utils/mongoose";
 
@@ -23,7 +24,22 @@ export default defineEventHandler(async (event) => {
     // dont return password
     const users = await User.find().select("-password");
 
-    return { users };
+    // aggregate booking counts per user email
+    const bookings = await TotalBooking.aggregate([
+      { $match: { status: { $in: ["success", "confirmed"] } } },
+      { $group: { _id: "$userEmail", count: { $sum: 1 } } },
+    ]);
+    const bookingMap = {};
+    for (const b of bookings) bookingMap[b._id] = b.count;
+
+    // attach events count to users
+    const usersWithCounts = users.map((u) => {
+      const obj = u.toObject();
+      obj.events = bookingMap[u.email] || 0;
+      return obj;
+    });
+
+    return { users: usersWithCounts };
   } catch (err) {
     throw createError({ statusCode: 401, statusMessage: "Invalid token" });
   }

@@ -21,46 +21,27 @@
           <div
             class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700"
           >
-            <div class="flex gap-2">
+            <div class="flex items-center gap-3">
               <div class="flex items-center gap-2">
-                <label for="hs-at-with-checkboxes-main" class="flex">
-                  <input
-                    type="checkbox"
-                    class="shrink-0 border-gray-300 rounded-sm text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-600 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                    id="hs-at-with-checkboxes-main"
-                  />
-                  <span class="sr-only">Checkbox</span>
-                </label>
-                <button class="text-sm text-gray-600 dark:text-neutral-400">
-                  Filter By Users
-                </button>
+                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'all' ? 'bg-[#9c4e8b] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('all')">All</button>
+                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'user' ? 'bg-[#3b82f6] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('user')">Users</button>
+                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'organiser' ? 'bg-[#f59e0b] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('organiser')">Organisers</button>
+                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'admin' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('admin')">Admins</button>
               </div>
-              <div class="flex items-center gap-2">
-                <label for="hs-at-with-checkboxes-main" class="flex">
-                  <input
-                    type="checkbox"
-                    class="shrink-0 border-gray-300 rounded-sm text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-600 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                    id="hs-at-with-checkboxes-main"
-                  />
-                  <span class="sr-only">Checkbox</span>
-                </label>
-                <button class="text-sm text-gray-600 dark:text-neutral-400">
-                  Filter By Admins
-                </button>
+
+              <div class="ml-4">
+                <input v-model="searchQuery" type="search" placeholder="Search by name or email" class="px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-[#9c4e8b] focus:border-transparent" />
               </div>
             </div>
 
             <div>
               <div class="inline-flex gap-x-2">
-                <button
-                  class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs cursor-pointer hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800"
-                >
-                  View all
-                </button>
+                <button @click="resetFilters" class="py-2 px-3 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50">Reset</button>
 
                 <button
                   @click="showModal = true"
-                  class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white cursor-pointer hover:bg-[#cb35a3] focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                  v-if="user.role === 'admin'"
+                  class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white hover:bg-[#cb35a3]"
                 >
                   <icon name="tdesign:add" class="w-42" />
                   Add Admin
@@ -117,7 +98,7 @@
             </thead>
 
             <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
-              <tr v-for="person in users" :key="person.name">
+                <tr v-for="person in filteredUsers" :key="person._id">
                 <td class="size-px whitespace-nowrap">
                   <div class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3">
                     <div class="flex items-center gap-x-3">
@@ -127,24 +108,17 @@
                         alt="Avatar"
                       />
                       <div class="grow">
-                        <span
-                          class="block text-sm font-semibold text-gray-800 dark:text-neutral-200"
-                          >{{ person.firstName }} {{ person.lastName }}</span
-                        >
-                        <span
-                          class="block text-sm text-gray-500 dark:text-neutral-500"
-                          >{{ person.email }}</span
-                        >
+                        <span class="block text-sm font-semibold text-gray-800 dark:text-neutral-200">{{ person.firstName }} {{ person.lastName }}</span>
+                        <span class="block text-sm text-gray-500 dark:text-neutral-500">{{ person.email }}</span>
                       </div>
                     </div>
                   </div>
                 </td>
                 <td class="h-px w-32 whitespace-nowrap">
                   <div class="px-6 py-3">
-                    <span
-                      class="block text-sm font-semibold text-gray-600 dark:text-neutral-200"
-                      >{{ person.role }}</span
-                    >
+                    <span v-if="person.role === 'admin'" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">Admin</span>
+                    <span v-else-if="person.role === 'organiser'" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-semibold">Organiser</span>
+                    <span v-else class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">User</span>
                   </div>
                 </td>
                 <td class="size-px whitespace-nowrap">
@@ -169,16 +143,17 @@
           <!-- End Table -->
 
           <!-- Footer -->
-          <div
-            class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-neutral-700"
-          >
+          <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-neutral-700">
             <div>
               <p class="text-sm text-gray-600 dark:text-neutral-400">
-                <span
-                  class="font-semibold text-gray-800 dark:text-neutral-200"
-                  >{{ users.length }}</span
-                >
+                <span class="font-semibold text-gray-800 dark:text-neutral-200">{{ users.length }}</span>
                 Total users
+              </p>
+            </div>
+            <div class="mt-2 md:mt-0">
+              <p class="text-sm text-gray-600 dark:text-neutral-400">
+                <span class="font-semibold text-gray-800 dark:text-neutral-200">{{ filteredUsers.length }}</span>
+                Shown
               </p>
             </div>
           </div>
@@ -193,6 +168,20 @@
 <script setup>
 const { users } = totalUsers();
 const { user } = useAuth();
+
+// filters
+const selectedRole = ref('all');
+const searchQuery = ref('');
+
+const setRole = (r) => {
+  selectedRole.value = r;
+};
+
+const resetFilters = () => {
+  selectedRole.value = 'all';
+  searchQuery.value = '';
+};
+
 // format date
 const formatDate = (date) => {
   if (!date) return "";
@@ -204,4 +193,14 @@ const formatDate = (date) => {
 };
 
 const showModal = ref(false);
+
+const filteredUsers = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase();
+  return (users.value || []).filter((u) => {
+    if (selectedRole.value !== 'all' && u.role !== selectedRole.value) return false;
+    if (!q) return true;
+    const name = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
+    return name.includes(q) || (u.email || '').toLowerCase().includes(q);
+  });
+});
 </script>
