@@ -1,60 +1,84 @@
 <template>
-  <div>
+  <div class="min-h-screen bg-gray-50">
     <!-- HEADER -->
     <header
-      class="sticky top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-48 w-full bg-gray-200 border-b border-gray-200 text-sm py-2.5 lg:ps-65"
+      class="sticky top-0 inset-x-0 z-30 w-full bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm"
     >
-      <nav class="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
+      <nav class="flex items-center gap-3 px-4 sm:px-6 py-3">
         <!-- Toggle Button (Mobile Only) -->
-        <button class="lg:hidden p-2" @click="toggleMenu">
-          <!-- Open Icon -->
+        <button
+          class="lg:hidden p-2 rounded-md hover:bg-gray-100 transition"
+          @click="toggleMenu"
+        >
           <Icon
             v-if="!openMenu"
             name="subway:menu"
-            class="text-2xl text-gray-700"
-          />
-
-          <!-- Close Icon -->
-          <Icon
-            v-else
-            name="zondicons:close-solid"
-            class="text-2xl text-gray-700"
+            class="text-2xl text-[#9d4e8a]"
           />
         </button>
 
         <!-- Search -->
-        <Dashboard-search />
+        <Dashboard-search class="flex-1" />
       </nav>
     </header>
 
+    <!-- Mobile Overlay -->
+    <Transition
+      enter-active-class="transition-opacity duration-300"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-300"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="openMenu"
+        class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        @click="toggleMenu"
+      />
+    </Transition>
+
     <!-- Sidebar (Mobile) -->
-    <div v-if="openMenu" class="lg:hidden">
-      <Dashboard-sidebar v-model="itemSelected" @close="toggleMenu" />
-    </div>
+    <Transition
+      enter-active-class="transition-transform duration-300"
+      enter-from-class="-translate-x-full"
+      enter-to-class="translate-x-0"
+      leave-active-class="transition-transform duration-300"
+      leave-from-class="translate-x-0"
+      leave-to-class="-translate-x-full"
+    >
+      <aside
+        v-if="openMenu"
+        class="fixed inset-y-0 start-0 z-50 w-64 bg-white shadow-xl lg:hidden"
+      >
+        <Dashboard-sidebar v-model="itemSelected" />
+      </aside>
+    </Transition>
 
     <!-- Sidebar (Desktop) -->
-    <div class="hidden lg:block">
+    <aside
+      class="hidden lg:block fixed inset-y-0 start-0 z-40 w-64 bg-white border-r border-gray-200 shadow-sm"
+    >
       <Dashboard-sidebar v-model="itemSelected" />
-    </div>
+    </aside>
 
     <!-- Main Content -->
-    <main class="w-full lg:ps-64">
-      <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <main class="lg:ps-64">
+      <div class="p-4 sm:p-6 space-y-6">
         <component
           v-if="itemSelected?.component"
           :is="itemSelected.component"
+          class="animate-fade-in"
         />
       </div>
     </main>
   </div>
 </template>
-
 <script setup>
 const openMenu = ref(false);
 const { sidebarMenu } = dashboardSidebar();
 const itemSelected = ref(sidebarMenu[0]);
 
-// toggle sidebar function
 const toggleMenu = () => {
   openMenu.value = !openMenu.value;
 };
