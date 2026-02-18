@@ -27,7 +27,7 @@
     >
       <div
         v-if="search && results.length"
-        class="absolute left-0 right-0 mt-2 z-[999]
+        class="absolute left-0 right-0 mt-2 z-999
                bg-white/95 backdrop-blur
                border rounded-xl shadow-2xl"
       >
