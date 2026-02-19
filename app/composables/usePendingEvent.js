@@ -39,10 +39,11 @@ export default function usePendingEvent() {
           "Content-Type": "application/json",
         },
         body: {
-          status: "upcoming",
+          status: "approved",
         },
       });
 
+      alert("✅ Event approved! Organiser has been notified.");
       await fetchPendingEvents();
     } catch (err) {
       alert("Failed to approve event");
