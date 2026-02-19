@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-
     <!-- Mobile Header -->
     <header
       class="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm lg:hidden"
@@ -12,7 +11,9 @@
         class="p-2 rounded-lg hover:bg-gray-100 transition"
       >
         <Icon
-          :name="sidebarOpen ? 'material-symbols:close' : 'material-symbols:menu'"
+          :name="
+            sidebarOpen ? 'material-symbols:close' : 'material-symbols:menu'
+          "
           class="text-2xl text-gray-700"
         />
       </button>
@@ -50,7 +51,10 @@
         <div class="h-full px-3 py-4 overflow-y-auto">
           <!-- Logo -->
           <div class="flex items-center gap-2 mb-6 px-2">
-            <Icon name="material-symbols:dashboard" class="text-2xl text-[#9c4e8b]" />
+            <Icon
+              name="material-symbols:dashboard"
+              class="text-2xl text-[#9c4e8b]"
+            />
             <span class="text-lg font-semibold">Organiser</span>
           </div>
 
@@ -72,6 +76,8 @@
             </li>
           </ul>
         </div>
+
+        <ProfileInfo />
       </aside>
     </Transition>
 
@@ -82,7 +88,10 @@
       <div class="h-full px-3 py-4 overflow-y-auto">
         <!-- Logo -->
         <div class="flex items-center gap-2 mb-6 px-2">
-          <Icon name="material-symbols:dashboard" class="text-2xl text-[#9c4e8b]" />
+          <Icon
+            name="material-symbols:dashboard"
+            class="text-2xl text-[#9c4e8b]"
+          />
           <span class="text-lg font-semibold">Organiser</span>
         </div>
 
@@ -104,6 +113,8 @@
           </li>
         </ul>
       </div>
+
+      <ProfileInfo />
     </aside>
 
     <!-- Main Content -->
@@ -112,7 +123,6 @@
         <component :is="currentComponent" class="animate-fade-in" />
       </div>
     </main>
-
   </div>
 </template>
 
@@ -121,6 +131,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import useOrganiserSidebar from "~/composables/organiserSidebar";
 
 // organiser components
+import ProfileInfo from "~/components/Profile/profileInfo.vue";
 import OrganiserDashboard from "~/components/organiser/Dashboard.vue";
 import OrganiserCreateEvents from "~/components/organiser/CreateEvents.vue";
 import OrganiserTrackEvents from "~/components/organiser/TrackEvents.vue";
