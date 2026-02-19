@@ -9,8 +9,8 @@
           <path d="M12 2v2m0 16v2m10-10h-2M4 12H2"/>
         </svg>
       </div>
-      <p class="text-2xl font-bold mt-2">$216k</p>
-      <p class="text-sm mt-1 text-green-200">+5.2%</p>
+      <p class="text-2xl font-bold mt-2">Ksh0</p>
+      <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
     <!-- Total Events -->
@@ -21,8 +21,8 @@
           <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V9H3v10a2 2 0 002 2z"/>
         </svg>
       </div>
-      <p class="text-2xl font-bold mt-2">2,221</p>
-      <p class="text-sm mt-1 text-green-200">+12.1%</p>
+      <p class="text-2xl font-bold mt-2">{{ events.length }}</p>
+      <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
     <!-- Booked Events -->
@@ -33,8 +33,8 @@
           <path d="M5 13l4 4L19 7"/>
         </svg>
       </div>
-      <p class="text-2xl font-bold mt-2">1,423</p>
-      <p class="text-sm mt-1 text-green-200">+9.8%</p>
+      <p class="text-2xl font-bold mt-2">0</p>
+      <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
     <!-- Cancelled Events -->
@@ -45,10 +45,12 @@
           <path d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </div>
-      <p class="text-2xl font-bold mt-2">78%</p>
-      <p class="text-sm mt-1 text-red-200">-1.2%</p>
+      <p class="text-2xl font-bold mt-2">0%</p>
+      <p class="text-sm mt-1 text-red-200">+0%</p>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const { events} = organiserEvents()
+</script>
