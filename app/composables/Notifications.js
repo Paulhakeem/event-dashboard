@@ -95,6 +95,22 @@ export default function useNotifications() {
     }
   });
 
+  // delete event
+  const deleteNotification = async (id, index) => {
+    if (!confirm("Are you sure you want to delete this notification?")) return;
+    try {
+      await $fetch(`/api/notification/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token._value}`,
+        },
+      });
+      removeNotification(index);
+    } catch (err) {
+      error.value = err.message;
+    }
+  };
+
   return {
     notifications,
     loading,
@@ -105,5 +121,6 @@ export default function useNotifications() {
     bgGradient,
     getIcon,
     formatTime,
+    deleteNotification
   };
 }

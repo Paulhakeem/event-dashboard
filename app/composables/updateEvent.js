@@ -19,6 +19,7 @@ export default function updateEvent(eventsRef = null) {
   });
 
   const removeEvent = async (id) => {
+     if (!confirm("Are you sure you want to delete this event?")) return;
     const res = await $fetch(`/api/events/${id}`, {
       method: "DELETE",
     });

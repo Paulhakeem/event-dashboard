@@ -60,7 +60,7 @@
       <!-- Notifications -->
       <TransitionGroup name="list" tag="div" class="space-y-4">
         <div
-          v-for="(notification, index) in notifications"
+          v-for="notification in notifications"
           :key="notification._id"
           class="group relative flex items-start justify-between p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border-l-4 overflow-hidden"
           :class="borderColor(notification.type)"
@@ -104,7 +104,7 @@
 
           <!-- Close Button -->
           <button
-            @click="removeNotification(index)"
+            @click="deleteNotification(notification._id)"
             class="relative ml-4 shrink-0 p-2 rounded-full text-gray-400 hover:text-[#9d4e8a] hover:bg-gray-100 transition"
           >
             <Icon name="material-symbols:close" class="text-xl" />
@@ -126,6 +126,7 @@ const {
   bgGradient,
   getIcon,
   formatTime,
+  deleteNotification,
 } = Notifications();
 </script>
 
