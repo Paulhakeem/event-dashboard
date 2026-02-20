@@ -39,7 +39,8 @@ export default function usePendingEvent() {
           "Content-Type": "application/json",
         },
         body: {
-          status: "approved",
+          // use 'upcoming' which represents an approved/live event per schema
+          status: "upcoming",
         },
       });
 

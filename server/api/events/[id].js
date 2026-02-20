@@ -63,7 +63,8 @@ export default defineEventHandler(async (event) => {
       // Get the current event to check if status is changing
       const currentEvent = await Event.findById(id);
       const eventTitle = body.title || currentEvent?.title || "Event";
-      const isApproved = body.status === "approved" && currentEvent?.status === "pending";
+      // treat transition from 'pending' -> 'upcoming' as approval
+      const isApproved = body.status === "upcoming" && currentEvent?.status === "pending";
 
       const updatedEvent = await Event.findByIdAndUpdate(id, update, {
         new: true,
