@@ -10,7 +10,10 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
-  const notifications = await Notification.find({ recipient: user._id }).sort({
+  if(user.role !== "admin"){
+    throw createError({ statusCode: 403, message: "Access denied" });
+  }
+  const notifications = await Notification.find({ recipientRole: user.role }).sort({
     createdAt: -1,
   });
   const notificationsWithSender = await Promise.all(

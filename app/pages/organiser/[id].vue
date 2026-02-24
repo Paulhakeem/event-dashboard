@@ -70,7 +70,17 @@
                     : 'hover:bg-neutral-tertiary hover:text-fg-brand'
                 "
               >
-                <Icon :name="menu.icon" class="text-xl" />
+                <div class="relative flex-shrink-0">
+                  <Icon :name="menu.icon" class="text-xl" />
+                  <div
+                    v-if="
+                      menu.title === 'Notifications' && notificationCount > 0
+                    "
+                    class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse"
+                  >
+                    {{ notificationCount > 99 ? "99+" : notificationCount }}
+                  </div>
+                </div>
                 <span>{{ menu.title }}</span>
               </button>
             </li>
@@ -107,7 +117,17 @@
                   : 'hover:bg-neutral-tertiary hover:text-fg-brand'
               "
             >
-              <Icon :name="menu.icon" class="text-xl" />
+              <div class="relative shrink-0">
+                <Icon :name="menu.icon" class="text-xl" />
+                <div
+                  v-if="
+                    menu.title === 'Notifications' && notifications.length > 0
+                  "
+                  class="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full animate-pulse"
+                >
+                  {{ notifications.length > 99 ? "99+" : notifications.length }}
+                </div>
+              </div>
               <span>{{ menu.title }}</span>
             </button>
           </li>
@@ -137,9 +157,8 @@ import OrganiserCreateEvents from "~/components/organiser/CreateEvents.vue";
 import OrganiserTrackEvents from "~/components/organiser/TrackEvents.vue";
 import OrganiserNotifications from "~/components/organiser/Notifications.vue";
 import OrganiserInsights from "~/components/organiser/Insights.vue";
-
+const { notifications } = orgNotifications();
 const { sidebar } = useOrganiserSidebar();
-
 const componentsMap = {
   OrganiserDashboard,
   OrganiserCreateEvents,
