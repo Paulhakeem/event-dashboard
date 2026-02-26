@@ -38,15 +38,22 @@ export default defineNuxtConfig({
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
 
-    // Paystack
-    paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
-    // opneAI
+    // Daraja M-Pesa
+    darajaConsumerKey: process.env.MPESA_CONSUMER_KEY,
+    darajaConsumerSecret: process.env.MPESA_CONSUMER_SECRET,
+    darajaUrl: process.env.MPESA_URL,
+    darajaInitiator: process.env.MPESA_INITIATOR,
+    darajaSecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
+    darajaPartyA: process.env.MPESA_PARTY_A,
+    darajaPasskey: process.env.MPESA_PASSKEY,
+    appUrl: process.env.APP_URL,
+    mpesaShortCode: process.env.MPESA_SHORT_CODE,
+    // openAI
     openAiApiKey: process.env.OPENAI_API_KEY,
 
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      paystackPublicKey: process.env.NUXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
     },
   },
 

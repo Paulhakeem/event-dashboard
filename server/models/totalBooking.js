@@ -9,6 +9,18 @@ const totalBookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // user who made the booking
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    // organiser (event creator) - stored for easy querying
+    organiserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     bookedAt: {
       type: Date,
       default: Date.now,
@@ -38,6 +50,12 @@ const totalBookingSchema = new mongoose.Schema(
     amount: {
       type: Number,
       default: 0,
+    },
+    mpesaReceiptNumber: {
+      type: String,
+    },
+    transactionId: {
+      type: String,
     },
   },
   { timestamps: true }

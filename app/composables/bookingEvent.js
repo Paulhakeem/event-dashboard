@@ -1,5 +1,4 @@
 export default function useEventBooking() {
-  const config = useRuntimeConfig();
   const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
@@ -90,24 +89,15 @@ export default function useEventBooking() {
     }
   };
 
-  /* -------------------- PAYSTACK POPUP -------------------- */
-  const bookAndPay = () => {
+  /* -------------------- DARAAJA STK PUSH -------------------- */
+  const bookAndPay = async () => {
     if (!user.value) {
       alert("Please login first");
       return;
     }
 
-    const PaystackPop = window.PaystackPop;
-    if (!PaystackPop) {
-      alert("Paystack not loaded yet");
-      return;
-    }
-
     /* -------- PRICE SELECTION -------- */
     const priceMap = {
-      earlyBirds: event.value.earlyBirds,
-      AtDoor: event.value.AtDoor,
-      Advanced: event.value.Advanced,
       regular: event.value.regular,
       vip: event.value.vip,
       vvip: event.value.vvip,
@@ -120,38 +110,46 @@ export default function useEventBooking() {
       return;
     }
 
-    /* -------- UNIQUE REFERENCE -------- */
-    const reference = `EVT-${id}-${Date.now()}`;
-    // Prevent opening payment if no tickets left
     if (event.value.TicketQuantity <= 0) {
       alert('Tickets sold out for this event');
       return;
     }
 
-    const handler = PaystackPop.setup({
-      key: config.public.paystackPublicKey,
-      email: user.value.email,
-      amount: amount * 100, // kobo
-      currency: "KES",
+    // ask phone number
+    const phone = prompt(
+      "Enter your phone number in format 2547XXXXXXXX (M-Pesa)",
+    );
+    if (!phone) {
+      alert("Phone number is required to initiate payment");
+      return;
+    }
 
-      ref: reference,
+    try {
+      loading.value = true;
+      const res = await $fetch("/api/booking/stkpush", {
+        method: "POST",
+        body: {
+          phone,
+          amount,
+          eventName: event.value.title,
+          userEmail: user.value.email,
+          ticketType: ticketType.value,
+        },
+      });
 
-      metadata: {
-        eventName: event.value.title,
-        userEmail: user.value.email,
-        ticketType: ticketType.value,
-      },
+      alert(
+        "An STK push has been sent to your phone. Enter your M-Pesa PIN to complete the payment. Click OK when done to verify."
+      );
 
-      callback: function (response) {
-        verifyPayment(response.reference);
-      },
-
-      onClose: function () {
-        alert("Transaction cancelled");
-      },
-    });
-
-    handler.openIframe();
+      // verify using returned transactionId
+      // use Daraja CheckoutRequestID for status query
+      await verifyPayment(res.checkoutRequestID);
+    } catch (err) {
+      console.error(err);
+      alert(err?.data?.statusMessage || "Failed to initiate payment");
+    } finally {
+      loading.value = false;
+    }
   };
 
   return {

@@ -25,10 +25,8 @@ export default function useOrganiserEvents() {
         console.log('API Response:', res)
         if (res.success && res.events) {
           events.value = res.events
-          console.log('Events assigned:', events.value)
         } else {
           error.value = 'Failed to fetch events'
-          console.error('Response not successful:', res)
         }
       } catch (err) {
         error.value = err.message || 'An error occurred while fetching events'

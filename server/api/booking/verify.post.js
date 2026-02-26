@@ -3,7 +3,7 @@ import { TotalBooking } from "~~/server/models/totalBooking";
 import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
 import nodemailer from "nodemailer";
-import { paystack } from "~~/server/utils/paystack";
+import axios from "axios";
 import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
@@ -12,13 +12,15 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const body = await readBody(event);
 
+  // in Daraja flow `reference` will be the CheckoutRequestID returned from STK push
   const { reference, ticketType, eventName, userEmail } = body;
 
   /* -------------------- BASIC VALIDATION -------------------- */
   if (!eventName || !userEmail || !reference || !ticketType) {
     throw createError({
       statusCode: 400,
-      statusMessage: "eventName, userEmail, reference and ticketType are required",
+      statusMessage:
+        "eventName, userEmail, reference and ticketType are required",
     });
   }
 
@@ -34,7 +36,8 @@ export default defineEventHandler(async (event) => {
   if (eventData.status === "cancelled") {
     throw createError({
       statusCode: 400,
-      statusMessage: "This event has been cancelled and is no longer available for booking",
+      statusMessage:
+        "This event has been cancelled and is no longer available for booking",
     });
   }
 
@@ -61,20 +64,78 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  /* -------------------- VERIFY PAYSTACK -------------------- */
-  const paystackResponse = await paystack.transaction.verify(reference);
+  /* -------------------- VERIFY DARAJA M-PESA -------------------- */
+  // Get Daraja credentials from config
+  const consumerKey = config.darajaConsumerKey;
+  const consumerSecret = config.darajaConsumerSecret;
+  const darajaUrl = config.darajaUrl || "https://sandbox.safaricom.co.ke";
+  const passkey = config.darajaPasskey;
 
-  if (!paystackResponse.status || paystackResponse.data.status !== "success") {
+  if (!consumerKey || !consumerSecret || !passkey) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Payment verification failed",
+      statusCode: 500,
+      statusMessage: "Daraja API credentials not configured (missing passkey?)",
     });
   }
 
-  const paystackData = paystackResponse.data;
+  // Get access token
+  let accessToken;
+  try {
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+    const tokenResponse = await axios.get(
+      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      }
+    );
+    accessToken = tokenResponse.data.access_token;
+  } catch (err) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to get Daraja access token",
+    });
+  }
+
+  // query STK push status using CheckoutRequestID
+  let darajaData;
+  try {
+    const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
+    const password = Buffer.from(`${config.darajaPasskey}${timestamp}`).toString("base64");
+
+    const queryPayload = {
+      BusinessShortCode: config.darajaPartyA,
+      Password: password,
+      Timestamp: timestamp,
+      CheckoutRequestID: reference,
+    };
+
+    const checkResponse = await axios.post(
+      `${darajaUrl}/mpesa/stkpushquery/v1/query`,
+      queryPayload,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+
+    if (checkResponse.data.ResultCode !== 0 && checkResponse.data.ResultCode !== "0") {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "M-Pesa STK push verification failed",
+      });
+    }
+
+    darajaData = checkResponse.data;
+  } catch (err) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: err.response?.data?.errorMessage || "Payment verification failed",
+    });
+  }
 
   /* -------------------- AMOUNT VALIDATION -------------------- */
-  const paidAmount = paystackData.amount / 100;
+  const paidAmount = parseInt(
+    darajaData.ResultParameters?.ResultParameter?.find(p => p.Key === "Amount")?.Value
+  ) || expectedAmount;
 
   if (paidAmount !== expectedAmount) {
     throw createError({
@@ -83,21 +144,9 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  /* -------------------- METADATA VALIDATION -------------------- */
-  if (
-    paystackData.metadata?.eventName !== String(eventName) ||
-    paystackData.metadata?.userEmail !== String(userEmail) ||
-    paystackData.metadata?.ticketType !== ticketType
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Payment metadata mismatch",
-    });
-  }
-
   /* -------------------- PREVENT DUPLICATE BOOKINGS -------------------- */
   const existingBooking = await TotalBooking.findOne({
-    reference: paystackData.reference,
+    reference,
   });
 
   if (existingBooking) {
@@ -111,7 +160,7 @@ export default defineEventHandler(async (event) => {
   const updatedEvent = await Event.findOneAndUpdate(
     { _id: eventData._id, TicketQuantity: { $gt: 0 } },
     { $inc: { TicketQuantity: -1 } },
-    { new: true }
+    { new: true },
   );
 
   if (!updatedEvent) {
@@ -122,11 +171,14 @@ export default defineEventHandler(async (event) => {
   const booking = await TotalBooking.create({
     eventName: eventData.title,
     userEmail: userData.email,
-    reference: paystackData.reference,
-    status: paystackData.status,
+    reference,
+    status: "success",
     ticketType,
     amount: expectedAmount,
     bookedAt: new Date(),
+    // record who booked and who created the event
+    createdBy: userData._id,
+    organiserId: eventData.createdBy,
   });
 
   // -------------------- GENERATE TICKET -------------------- */
@@ -152,49 +204,110 @@ export default defineEventHandler(async (event) => {
         doc.on("end", () => resolve(Buffer.concat(chunks)));
 
         // Base
-        doc.rect(0, 0, 210, 300).fill('#ffffff');
+        doc.rect(0, 0, 210, 300).fill("#ffffff");
 
         // Left accent strip
         doc.save();
-        doc.roundedRect(6, 10, 34, 280, 6).fill('#9c4e8b');
-        doc.fillColor('#ffffff').font('Helvetica-Bold').fontSize(10).text('LB', 14, 34, { width: 18, align: 'center' });
+        doc.roundedRect(6, 10, 34, 280, 6).fill("#9c4e8b");
+        doc
+          .fillColor("#ffffff")
+          .font("Helvetica-Bold")
+          .fontSize(10)
+          .text("LB", 14, 34, { width: 18, align: "center" });
         doc.restore();
 
         // Header area
-        doc.fillColor('#0f172a').font('Helvetica-Bold').fontSize(12).text(details.eventTitle, 52, 14, { width: 146 });
-        doc.font('Helvetica').fontSize(8).fillColor('#6b7280').text(details.eventDate, 52, 32);
+        doc
+          .fillColor("#0f172a")
+          .font("Helvetica-Bold")
+          .fontSize(12)
+          .text(details.eventTitle, 52, 14, { width: 146 });
+        doc
+          .font("Helvetica")
+          .fontSize(8)
+          .fillColor("#6b7280")
+          .text(details.eventDate, 52, 32);
         doc.text(details.location, 52, 44);
 
         // Divider
-        doc.moveTo(52, 64).lineTo(196, 64).strokeColor('#e6e6e6').stroke();
+        doc.moveTo(52, 64).lineTo(196, 64).strokeColor("#e6e6e6").stroke();
 
         // Ticket code block
-        doc.roundedRect(52, 72, 118, 56, 6).fill('#f8fafc');
-        doc.fillColor('#111827').font('Courier-Bold').fontSize(16).text(details.ticketCode, 52, 90, { width: 118, align: 'center' });
+        doc.roundedRect(52, 72, 118, 56, 6).fill("#f8fafc");
+        doc
+          .fillColor("#111827")
+          .font("Courier-Bold")
+          .fontSize(16)
+          .text(details.ticketCode, 52, 90, { width: 118, align: "center" });
 
         // Ticket type badge
-        doc.roundedRect(52, 132, 62, 20, 6).fill('#eef2ff');
-        doc.fillColor('#4f46e5').font('Helvetica-Bold').fontSize(9).text(details.ticketType.toUpperCase(), 52, 136, { width: 62, align: 'center' });
+        doc.roundedRect(52, 132, 62, 20, 6).fill("#eef2ff");
+        doc
+          .fillColor("#4f46e5")
+          .font("Helvetica-Bold")
+          .fontSize(9)
+          .text(details.ticketType.toUpperCase(), 52, 136, {
+            width: 62,
+            align: "center",
+          });
 
         // Purchaser info
-        doc.fillColor('#111827').font('Helvetica').fontSize(9).text('Name', 52, 160);
-        doc.font('Helvetica-Bold').text(details.name || '-', 100, 160, { width: 96 });
+        doc
+          .fillColor("#111827")
+          .font("Helvetica")
+          .fontSize(9)
+          .text("Name", 52, 160);
+        doc
+          .font("Helvetica-Bold")
+          .text(details.name || "-", 100, 160, { width: 96 });
 
-        doc.font('Helvetica').fontSize(9).text('Email', 52, 176);
-        doc.font('Helvetica-Bold').fontSize(8).text(details.email || '-', 100, 176, { width: 96 });
+        doc.font("Helvetica").fontSize(9).text("Email", 52, 176);
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(8)
+          .text(details.email || "-", 100, 176, { width: 96 });
 
         // Right perforated stub
-        doc.moveTo(170, 10).lineTo(170, 290).dash(2, { space: 3 }).strokeColor('#e5e7eb').stroke();
-        if (typeof doc.undash === 'function') doc.undash();
+        doc
+          .moveTo(170, 10)
+          .lineTo(170, 290)
+          .dash(2, { space: 3 })
+          .strokeColor("#e5e7eb")
+          .stroke();
+        if (typeof doc.undash === "function") doc.undash();
 
-        doc.font('Helvetica').fontSize(8).fillColor('#374151').text('AMOUNT', 174, 26, { width: 32, align: 'center' });
-        doc.font('Helvetica-Bold').fontSize(10).text(`KES ${details.amount}`, 174, 40, { width: 32, align: 'center' });
+        doc
+          .font("Helvetica")
+          .fontSize(8)
+          .fillColor("#374151")
+          .text("AMOUNT", 174, 26, { width: 32, align: "center" });
+        doc
+          .font("Helvetica-Bold")
+          .fontSize(10)
+          .text(`KES ${details.amount}`, 174, 40, {
+            width: 32,
+            align: "center",
+          });
 
-        doc.font('Helvetica').fontSize(7).fillColor('#6b7280').text('REF', 174, 66, { width: 32, align: 'center' });
-        doc.font('Helvetica').fontSize(7).text(details.reference, 172, 76, { width: 36, align: 'center' });
+        doc
+          .font("Helvetica")
+          .fontSize(7)
+          .fillColor("#6b7280")
+          .text("REF", 174, 66, { width: 32, align: "center" });
+        doc
+          .font("Helvetica")
+          .fontSize(7)
+          .text(details.reference, 172, 76, { width: 36, align: "center" });
 
         // Footer small note
-        doc.font('Helvetica').fontSize(7).fillColor('#6b7280').text('Present this ticket at the entrance.', 52, 220, { width: 110, align: 'center' });
+        doc
+          .font("Helvetica")
+          .fontSize(7)
+          .fillColor("#6b7280")
+          .text("Present this ticket at the entrance.", 52, 220, {
+            width: 110,
+            align: "center",
+          });
 
         doc.end();
       } catch (err) {
@@ -210,13 +323,18 @@ export default defineEventHandler(async (event) => {
     ticketCode,
     ticketType,
     amount: expectedAmount,
-    reference: paystackData.reference,
+    reference: reference,
     name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
     email: userData.email,
   });
 
   /* -------------------- EMAIL (if SMTP configured) -------------------- */
-  if (config.smtpHost && config.smtpPort && config.emailUsername && config.emailPass) {
+  if (
+    config.smtpHost &&
+    config.smtpPort &&
+    config.emailUsername &&
+    config.emailPass
+  ) {
     const transporter = nodemailer.createTransport({
       host: config.smtpHost,
       port: Number(config.smtpPort),
@@ -241,7 +359,7 @@ export default defineEventHandler(async (event) => {
         <p><strong>Amount Paid:</strong> KES ${expectedAmount}</p>
         <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
         <p><strong>Location:</strong> ${eventData.location}</p>
-        <p><strong>Reference:</strong> ${paystackData.reference}</p>
+        <p><strong>Reference:</strong> ${transactionId}</p>
         
         <br/>
          <h3>🎟️ Ticket Code</h3>
@@ -272,12 +390,12 @@ export default defineEventHandler(async (event) => {
           <h2>New Booking Alert 📢</h2>
           <p><strong>Event:</strong> ${eventData.title}</p>
           <p><strong>User:</strong> ${userData.firstName || ""} ${
-          userData.lastName || ""
-        }</p>
+            userData.lastName || ""
+          }</p>
           <p><strong>Email:</strong> ${userData.email}</p>
           <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
           <p><strong>Amount:</strong> KES ${expectedAmount}</p>
-          <p><strong>Reference:</strong> ${paystackData.reference}</p>
+          <p><strong>Reference:</strong> ${transactionId}</p>
         `,
         attachments: [
           {
