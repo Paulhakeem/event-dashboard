@@ -3,9 +3,7 @@
     <div class="flex justify-between items-center">
       <div>
         <h2 class="text-2xl font-bold text-gray-900">Total Events</h2>
-        <p class="text-gray-600 mt-1">
-          View and manage your created events here.
-        </p>
+        <p class="text-gray-600 mt-1">View and manage your events here.</p>
       </div>
     </div>
 
