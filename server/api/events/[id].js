@@ -1,6 +1,7 @@
 import { Event } from "../../models/Events.js";
 import { Notification } from "../../models/Notification.js";
 import connectDB from "../../utils/mongoose.js";
+import { markPastEventsCompleted } from "../../utils/eventStatus.js";
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
@@ -10,6 +11,8 @@ export default defineEventHandler(async (event) => {
     await connectDB();
     
     if (method === "GET") {
+      // make sure status is up-to-date before returning individual event
+      await markPastEventsCompleted();
       const eventData = await Event.findById(id).exec();
       if (!eventData) {
         throw createError({

@@ -1,4 +1,4 @@
-import { TotalBooking } from "~~/server/models/totalbooking";
+import { TotalBooking } from "~~/server/models/totalBooking";
 import connectDB from "~~/server/utils/mongoose.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
 

@@ -22,7 +22,6 @@ export default function useOrganiserEvents() {
             Authorization: `Bearer ${token.value}`,
           },
         })
-        console.log('API Response:', res)
         if (res.success && res.events) {
           events.value = res.events
         } else {

@@ -28,5 +28,19 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// whenever events are queried, ensure any past events are marked completed
+eventSchema.pre(/^find/, async function(next) {
+  try {
+    const now = new Date();
+    await this.model("Event").updateMany(
+      { date: { $lt: now }, status: { $ne: "completed" } },
+      { $set: { status: "completed" } }
+    );
+  } catch (err) {
+    console.error("Error auto-updating event statuses:", err);
+  }
+  next();
+});
+
 export const Event =
   mongoose.models.Event || mongoose.model("Event", eventSchema);

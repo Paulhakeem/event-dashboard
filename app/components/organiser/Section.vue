@@ -120,7 +120,6 @@ watch(
         Authorization: `Bearer ${token._value}`,
       },
     });
-    console.log(res);
     totalBookedEvents.value = res.totalBookedEvents;
   },
   { immediate: true },
