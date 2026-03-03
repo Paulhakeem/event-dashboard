@@ -24,8 +24,24 @@
           </td>
         </tr>
 
+        <!-- if length is 0 -->
+        <tr v-else-if="eventsBooked.length === 0">
+          <td colspan="3" class="px-6 py-10">
+            <div
+              class="flex flex-col items-center justify-center text-gray-500"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 text-lg"
+              >
+                📋
+              </div>
+              <p class="mt-3 text-sm font-medium">No booked events found</p>
+            </div>
+          </td>
+        </tr>
+
         <!-- ERROR STATE -->
-        <tr v-else-if="BookedEvent.length === 0 && error">
+        <tr v-else-if="error">
           <td colspan="3" class="px-6 py-10">
             <div
               class="flex flex-col items-center justify-center rounded-lg bg-red-50 border border-red-200 p-6"
@@ -44,7 +60,7 @@
               </p>
 
               <button
-                @click="fetchBookedEvents"
+                @click="aggregateBookings()"
                 class="mt-4 px-4 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 cursor-pointer transition"
               >
                 Retry
@@ -56,7 +72,7 @@
         <!-- booked events data -->
         <tr
           v-else
-          v-for="(event, index) in BookedEvent"
+          v-for="(event, index) in eventsBooked"
           :key="index"
           class="border-b hover:bg-gray-50"
         >
@@ -70,52 +86,10 @@
 </template>
 
 <script setup>
-const { token } = useAuth();
-const BookedEvent = ref([]);
-const loading = ref(false);
-const error = ref("");
-
-// fetch booked events data from API and get top 5 events by total bookings
-const fetchBookedEvents = async () => {
-  try {
-    loading.value = true;
-    const res = await $fetch("/api/organiser/bookedEvents/bookings", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-
-    if (res.success && res.bookings) {
-      // aggregate total bookings and income by event
-      const eventMap = {};
-      res.bookings.forEach((booking) => {
-        const eventId = booking.event._id;
-        if (!eventMap[eventId]) {
-          eventMap[eventId] = {
-            name: booking.event.name,
-            totalBookings: 0,
-            totalIncome: 0,
-          };
-        }
-        eventMap[eventId].totalBookings += 1;
-        eventMap[eventId].totalIncome += booking.amount;
-      });
-      // convert map to array and sort by total bookings
-      BookedEvent.value = Object.values(eventMap)
-        .sort((a, b) => b.totalBookings - a.totalBookings)
-        .slice(0, 5); // get top 5 events
-    } else {
-      error.value = "Failed to fetch booked events data";
-    }
-  } catch (err) {
-    error.value = "An error occurred while fetching booked events data";
-  } finally {
-    loading.value = false;
-  }
-};
+// get top 5 booked events
+const { loading, eventsBooked, error, aggregateBookings } = eventsBooking();
 
 onMounted(() => {
-  fetchBookedEvents();
+  aggregateBookings();
 });
 </script>

@@ -1,9 +1,9 @@
 <template>
   <div class="bg-white p-6 rounded-lg shadow">
-    <h2 class="text-lg font-semibold mb-4">Activities</h2>
+    <h2 class="text-lg font-semibold mb-4">Ongoing Events</h2>
     <!-- LOADING -->
     <div
-      v-if="loading"
+      v-if="pendings"
       class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-gray-200 shadow-sm"
     >
       <div
@@ -16,7 +16,7 @@
 
     <!-- ERROR -->
     <div
-      v-else-if="error"
+      v-else-if="errorMessage"
       class="flex flex-col items-center justify-center py-12 px-6 bg-red-50 border border-red-200 rounded-xl shadow-sm text-center"
     >
       <div
@@ -28,11 +28,11 @@
         Something went wrong
       </p>
       <p class="mt-1 text-xs text-red-600">
-        {{ error }}
+        {{ errorMessage }}
       </p>
 
       <button
-        @click="getOngoingEvents"
+        @click="ongoingEvents"
         class="mt-4 px-4 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
       >
         Retry
@@ -57,7 +57,7 @@
 
     <ul v-else class="space-y-4">
       <li
-        v-for="event in ongoingEvents"
+        v-for="event in eventPosters"
         :key="event._id"
         class="border p-4 rounded"
       >
@@ -73,10 +73,10 @@
   </div>
 </template>
 <script setup>
-const { events, loading, error } = organiserEvents();
+const {eventPosters, errorMessage, pendings} = EventFunctions();
 
 // get events with ongoing status
 const ongoingEvents = computed(() => {
-  return events.value.filter((event) => event.status === "ongoing");
+  return eventPosters.value.filter((event) => event.status === "ongoing");
 });
 </script>
