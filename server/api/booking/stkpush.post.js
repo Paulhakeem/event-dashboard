@@ -1,4 +1,5 @@
 import connectDB from "../../utils/mongoose.js";
+import { Event } from "~~/server/models/Events";
 import axios from "axios";
 
 export default defineEventHandler(async (event) => {
@@ -14,6 +15,15 @@ export default defineEventHandler(async (event) => {
   }
 
   await connectDB();
+
+  // verify event exists and is bookable
+  const eventData = await Event.findOne({ title: eventName });
+  if (!eventData) {
+    throw createError({ statusCode: 404, statusMessage: "Event not found" });
+  }
+  if (eventData.status === "cancelled" || eventData.status === "completed") {
+    throw createError({ statusCode: 400, statusMessage: "Event is no longer available for booking" });
+  }
 
   const consumerKey = config.darajaConsumerKey;
   const consumerSecret = config.darajaConsumerSecret;

@@ -32,7 +32,8 @@ const eventSchema = new mongoose.Schema({
 eventSchema.pre(/^find/, async function(next) {
   try {
     const now = new Date();
-    await this.model("Event").updateMany(
+    // this.model is already the Model instance for the current query
+    await this.model.updateMany(
       { date: { $lt: now }, status: { $ne: "completed" } },
       { $set: { status: "completed" } }
     );

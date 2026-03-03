@@ -30,9 +30,9 @@ export default function useEventBooking() {
     try {
       loading.value = true;
 
-      // Check if event is cancelled
-      if (event.value.status === "cancelled") {
-        error.value = "This event has been cancelled and is no longer available for booking";
+      // Check if event is cancelled or already completed
+      if (event.value.status === "cancelled" || event.value.status === "completed") {
+        error.value = "This event is no longer available for booking";
         alert(error.value);
         return;
       }
@@ -112,6 +112,10 @@ export default function useEventBooking() {
 
     if (event.value.TicketQuantity <= 0) {
       alert('Tickets sold out for this event');
+      return;
+    }
+    if (event.value.status === "cancelled" || event.value.status === "completed") {
+      alert('This event is no longer available for booking');
       return;
     }
 

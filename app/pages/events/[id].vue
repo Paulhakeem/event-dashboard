@@ -202,10 +202,16 @@
                 <!-- mpesa payment -->
                 <button
                   @click="bookAndPay"
-                  class="w-full flex items-center justify-center gap-3 p-4 bg-linear-to-r from-green-500 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 cursor-pointer"
+                  :disabled="!isBookable"
+                  :class="[
+                    'w-full flex items-center justify-center gap-3 p-4 text-white font-semibold rounded-lg transition duration-200',
+                    isBookable
+                      ? 'bg-linear-to-r from-green-500 to-green-600 hover:shadow-lg transform hover:scale-105 cursor-pointer'
+                      : 'bg-gray-300 cursor-not-allowed opacity-50',
+                  ]"
                 >
                   <Icon name="mingcute:phone-fill" class="text-2xl" />
-                  {{ loading ? "Processing..." : "Pay with Mobile Money" }}
+                  {{ loading ? "Processing..." : (isBookable ? "Pay with Mobile Money" : "Unavailable") }}
                 </button>
                 <!-- card payment -->
                 <button
@@ -269,4 +275,12 @@ const {
 } = useEventBooking();
 
 const { user } = useAuth();
+
+import { computed } from 'vue';
+
+const isBookable = computed(() => {
+  const ev = event.value;
+  if (!ev) return false;
+  return ev.status !== 'cancelled' && ev.status !== 'completed' && ev.TicketQuantity > 0;
+});
 </script>

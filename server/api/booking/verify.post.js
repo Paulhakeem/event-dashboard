@@ -32,12 +32,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
 
-  /* -------------------- CHECK IF EVENT IS CANCELLED -------------------- */
-  if (eventData.status === "cancelled") {
+  /* -------------------- CHECK IF EVENT IS CANCELLED/COMPLETED -------------------- */
+  if (eventData.status === "cancelled" || eventData.status === "completed") {
     throw createError({
       statusCode: 400,
       statusMessage:
-        "This event has been cancelled and is no longer available for booking",
+        "This event is no longer available for booking",
     });
   }
 
@@ -158,7 +158,7 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- DECREMENT TICKET QUANTITY ATOMICALLY -------------------- */
   const updatedEvent = await Event.findOneAndUpdate(
-    { _id: eventData._id, TicketQuantity: { $gt: 0 } },
+    { _id: eventData._id, TicketQuantity: { $gt: 0 }, status: { $nin: ["cancelled","completed"] } },
     { $inc: { TicketQuantity: -1 } },
     { new: true },
   );
