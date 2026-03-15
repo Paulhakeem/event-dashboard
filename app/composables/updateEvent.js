@@ -1,4 +1,5 @@
 export default function updateEvent(eventsRef = null) {
+  const config = useRuntimeConfig()
   const editingEvent = ref(false);
   const events = eventsRef || ref([]);
   const editForm = ref({
@@ -8,9 +9,6 @@ export default function updateEvent(eventsRef = null) {
     date: "",
     location: "",
     TicketQuantity: 0,
-    earlyBirds: 0,
-    Advance: 0,
-    AtDoor: 0,
     regular: 0,
     vip: 0,
     vvip: 0,
@@ -20,7 +18,7 @@ export default function updateEvent(eventsRef = null) {
 
   const removeEvent = async (id) => {
      if (!confirm("Are you sure you want to delete this event?")) return;
-    const res = await $fetch(`/api/events/${id}`, {
+    const res = await $fetch(`${config.public.deleteEvent}/${id}`, {
       method: "DELETE",
     });
     if (res && res.success) {
@@ -39,9 +37,6 @@ export default function updateEvent(eventsRef = null) {
       date: ev.date ? new Date(ev.date).toISOString().substr(0, 10) : "",
       location: ev.location || "",
       TicketQuantity: ev.TicketQuantity || 0,
-      earlyBirds: ev.earlyBirds || 0,
-      Advance: ev.Advance || 0,
-      AtDoor: ev.AtDoor || 0,
       regular: ev.regular || 0,
       vip: ev.vip || 0,
       vvip: ev.vvip || 0,
@@ -56,7 +51,7 @@ export default function updateEvent(eventsRef = null) {
 
   const submitUpdate = async () => {
     try {
-      const res = await $fetch(`/api/events/${editingEvent.value}`, {
+      const res = await $fetch(`${config.public.updateEvent}/${editingEvent.value}`, {
         method: "PATCH",
         body: { ...editForm.value },
       });

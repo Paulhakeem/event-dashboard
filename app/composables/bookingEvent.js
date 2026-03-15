@@ -1,10 +1,10 @@
 export default function useEventBooking() {
+  const config = useRuntimeConfig()
   const { user } = useAuth();
   const route = useRoute();
   const id = route.params.id;
 
   const event = ref({});
-  const ticketType = ref("earlyBirds"); 
 
   const loading = ref(false);
   const error = ref(null);
@@ -16,7 +16,7 @@ export default function useEventBooking() {
   onMounted(async () => {
     try {
       loading.value = true;
-      const res = await $fetch(`/api/events/${id}`);
+      const res = await $fetch(`${config.public.bookingEvent}/${id}`);
       event.value = res.eventData;
     } catch (err) {
       error.value = err?.message || "Failed to load event";
@@ -37,7 +37,7 @@ export default function useEventBooking() {
         return;
       }
 
-      const verifyResponse = await $fetch("/api/booking/verify", {
+      const verifyResponse = await $fetch(`${config.public.verifyApi}`, {
         method: "POST",
         body: {
           reference,
@@ -97,18 +97,6 @@ export default function useEventBooking() {
     }
 
     /* -------- PRICE SELECTION -------- */
-    const priceMap = {
-      regular: event.value.regular,
-      vip: event.value.vip,
-      vvip: event.value.vvip,
-    };
-
-    const amount = priceMap[ticketType.value];
-
-    if (!amount) {
-      alert("Invalid ticket selected");
-      return;
-    }
 
     if (event.value.TicketQuantity <= 0) {
       alert('Tickets sold out for this event');
@@ -130,14 +118,13 @@ export default function useEventBooking() {
 
     try {
       loading.value = true;
-      const res = await $fetch("/api/booking/stkpush", {
+      const res = await $fetch(`${config.public.stkpushApi}`, {
         method: "POST",
         body: {
           phone,
           amount,
           eventName: event.value.title,
           userEmail: user.value.email,
-          ticketType: ticketType.value,
         },
       });
 
@@ -158,7 +145,6 @@ export default function useEventBooking() {
 
   return {
     event,
-    ticketType,
     loading,
     error,
     successMessage,

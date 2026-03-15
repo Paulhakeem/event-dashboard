@@ -2,6 +2,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth' // adjust path if needed
 
 export default function useBookingData() {
+  const config = useRuntimeConfig()
   const { token } = useAuth()
   const loading = ref(true)
   const booking = ref([])
@@ -9,7 +10,7 @@ export default function useBookingData() {
 
   onMounted(async () => {
     try {
-      const res = await $fetch('/api/users/userInfo', {
+      const res = await $fetch(`${config.public.bookingData}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token.value}`,

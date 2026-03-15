@@ -2,7 +2,7 @@ import { ref, watch } from "vue";
 
 export default function useFormAuth() {
   const { setAuth } = useAuth();
-
+  const config = useRuntimeConfig();
   // form fields
   const firstName = ref("");
   const lastName = ref("");
@@ -70,7 +70,7 @@ export default function useFormAuth() {
         formData.append("profileImage", imageFile.value);
       }
 
-      const res = await fetch("/api/auth/regester", {
+      const res = await fetch(`${config.public.signupApi}`, {
         method: "POST",
         body: formData,
       });

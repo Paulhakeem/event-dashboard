@@ -1,6 +1,7 @@
+
 export const orgCreateEvent = () => {
   const { token } = useAuth();
-
+const config = useRuntimeConfig()
   const form = reactive({
     title: "",
     description: "",
@@ -57,7 +58,7 @@ export const orgCreateEvent = () => {
       if (form.vvip !== "" && form.vvip !== null && form.vvip !== undefined)
         formData.append("vvip", form.vvip);
 
-      const response = await $fetch("/api/organiser/addevent", {
+      const response = await $fetch(`${config.public.organiserCreateEventApi}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token._value}`,

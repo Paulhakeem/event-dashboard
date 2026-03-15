@@ -1,6 +1,6 @@
 export default function useNotifications() {
   const { token } = useAuth();
-
+  const config = useRuntimeConfig();
   const notifications = ref([]);
   const loading = ref(true);
   const error = ref(null);
@@ -80,7 +80,7 @@ export default function useNotifications() {
 
   onMounted(async () => {
     try {
-      const res = await $fetch("/api/notification/notifications", {
+      const res = await $fetch(`${config.public.notificationsApi}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token.value}`,
@@ -99,7 +99,7 @@ export default function useNotifications() {
   const deleteNotification = async (id, index) => {
     if (!confirm("Are you sure you want to delete this notification?")) return;
     try {
-      await $fetch(`/api/notification/${id}`, {
+      await $fetch(`${config.public.deleteNotification}/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token._value}`,
@@ -121,6 +121,6 @@ export default function useNotifications() {
     bgGradient,
     getIcon,
     formatTime,
-    deleteNotification
+    deleteNotification,
   };
 }

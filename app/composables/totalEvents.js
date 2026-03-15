@@ -1,10 +1,11 @@
 export const totalEvents = () => {
+  const config = useRuntimeConfig()
   const { token } = useAuth();
   const events = ref([]);
   const loading = ref(true);
   onMounted(async () => {
     try {
-      const res = await $fetch("/api/events", {
+      const res = await $fetch(`${config.public.totalEventsApi}`, {
         headers: {
           // send token
           Authorization: `Bearer ${token.value}`,

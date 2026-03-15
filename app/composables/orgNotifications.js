@@ -1,4 +1,5 @@
 export const orgNotifications = () => {
+  const config = useRuntimeConfig();
   const { token } = useAuth();
   const notifications = ref([]);
   const loading = ref(false);
@@ -23,7 +24,7 @@ export const orgNotifications = () => {
       return notifications.value.filter((n) => n.title.includes("Approved"));
     if (filterType.value === "submitted")
       return notifications.value.filter((n) => n.title.includes("Submitted"));
-    if(filterType.value === "cancelled")
+    if (filterType.value === "cancelled")
       return notifications.value.filter((n) => n.title.includes("Cancelled"));
     return notifications.value;
   });
@@ -58,28 +59,28 @@ export const orgNotifications = () => {
   const getIconBg = (notif) => {
     if (notif.title.includes("Approved")) return "bg-green-100";
     if (notif.title.includes("Submitted")) return "bg-blue-100";
-    if(notif.title.includes("Cancelled")) return "bg-red-100";
+    if (notif.title.includes("Cancelled")) return "bg-red-100";
     return "bg-purple-100";
   };
 
   const getIconColor = (notif) => {
     if (notif.title.includes("Approved")) return "text-green-600";
     if (notif.title.includes("Submitted")) return "text-blue-600";
-    if(notif.title.includes("Cancelled")) return "text-red-600";
+    if (notif.title.includes("Cancelled")) return "text-red-600";
     return "text-purple-600";
   };
 
   const getTypeBadge = (notif) => {
     if (notif.title.includes("Approved")) return "bg-green-100 text-green-700";
     if (notif.title.includes("Submitted")) return "bg-blue-100 text-blue-700";
-    if(notif.title.includes("Cancelled")) return "bg-red-100 text-red-700";
+    if (notif.title.includes("Cancelled")) return "bg-red-100 text-red-700";
     return "bg-gray-100 text-gray-700";
   };
 
   const getTypeLabel = (notif) => {
     if (notif.title.includes("Approved")) return "approval";
     if (notif.title.includes("Submitted")) return "submission";
-    if(notif.title.includes("Cancelled")) return "cancellation";
+    if (notif.title.includes("Cancelled")) return "cancellation";
     return "notification";
   };
 
@@ -87,7 +88,7 @@ export const orgNotifications = () => {
     loading.value = true;
     errorMessage.value = "";
     try {
-      const res = await $fetch("/api/organiser/notifications/receiveNot", {
+      const res = await $fetch(`${config.public.organiserNotifications}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token._value}`,
@@ -126,7 +127,7 @@ export const orgNotifications = () => {
   return {
     notifications,
     filteredNotifications,
-    formatTime ,
+    formatTime,
     loading,
     errorMessage,
     filterType,

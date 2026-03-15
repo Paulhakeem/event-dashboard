@@ -1,4 +1,5 @@
 export default function getBookingEvents() {
+  const config = useRuntimeConfig()
   const loading = ref(true);
   const eventsBooked = ref([]);
   const error = ref("");
@@ -6,7 +7,7 @@ export default function getBookingEvents() {
   // get total events booked for the logged in user
   onMounted(async () => {
     try {
-      const res = await $fetch("/api/events/bookedEvents");
+      const res = await $fetch(`${config.public.bookedEvents}`);
       if (res?.success) {
         // use deduplicated events summary
         eventsBooked.value = res.events;
@@ -21,7 +22,7 @@ export default function getBookingEvents() {
   // aggregate total bookings and income by event
   const aggregateBookings = async () => {
     loading.value = true;
-    const res = await $fetch("/api/events/bookedEvents");
+    const res = await $fetch(`${config.public.bookedEvents}`);
     const eventMap = {};
     if (res.success && res.events) {
       res.events.forEach((event) => {

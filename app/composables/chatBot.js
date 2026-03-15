@@ -2,6 +2,7 @@
 import { ref, nextTick } from "vue";
 
 export const useChatBot = () => {
+  const config = useRuntimeConfig()
   const isOpen = ref(false);
   const showBadge = ref(true);
   const newMessage = ref("");
@@ -40,7 +41,7 @@ export const useChatBot = () => {
       messages.value.push({ sender: "bot", text: "Typing..." }) - 1;
 
     try {
-      const res = await $fetch("/api/chat/chat", {
+      const res = await $fetch(`${config.public.chatbotApi}`, {
         method: "POST",
         body: {
           messages: messages.value

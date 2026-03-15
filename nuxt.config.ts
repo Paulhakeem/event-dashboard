@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
-import { resolve } from 'path';
+import { resolve } from "path";
 export default defineNuxtConfig({
   app: {
     head: {
@@ -20,9 +20,9 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
     resolve: {
       alias: {
-        'striptags': resolve(__dirname, 'shims/striptags.js')
-      }
-    }
+        striptags: resolve(__dirname, "shims/striptags.js"),
+      },
+    },
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
@@ -54,7 +54,25 @@ export default defineNuxtConfig({
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      // api request
+      eventApi: process.env.EVENT_API,
+      bookingEvent: process.env.BOOKING_EVENTS,
+      verifyApi: process.env.VERIFY_API,
+      stkpushApi: process.env.STKPUSH_API,
+      chatbotApi: process.env.CHATBOT_API,
+      bookedEvents: process.env.BOOKEDEVENTS_API,
+      cancelEventsApi: process.env.CANCEL_EVENTS_API,
+      signupApi: process.env.SIGNUP_API,
+      notificationsApi: process.env.NOTIFICATIONS_API,
+      deleteNotification: process.env.DELETE_NOTIFICATION_API,
+      organiserEvents: process.env.ORGANISER_EVENTS_API,
+      organiserCreateEventApi: process.env.ORGANISER_CREATE_EVENT_API,
+      organiserNotifications: process.env.ORGANISER_NOTIFICATIONS_API,
+      totalEventsApi: process.env.TOTAL_EVENTS_API,
+      usersApi: process.env.USERS_API,
+      deleteEvent: process.env.DELETE_EVENT_API,
+      updateEvent: process.env.UPDATE_EVENT_API,
+      bookingData: process.env.BOOKING_DATA_API
     },
   },
-
 });
