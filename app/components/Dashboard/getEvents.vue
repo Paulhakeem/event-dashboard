@@ -134,43 +134,6 @@
               class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
             />
           </div>
-
-          <!-- early birds-->
-          <div class="flex flex-col">
-            <label for="earlybirds" class="text-sm font-medium text-gray-700 mb-1"
-              >Early Birds</label
-            >
-            <input
-              id="regular"
-              v-model.number="editForm.earlyBirds"
-              placeholder="Early Birds"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
-            />
-          </div>
-          <!-- Advance-->
-          <div class="flex flex-col">
-            <label for="advance" class="text-sm font-medium text-gray-700 mb-1"
-              >Advance</label
-            >
-            <input
-              id="regular"
-              v-model.number="editForm.Advance"
-              placeholder="Advance"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
-            />
-          </div>
-          <!-- atDoor-->
-          <div class="flex flex-col">
-            <label for="atDoor" class="text-sm font-medium text-gray-700 mb-1"
-              >At Door</label
-            >
-            <input
-              id="regular"
-              v-model.number="editForm.AtDoor"
-              placeholder="at Door"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
-            />
-          </div>
           <!-- regular ticket -->
           <div class="flex flex-col">
             <label for="regular" class="text-sm font-medium text-gray-700 mb-1"

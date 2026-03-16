@@ -1,22 +1,28 @@
 export default function useEventBooking() {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const { user } = useAuth();
   const route = useRoute();
+
   const id = route.params.id;
 
   const event = ref({});
+  const ticketType = ref(null);
 
   const loading = ref(false);
   const error = ref(null);
   const successMessage = ref(null);
+
   const ticketPdfBase64 = ref(null);
   const ticketPdfUrl = ref(null);
 
-  /* -------------------- LOAD EVENT -------------------- */
+  /* ---------------- LOAD EVENT ---------------- */
+
   onMounted(async () => {
     try {
       loading.value = true;
+
       const res = await $fetch(`${config.public.bookingEvent}/${id}`);
+
       event.value = res.eventData;
     } catch (err) {
       error.value = err?.message || "Failed to load event";
@@ -25,44 +31,35 @@ export default function useEventBooking() {
     }
   });
 
-  /* -------------------- VERIFY PAYMENT -------------------- */
-  const verifyPayment = async (reference) => {
+  /* ---------------- VERIFY PAYMENT ---------------- */
+
+  const verifyPayment = async (checkoutRequestID) => {
     try {
       loading.value = true;
 
-      // Check if event is cancelled or already completed
-      if (event.value.status === "cancelled" || event.value.status === "completed") {
-        error.value = "This event is no longer available for booking";
-        alert(error.value);
-        return;
-      }
-
-      const verifyResponse = await $fetch(`${config.public.verifyApi}`, {
+      const verifyResponse = await $fetch(config.public.verifyApi, {
         method: "POST",
         body: {
-          reference,
-          eventName: event.value.title,
+          reference: checkoutRequestID,
+          eventId: id,
           userEmail: user.value.email,
-          ticketType: ticketType.value, // REQUIRED
+          ticketType: ticketType.value,
         },
       });
 
       successMessage.value = verifyResponse.message;
+
       if (verifyResponse.ticketPdfBase64) {
         ticketPdfBase64.value = verifyResponse.ticketPdfBase64;
-        try {
-          const binary = atob(verifyResponse.ticketPdfBase64);
-          const len = binary.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-          const blob = new Blob([bytes], { type: "application/pdf" });
-          ticketPdfUrl.value = URL.createObjectURL(blob);
-        } catch (e) {
-          console.warn("Failed to build ticket PDF URL", e);
-        }
-      }
-      alert("Payment successful 🎉 Check your email");
 
+        const binary = atob(ticketPdfBase64.value);
+        const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+        const blob = new Blob([bytes], { type: "application/pdf" });
+
+        ticketPdfUrl.value = URL.createObjectURL(blob);
+      }
+
+      alert("Payment successful 🎉 Check your email");
     } catch (err) {
       alert(err?.data?.statusMessage || "Payment verification failed");
     } finally {
@@ -70,81 +67,72 @@ export default function useEventBooking() {
     }
   };
 
-  const downloadTicket = () => {
-    if (!ticketPdfUrl.value && ticketPdfBase64.value) {
-      const binary = atob(ticketPdfBase64.value);
-      const len = binary.length;
-      const bytes = new Uint8Array(len);
-      for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-      const blob = new Blob([bytes], { type: "application/pdf" });
-      ticketPdfUrl.value = URL.createObjectURL(blob);
-    }
-    if (ticketPdfUrl.value) {
-      const a = document.createElement("a");
-      a.href = ticketPdfUrl.value;
-      a.download = `${event.value.title || 'ticket'}-${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-  };
+  /* ---------------- BOOK EVENT ---------------- */
 
-  /* -------------------- DARAAJA STK PUSH -------------------- */
-  const bookAndPay = async () => {
+  const bookAndPay = async (phone) => {
     if (!user.value) {
       alert("Please login first");
       return;
     }
 
-    /* -------- PRICE SELECTION -------- */
-
-    if (event.value.TicketQuantity <= 0) {
-      alert('Tickets sold out for this event');
-      return;
-    }
-    if (event.value.status === "cancelled" || event.value.status === "completed") {
-      alert('This event is no longer available for booking');
+    if (!ticketType.value) {
+      alert("Please select a ticket type");
       return;
     }
 
-    // ask phone number
-    const phone = prompt(
-      "Enter your phone number in format 2547XXXXXXXX (M-Pesa)",
-    );
     if (!phone) {
-      alert("Phone number is required to initiate payment");
+      alert("Please enter your phone number");
+      return;
+    }
+
+    if (
+      event.value.status === "cancelled" ||
+      event.value.status === "completed"
+    ) {
+      alert("This event is no longer available");
       return;
     }
 
     try {
       loading.value = true;
-      const res = await $fetch(`${config.public.stkpushApi}`, {
+
+      const res = await $fetch(config.public.stkpushApi, {
         method: "POST",
         body: {
           phone,
-          amount,
-          eventName: event.value.title,
+          eventId: id,
           userEmail: user.value.email,
+          ticketType: ticketType.value,
         },
       });
 
-      alert(
-        "An STK push has been sent to your phone. Enter your M-Pesa PIN to complete the payment. Click OK when done to verify."
-      );
+      alert("STK Push sent. Complete payment on your phone.");
 
-      // verify using returned transactionId
-      // use Daraja CheckoutRequestID for status query
       await verifyPayment(res.checkoutRequestID);
     } catch (err) {
-      console.error(err);
-      alert(err?.data?.statusMessage || "Failed to initiate payment");
+      alert(err?.data?.statusMessage || "Payment initiation failed");
     } finally {
       loading.value = false;
     }
   };
 
+  /* ---------------- DOWNLOAD TICKET ---------------- */
+
+  const downloadTicket = () => {
+    if (!ticketPdfUrl.value) return;
+
+    const a = document.createElement("a");
+    a.href = ticketPdfUrl.value;
+    a.download = `${event.value.title}-ticket.pdf`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   return {
     event,
+    ticketType,
     loading,
     error,
     successMessage,

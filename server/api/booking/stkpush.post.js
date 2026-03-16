@@ -5,98 +5,170 @@ import axios from "axios";
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const body = await readBody(event);
-  const { phone, amount, eventName, userEmail, ticketType } = body;
 
-  if (!phone || !amount || !eventName || !userEmail || !ticketType) {
+  const { phone, eventId, userEmail, ticketType } = body;
+
+  if (!phone || !eventId || !userEmail || !ticketType) {
     throw createError({
       statusCode: 400,
-      statusMessage: "phone, amount, eventName, userEmail and ticketType are required",
+      statusMessage: "phone, eventId, userEmail and ticketType are required",
     });
   }
 
   await connectDB();
 
-  // verify event exists and is bookable
-  const eventData = await Event.findOne({ title: eventName });
-  if (!eventData) {
-    throw createError({ statusCode: 404, statusMessage: "Event not found" });
-  }
-  if (eventData.status === "cancelled" || eventData.status === "completed") {
-    throw createError({ statusCode: 400, statusMessage: "Event is no longer available for booking" });
+  // Normalize phone
+  let formattedPhone = phone.replace(/\D/g, "");
+
+  if (formattedPhone.startsWith("0")) {
+    formattedPhone = "254" + formattedPhone.slice(1);
   }
 
-  const consumerKey = config.darajaConsumerKey;
-  const consumerSecret = config.darajaConsumerSecret;
-  const darajaUrl = config.darajaUrl || "https://sandbox.safaricom.co.ke";
-  const passkey = config.darajaPasskey;
-
-  if (!consumerKey || !consumerSecret || !passkey) {
-    throw createError({ statusCode: 500, statusMessage: "Daraja credentials not configured (missing passkey?)" });
-  }
-
-  // get token
-  let accessToken;
-  try {
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
-    const tokenRes = await axios.get(
-      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
-      { headers: { Authorization: `Basic ${auth}` } }
-    );
-    accessToken = tokenRes.data.access_token;
-  } catch (err) {
-    throw createError({ statusCode: 500, statusMessage: "Failed to obtain Daraja access token" });
-  }
-
-  const transactionId = `MPESA-${Date.now()}`;
-
-  // build STK push request
-  const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
-  const password = Buffer.from(`${config.darajaPartyA}${passkey}${timestamp}`).toString("base64");
-
-  // callback URL must be accessible to Safaricom and usually HTTPS
-  const callbackUrl = `${config.appUrl}/api/booking/mpesa-callback`;
-  if (callbackUrl.startsWith("https://letsbook.vercel.app")) {
-    // running locally: Daraja sandbox will reject this, so warn early
-    console.warn("Using localhost callback URL - Daraja may reject the request");
-  }
-  if (!/^https?:\/\//.test(callbackUrl)) {
+  if (!/^2547\d{8}$/.test(formattedPhone)) {
     throw createError({
-      statusCode: 500,
-      statusMessage: "Invalid CallBackURL configured for Daraja (must be a valid URL)",
+      statusCode: 400,
+      statusMessage: "Invalid phone number format",
     });
   }
 
-  const stkPayload = {
-    BusinessShortCode: config.mpesaShortCode,
+  // Find event
+  const eventData = await Event.findById(eventId);
+
+  if (!eventData) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Event not found",
+    });
+  }
+
+  if (["cancelled", "completed"].includes(eventData.status)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Event not available for booking",
+    });
+  }
+
+  // Verify ticket type
+  let amount = null;
+
+  if (ticketType === "regular") {
+    amount = eventData.regular;
+  }
+
+  if (ticketType === "vip") {
+    amount = eventData.vip;
+  }
+
+  if (ticketType === "vvip") {
+    amount = eventData.vvip;
+  }
+
+  if (!amount) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Ticket type not found",
+    });
+  }
+
+  // Daraja credentials
+  const {
+    darajaConsumerKey,
+    darajaConsumerSecret,
+    darajaPasskey,
+    darajaUrl,
+    mpesaShortCode,
+    appUrl,
+  } = config;
+
+  if (!darajaConsumerKey || !darajaConsumerSecret || !darajaPasskey) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Daraja credentials missing",
+    });
+  }
+
+  // Get access token
+  let accessToken;
+
+  try {
+    const auth = Buffer.from(
+      `${darajaConsumerKey}:${darajaConsumerSecret}`,
+    ).toString("base64");
+
+    const tokenRes = await axios.get(
+      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      },
+    );
+
+    accessToken = tokenRes.data.access_token;
+  } catch (err) {
+    console.error("Token error", err.response?.data);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to get Daraja token",
+    });
+  }
+
+  // Timestamp
+  const date = new Date();
+
+  const timestamp =
+    date.getFullYear() +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    ("0" + date.getDate()).slice(-2) +
+    ("0" + date.getHours()).slice(-2) +
+    ("0" + date.getMinutes()).slice(-2) +
+    ("0" + date.getSeconds()).slice(-2);
+
+  const password = Buffer.from(
+    `${mpesaShortCode}${darajaPasskey}${timestamp}`,
+  ).toString("base64");
+
+  const transactionId = `MPESA-${Date.now()}`;
+
+  const callbackUrl = `${appUrl}/api/booking/mpesa-callback`;
+
+  const payload = {
+    BusinessShortCode: mpesaShortCode,
     Password: password,
     Timestamp: timestamp,
     TransactionType: "CustomerPayBillOnline",
     Amount: amount,
-    PartyA: phone,
-    PartyB: config.mpesaShortCode,
-    PhoneNumber: phone,
+    PartyA: formattedPhone,
+    PartyB: mpesaShortCode,
+    PhoneNumber: formattedPhone,
     CallBackURL: callbackUrl,
-    AccountReference: eventName,
-    TransactionDesc: `Booking ${eventName}`,
-    // embed transactionId so we can track later
-    // some implementations put this in Remarks or AccountReference
+    AccountReference: eventData.title,
+    TransactionDesc: `Ticket booking for ${eventData.title}`,
   };
 
   try {
-    const pushRes = await axios.post(
+    const response = await axios.post(
       `${darajaUrl}/mpesa/stkpush/v1/processrequest`,
-      stkPayload,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
     );
 
     return {
       success: true,
-      checkoutRequestID: pushRes.data.CheckoutRequestID,
+      checkoutRequestID: response.data.CheckoutRequestID,
       transactionId,
-      response: pushRes.data,
+      message: "STK push sent successfully",
     };
   } catch (err) {
-    console.error("STK push error", err.response?.data || err.message);
-    throw createError({ statusCode: 500, statusMessage: "Failed to initiate STK push" });
+    console.error("STK push error:", err.response?.data);
+
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to initiate STK push",
+    });
   }
 });

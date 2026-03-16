@@ -31,11 +31,10 @@
                 Explore Events
               </NuxtLink>
               <NuxtLink
-                v-if="user && user.role === 'admin'"
-                to="/admin/dashboard"
+                to="/"
                 class="px-8 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition duration-200 text-center"
               >
-                Create Event
+                Be Organiser😁
               </NuxtLink>
             </div>
 
