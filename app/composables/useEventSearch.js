@@ -1,4 +1,5 @@
 export default function useEventSearch() {
+  const config = useRuntimeConfig();
   const search = ref("");
   const results = ref([]);
   const isLoading = ref(false);
@@ -11,7 +12,7 @@ export default function useEventSearch() {
 
     isLoading.value = true;
     try {
-      const { data } = await useFetch("/api/search/filter", {
+      const { data } = await useFetch(`${config.public.searchApi}`, {
         params: { q: search.value },
       });
       if (data) {

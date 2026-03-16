@@ -2,6 +2,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
 export default function userUpcomingEvents() {
+  const config = useRuntimeConfig()
   const { token } = useAuth()
   const events = ref([])
   const eventsLoading = ref(true)
@@ -9,7 +10,7 @@ export default function userUpcomingEvents() {
 
   onMounted(async () => {
     try {
-      const res = await $fetch('/api/events/fetch', {
+      const res = await $fetch(`${config.public.upcomingEvents}`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token.value}`,

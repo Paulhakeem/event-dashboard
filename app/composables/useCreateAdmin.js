@@ -1,4 +1,5 @@
 export default function useCreateAdmin() {
+  const config = useRuntimeConfig()
   const { token } = useAuth();
   // form fields
   const firstName = ref("");
@@ -38,7 +39,7 @@ export default function useCreateAdmin() {
       return;
     }
     try {
-      await $fetch("/api/admin/create-admin", {
+      await $fetch(`${config.public.createAdminApi}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token.value}`,

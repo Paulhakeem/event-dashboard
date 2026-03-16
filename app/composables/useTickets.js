@@ -1,9 +1,10 @@
 import { ref, computed } from "vue";
 export default function useTickets() {
+  const config = useRuntimeConfig()
   const { token } = useAuth();
   const tickets = ref([]);
   onMounted(async () => {
-    const res = await $fetch("/api/users/userTickets", {
+    const res = await $fetch(`${config.public.ticketsEvents}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token.value}`,

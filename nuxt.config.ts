@@ -72,7 +72,13 @@ export default defineNuxtConfig({
       usersApi: process.env.USERS_API,
       deleteEvent: process.env.DELETE_EVENT_API,
       updateEvent: process.env.UPDATE_EVENT_API,
-      bookingData: process.env.BOOKING_DATA_API
+      bookingData: process.env.BOOKING_DATA_API,
+      createAdminApi: process.env.CREATE_ADMIN_API,
+      searchApi: process.env.SEARCH_API,
+      approvedEvent: process.env.APPROVED_EVENT_API,
+      rejectedEvents: process.env.REJECTED_EVENTS_API,
+      upcomingEvents: process.env.UPCOMING_EVENTS_API,
+      ticketsEvents: process.env.TICKETS_EVENT_API
     },
   },
 });

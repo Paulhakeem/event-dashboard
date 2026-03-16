@@ -1,4 +1,5 @@
 export default function usePendingEvent() {
+  const config = useRuntimeConfig()
 //  get all the pending events
  const { token } = useAuth();
   const pendingEvents = ref([]);
@@ -11,7 +12,7 @@ export default function usePendingEvent() {
     error.value = null;
 
     try {
-      const res = await $fetch("/api/events/fetch", {
+      const res = await $fetch(`${config.public.pendingEvents}`, {
         headers: {
           Authorization: `Bearer ${token.value}`,
         },
@@ -32,7 +33,7 @@ export default function usePendingEvent() {
   // Approve event
   const approveEvent = async (eventId) => {
     try {
-      await $fetch(`/api/events/${eventId}`, {
+      await $fetch(`${config.public.approvedEvent}/${eventId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token.value}`,
@@ -56,7 +57,7 @@ export default function usePendingEvent() {
     if (!confirm("Are you sure you want to reject this event?")) return;
 
     try {
-      await $fetch(`/api/events/${eventId}`, {
+      await $fetch(`${config.public.rejectedEvents}/${eventId}`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token.value}`,
