@@ -41,7 +41,7 @@ export default defineNuxtConfig({
     // Daraja M-Pesa
     darajaConsumerKey: process.env.MPESA_CONSUMER_KEY,
     darajaConsumerSecret: process.env.MPESA_CONSUMER_SECRET,
-    darajaUrl: process.env.MPESA_URL,
+    darajaUrl: process.env.DARAJA_URL,
     darajaInitiator: process.env.MPESA_INITIATOR,
     darajaSecurityCredential: process.env.MPESA_SECURITY_CREDENTIAL,
     darajaPartyA: process.env.MPESA_PARTY_A,
