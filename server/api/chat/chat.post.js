@@ -1,31 +1,27 @@
-import OpenAI from "openai";
-
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event);
   const config = useRuntimeConfig();
+  const body = await readBody(event);
 
-  if (!body.messages || !Array.isArray(body.messages)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Messages array is required",
-    });
-  }
-
-  const openai = new OpenAI({
-    apiKey: config.openAiApiKey,
+  const response = await $fetch("https://api.deepseek.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.deepseekApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: {
+      model: "deepseek-chat",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant."
+        },
+        {
+          role: "user",
+          content: body.message
+        }
+      ]
+    }
   });
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini", // ✅ valid model
-    messages: [
-      { role: "system", content: "You are a helpful assistant." },
-      ...body.messages,
-    ],
-  });
-
-  const reply =
-    completion.choices?.[0]?.message?.content?.trim() ||
-    "Sorry, I couldn’t generate a response.";
-
-  return { reply };
+  return response;
 });

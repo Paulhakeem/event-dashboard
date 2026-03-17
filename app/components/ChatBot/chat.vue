@@ -1,106 +1,125 @@
 <template>
-  <!-- Chat Icon -->
-  <div class="fixed bottom-5 right-5 cursor-pointer z-50" @click="toggleChat">
-    <div class="relative">
-      <Icon
-        name="mdi:chat"
-        class="text-4xl text-[#16c851] drop-shadow-lg transition-transform duration-300 hover:scale-110"
-      />
-      <!-- Notification Badge -->
-      <span
-        v-if="showBadge"
-        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md"
-      >
-        1
-      </span>
-    </div>
-  </div>
-
-  <!-- Chat Window -->
-  <transition name="fade-scale">
-    <div
-      v-if="isOpen"
-      class="fixed bottom-20 right-5 w-80 h-96 bg-white border border-gray-200 rounded-xl shadow-2xl flex flex-col overflow-hidden z-50"
+  <div>
+    <!-- 💬 Floating Chat Button -->
+    <button
+      @click="toggleChat"
+      class="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition flex items-center justify-center"
     >
-      <!-- Header -->
-      <div
-        class="bg-linear-to-r from-[#16c851] to-[#0ea44f] text-white p-3 font-semibold text-lg flex items-center justify-between"
+      <!-- Chat Icon (SVG) -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
       >
-        <span class="flex items-center">
-          <Icon name="mdi:robot" class="mr-2" />
-          Velora Chatbot
-        </span>
-        <button @click="closeChat">
-          <Icon name="mdi:close" class="text-xl opacity-80 hover:opacity-100" />
-        </button>
-      </div>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 20l1.8-3.6A7.5 7.5 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+    </button>
 
-      <!-- Body -->
+    <!-- 💬 Chat Popup -->
+    <transition name="fade">
       <div
-        ref="chatBody"
-        class="flex-1 p-4 space-y-3 overflow-y-auto bg-gray-50"
+        v-if="open"
+        class="fixed bottom-20 right-6 z-50 w-80 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
       >
-        <div
-          v-for="(msg, index) in messages"
-          :key="index"
-          class="flex"
-          :class="msg.sender === 'user' ? 'justify-end' : 'justify-start'"
-        >
+        <!-- Header -->
+        <div class="bg-green-500 text-white p-4 flex justify-between items-center">
+          <div>
+            <h3 class="font-bold">Chatbot</h3>
+            <p class="text-xs opacity-80">Online</p>
+          </div>
+          <button @click="open = false">✖</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="p-4 space-y-2 bg-gray-50 max-h-64 overflow-y-auto">
           <div
-            class="px-3 py-2 rounded-lg max-w-xs shadow-sm text-sm"
-            :class="
-              msg.sender === 'user'
-                ? 'bg-[#9d4e8a] text-white'
-                : 'bg-gray-200 text-gray-800'
-            "
+            v-for="(msg, i) in messages"
+            :key="i"
+            :class="[
+              'p-2 rounded-lg text-sm max-w-[80%]',
+              msg.from === 'user'
+                ? 'bg-green-500 text-white ml-auto'
+                : 'bg-white shadow'
+            ]"
           >
-            <p class="text-lg font-semibold text-[#16c851]">{{ msg.sender === "user" ? "You " : "Bot " }}</p>
             {{ msg.text }}
           </div>
         </div>
-      </div>
 
-      <!-- Footer -->
-      <div class="flex p-3 border-t bg-white">
-        <input
-          v-model="newMessage"
-          @keyup.enter="sendMessage"
-          type="text"
-          placeholder="Type a message..."
-          class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#16c851]"
-        />
-        <button
-          @click="sendMessage"
-          class="ml-2 px-4 py-2 bg-[#9d4e8a] text-white rounded-lg hover:bg-[#7c3f6f]"
-        >
-          Send
-        </button>
+        <!-- Input -->
+        <div class="p-3 border-t flex gap-2">
+          <input
+            v-model="message"
+            @keyup.enter="sendMessage"
+            type="text"
+            placeholder="Type a message..."
+            class="flex-1 border rounded-lg px-3 py-2 text-sm"
+          />
+          <button
+            @click="sendMessage"
+            class="bg-green-500 text-white px-4 rounded-lg"
+          >
+            Send
+          </button>
+        </div>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </div>
 </template>
 
 <script setup>
-const {
-  isOpen,
-  showBadge,
-  newMessage,
-  chatBody,
-  messages,
-  toggleChat,
-  closeChat,
-  sendMessage,
-} = useChatBot();
+import { ref } from "vue";
+
+const config = useRuntimeConfig();
+
+const open = ref(false);
+const message = ref("");
+const messages = ref([
+  { from: "bot", text: "👋 Hi! Ask me anything." }
+]);
+
+const toggleChat = () => {
+  open.value = !open.value;
+};
+
+const sendMessage = async () => {
+  if (!message.value) return;
+
+  messages.value.push({ from: "user", text: message.value });
+
+  const userMessage = message.value;
+  message.value = "";
+
+  try {
+    const res = await $fetch(`${config.public.chatbotApi}`, {
+      method: "POST",
+      body: { message: userMessage }
+    });
+
+    const reply = res.choices[0].message.content;
+
+    messages.value.push({ from: "bot", text: reply });
+  } catch (err) {
+    messages.value.push({ from: "bot", text: "⚠️ Error getting response" });
+  }
+};
 </script>
 
-<style>
-.fade-scale-enter-active,
-.fade-scale-leave-active {
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
   transition: all 0.25s ease;
 }
-.fade-scale-enter-from,
-.fade-scale-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  transform: scale(0.9);
+  transform: translateY(20px);
 }
 </style>

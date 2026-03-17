@@ -49,7 +49,7 @@ export default defineNuxtConfig({
     appUrl: process.env.APP_URL,
     mpesaShortCode: process.env.MPESA_SHORT_CODE,
     // openAI
-    openAiApiKey: process.env.OPENAI_API_KEY,
+    deepseekApiKey: process.env.DEEPSEEK_API,
 
     public: {
       // 🌍 Client-available (unsafe)

@@ -42,7 +42,8 @@
     "tw-animate-css": "^1.3.8",
     "vite-tsconfig-paths": "^5.1.4",
     "vue": "^3.5.21",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "vue-social-chat": "^0.1.6"
   },
   "devDependencies": {
     "@iconify-json/material-symbols": "^1.2.50",
