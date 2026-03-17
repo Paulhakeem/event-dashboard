@@ -41,7 +41,7 @@ export default function useEventBooking() {
         method: "POST",
         body: {
           reference: checkoutRequestID,
-          eventId: id,
+          eventName: event.value.title,
           userEmail: user.value.email,
           ticketType: ticketType.value,
         },
