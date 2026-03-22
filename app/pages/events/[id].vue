@@ -211,10 +211,9 @@
               @click="handleBooking"
               :disabled="
                 !isBookable ||
-                paymentStatus !== 'idle' ||
-                event.status === 'completed'
+                paymentStatus !== 'idle'
               "
-              class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2"
+              class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
               :class="{
                 'bg-green-500 hover:bg-green-600': paymentStatus === 'idle',
                 'bg-yellow-500': paymentStatus === 'waiting',
