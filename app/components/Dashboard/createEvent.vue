@@ -138,7 +138,7 @@
 
 <script setup>
 const { token } = useAuth();
-
+const config = useRuntimeConfig()
 const form = reactive({
   title: "",
   description: "",
@@ -185,13 +185,15 @@ const submitEvent = async () => {
     formData.append("status", form.status);
     formData.append("image", file.value); // 🖼️ add the file
 
-    const res = await $fetch("/api/upload/post", {
+    const res = await $fetch(`${config.public.createEventApi}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token._value}`,
       },
       body: formData,
     });
+
+    
 
     alert("✅ Event created successfully!");
 

@@ -55,6 +55,7 @@ export default defineNuxtConfig({
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
       // api request
+      createEventApi: process.env.CREATE_EVENT_API,
       eventApi: process.env.EVENT_API,
       bookingEvent: process.env.BOOKING_EVENTS,
       verifyApi: process.env.VERIFY_API,
