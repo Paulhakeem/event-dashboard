@@ -9,6 +9,7 @@ export default function useEventBooking() {
   const ticketType = ref(null);
 
   const loading = ref(false);
+  const paymentStatus = ref("idle");
   const error = ref(null);
   const successMessage = ref(null);
 
@@ -94,7 +95,7 @@ export default function useEventBooking() {
     }
 
     try {
-      loading.value = true;
+      paymentStatus.value = "sending";
 
       const res = await $fetch(config.public.stkpushApi, {
         method: "POST",
@@ -105,14 +106,46 @@ export default function useEventBooking() {
           ticketType: ticketType.value,
         },
       });
+      paymentStatus.value = "waiting";
+      alert("STK Push sent. Enter your M-Pesa PIN to complete payment.");
 
-      alert("STK Push sent. Complete payment on your phone.");
+      // wait before verifying
+      const tryVerify = async (id, retries = 5) => {
+        paymentStatus.value = "verifying";
 
-      await verifyPayment(res.checkoutRequestID);
+        for (let i = 0; i < retries; i++) {
+          try {
+            console.log(`Verification attempt ${i + 1}`);
+
+            await verifyPayment(id);
+
+            // ✅ SUCCESS
+            paymentStatus.value = "success";
+            return;
+          } catch (err) {
+            console.log("Retrying verification...", i + 1);
+
+            // If it's last attempt → fail
+            if (i === retries - 1) {
+              paymentStatus.value = "failed";
+              alert("Payment not confirmed. Please try again.");
+              return;
+            }
+
+            // ⏳ Still waiting for user payment
+            paymentStatus.value = "waiting";
+
+            await new Promise((res) => setTimeout(res, 5000));
+            paymentStatus.value = "verifying";
+          }
+        }
+      };
+
+      tryVerify(res.checkoutRequestID);
     } catch (err) {
+      paymentStatus.value = "failed";
       alert(err?.data?.statusMessage || "Payment initiation failed");
     } finally {
-      loading.value = false;
     }
   };
 
@@ -134,6 +167,7 @@ export default function useEventBooking() {
     event,
     ticketType,
     loading,
+    paymentStatus,
     error,
     successMessage,
     ticketPdfUrl,

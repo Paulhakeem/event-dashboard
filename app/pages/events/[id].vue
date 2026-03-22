@@ -209,17 +209,59 @@
             <!-- PAYMENT BUTTON -->
             <button
               @click="handleBooking"
-              :disabled="!isBookable"
-              class="w-full p-4 rounded-lg text-white font-semibold transition"
-              :class="
-                isBookable
-                  ? 'bg-green-500 hover:bg-green-600'
-                  : 'bg-gray-300 cursor-not-allowed'
-              "
+              :disabled="!isBookable || paymentStatus !== 'idle'"
+              class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2"
+              :class="{
+                'bg-green-500 hover:bg-green-600': paymentStatus === 'idle',
+                'bg-yellow-500': paymentStatus === 'waiting',
+                'bg-blue-500':
+                  paymentStatus === 'verifying' || paymentStatus === 'sending',
+                'bg-green-600': paymentStatus === 'success',
+                'bg-red-500': paymentStatus === 'failed',
+                'bg-gray-400 cursor-not-allowed':
+                  paymentStatus !== 'idle' && paymentStatus !== 'success',
+              }"
             >
-              <span v-if="loading"> Processing... </span>
+              <!-- Spinner -->
+              <svg
+                v-if="
+                  ['sending', 'waiting', 'verifying'].includes(paymentStatus)
+                "
+                class="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                />
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v8H4z"
+                />
+              </svg>
 
-              <span v-else> Pay with M-Pesa </span>
+              <!-- TEXT STATES -->
+              <span v-if="paymentStatus === 'idle'">Pay with M-Pesa</span>
+              <span v-else-if="paymentStatus === 'sending'"
+                >Sending STK...</span
+              >
+              <span v-else-if="paymentStatus === 'waiting'"
+                >Waiting for payment...</span
+              >
+              <span v-else-if="paymentStatus === 'verifying'"
+                >Verifying payment...</span
+              >
+              <span v-else-if="paymentStatus === 'success'"
+                >Payment Successful 🎉</span
+              >
+              <span v-else>Failed ❌ Try Again</span>
             </button>
 
             <!-- ERRORS -->
@@ -242,8 +284,15 @@
 import useEventBooking from "~/composables/bookingEvent";
 import { computed, ref } from "vue";
 
-const { event, loading, error, successMessage, bookAndPay, ticketType } =
-  useEventBooking();
+const {
+  event,
+  loading,
+  paymentStatus,
+  error,
+  successMessage,
+  bookAndPay,
+  ticketType,
+} = useEventBooking();
 
 const { user } = useAuth();
 

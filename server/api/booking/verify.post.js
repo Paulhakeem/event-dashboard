@@ -36,8 +36,7 @@ export default defineEventHandler(async (event) => {
   if (eventData.status === "cancelled" || eventData.status === "completed") {
     throw createError({
       statusCode: 400,
-      statusMessage:
-        "This event is no longer available for booking",
+      statusMessage: "This event is no longer available for booking",
     });
   }
 
@@ -81,14 +80,16 @@ export default defineEventHandler(async (event) => {
   // Get access token
   let accessToken;
   try {
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString(
+      "base64",
+    );
     const tokenResponse = await axios.get(
       `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
       {
         headers: {
           Authorization: `Basic ${auth}`,
         },
-      }
+      },
     );
     accessToken = tokenResponse.data.access_token;
   } catch (err) {
@@ -101,11 +102,16 @@ export default defineEventHandler(async (event) => {
   // query STK push status using CheckoutRequestID
   let darajaData;
   try {
-    const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
-    const password = Buffer.from(`${config.darajaPasskey}${timestamp}`).toString("base64");
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[-:TZ.]/g, "")
+      .slice(0, 14);
+    const password = Buffer.from(
+      `${config.mpesaShortCode}${passkey}${timestamp}`,
+    ).toString("base64");
 
     const queryPayload = {
-      BusinessShortCode: config.darajaPartyA,
+      BusinessShortCode: config.mpesaShortCode,
       Password: password,
       Timestamp: timestamp,
       CheckoutRequestID: reference,
@@ -114,28 +120,34 @@ export default defineEventHandler(async (event) => {
     const checkResponse = await axios.post(
       `${darajaUrl}/mpesa/stkpushquery/v1/query`,
       queryPayload,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
+      { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
-    if (checkResponse.data.ResultCode !== 0 && checkResponse.data.ResultCode !== "0") {
+    if (
+      checkResponse.data.ResultCode !== 0 &&
+      checkResponse.data.ResultCode !== "0"
+    ) {
       throw createError({
         statusCode: 400,
         statusMessage: "M-Pesa STK push verification failed",
       });
     }
-
     darajaData = checkResponse.data;
   } catch (err) {
     throw createError({
       statusCode: 400,
-      statusMessage: err.response?.data?.errorMessage || "Payment verification failed",
+      statusMessage:
+        err.response?.data?.errorMessage || "Payment verification failed",
     });
   }
 
   /* -------------------- AMOUNT VALIDATION -------------------- */
-  const paidAmount = parseInt(
-    darajaData.ResultParameters?.ResultParameter?.find(p => p.Key === "Amount")?.Value
-  ) || expectedAmount;
+  const paidAmount =
+    parseInt(
+      darajaData.ResultParameters?.ResultParameter?.find(
+        (p) => p.Key === "Amount",
+      )?.Value,
+    ) || expectedAmount;
 
   if (paidAmount !== expectedAmount) {
     throw createError({
@@ -143,6 +155,11 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Payment amount mismatch",
     });
   }
+
+  const transactionId =
+    darajaData.ResultParameters?.ResultParameter?.find(
+      (p) => p.Key === "MpesaReceiptNumber",
+    )?.Value || reference;
 
   /* -------------------- PREVENT DUPLICATE BOOKINGS -------------------- */
   const existingBooking = await TotalBooking.findOne({
@@ -158,7 +175,11 @@ export default defineEventHandler(async (event) => {
 
   /* -------------------- DECREMENT TICKET QUANTITY ATOMICALLY -------------------- */
   const updatedEvent = await Event.findOneAndUpdate(
-    { _id: eventData._id, TicketQuantity: { $gt: 0 }, status: { $nin: ["cancelled","completed"] } },
+    {
+      _id: eventData._id,
+      TicketQuantity: { $gt: 0 },
+      status: { $nin: ["cancelled", "completed"] },
+    },
     { $inc: { TicketQuantity: -1 } },
     { new: true },
   );
