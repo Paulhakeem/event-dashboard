@@ -79,7 +79,9 @@ export default defineNuxtConfig({
       approvedEvent: process.env.APPROVED_EVENT_API,
       rejectedEvents: process.env.REJECTED_EVENTS_API,
       upcomingEvents: process.env.UPCOMING_EVENTS_API,
-      ticketsEvents: process.env.TICKETS_EVENT_API
+      ticketsEvents: process.env.TICKETS_EVENT_API,
+      monthlyStatsApi: process.env.MONTHLY_STATS_API,
+      totalAmountApi: process.env.TOTAL_AMOUNT_API
     },
   },
 });
