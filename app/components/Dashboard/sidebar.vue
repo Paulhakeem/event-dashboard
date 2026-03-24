@@ -103,7 +103,7 @@
                 <Icon
                   @click="open = false"
                   name="carbon:close-filled"
-                  class="text-2xl text-gray-200"
+                  class="text-2xl text-gray-200 "
                 />
                 <AdminProfile />
               </div>

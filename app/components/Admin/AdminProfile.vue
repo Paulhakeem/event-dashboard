@@ -95,12 +95,12 @@
         <!-- users & organisers -->
         <div class="grid grid-cols-2 gap-4 w-full pt-10">
           <div class="stat-card hover:border-pink-400">
-            <Icon name="mdi:cash-multiple" class="text-pink-500 text-2xl" />
+            <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
             <p class="stat-number">{{ users.length }}</p>
             <span>Users</span>
           </div>
           <div class="stat-card hover:border-pink-400">
-            <Icon name="mdi:cash-multiple" class="text-pink-500 text-2xl" />
+            <Icon name="eos-icons:admin" class="text-pink-500 text-2xl" />
             <p class="stat-number">1K</p>
             <span>Organisers</span>
           </div>
