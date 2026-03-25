@@ -93,7 +93,12 @@
         </div>
 
         <!-- users & organisers -->
-        <div class="grid grid-cols-2 gap-4 w-full pt-10">
+        <div class="grid grid-cols-3 gap-4 w-full pt-10">
+          <div class="stat-card hover:border-pink-400">
+            <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
+            <p class="stat-number">0</p>
+            <span>Refunded</span>
+          </div>
           <div class="stat-card hover:border-pink-400">
             <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
             <p class="stat-number">{{ users.length }}</p>
@@ -101,7 +106,7 @@
           </div>
           <div class="stat-card hover:border-pink-400">
             <Icon name="eos-icons:admin" class="text-pink-500 text-2xl" />
-            <p class="stat-number">1K</p>
+            <p class="stat-number">{{ getOrganisers.length }}</p>
             <span>Organisers</span>
           </div>
         </div>
@@ -137,6 +142,11 @@ const { booking } = useBookingData();
 // total income
 const config = useRuntimeConfig()
 const total = ref({ total: 0 });
+
+
+const getOrganisers = computed(()=> {
+ return users.value.filter(users => users.role === "organiser")
+})
 
 onMounted(async () => {
   try {
