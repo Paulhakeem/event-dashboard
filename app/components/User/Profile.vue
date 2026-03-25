@@ -1,25 +1,27 @@
 <template>
   <div class="w-full flex justify-center mt-12 px-4">
     <div
-      class="relative w-full max-w-md rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-xl"
+      class="relative w-full max-w-md rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
     >
       <!-- Card -->
       <div
         class="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl rounded-3xl p-8 flex flex-col items-center text-center"
       >
-        <!-- Profile Image -->
+        <!-- Avatar -->
         <div class="relative group">
           <div
-            class="absolute inset-0 rounded-full bg-gradient-to-tr from-pink-500 to-indigo-500 blur-md opacity-60 group-hover:opacity-100 transition"
+            class="absolute inset-0 rounded-full bg-gradient-to-tr from-pink-500 to-indigo-500 blur-xl opacity-70 group-hover:opacity-100 transition"
           ></div>
 
           <img
-            src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80"
-            alt="User Profile"
-            class="relative w-32 h-32 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-lg"
+            :src="
+              user.avatar ||
+              'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80'
+            "
+            class="relative w-28 h-28 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-xl"
           />
 
-          <!-- Online Badge -->
+          <!-- Online badge -->
           <span
             class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
           ></span>
@@ -31,15 +33,15 @@
         </h2>
 
         <!-- Email -->
-        <p class="text-gray-500 dark:text-neutral-400 mt-1 text-sm">
+        <p class="text-gray-500 dark:text-neutral-400 text-sm">
           {{ user.email }}
         </p>
 
-        <!-- Role Badge -->
+        <!-- Role -->
         <span
-          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow"
+          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
-          Active Member
+          {{ user.role || "Member" }}
         </span>
 
         <!-- Divider -->
@@ -49,50 +51,58 @@
 
         <!-- Stats -->
         <div class="grid grid-cols-2 gap-4 w-full">
-          <div
-            class="flex flex-col items-center bg-gradient-to-br from-indigo-50 to-white dark:from-neutral-800 dark:to-neutral-700 rounded-xl px-4 py-4 shadow hover:scale-105 transition"
-          >
-            <Icon
-              name="mdi:calendar-check"
-              class="text-indigo-500 text-3xl mb-1"
-            />
-            <p class="text-lg font-bold text-gray-800 dark:text-white">15</p>
-            <span class="text-xs text-gray-500 dark:text-neutral-300">
-              Events Attended
-            </span>
+          <div class="stat-card">
+            <Icon name="mdi:calendar-check" class="text-indigo-500 text-2xl" />
+            <p class="stat-number">15</p>
+            <span>Attended</span>
           </div>
 
-          <div
-            class="flex flex-col items-center bg-gradient-to-br from-pink-50 to-white dark:from-neutral-800 dark:to-neutral-700 rounded-xl px-4 py-4 shadow hover:scale-105 transition"
-          >
+          <div class="stat-card">
+            <Icon name="mdi:calendar-clock" class="text-pink-500 text-2xl" />
+            <p class="stat-number">3</p>
+            <span>Upcoming</span>
+          </div>
+
+          <div class="stat-card">
             <Icon
-              name="mdi:calendar-clock"
-              class="text-pink-500 text-3xl mb-1"
+              name="mdi:ticket-confirmation"
+              class="text-green-500 text-2xl"
             />
-            <p class="text-lg font-bold text-gray-800 dark:text-white">3</p>
-            <span class="text-xs text-gray-500 dark:text-neutral-300">
-              Pending Events
-            </span>
+            <p class="stat-number">8</p>
+            <span>Bookings</span>
+          </div>
+
+          <div class="stat-card">
+            <Icon name="mdi:cash" class="text-yellow-500 text-2xl" />
+            <p class="stat-number">Ksh {{ totalSpent }}</p>
+            <span>Spent</span>
           </div>
         </div>
 
         <!-- Member Since -->
         <p class="text-gray-400 dark:text-neutral-500 mt-6 text-xs italic">
-          Member since: January 2022
+          Member since: {{ formatDate(user.joinedAt) }}
         </p>
+
+        <!-- Quick Action -->
+        <div
+          class="mt-4 w-full text-left bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl text-sm text-gray-600 dark:text-neutral-300"
+        >
+          🎟 You have <b>2 upcoming events</b> this week
+        </div>
 
         <!-- Buttons -->
         <div class="flex gap-3 mt-6 w-full">
           <button
             @click="editProfile"
-            class="flex-1 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow hover:scale-105 hover:shadow-lg transition"
+            class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
           </button>
 
           <button
             @click="logout"
-            class="flex-1 py-2 rounded-xl border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-white text-sm font-semibold hover:bg-gray-100 dark:hover:bg-neutral-800 transition"
+            class="flex-1 py-2.5 rounded-xl border border-gray-300 dark:border-neutral-600 text-gray-700 dark:text-white text-sm font-semibold hover:bg-gray-100 dark:hover:bg-neutral-800 transition"
           >
             Logout
           </button>
@@ -105,7 +115,19 @@
 <script setup>
 const { user, logout } = useAuth();
 
-const editProfile = () => {
-  // handle profile edit
+const editProfile = () => {};
+
+// format date
+const formatDate = (date) => {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString("en-KE", {
+    month: "long",
+    year: "numeric",
+  });
 };
+
+const { booking } = useBookingData();
+const totalSpent = computed(() => {
+  return booking.value.reduce((total, b) => total + (b.amount || 0), 0);
+});
 </script>

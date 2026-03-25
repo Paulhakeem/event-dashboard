@@ -88,23 +88,22 @@
             class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
           >
             <div
-              class="w-full bg-white/10 backdrop-blur-lg rounded-t-2xl shadow-xl p-6 animate-slide-up border border-white/20"
+             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50"
             >
-              <div class="flex justify-end mb-4">
-                <button
-                  @click="open = false"
-                  class="text-gray-500 hover:text-red-500"
-                >
-                  ✕
-                </button>
-              </div>
+              <button
+                @click="open = false"
+                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 transition shadow-sm cursor-pointer"
+              >
+                ✕
+              </button>
 
-              <div>
-                <Icon
-                  @click="open = false"
-                  name="carbon:close-filled"
-                  class="text-2xl text-gray-200 "
-                />
+              <!-- Optional drag handle (nice UX) -->
+              <div
+                class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"
+              ></div>
+
+              <!-- Content -->
+              <div class="mt-2">
                 <AdminProfile />
               </div>
             </div>
