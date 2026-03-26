@@ -126,12 +126,12 @@ const { token } = useAuth();
 const booking = ref([]);
 const loadingBookings = ref(false);
 const errorBookings = ref(null);
-
+const config = useRuntimeConfig()
 const getBookings = async () => {
   loadingBookings.value = true;
   errorBookings.value = null;
   try {
-    const response = await $fetch("/api/organiser/bookedEvents/booking", {
+    const response = await $fetch(`${config.public.organiserBookingEvents}`, {
       headers: {
         Authorization: `Bearer ${token._value}`,
       },

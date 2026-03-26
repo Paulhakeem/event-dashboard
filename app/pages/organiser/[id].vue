@@ -134,7 +134,41 @@
         </ul>
       </div>
 
-      <ProfileInfo />
+      <div
+        class="sticky bottom-0 bg-white border-t border-gray-200 p-4 cursor-pointer"
+      >
+        <ProfileInfo @click="openProfile" />
+      </div>
+      <transition
+          enter-active-class="animate-slide-up"
+          leave-active-class="animate-slide-down"
+        >
+          <div
+            v-if="open"
+            class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
+          >
+            <div
+             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50"
+            >
+              <button
+                @click="open = false"
+                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 transition shadow-sm cursor-pointer"
+              >
+                ✕
+              </button>
+
+              <!-- Optional drag handle (nice UX) -->
+              <div
+                class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"
+              ></div>
+
+              <!-- Content -->
+              <div class="mt-2">
+                <OrganiserProfile/>
+              </div>
+            </div>
+          </div>
+        </transition>
     </aside>
 
     <!-- Main Content -->
@@ -202,4 +236,43 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", checkMobile);
 });
+
+// open profile
+const open = ref(false);
+
+const openProfile = () => {
+  open.value = !open.value;
+};
 </script>
+<style>
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-in forwards;
+}
+</style>
+ 

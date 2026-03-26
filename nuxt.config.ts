@@ -81,7 +81,9 @@ export default defineNuxtConfig({
       upcomingEvents: process.env.UPCOMING_EVENTS_API,
       ticketsEvents: process.env.TICKETS_EVENT_API,
       monthlyStatsApi: process.env.MONTHLY_STATS_API,
-      totalAmountApi: process.env.TOTAL_AMOUNT_API
+      totalAmountApi: process.env.TOTAL_AMOUNT_API,
+      organiserBookedEvents: process.env.ORGANISER_BOOKED_EVENTS_API,
+      organiserBookingEvents: process.env.ORGANISER_BOOKING_EVENTS_API
     },
   },
 });

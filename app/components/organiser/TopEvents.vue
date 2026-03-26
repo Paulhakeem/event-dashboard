@@ -74,12 +74,13 @@ const { token } = useAuth();
 const BookedEvent = ref([]);
 const loading = ref(false);
 const error = ref("");
+const config = useRuntimeConfig()
 
 // fetch booked events data from API and get top 5 events by total bookings
 const fetchBookedEvents = async () => {
   try {
     loading.value = true;
-    const res = await $fetch("/api/organiser/bookedEvents/bookings", {
+    const res = await $fetch(`${config.public.organiserBookingEvents}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token.value}`,

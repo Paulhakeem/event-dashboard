@@ -110,12 +110,12 @@ const totalIncome = computed(() => {
     return total + regularIncome + vipIncome + vvipIncome;
   }, 0);
 });
-
+const config = useRuntimeConfig()
 // get total booked events
 watch(
   events,
   async () => {
-    const res = await $fetch("/api/organiser/totalBookedEvents", {
+    const res = await $fetch(`${config.public.organiserBookedEvents}`, {
       headers: {
         Authorization: `Bearer ${token._value}`,
       },

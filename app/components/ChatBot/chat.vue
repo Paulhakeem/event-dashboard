@@ -29,9 +29,14 @@
         class="fixed bottom-20 right-6 z-50 w-80 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
       >
         <!-- Header -->
-        <div class="bg-green-500 text-white p-4 flex justify-between items-center">
+        <div
+          class="bg-green-500 text-white p-4 flex justify-between items-center"
+        >
           <div>
-            <h3 class="font-bold">Chatbot</h3>
+            <div class="flex gap-2 items-center">
+              <Icon name="mage:robot-fill" class="text-xl" />
+              <h3 class="font-bold">Velora AI assistant</h3>
+            </div>
             <p class="text-xs opacity-80">Online</p>
           </div>
           <button @click="open = false">✖</button>
@@ -46,7 +51,7 @@
               'p-2 rounded-lg text-sm max-w-[80%]',
               msg.from === 'user'
                 ? 'bg-green-500 text-white ml-auto'
-                : 'bg-white shadow'
+                : 'bg-white shadow',
             ]"
           >
             {{ msg.text }}
@@ -81,9 +86,7 @@ const config = useRuntimeConfig();
 
 const open = ref(false);
 const message = ref("");
-const messages = ref([
-  { from: "bot", text: "👋 Hi! Ask me anything." }
-]);
+const messages = ref([{ from: "bot", text: "👋 Hi! Looking for an event🤷‍♂️?." }]);
 
 const toggleChat = () => {
   open.value = !open.value;
@@ -100,7 +103,7 @@ const sendMessage = async () => {
   try {
     const res = await $fetch(`${config.public.chatbotApi}`, {
       method: "POST",
-      body: { message: userMessage }
+      body: { message: userMessage },
     });
 
     const reply = res.choices[0].message.content;
