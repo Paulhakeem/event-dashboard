@@ -59,7 +59,7 @@
           <path d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <p class="text-2xl font-bold mt-2">{{ totalBookedEvents }}</p>
+      <p class="text-2xl font-bold mt-2">{{ totalBookedEvents.length }}</p>
       <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
@@ -90,6 +90,8 @@ const { events } = organiserEvents();
 const { token } = useAuth();
 const cancelledEvents = ref([]);
 const totalBookedEvents = ref([]);
+const totalIncome = ref(0);
+const config = useRuntimeConfig()
 // cancelled events
 watch(
   events,
@@ -102,15 +104,19 @@ watch(
 );
 
 // total amaunt for all events
-const totalIncome = computed(() => {
-  return events.value.reduce((total, event) => {
-    const regularIncome = (event.regular || 0) * (event.TicketQuantity || 0);
-    const vipIncome = (event.vip || 0) * (event.TicketQuantity || 0);
-    const vvipIncome = (event.vvip || 0) * (event.TicketQuantity || 0);
-    return total + regularIncome + vipIncome + vvipIncome;
-  }, 0);
-});
-const config = useRuntimeConfig()
+watch(
+  events,
+  async () => {
+    const res = await $fetch(`${config.public.organiserTotalAmount}`, {
+      headers: {
+        Authorization: `Bearer ${token._value}`,
+      },
+    });
+    totalIncome.value = res.totalIncome;
+  },
+  { immediate: true },
+);
+
 // get total booked events
 watch(
   events,

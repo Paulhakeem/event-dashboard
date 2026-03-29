@@ -61,7 +61,7 @@
               name="mdi:ticket-confirmation"
               class="text-green-500 text-2xl"
             />
-            <p class="stat-number">{{ totalBookedEvents }}</p>
+            <p class="stat-number">{{ totalBookedEvents.length }}</p>
             <span>Booked</span>
           </div>
 
@@ -101,10 +101,24 @@
           </div>
         </div>
 
+        <!-- Update Profile Modal -->
+        <Transition name="fade">
+          <div
+            v-if="open"
+            @click.self="open = false"
+            class="fixed inset-0 bg-black/10 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 w-full max-w-md"
+            >
+              <ProfileUpdateProfile />
+            </div>
+          </div>
+        </Transition>
         <!-- Buttons -->
         <div class="flex gap-3 mt-8 w-full">
           <button
-            @click="editProfile"
+            @click="toggle"
             class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
@@ -122,16 +136,22 @@
   </div>
 </template>
 <script setup>
+import ProfileUpdateProfile from "../Profile/update-profile.vue";
 const { user, logout, token } = useAuth();
 const { events } = organiserEvents();
 const { cancelledEvents } = fetchCancelledEvents();
 const { pendingEvents } = usePendingEvent();
-const { booking } = useBookingData();
 
 // total income
 const config = useRuntimeConfig();
 const total = ref({ total: 0 });
 const totalBookedEvents = ref([]);
+
+// open update profile modal
+const open = ref(false);
+const toggle = () => {
+  open.value = !open.value;
+};
 
 watch(
   events,
@@ -147,6 +167,18 @@ watch(
 );
 
 // total amount
+watch(
+  events,
+  async () => {
+    const res = await $fetch(`${config.public.organiserTotalAmount}`, {
+      headers: {
+        Authorization: `Bearer ${token._value}`,
+      },
+    });
+    total.value.total = res.totalIncome;
+  },
+  { immediate: true },
+);
 
 // get events with ongoing status
 const ongoingEvents = computed(() => {
@@ -156,3 +188,15 @@ const editProfile = () => {
   // handle profile edit
 };
 </script>
+
+<style>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.25s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+</style>

@@ -26,5 +26,5 @@ export default defineEventHandler(async (event) => {
             message: err.message,
         });
     }
-  
+
 })
