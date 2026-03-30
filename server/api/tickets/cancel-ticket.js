@@ -3,6 +3,7 @@ import { User } from "~~/server/models/User";
 import { CancelledTicket } from "~~/server/models/CancelledTickets";
 import connectDB from "~~/server/utils/mongoose";
 import { requireAuth } from "~~/server/utils/requireAuth";
+import nodemailer from "nodemailer";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -31,4 +32,9 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     throw createError({ statusCode: 500, message: error.message });
   }
+
+
+// Send cancellation email to the user
+
+
 });

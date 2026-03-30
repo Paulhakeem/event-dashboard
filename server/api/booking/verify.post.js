@@ -209,6 +209,7 @@ export default defineEventHandler(async (event) => {
     ticketCode,
     eventName: eventData.title,
     userEmail: userData.email,
+    userId: userData._id,
     bookingId: booking._id,
     ticketType,
     amount: expectedAmount,
