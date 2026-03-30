@@ -67,22 +67,31 @@
 
 <script setup>
 const { firstName, lastName, loading, updateProfile } = profileEditing();
-
+const { token } = useAuth();
+const config = useRuntimeConfig();
+77;
 // delete account logic
 const deleteAccount = async () => {
-  const res = await fetch("/api/profile/delete-profile", {
+  // are you sure?
+  if (
+    !confirm(
+      "Are you sure you want to delete your account? This action cannot be undone.",
+    )
+  ) {
+    return;
+  }
+  const res = await fetch(`${config.public.profileDeleteApi}`, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json",
+      Authorization: `Bearer ${token.value}`,
     },
   });
 
   if (res.ok) {
-    // are you sure?
-    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      return;
-    }
-    window.location.href = "/login";
+    // Redirect to homepage or login page after deletion using nuxt router
+    const router = useRouter();
+    alert("Your account has been deleted successfully.");
+    router.push("/login");
   } else {
     // Handle error
     const errorData = await res.json();

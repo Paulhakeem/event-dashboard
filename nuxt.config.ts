@@ -85,6 +85,7 @@ export default defineNuxtConfig({
       organiserBookingEvents: process.env.ORGANISER_BOOKED_EVENTS_API,
       organiserTotalAmount: process.env.ORGANISER_TOTAL_AMOUNT_API,
       profileUpdateApi: process.env.PROFILE_UPDATE_API,
+      profileDeleteApi: process.env.PROFILE_DELETE_API,
     },
   },
 });

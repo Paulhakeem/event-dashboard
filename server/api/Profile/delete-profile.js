@@ -14,13 +14,13 @@ export default defineEventHandler(async (event) => {
   try {
     // check if user is organizer and delete events if they are an organizer
     if (user.role === "organiser") {
-      await Event.deleteMany({ organizer: user._id });
+      await Event.deleteMany({ organizer: user.id });
     }
 
     // Delete the user
-    await User.findByIdAndDelete(user._id);
+    await User.findByIdAndDelete(user.id);
     // Delete all bookings associated with the user
-    await TotalBooking.deleteMany({ userId: user._id });
+    await TotalBooking.deleteMany({ userId: user.id });
     return {
       message: "Profile and associated bookings deleted successfully",
     };

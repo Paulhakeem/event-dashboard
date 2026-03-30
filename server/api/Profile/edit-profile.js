@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
-      user._id,
+      user.id,
       { firstName, lastName },
       { new: true, runValidators: true, context: "query" }
     );
@@ -35,4 +35,4 @@ export default defineEventHandler(async (event) => {
     console.error("Error updating profile:", err);
     throw createError({ statusCode: err.statusCode || 500, message: err.message || "Unable to update profile" });
   }
-});
+})

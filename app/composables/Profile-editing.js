@@ -3,12 +3,16 @@ export const profileEditing = () => {
   const firstName = ref("");
   const lastName = ref("");
   const loading = ref(false);
-
+  const { token } = useAuth();
   const updateProfile = async () => {
     loading.value = true;
     try {
       const response = await $fetch(`${config.public.profileUpdateApi}`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token.value}`,
+        },
         body: {
           firstName: firstName.value,
           lastName: lastName.value,
