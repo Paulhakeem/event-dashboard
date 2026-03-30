@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-center mt-12 px-4">
     <div
-      class="relative w-full max-w-md rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
+      class="relative w-full max-w-lg rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
     >
       <!-- Card -->
       <div
@@ -36,10 +36,13 @@
         <p class="text-gray-500 dark:text-neutral-400 text-sm">
           {{ user.email }}
         </p>
-
+        <!-- Member Since -->
+        <p class="text-gray-400 dark:text-neutral-500 text-xs italic">
+          Member since: {{ formatDate(user.joinedAt) }}
+        </p>•
         <!-- Role -->
         <span
-          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class=" px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
           {{ user.role || "Member" }}
         </span>
@@ -50,7 +53,7 @@
         ></div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 gap-4 w-full">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">
           <div class="stat-card">
             <Icon name="mdi:calendar-check" class="text-indigo-500 text-2xl" />
             <p class="stat-number">15</p>
@@ -71,6 +74,14 @@
             <p class="stat-number">8</p>
             <span>Bookings</span>
           </div>
+          <div class="stat-card">
+            <Icon
+              name="ri:live-fill"
+              class="text-red-500 text-2xl"
+            />
+            <p class="stat-number">8</p>
+            <span>Live Events</span>
+          </div>
 
           <div class="stat-card">
             <Icon name="mdi:cash" class="text-yellow-500 text-2xl" />
@@ -79,22 +90,32 @@
           </div>
         </div>
 
-        <!-- Member Since -->
-        <p class="text-gray-400 dark:text-neutral-500 mt-6 text-xs italic">
-          Member since: {{ formatDate(user.joinedAt) }}
-        </p>
-
         <!-- Quick Action -->
         <div
-          class="mt-4 w-full text-left bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl text-sm text-gray-600 dark:text-neutral-300"
+          class="mt-4 w-full text-center bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl text-sm text-gray-600 dark:text-neutral-300"
         >
           🎟 You have <b>2 upcoming events</b> this week
         </div>
 
+        <!-- Update Profile Modal -->
+        <Transition name="fade">
+          <div
+            v-if="open"
+            @click.self="open = false"
+            class="fixed inset-0 bg-black/10 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 w-full max-w-md"
+            >
+              <ProfileUpdateProfile />
+            </div>
+          </div>
+        </Transition>
+
         <!-- Buttons -->
         <div class="flex gap-3 mt-6 w-full">
           <button
-            @click="editProfile"
+            @click="toggle"
             class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
@@ -115,7 +136,11 @@
 <script setup>
 const { user, logout } = useAuth();
 
-const editProfile = () => {};
+// open update profile modal
+const open = ref(false);
+const toggle = () => {
+  open.value = !open.value;
+};
 
 // format date
 const formatDate = (date) => {

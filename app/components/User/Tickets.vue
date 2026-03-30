@@ -77,6 +77,12 @@
             <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
               {{ ticket.amount }} Ksh
             </span>
+           <!-- cancel ticket button   -->
+            <button
+              class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium hover:bg-red-200 transition cursor-pointer"
+            >
+              Cancel Ticket
+            </button>
           </div>
         </div>
       </div>

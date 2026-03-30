@@ -3,6 +3,7 @@ const TicketSchema = new mongoose.Schema({
  ticketCode: { type: String, required: true, unique: true },
  eventName: { type: String, required: true },
  userEmail: { type: String, required: true },
+ userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
  bookingId: { type: mongoose.Schema.Types.ObjectId, ref: 'TotalBooking', required: true },
  ticketType: { type: String, required: true },
  amount: { type: Number, required: true },
