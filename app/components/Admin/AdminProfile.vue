@@ -111,10 +111,25 @@
           </div>
         </div>
 
+        <!-- Update Profile Modal -->
+        <Transition name="fade">
+          <div
+            v-if="open"
+            @click.self="open = false"
+            class="fixed inset-0 bg-black/10 flex items-center justify-center z-50"
+          >
+            <div
+              class="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 w-full max-w-md"
+            >
+              <ProfileUpdateProfile />
+            </div>
+          </div>
+        </Transition>
+
         <!-- Buttons -->
         <div class="flex gap-3 mt-8 w-full">
           <button
-            @click="editProfile"
+           @click="toggle"
             class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
@@ -132,6 +147,7 @@
   </div>
 </template>
 <script setup>
+
 const { user, logout } = useAuth();
 const { users } = totalUsers();
 const { events } = totalEvents();
@@ -140,13 +156,18 @@ const { pendingEvents } = usePendingEvent();
 const { booking } = useBookingData();
 
 // total income
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 const total = ref({ total: 0 });
 
+// open update profile modal
+const open = ref(false);
+const toggle = () => {
+  open.value = !open.value;
+};
 
-const getOrganisers = computed(()=> {
- return users.value.filter(users => users.role === "organiser")
-})
+const getOrganisers = computed(() => {
+  return users.value.filter((users) => users.role === "organiser");
+});
 
 onMounted(async () => {
   try {
