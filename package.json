@@ -49,6 +49,7 @@
     "@iconify-json/material-symbols": "^1.2.50",
     "@iconify-json/mdi": "^1.2.3",
     "@iconify-json/meteor-icons": "^1.2.1",
+    "@iconify-json/svg-spinners": "^1.2.4",
     "@types/node": "^24.5.2",
     "baseline-browser-mapping": "^2.9.18",
     "oxc-parser": "^0.96.0",

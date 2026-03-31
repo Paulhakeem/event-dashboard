@@ -79,6 +79,7 @@
             </span>
            <!-- cancel ticket button   -->
             <button
+              @click="cancelTicket(ticket._id)"
               class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium hover:bg-red-200 transition cursor-pointer"
             >
               Cancel Ticket
@@ -91,8 +92,9 @@
 </template>
 
 <script setup>
+import useTicketCancellation from '~/composables/ticketCancellation';
 
-
+ const { cancelTicket }= useTicketCancellation();
 const { tickets, filterOptions, activeFilter, filteredTickets } = useTickets();
 
 </script>

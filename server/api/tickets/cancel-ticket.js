@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // 2. Ensure the logged-in user owns the ticket (optional but recommended)
-    if (ticket.userId.toString() !== authUser.id.toString()) {
+    if (ticket.userId !== authUser.id) {
       throw createError({ statusCode: 403, message: "Unauthorized action" });
     }
 
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
     // 5. Save cancelled ticket
     const cancelledTicket = new CancelledTicket({
       user: user._id,
-      event: ticket.event,
+      event: ticket.eventId,
       amount: ticket.amount,
     });
     await cancelledTicket.save();
@@ -81,7 +81,7 @@ export default defineEventHandler(async (event) => {
       subject: "Ticket Cancelled Notification",
       html: `
         <h3>Ticket Cancellation</h3>
-        <p>A ticket has been cancelled for ${eventDetails.name}. Here are the user details:</p>
+         <p>A ticket has been cancelled for ${eventDetails.name}. Here are the user details:</p>
         <p><strong>User Name:</strong> ${user.firstName} ${user.lastName}</p>
         <p><strong>User Email:</strong> ${user.email}</p>
         <p><strong>Refund Amount:</strong> ${ticket.amount}</p>

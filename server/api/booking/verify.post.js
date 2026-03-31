@@ -208,6 +208,7 @@ export default defineEventHandler(async (event) => {
   await Ticket.create({
     ticketCode,
     eventName: eventData.title,
+    eventId: eventData._id,
     userEmail: userData.email,
     userId: userData._id,
     bookingId: booking._id,
