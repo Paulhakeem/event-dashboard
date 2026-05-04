@@ -1,15 +1,35 @@
 import { Event } from "../models/Events.js";
 
-// Update any events whose date has passed and are not yet marked as completed.
-// This can be called from request handlers or a scheduled job.
-export async function markPastEventsCompleted() {
+// Update events based on their dates
+// Mark today's events as "live" and past events as "completed"
+export async function updateEventStatuses() {
   try {
     const now = new Date();
+    
+    // Get today's date range (start and end of day)
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    
+    // Mark today's events as live
     await Event.updateMany(
-      { date: { $lt: now }, status: { $ne: "completed" } },
+      {
+        date: { $gte: todayStart, $lt: todayEnd },
+        status: { $ne: "completed" }
+      },
+      { $set: { status: "live" } }
+    );
+    
+    // Mark past events as completed
+    await Event.updateMany(
+      { date: { $lt: todayStart }, status: { $ne: "completed" } },
       { $set: { status: "completed" } }
     );
   } catch (err) {
-    console.error("Error updating past event statuses:", err);
+    console.error("Error updating event statuses:", err);
   }
+}
+
+// Legacy function for backwards compatibility
+export async function markPastEventsCompleted() {
+  await updateEventStatuses();
 }

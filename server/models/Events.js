@@ -12,7 +12,7 @@ const eventSchema = new mongoose.Schema({
   vvip: { type: Number, default: 0 },
   status: {
     type: String,
-    enum: ["upcoming", "ongoing", "completed", "cancelled", "pending"],
+    enum: ["upcoming", "ongoing", "completed", "cancelled", "pending", "live"],
     default: "upcoming",
   },
   eventType: {
@@ -28,13 +28,27 @@ const eventSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-// whenever events are queried, ensure any past events are marked completed
+// whenever events are queried, ensure statuses are updated based on dates
 eventSchema.pre(/^find/, async function(next) {
   try {
     const now = new Date();
-    // this.model is already the Model instance for the current query
+    
+    // Get today's date range (start and end of day)
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    
+    // Mark today's events as live
     await this.model.updateMany(
-      { date: { $lt: now }, status: { $ne: "completed" } },
+      {
+        date: { $gte: todayStart, $lt: todayEnd },
+        status: { $ne: "completed" }
+      },
+      { $set: { status: "live" } }
+    );
+    
+    // Mark past events as completed
+    await this.model.updateMany(
+      { date: { $lt: todayStart }, status: { $ne: "completed" } },
       { $set: { status: "completed" } }
     );
   } catch (err) {

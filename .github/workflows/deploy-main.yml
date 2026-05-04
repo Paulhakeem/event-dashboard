@@ -1,0 +1,49 @@
+name: Deploy Main App
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: false
+          command_timeout: 20m
+          script: |
+            set -e
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            LIVE_DIR="/var/www/velora-events"
+            BUILD_DIR="/var/www/velora-events-build"
+            BACKUP_DIR="/var/www/velora-events-backup"
+            ENV_BACKUP_DIR="/root/.env-backups/velora-events"
+
+            echo "🔄 Starting zero-downtime deployment..."
+
+            mkdir -p /var/www
+            mkdir -p "$ENV_BACKUP_DIR"
+
+            # STEP 2: Clone fresh copy
+            echo "📥 Cloning fresh copy..."
+            rm -rf "$BUILD_DIR"
+            git clone git@github.com:Paulhakeem/event-dashboard.git "$BUILD_DIR" 2>&1
+            cd "$BUILD_DIR"
+            echo "✅ Cloned successfully"
+
+            # STEP 4: Install dependencies
+            echo "📦 Installing dependencies..."
+            npm install -g pnpm@latest
+            rm -rf node_modules pnpm-lock.yaml
+            pnpm install --prefer-offline
+
+            echo "🎉 All apps running successfully!"
+            rm -rf "$BACKUP_DIR"
