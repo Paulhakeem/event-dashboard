@@ -1,12 +1,15 @@
-name: Deploy Main App
+name: Deploy Velora Events
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
@@ -25,24 +28,77 @@ jobs:
             BUILD_DIR="/var/www/velora-events-build"
             BACKUP_DIR="/var/www/velora-events-backup"
             ENV_BACKUP_DIR="/root/.env-backups/velora-events"
+            ENV_SAFE="$ENV_BACKUP_DIR/.env"
 
             echo "🔄 Starting zero-downtime deployment..."
+            mkdir -p /var/www "$ENV_BACKUP_DIR"
 
-            mkdir -p /var/www
-            mkdir -p "$ENV_BACKUP_DIR"
+            # ── 1. Backup .env from /var/www/velora-events BEFORE anything ──
+            echo "💾 Backing up .env from live directory..."
+            if [ -f "$LIVE_DIR/.env" ]; then
+              TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+              cp "$LIVE_DIR/.env" "$ENV_SAFE"
+              cp "$LIVE_DIR/.env" "$ENV_BACKUP_DIR/.env.$TIMESTAMP"
+              # Keep only the 5 most recent timestamped backups
+              ls -t "$ENV_BACKUP_DIR"/.env.* 2>/dev/null | tail -n +6 | xargs -r rm --
+              echo "✅ .env backed up from $LIVE_DIR (timestamped: $TIMESTAMP)"
+            elif [ -f "$ENV_SAFE" ]; then
+              echo "⚠️  No live .env found in $LIVE_DIR — existing backup at $ENV_SAFE will be used"
+            else
+              echo "❌ No .env found anywhere — please manually place a .env in $LIVE_DIR or $ENV_SAFE before deploying"
+              exit 1
+            fi
 
-            # STEP 2: Clone fresh copy
+            # ── 2. Clone fresh copy ──────────────────────────────────────────
             echo "📥 Cloning fresh copy..."
             rm -rf "$BUILD_DIR"
-            git clone git@github.com:Paulhakeem/event-dashboard.git "$BUILD_DIR" 2>&1
-            cd "$BUILD_DIR"
-            echo "✅ Cloned successfully"
+            git clone git@github-velora:Paulhakeem/event-dashboard.git "$BUILD_DIR"
+            echo "✅ Cloned"
 
-            # STEP 4: Install dependencies
+            # ── 3. Retrieve .env into the build ─────────────────────────────
+            echo "🔑 Retrieving .env into build..."
+            if [ -f "$ENV_SAFE" ]; then
+              cp "$ENV_SAFE" "$BUILD_DIR/.env"
+              echo "✅ .env restored from backup into $BUILD_DIR"
+            else
+              echo "❌ No .env backup found — aborting"
+              exit 1
+            fi
+
+            # ── 4. Install dependencies & build ─────────────────────────────
             echo "📦 Installing dependencies..."
+            cd "$BUILD_DIR"
             npm install -g pnpm@latest
-            rm -rf node_modules pnpm-lock.yaml
-            pnpm install --prefer-offline
+            pnpm install --frozen-lockfile
+            echo "🏗️  Building Nuxt app..."
+            pnpm run build
+            echo "✅ Build complete"
 
-            echo "🎉 All apps running successfully!"
+            # ── 5. Swap live directory (zero-downtime) ───────────────────────
+            echo "🔁 Swapping live directory..."
             rm -rf "$BACKUP_DIR"
+            [ -d "$LIVE_DIR" ] && mv "$LIVE_DIR" "$BACKUP_DIR"
+            mv "$BUILD_DIR" "$LIVE_DIR"
+            echo "✅ Directory swapped"
+
+            # ── 6. Fix permissions ───────────────────────────────────────────
+            chown -R www-data:www-data "$LIVE_DIR"
+            chmod -R 755 "$LIVE_DIR"
+            # Lock down the .env file
+            chmod 600 "$LIVE_DIR/.env"
+
+            # ── 7. Restart app with PM2 ──────────────────────────────────────
+            echo "♻️  Restarting app with PM2..."
+            cd "$LIVE_DIR"
+            pm2 startOrReload ecosystem.config.js --update-env
+            pm2 save
+            pm2 is-active --quiet velora-events \
+              && echo "✅ PM2 velora-events is running" \
+              || { echo "❌ PM2 failed to start"; pm2 logs velora-events --lines 20; exit 1; }
+
+            # ── 8. Reload Nginx ──────────────────────────────────────────────
+            nginx -t && systemctl reload nginx
+            echo "✅ Nginx reloaded"
+
+            echo ""
+            echo "🎉 Deployment complete!"
