@@ -65,10 +65,7 @@ jobs:
               exit 1
             fi
 
-            # ── 4. Set Node memory limit via .npmrc ──────────────────────────
-            echo "node-options=--max-old-space-size=6144" >> "$BUILD_DIR/.npmrc"
-
-            # ── 5. Install dependencies & build ─────────────────────────────
+            # ── 4. Install dependencies & build ─────────────────────────────
             echo "📦 Installing dependencies..."
             cd "$BUILD_DIR"
             npm install -g pnpm@latest
@@ -79,29 +76,29 @@ jobs:
             pnpm run build
             echo "✅ Build complete"
 
-            # ── 6. Swap live directory (zero-downtime) ───────────────────────
+            # ── 5. Swap live directory (zero-downtime) ───────────────────────
             echo "🔁 Swapping live directory..."
             rm -rf "$BACKUP_DIR"
             [ -d "$LIVE_DIR" ] && mv "$LIVE_DIR" "$BACKUP_DIR"
             mv "$BUILD_DIR" "$LIVE_DIR"
             echo "✅ Directory swapped"
 
-            # ── 7. Fix permissions ───────────────────────────────────────────
+            # ── 6. Fix permissions ───────────────────────────────────────────
             chown -R www-data:www-data "$LIVE_DIR"
             chmod -R 755 "$LIVE_DIR"
             # Lock down the .env file
             chmod 600 "$LIVE_DIR/.env"
 
-            # ── 8. Restart app with PM2 ──────────────────────────────────────
+            # ── 7. Restart app with PM2 ──────────────────────────────────────
             echo "♻️  Restarting app with PM2..."
             cd "$LIVE_DIR"
-            pm2 startOrReload ecosystem.config.js --update-env
+            pm2 startOrReload ecosystem.config.cjs --update-env
             pm2 save
             pm2 is-active --quiet velora-events \
               && echo "✅ PM2 velora-events is running" \
               || { echo "❌ PM2 failed to start"; pm2 logs velora-events --lines 20; exit 1; }
 
-            # ── 9. Reload Nginx ──────────────────────────────────────────────
+            # ── 8. Reload Nginx ──────────────────────────────────────────────
             nginx -t && systemctl reload nginx
             echo "✅ Nginx reloaded"
 
