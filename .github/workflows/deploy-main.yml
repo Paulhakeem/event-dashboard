@@ -69,7 +69,7 @@ jobs:
             echo "📦 Installing dependencies..."
             cd "$BUILD_DIR"
             npm install -g pnpm@latest
-            pnpm install --frozen-lockfile
+            pnpm install --no-frozen-lockfile
             echo "🏗️  Building Nuxt app..."
             pnpm run build
             echo "✅ Build complete"
