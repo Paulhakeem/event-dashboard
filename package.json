@@ -3,12 +3,12 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "vercel-build": "nuxt build"
+    "vercel-build": "NODE_OPTIONS=--max-old-space-size=6144 nuxt build"
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
