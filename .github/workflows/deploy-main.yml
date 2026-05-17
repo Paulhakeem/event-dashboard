@@ -69,7 +69,9 @@ jobs:
             echo "📦 Installing dependencies..."
             cd "$BUILD_DIR"
             npm install -g pnpm@latest
-            pnpm install --no-frozen-lockfile
+            pnpm install --no-frozen-lockfile --ignore-scripts
+            pnpm approve-builds --yes
+            pnpm rebuild
             echo "🏗️  Building Nuxt app..."
             pnpm run build
             echo "✅ Build complete"
