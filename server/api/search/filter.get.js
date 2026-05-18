@@ -1,4 +1,3 @@
-import { requireAuth } from "~~/server/utils/requireAuth.js";
 import connectDB from "~~/server/utils/mongoose.js";
 import { Event } from "~~/server/models/Events";
 
@@ -15,7 +14,7 @@ export default defineEventHandler(async (event) => {
   try {
     const events = await Event.find({
       $or: [
-        { name: { $regex: search, $options: "i" } },
+        { title: { $regex: search, $options: "i" } },
         { description: { $regex: search, $options: "i" } },
         { location: { $regex: search, $options: "i" } },
       ],

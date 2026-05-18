@@ -57,7 +57,7 @@
 
     <ul v-else class="space-y-4">
       <li
-        v-for="event in eventPosters"
+        v-for="event in ongoingEvents"
         :key="event._id"
         class="border p-4 rounded"
       >

@@ -34,7 +34,7 @@ export default function updateEvent(eventsRef = null) {
       image: ev.image || "",
       title: ev.title || "",
       description: ev.description || "",
-      date: ev.date ? new Date(ev.date).toISOString().substr(0, 10) : "",
+      date: ev.date ? new Date(ev.date).toISOString().slice(0, 10) : "",
       location: ev.location || "",
       TicketQuantity: ev.TicketQuantity || 0,
       regular: ev.regular || 0,

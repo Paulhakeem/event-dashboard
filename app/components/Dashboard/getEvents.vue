@@ -15,6 +15,7 @@
                 <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">Event Type</th>
+                <th scope="col" class="px-6 py-4 text-white">Capacity</th>
                 <th scope="col" class="px-6 py-4 text-white">Status</th>
                 <th scope="col" class="px-6 py-4 text-white">Edit Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Delete Event</th>
@@ -49,8 +50,14 @@
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
                   {{ event.eventType }}
                 </td>
+                <td class="whitespace-nowrap px-6 py-4 font-medium">
+                  <span :class="event.ticketsRemaining === 0 ? 'text-red-500' : event.ticketsRemaining < 10 ? 'text-yellow-500' : 'text-green-500'">
+                    {{ event.ticketsSold || 0 }}/{{ event.TicketQuantity || 0 }}
+                  </span>
+                </td>
                 <td
-                  class="whitespace-nowrap px-6 py-4 font-medium text-green-500"
+                  class="whitespace-nowrap px-6 py-4 font-medium"
+                  :class="statusClass(event.status)"
                 >
                   {{ event.status }}
                 </td>
@@ -73,10 +80,10 @@
                 </td>
               </tr>
               <tr v-if="loading">
-                <td colspan="4" class="text-center py-4">Loading events...</td>
+                <td colspan="11" class="text-center py-4">Loading events...</td>
               </tr>
               <tr v-if="!loading && events.length === 0">
-                <td colspan="4" class="text-center py-4">No events found.</td>
+                <td colspan="11" class="text-center py-4">No events found.</td>
               </tr>
             </tbody>
           </table>
@@ -260,6 +267,18 @@ const {
   closeEdit,
   submitUpdate,
 } = updateEvent(events);
+
+const statusClass = (status) => {
+  const map = {
+    upcoming: 'text-blue-500',
+    ongoing: 'text-yellow-500',
+    live: 'text-green-500',
+    completed: 'text-gray-500',
+    cancelled: 'text-red-500',
+    pending: 'text-orange-500',
+  };
+  return map[status] || 'text-gray-500';
+};
 </script>
 
 <style scoped>

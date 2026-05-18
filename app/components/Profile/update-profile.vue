@@ -69,7 +69,6 @@
 const { firstName, lastName, loading, updateProfile } = profileEditing();
 const { token } = useAuth();
 const config = useRuntimeConfig();
-77;
 // delete account logic
 const deleteAccount = async () => {
   // are you sure?

@@ -1,25 +1,28 @@
+import { CancelledTicket } from "~~/server/models/CancelledTickets";
+import connectDB from "~~/server/utils/mongoose.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
-import connectDB from "../../utils/mongoose.js";
-import { TotalBooking } from "../../models/totalBooking.js";
 
 export default defineEventHandler(async (event) => {
   await requireAuth(event);
   await connectDB();
+
   try {
-    const totalAmount = await TotalBooking.aggregate([
-      { $match: { status: { $in: ["success", "confirmed"] } } },
+    const result = await CancelledTicket.aggregate([
       {
         $group: {
           _id: null,
-          amount: { $sum: "$amount" },
+          count: { $sum: 1 },
+          totalRefunded: { $sum: "$amount" },
         },
       },
     ]);
 
-    const total = totalAmount[0]?.amount || 0;
+    const summary = result[0] || { count: 0, totalRefunded: 0 };
+
     return {
       success: true,
-      total,
+      cancelledCount: summary.count,
+      totalRefunded: summary.totalRefunded,
     };
   } catch (error) {
     throw createError({

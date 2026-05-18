@@ -121,7 +121,7 @@ watch(
 watch(
   events,
   async () => {
-    const res = await $fetch(`${config.public.organiserBookedEvents}`, {
+    const res = await $fetch(`${config.public.organiserBookingEvents}`, {
       headers: {
         Authorization: `Bearer ${token._value}`,
       },

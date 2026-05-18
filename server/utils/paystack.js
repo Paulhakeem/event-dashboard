@@ -1,5 +1,6 @@
 import Paystack from "paystack";
 
-const config = useRuntimeConfig();
-
-export const paystack = Paystack(config.paystackSecretKey);
+export function getPaystack() {
+  const config = useRuntimeConfig();
+  return Paystack(config.paystackSecretKey);
+}

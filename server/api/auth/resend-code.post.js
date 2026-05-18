@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import connectDB from "../../utils/mongoose";
+import connectDB from "../../utils/mongoose.js";
 import { User } from "../../models/User";
 
 export default defineEventHandler(async (event) => {

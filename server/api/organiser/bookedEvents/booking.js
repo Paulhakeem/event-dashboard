@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   }
   try {
     const bookings = await TotalBooking.find({
-      organiserEmail: user.email,
+      organiserId: user.id,
     }).sort({ createdAt: -1 });
     return { bookings };
   } catch (err) {

@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
-    role: "organiser",
+    role: "admin",
     isEmailVerified: false,
     emailVerificationCode: verificationCode,
     emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins
@@ -109,19 +109,15 @@ export default defineEventHandler(async (event) => {
   
     /* ---------- RESPONSE (NO TOKEN YET) ---------- */
     return {
-      message: "Registration successful. Verify your email to continue.",
+      success: true,
+      message: "Admin created successfully. Verify their email to continue.",
       email,
+      admin: {
+        id: admin._id,
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+        role: admin.role,
+      },
     };
-
-  return {
-    success: true,
-    message: "organiser created successfully",
-    admin: {
-      id: admin._id,
-      firstName: admin.firstName,
-      lastName: admin.lastName,
-      email: admin.email,
-      role: admin.role,
-    },
-  };
 });

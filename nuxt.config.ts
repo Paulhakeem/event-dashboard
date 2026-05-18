@@ -27,7 +27,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
-    cloundinaryPresetName: process.env.CLOUNDINARY_PRESET_NAME,
+    cloudinaryPresetName: process.env.CLOUDINARY_PRESET_NAME,
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     // 🔒 Server-only (safe)
     mongoUrl: process.env.CONNECTION_STR,
@@ -48,6 +48,8 @@ export default defineNuxtConfig({
     darajaPasskey: process.env.MPESA_PASSKEY,
     appUrl: process.env.APP_URL,
     mpesaShortCode: process.env.MPESA_SHORT_CODE,
+    // paystack
+    paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     // openAI
     deepseekApiKey: process.env.DEEPSEEK_API,
 
@@ -69,6 +71,7 @@ export default defineNuxtConfig({
       organiserEvents: process.env.ORGANISER_EVENTS_API,
       organiserCreateEventApi: process.env.ORGANISER_CREATE_EVENT_API,
       organiserNotifications: process.env.ORGANISER_NOTIFICATIONS_API,
+      pendingEventApi: process.env.PENDING_EVENT_API,
       totalEventsApi: process.env.TOTAL_EVENTS_API,
       usersApi: process.env.USERS_API,
       deleteEvent: process.env.DELETE_EVENT_API,
@@ -87,6 +90,7 @@ export default defineNuxtConfig({
       profileUpdateApi: process.env.PROFILE_UPDATE_API,
       profileDeleteApi: process.env.PROFILE_DELETE_API,
       ticketCancelApi: process.env.TICKET_CANCEL_API,
+      cancelledSummaryApi: process.env.CANCELLED_SUMMARY_API,
     },
   },
 });

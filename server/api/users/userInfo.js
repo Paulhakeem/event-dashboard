@@ -1,6 +1,6 @@
-import connectDB from "~~/server/utils/mongoose";
+import connectDB from "~~/server/utils/mongoose.js";
 import { TotalBooking } from "../../models/totalBooking.js";
-import { requireAuth } from "~~/server/utils/requireAuth";
+import { requireAuth } from "~~/server/utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -10,7 +10,6 @@ export default defineEventHandler(async (event) => {
 
   try {
     const bookings = await TotalBooking.find({userEmail: user.email})
-      .populate("eventName")
       .sort({ bookedAt: -1 })
       .lean();
 

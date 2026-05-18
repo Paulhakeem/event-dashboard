@@ -22,26 +22,31 @@ export default function getBookingEvents() {
   // aggregate total bookings and income by event
   const aggregateBookings = async () => {
     loading.value = true;
-    const res = await $fetch(`${config.public.bookedEvents}`);
-    const eventMap = {};
-    if (res.success && res.events) {
-      res.events.forEach((event) => {
-        if (!eventMap[event.name]) {
-          eventMap[event.name] = {
-            name: event.name,
-            totalBookings: 0,
-            totalIncome: 0,
-          };
-        }
-        eventMap[event.name].totalBookings += event.totalBookings;
-        eventMap[event.name].totalIncome += event.totalIncome;
-      });
+    try {
+      const res = await $fetch(`${config.public.bookedEvents}`);
+      const eventMap = {};
+      if (res.success && res.events) {
+        res.events.forEach((event) => {
+          if (!eventMap[event.name]) {
+            eventMap[event.name] = {
+              name: event.name,
+              totalBookings: 0,
+              totalIncome: 0,
+            };
+          }
+          eventMap[event.name].totalBookings += event.totalBookings;
+          eventMap[event.name].totalIncome += event.totalIncome;
+        });
 
-      eventsBooked.value = Object.values(eventMap)
-        .sort((a, b) => b.totalBookings - a.totalBookings)
-        .slice(0, 5);
+        eventsBooked.value = Object.values(eventMap)
+          .sort((a, b) => b.totalBookings - a.totalBookings)
+          .slice(0, 5);
+      }
+    } catch (err) {
+      error.value = "Failed to fetch booked events data";
+    } finally {
+      loading.value = false;
     }
-    error.value = "Failed to fetch booked events data";
   };
   return {
     loading,

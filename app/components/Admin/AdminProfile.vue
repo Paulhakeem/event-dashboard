@@ -79,7 +79,7 @@
 
           <div class="stat-card hover:border-purple-400">
             <Icon name="mdi:calendar-star" class="text-purple-500 text-2xl" />
-            <p class="stat-number">3</p>
+            <p class="stat-number">{{ liveCount }}</p>
             <span>Live</span>
           </div>
 
@@ -96,7 +96,7 @@
         <div class="grid grid-cols-3 gap-4 w-full pt-10">
           <div class="stat-card hover:border-pink-400">
             <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
-            <p class="stat-number">0</p>
+            <p class="stat-number">{{ cancelledSummary?.cancelledCount || 0 }}</p>
             <span>Refunded</span>
           </div>
           <div class="stat-card hover:border-pink-400">
@@ -169,6 +169,12 @@ const getOrganisers = computed(() => {
   return users.value.filter((users) => users.role === "organiser");
 });
 
+const liveCount = computed(() => {
+  return events.value.filter((e) => e.status === "live").length;
+});
+
+const cancelledSummary = ref({ cancelledCount: 0, totalRefunded: 0 });
+
 onMounted(async () => {
   try {
     const res = await $fetch(`${config.public.totalAmountApi}`);
@@ -178,6 +184,14 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error fetching total amount:", error);
     total.value = { total: 0 };
+  }
+  try {
+    const res = await $fetch(`${config.public.cancelledSummaryApi}`);
+    if (res?.success) {
+      cancelledSummary.value = res;
+    }
+  } catch (error) {
+    console.error("Error fetching cancelled summary:", error);
   }
 });
 

@@ -26,7 +26,7 @@
         <BarChart
           :data="RevenueData"
           :height="290"
-          :widh="1000"
+          :width="1000"
           :categories="RevenueCategoriesMultple"
           :y-axis="['events', 'users']"
           :group-padding="0"

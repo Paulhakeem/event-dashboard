@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   const user = await requireAuth(event);
 
   if (!user) {
-    throw createError({ statusCode: 401, message: "Unauthorized" });
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
   if (user.role !== "organiser") {
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
   } catch (err) {
     throw createError({
       statusCode: 500,
-      message: err.message,
+      statusMessage: err.message,
     });
   }
 });

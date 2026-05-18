@@ -111,9 +111,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Method not allowed",
     });
   } catch (error) {
-    return {
+    throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.message,
-    };
+      statusMessage: error.statusMessage || error.message,
+    });
   }
 });

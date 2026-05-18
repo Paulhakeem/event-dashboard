@@ -12,7 +12,7 @@ export default function usePendingEvent() {
     error.value = null;
 
     try {
-      const res = await $fetch(`${config.public.pendingEvents}`, {
+      const res = await $fetch(`${config.public.pendingEventApi}`, {
         headers: {
           Authorization: `Bearer ${token.value}`,
         },

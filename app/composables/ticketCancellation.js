@@ -2,9 +2,9 @@
   const { token } = useAuth();
   const config = useRuntimeConfig();
   const cancelTicket = async (ticketId) => {
-    confirm(
-      "Are you sure you want to cancel this ticket? This action cannot be undone.•",
-     );
+    if (!confirm(
+      "Are you sure you want to cancel this ticket? This action cannot be undone.",
+     )) return;
     try {
       const response = await $fetch(`${config.public.ticketCancelApi}`, {
         method: "POST",

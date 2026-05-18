@@ -46,18 +46,22 @@ export default defineEventHandler(async (event) => {
     await Ticket.findByIdAndDelete(ticketId);
 
     // 7. Setup email transporter
-    const transporter = nodemailer.createTransport({
-      host: config.smtpHost,
-      port: Number(config.smtpPort),
-      secure: false,
-      auth: {
-        user: config.emailUsername,
-        pass: config.emailPass,
-      },
-    });
+    let transporter = null;
+    if (config.smtpHost && config.emailUsername && config.emailPass) {
+      transporter = nodemailer.createTransport({
+        host: config.smtpHost,
+        port: Number(config.smtpPort),
+        secure: false,
+        auth: {
+          user: config.emailUsername,
+          pass: config.emailPass,
+        },
+      });
+    }
 
     // 8. Send email to user
-    await transporter.sendMail({
+    if (transporter) {
+      await transporter.sendMail({
       from: `"Velora Events" <${config.emailUsername}>`,
       to: user.email,
       subject: "Ticket Cancellation Confirmation",
@@ -73,24 +77,25 @@ export default defineEventHandler(async (event) => {
     });
 
     // 9. Send email to admin
-    const admin = await User.findOne({ role: "admin" });
+      const admin = await User.findOne({ role: "admin" });
 
-    await transporter.sendMail({
-      from: `"Velora Events" <${config.emailUsername}>`,
-      to: admin.email,
-      subject: "Ticket Cancelled Notification",
-      html: `
-        <h3>Ticket Cancellation</h3>
-         <p>A ticket has been cancelled for ${eventDetails.name}. Here are the user details:</p>
-        <p><strong>User Name:</strong> ${user.firstName} ${user.lastName}</p>
-        <p><strong>User Email:</strong> ${user.email}</p>
-        <p><strong>Refund Amount:</strong> ${ticket.amount}</p>
-      `,
-    });
+      await transporter.sendMail({
+        from: `"Velora Events" <${config.emailUsername}>`,
+        to: admin.email,
+        subject: "Ticket Cancelled Notification",
+        html: `
+          <h3>Ticket Cancellation</h3>
+           <p>A ticket has been cancelled for ${eventDetails.name}. Here are the user details:</p>
+          <p><strong>User Name:</strong> ${user.firstName} ${user.lastName}</p>
+          <p><strong>User Email:</strong> ${user.email}</p>
+          <p><strong>Refund Amount:</strong> ${ticket.amount}</p>
+        `,
+      });
+    }
 
     return {
       message:
-        "Ticket cancelled, refund processed, and emails sent successfully",
+        "Ticket cancelled, refund processed",
     };
   } catch (error) {
     throw createError({

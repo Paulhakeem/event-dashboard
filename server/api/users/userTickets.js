@@ -1,6 +1,6 @@
-import connectDB from "~~/server/utils/mongoose";
+import connectDB from "~~/server/utils/mongoose.js";
 import { Ticket } from "../../models/Ticket.js";
-import { requireAuth } from "~~/server/utils/requireAuth";
+import { requireAuth } from "~~/server/utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -13,7 +13,6 @@ export default defineEventHandler(async (event) => {
 
   try {
     const tickets = await Ticket.find({ userEmail: user?.email })
-      .populate("eventName")
       .sort({ createdAt: -1 })
       .lean();
 

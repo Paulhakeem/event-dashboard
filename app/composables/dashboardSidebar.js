@@ -13,7 +13,6 @@ export const dashboardSidebar = () => {
     { name: "Users", icon: "majesticons:users", component: Users },
     { name: "Events", icon: "material-symbols:event", component: Events },
     {name: "Notifications", icon: "material-symbols:notifications", component: Notifications},
-    { name: "Statistics", icon: "tabler:graph-filled", component: Events },
   ];
 
   return { sidebarMenu };
