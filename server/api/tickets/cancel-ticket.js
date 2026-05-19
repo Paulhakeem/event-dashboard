@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
       html: `
         <h2>Ticket Cancelled</h2>
         <p>Hello ${user.name || "User"},</p>
-        <p>Your ticket cancellation for ${eventDetails.name} has been processed.</p>
+        <p>Your ticket cancellation for ${eventDetails.title} has been processed.</p>
           <p><strong>You will be refunded:</strong> ${ticket.amount} <span style="color: red;">(This amount will be credited back to your account within 5-7 business days)</span></p>
         
         <br/>
@@ -79,18 +79,20 @@ export default defineEventHandler(async (event) => {
     // 9. Send email to admin
       const admin = await User.findOne({ role: "admin" });
 
-      await transporter.sendMail({
+      if (admin) {
+        await transporter.sendMail({
         from: `"Velora Events" <${config.emailUsername}>`,
         to: admin.email,
         subject: "Ticket Cancelled Notification",
         html: `
           <h3>Ticket Cancellation</h3>
-           <p>A ticket has been cancelled for ${eventDetails.name}. Here are the user details:</p>
+           <p>A ticket has been cancelled for ${eventDetails.title}. Here are the user details:</p>
           <p><strong>User Name:</strong> ${user.firstName} ${user.lastName}</p>
           <p><strong>User Email:</strong> ${user.email}</p>
           <p><strong>Refund Amount:</strong> ${ticket.amount}</p>
         `,
       });
+      }
     }
 
     return {

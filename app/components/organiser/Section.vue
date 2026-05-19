@@ -109,7 +109,7 @@ watch(
   async () => {
     const res = await $fetch(`${config.public.organiserTotalAmount}`, {
       headers: {
-        Authorization: `Bearer ${token._value}`,
+        Authorization: `Bearer ${token.value}`,
       },
     });
     totalIncome.value = res.totalIncome;
@@ -123,7 +123,7 @@ watch(
   async () => {
     const res = await $fetch(`${config.public.organiserBookingEvents}`, {
       headers: {
-        Authorization: `Bearer ${token._value}`,
+        Authorization: `Bearer ${token.value}`,
       },
     });
     totalBookedEvents.value = res.totalBookedEvents;

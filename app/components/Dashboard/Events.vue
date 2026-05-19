@@ -18,7 +18,7 @@
         >
           <button
             :class="[
-              'px-6 py-3 text-sm font-semibold leading-5 rounded-lg transition-all duration-200',
+              'px-6 py-3 text-sm font-semibold leading-5 rounded-lg transition-all flex items-center duration-200',
               'ring-white/60 focus:outline-none',
               selected
                 ? 'bg-[#9c4e8b] text-white shadow-md'
@@ -38,6 +38,11 @@
             <Icon
               v-else-if="category === 'Booked Events'"
               name="material-symbols:confirmation-number"
+              class="inline mr-2"
+            />
+            <Icon
+              v-else-if="category === 'Cancelled Events'"
+              name="material-symbols:cancel"
               class="inline mr-2"
             />
             {{ category }}
@@ -111,6 +116,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import createEvent from "./createEvent.vue";
 import totalEvents from "../Dashboard/getEvents.vue";
 import BookedEvents from "./BookedEvents.vue";
+import CancelledEvents from "./CancelledEvents.vue";
 
 const categories = ref({
   Events: [
@@ -129,6 +135,12 @@ const categories = ref({
     {
       id: 1,
       component: BookedEvents,
+    },
+  ],
+  "Cancelled Events": [
+    {
+      id: 1,
+      component: CancelledEvents,
     },
   ],
 });
