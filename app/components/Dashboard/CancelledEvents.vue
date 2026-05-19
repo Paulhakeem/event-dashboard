@@ -117,13 +117,6 @@
               <div class="text-sm text-gray-600">
                 Seats: {{ event.TicketQuantity }}
               </div>
-              <div class="flex items-center gap-2">
-                <NuxtLink
-                  :to="`/eventPage/${event._id}`"
-                  class="text-indigo-600 hover:underline"
-                  >View</NuxtLink
-                >
-              </div>
             </div>
           </div>
         </div>
