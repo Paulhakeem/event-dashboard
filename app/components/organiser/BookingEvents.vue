@@ -35,25 +35,23 @@
 
         <tbody class="divide-y">
           <tr
-            v-for="booking in booking"
-            :key="booking._id"
+            v-for="b in bookings"
+            :key="b._id"
             class="hover:bg-gray-50 transition"
           >
             <!-- EVENT -->
             <td class="px-6 py-4">
               <p class="font-medium text-gray-900 truncate max-w-55">
-                {{ booking.name }}
+                {{ b.name }}
               </p>
             </td>
 
             <!-- LOCATION -->
-            <td class="px-6 py-4 text-gray-600">
-              📍 {{ booking.location }}
-            </td>
+            <td class="px-6 py-4 text-gray-600">📍 {{ b.location }}</td>
 
             <!-- DATE -->
             <td class="px-6 py-4 text-gray-600">
-              {{ formatDate(booking.bookedAt) }}
+              {{ formatDate(b.bookedAt) }}
             </td>
 
             <!-- TICKETS -->
@@ -61,7 +59,7 @@
               <span
                 class="inline-flex items-center justify-center min-w-10 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700"
               >
-                {{ booking.ticketsBooked }}
+                {{ b.ticketsBooked }}
               </span>
             </td>
           </tr>
@@ -97,7 +95,7 @@
 
       <!-- EMPTY STATE -->
       <div
-        v-if="!loadingBookings && booking.length === 0 && !errorBookings"
+        v-if="!loadingBookings && bookings.length === 0 && !errorBookings"
         class="flex flex-col items-center justify-center py-16 text-center"
       >
         <div
@@ -123,20 +121,21 @@
 
 <script setup>
 const { token } = useAuth();
-const booking = ref([]);
+const bookings = ref([]);
 const loadingBookings = ref(false);
 const errorBookings = ref(null);
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 const getBookings = async () => {
   loadingBookings.value = true;
   errorBookings.value = null;
   try {
     const response = await $fetch(`${config.public.organiserBookingEvents}`, {
       headers: {
-        Authorization: `Bearer ${token._value}`,
+        Authorization:
+          token && token.value ? `Bearer ${token.value}` : undefined,
       },
     });
-    booking.value = response.bookings;
+    bookings.value = response?.bookings || [];
   } catch (err) {
     errorBookings.value = "An error occurred while fetching bookings";
   } finally {

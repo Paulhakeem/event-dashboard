@@ -60,7 +60,7 @@
     >
       <article
         v-for="(event, index) in topBookedEvents"
-        :key="event.eventName || index"
+        :key="event.title || index"
         class="group overflow-hidden rounded-4xl border border-slate-200 bg-linear-to-br from-white via-slate-50 to-slate-100 p-5 shadow-lg shadow-slate-200/40 transition hover:-translate-y-1 hover:shadow-xl"
       >
         <div class="flex items-center justify-between gap-4">
@@ -69,7 +69,7 @@
               Rank {{ index + 1 }}
             </p>
             <h3 class="mt-2 text-xl font-semibold text-slate-900">
-              {{ event.eventName || "Unnamed event" }}
+              {{ event.title }}
             </h3>
           </div>
           <div
