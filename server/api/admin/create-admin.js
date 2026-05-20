@@ -23,7 +23,7 @@ const isSpamEmail = (email) => {
 };
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   // 🔐 Require authenticated user
   await requireAuth(event);
 
@@ -51,11 +51,11 @@ export default defineEventHandler(async (event) => {
   }
 
   if (isSpamEmail(email)) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Disposable or invalid email is not allowed",
-      });
-    }
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Disposable or invalid email is not allowed",
+    });
+  }
 
   // 🚫 Prevent duplicate admins
   const existingUser = await User.findOne({ email });
@@ -78,46 +78,46 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
-    role: "admin",
+    role: "organiser",
     isEmailVerified: false,
     emailVerificationCode: verificationCode,
     emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins
   });
 
-   /* ---------- SEND EMAIL ---------- */
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: config.emailUsername,
-        pass: config.emailPass,
-      },
-    });
-  
-    await transporter.sendMail({
-      from: `"Velora Events" <${config.emailUsername}>`,
-      to: email,
-      subject: "Verify your email",
-      html: `
+  /* ---------- SEND EMAIL ---------- */
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: config.emailUsername,
+      pass: config.emailPass,
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"Velora Events" <${config.emailUsername}>`,
+    to: email,
+    subject: "Verify your email",
+    html: `
         <h2>Email Verification</h2>
         <p>Your verification code:</p>
         <h1>${verificationCode}</h1>
         <p>Expires in 10 minutes</p>
       `,
-    });
-  
-    /* ---------- RESPONSE (NO TOKEN YET) ---------- */
-    return {
-      success: true,
-      message: "Admin created successfully. Verify their email to continue.",
-      email,
-      admin: {
-        id: admin._id,
-        firstName: admin.firstName,
-        lastName: admin.lastName,
-        email: admin.email,
-        role: admin.role,
-      },
-    };
+  });
+
+  /* ---------- RESPONSE (NO TOKEN YET) ---------- */
+  return {
+    success: true,
+    message: "Admin created successfully. Verify their email to continue.",
+    email,
+    admin: {
+      id: admin._id,
+      firstName: admin.firstName,
+      lastName: admin.lastName,
+      email: admin.email,
+      role: admin.role,
+    },
+  };
 });

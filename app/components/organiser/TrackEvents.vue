@@ -133,6 +133,7 @@
     <!-- booked event list -->
 
     <OrganiserBookingEvents />
+    <OrganiserTopBookedEvents />
   </div>
 </template>
 
