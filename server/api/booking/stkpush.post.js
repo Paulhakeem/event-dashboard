@@ -2,6 +2,17 @@ import connectDB from "../../utils/mongoose.js";
 import { Event } from "~~/server/models/Events";
 import axios from "axios";
 
+const sanitizeForMpesa = (str) => {
+  return str
+    .replace(/&/g, "and") // & breaks XML
+    .replace(/'/g, "") // apostrophes can break SOAP
+    .replace(/"/g, "") // quotes too
+    .replace(/[<>]/g, "") // XML tags
+    .replace(/[^\w\s\-\.]/g, "") // any other special chars
+    .trim()
+    .slice(0, 12); // Safaricom recommends max 12 chars
+};
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const body = await readBody(event);
@@ -142,8 +153,8 @@ export default defineEventHandler(async (event) => {
     PartyB: mpesaShortCode,
     PhoneNumber: formattedPhone,
     CallBackURL: callbackUrl,
-    AccountReference: eventData.title,
-    TransactionDesc: `Ticket booking for ${eventData.title}`,
+    AccountReference: sanitizeForMpesa(eventData.title),
+    TransactionDesc: `Booking ${sanitizeForMpesa(eventData.title)}`,
   };
 
   try {
@@ -164,7 +175,12 @@ export default defineEventHandler(async (event) => {
       message: "STK push sent successfully",
     };
   } catch (err) {
-    console.error("STK push error:", err.response?.data);
+    console.error(
+      "STK push error FULL:",
+      JSON.stringify(err.response?.data, null, 2),
+    );
+    console.error("STK push status:", err.response?.status);
+    console.error("STK push payload sent:", JSON.stringify(payload, null, 2));
 
     throw createError({
       statusCode: 500,

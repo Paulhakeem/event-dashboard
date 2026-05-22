@@ -69,7 +69,7 @@
             :key="event.name || index"
             class="border-b hover:bg-gray-50"
           >
-            <td class="py-2">{{ event.name }}</td>
+            <td class="py-2">{{ event.eventName }}</td>
             <td class="py-2">{{ event.totalBookings }}</td>
             <td class="py-2">{{ event.totalIncome }}</td>
           </tr>
@@ -96,17 +96,21 @@ const fetchBookedEvents = async () => {
     const res = await $fetch(`${config.public.organiserBookingEvents}`, {
       method: "GET",
       headers: {
-        Authorization:
-          token && token.value ? `Bearer ${token.value}` : undefined,
+        Authorization: `Bearer ${token.value}`,
       },
     });
 
-    const bookings = Array.isArray(res?.bookings) ? res.bookings : [];
+    console.log("API response for booked events:", res);
+    const bookings = Array.isArray(res)
+      ? res
+      : Array.isArray(res?.bookings)
+        ? res.bookings
+        : [];
 
     if (bookings.length > 0) {
       const eventMap = {};
       bookings.forEach((booking) => {
-        const eventName = booking.eventName || booking.name || "Unnamed event";
+        const eventName = booking.eventName;
         const eventId = eventName;
 
         if (!eventMap[eventId]) {
