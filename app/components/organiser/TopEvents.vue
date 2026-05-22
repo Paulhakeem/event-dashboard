@@ -67,7 +67,7 @@
           <tr
             v-for="(event, index) in bookedEvents"
             :key="event.name || index"
-            class="border-b hover:bg-gray-50"
+            class="border-b hover:bg-gray-50 overflow-y-auto max-h-96"
           >
             <td class="py-2">{{ event.eventName }}</td>
             <td class="py-2">{{ event.totalBookings }}</td>
@@ -137,7 +137,6 @@ const fetchBookedEvents = async () => {
     loading.value = false;
   }
 };
-
 onMounted(() => {
   fetchBookedEvents();
 });
