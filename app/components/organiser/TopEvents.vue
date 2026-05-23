@@ -1,81 +1,80 @@
 <template>
   <div class="bg-white p-6 rounded-lg shadow">
-    <h2 class="text-lg font-semibold mb-4">Top Events Booked Events</h2>
-    <table class="w-full text-sm text-left">
-      <thead>
-        <tr class="text-gray-500 border-b">
-          <th>Event Name</th>
-          <th>Total Booking</th>
-          <th>Total Income (Ksh)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-if="loading">
-          <tr>
-            <td colspan="3" class="px-6 py-12">
-              <div
-                class="flex flex-col items-center justify-center text-gray-500"
-              >
-                <div
-                  class="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-[#9c4e8b]"
-                ></div>
-                <p class="mt-3 text-sm font-medium">Loading booked events...</p>
-              </div>
-            </td>
-          </tr>
-        </template>
+    <h2 class="text-lg font-semibold mb-4">Top Booked Events</h2>
 
-        <template v-else-if="error">
-          <tr>
-            <td colspan="3" class="px-6 py-10">
-              <div
-                class="flex flex-col items-center justify-center rounded-lg bg-red-50 border border-red-200 p-6"
-              >
-                <div
-                  class="w-12 h-12 flex items-center justify-center rounded-full bg-red-100 text-red-600 text-lg"
-                >
-                  ⚠️
-                </div>
-                <p class="mt-3 text-sm font-semibold text-red-700">
-                  Something went wrong
-                </p>
-                <p class="text-xs text-red-600 mt-1 text-center">{{ error }}</p>
-                <button
-                  @click="fetchBookedEvents"
-                  class="mt-4 px-4 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 cursor-pointer transition"
-                >
-                  Retry
-                </button>
-              </div>
-            </td>
-          </tr>
-        </template>
+    <div v-if="loading" class="py-8 flex items-center justify-center">
+      <div
+        class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-[#9c4e8b]"
+      ></div>
+      <p class="ml-4 text-sm text-gray-500">Loading booked events...</p>
+    </div>
 
-        <template v-else-if="bookedEvents.length === 0">
-          <tr>
-            <td
-              colspan="3"
-              class="px-6 py-10 text-center text-sm text-gray-500"
-            >
-              No booked events yet. Once you receive bookings, the top events
-              will appear here.
-            </td>
-          </tr>
-        </template>
+    <div
+      v-else-if="error"
+      class="rounded-lg bg-red-50 border border-red-200 p-4"
+    >
+      <p class="font-semibold text-red-700">Something went wrong</p>
+      <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+      <button
+        @click="fetchBookedEvents"
+        class="mt-3 px-3 py-1 text-xs bg-red-600 text-white rounded"
+      >
+        Retry
+      </button>
+    </div>
 
-        <template v-else>
-          <tr
-            v-for="(event, index) in bookedEvents"
-            :key="event.name || index"
-            class="border-b hover:bg-gray-50 overflow-y-auto max-h-96"
-          >
-            <td class="py-2">{{ event.eventName }}</td>
-            <td class="py-2">{{ event.totalBookings }}</td>
-            <td class="py-2">{{ event.totalIncome }}</td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
+    <div
+      v-else-if="bookedEvents.length === 0"
+      class="py-6 text-center text-gray-500"
+    >
+      No booked events yet. Once you receive bookings, the top events will
+      appear here.
+    </div>
+
+    <div v-else class="space-y-4">
+      <!-- Top event highlight -->
+      <div
+        class="rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white border border-gray-100 flex items-center justify-between"
+      >
+        <div>
+          <p class="text-sm text-gray-500">Top Event</p>
+          <h3 class="text-lg font-bold text-gray-900">
+            {{ bookedEvents[0].eventName || bookedEvents[0].name }}
+          </h3>
+          <p class="text-sm text-gray-500 mt-1">
+            Booked {{ bookedEvents[0].totalBookings }} times
+          </p>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-gray-500">Total income</p>
+          <p class="text-lg font-semibold text-gray-900">
+            Ksh {{ bookedEvents[0].totalIncome ?? 0 }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Other top events list -->
+      <ul class="divide-y">
+        <li
+          v-for="(event, idx) in bookedEvents.slice(1)"
+          :key="event.eventName || event.name || idx"
+          class="py-3 flex items-center justify-between"
+        >
+          <div>
+            <p class="font-medium text-gray-900">
+              {{ event.eventName || event.name }}
+            </p>
+            <p class="text-xs text-gray-500 mt-1">
+              Booked {{ event.totalBookings }} times
+            </p>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-500">Income</p>
+            <p class="font-semibold">Ksh {{ event.totalIncome ?? 0 }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -110,12 +109,12 @@ const fetchBookedEvents = async () => {
     if (bookings.length > 0) {
       const eventMap = {};
       bookings.forEach((booking) => {
-        const eventName = booking.eventName;
+        const eventName = booking.eventName || booking.name || "Unnamed event";
         const eventId = eventName;
 
         if (!eventMap[eventId]) {
           eventMap[eventId] = {
-            name: eventName,
+            eventName: eventName,
             totalBookings: 0,
             totalIncome: 0,
           };
