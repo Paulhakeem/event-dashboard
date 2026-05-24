@@ -139,8 +139,8 @@
 import ProfileUpdateProfile from "../Profile/update-profile.vue";
 const { user, logout, token } = useAuth();
 const { events } = organiserEvents();
-const { cancelledEvents } = fetchCancelledEvents();
 const { pendingEvents } = usePendingEvent();
+const cancelledEvents = ref([]);
 
 // total income
 const config = useRuntimeConfig();
@@ -152,6 +152,17 @@ const open = ref(false);
 const toggle = () => {
   open.value = !open.value;
 };
+
+// cancelled events
+watch(
+  events,
+  () => {
+    cancelledEvents.value = events.value.filter(
+      (event) => event.status === "cancelled",
+    );
+  },
+  { immediate: true },
+);
 
 watch(
   events,
