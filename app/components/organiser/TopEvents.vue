@@ -39,16 +39,16 @@
         <div>
           <p class="text-sm text-gray-500">Top Event</p>
           <h3 class="text-lg font-bold text-gray-900">
-            {{ bookedEvents[0].eventName || bookedEvents[0].name }}
+            {{ bookedEvents[0]?.eventName || bookedEvents[0]?.name || "—" }}
           </h3>
           <p class="text-sm text-gray-500 mt-1">
-            Booked {{ bookedEvents[0].totalBookings }} times
+            Booked {{ bookedEvents[0]?.totalBookings ?? 0 }} times
           </p>
         </div>
         <div class="text-right">
           <p class="text-sm text-gray-500">Total income</p>
           <p class="text-lg font-semibold text-gray-900">
-            Ksh {{ bookedEvents[0].totalIncome ?? 0 }}
+            Ksh {{ bookedEvents[0]?.totalIncome ?? 0 }}
           </p>
         </div>
       </div>
@@ -83,7 +83,6 @@ const { token } = useAuth();
 const bookedEvents = ref([]);
 const loading = ref(false);
 const error = ref("");
-const config = useRuntimeConfig();
 
 // fetch booked events data from API and get top 5 events by total bookings
 const fetchBookedEvents = async () => {
@@ -92,42 +91,21 @@ const fetchBookedEvents = async () => {
   bookedEvents.value = [];
 
   try {
-    const res = await $fetch(`${config.public.organiserBookingEvents}`, {
+    const res = await $fetch("/api/organiser/top-booked-events", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
     });
 
-    console.log("API response for booked events:", res);
-    const bookings = Array.isArray(res)
-      ? res
-      : Array.isArray(res?.bookings)
-        ? res.bookings
+    console.log("API response for top booked events:", res);
+    const top = Array.isArray(res?.topBookedEvents)
+      ? res.topBookedEvents
+      : Array.isArray(res)
+        ? res
         : [];
 
-    if (bookings.length > 0) {
-      const eventMap = {};
-      bookings.forEach((booking) => {
-        const eventName = booking.eventName || booking.name || "Unnamed event";
-        const eventId = eventName;
-
-        if (!eventMap[eventId]) {
-          eventMap[eventId] = {
-            eventName: eventName,
-            totalBookings: 0,
-            totalIncome: 0,
-          };
-        }
-
-        eventMap[eventId].totalBookings += 1;
-        eventMap[eventId].totalIncome += Number(booking.amount || 0);
-      });
-
-      bookedEvents.value = Object.values(eventMap)
-        .sort((a, b) => b.totalBookings - a.totalBookings)
-        .slice(0, 5);
-    }
+    bookedEvents.value = top.slice(0, 5);
   } catch (err) {
     bookedEvents.value = [];
     error.value =

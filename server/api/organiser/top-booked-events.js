@@ -16,11 +16,17 @@ export default defineEventHandler(async (event) => {
   //   get the top booked events for the organiser
   try {
     const topBookedEvents = await TotalBooking.aggregate([
-      { $match: { organiserId: user.id, status: "success" } },
+      {
+        $match: {
+          organiserId: user.id,
+          status: { $in: ["success", "confirmed"] },
+        },
+      },
       {
         $group: {
           _id: "$eventName",
           totalBookings: { $sum: 1 },
+          totalIncome: { $sum: "$amount" },
         },
       },
       { $sort: { totalBookings: -1 } },
@@ -30,6 +36,7 @@ export default defineEventHandler(async (event) => {
           _id: 0,
           eventName: "$_id",
           totalBookings: 1,
+          totalIncome: 1,
         },
       },
     ]);
