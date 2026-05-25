@@ -1,15 +1,19 @@
 <template>
-  <div class="w-full flex items-center justify-center px-3 sm:px-4 md:px-6 py-6 md:py-10">
-    <div class="w-full lg:w-11/12 xl:w-4/5">
+  <div
+    class="w-full flex flex-col items-center px-3 sm:px-4 md:px-6 py-6 md:py-10"
+  >
+    <div class="w-full max-w-6xl mx-auto">
       <!-- Flex container instead of grid -->
       <div class="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8">
         <!-- Recent Activity Card -->
         <div
-          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-[250px] md:min-h-[350px] flex flex-col"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col"
         >
           <!-- Header -->
           <div class="flex items-center justify-between mb-4 md:mb-6">
-            <h2 class="text-base md:text-xl font-semibold text-gray-700 dark:text-white">
+            <h2
+              class="text-base md:text-xl font-semibold text-gray-700 dark:text-white"
+            >
               Recent Activity
             </h2>
             <span
@@ -43,10 +47,14 @@
               name="svg-spinners:clock"
               class="text-4xl md:text-6xl text-gray-300 dark:text-gray-600 mx-auto"
             />
-            <p class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 mt-2">
+            <p
+              class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 mt-2"
+            >
               No activity yet
             </p>
-            <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">
+            <p
+              class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2"
+            >
               Your recent activities will appear here
             </p>
           </div>
@@ -56,10 +64,12 @@
 
         <!-- Upcoming Events Card -->
         <div
-          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-[250px] md:min-h-[350px] flex flex-col justify-between"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col justify-between"
         >
           <div class="flex items-center justify-between mb-4 md:mb-6">
-            <h2 class="text-base md:text-xl font-semibold text-gray-700 dark:text-white">
+            <h2
+              class="text-base md:text-xl font-semibold text-gray-700 dark:text-white"
+            >
               Upcoming Events
             </h2>
             <span
@@ -68,7 +78,9 @@
               <Icon name="mdi:calendar" class="text-lg md:text-2xl" />
             </span>
           </div>
-          <div class="text-center mt-4 md:mt-6 flex-1 flex flex-col justify-center">
+          <div
+            class="text-center mt-4 md:mt-6 flex-1 flex flex-col justify-center"
+          >
             <!-- Loading state -->
             <div
               v-if="eventsLoading"
@@ -92,10 +104,14 @@
                 name="mdi:calendar-clock"
                 class="text-4xl md:text-6xl text-gray-300 dark:text-gray-600 mx-auto"
               />
-              <p class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 mt-2">
+              <p
+                class="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 mt-2"
+              >
                 No upcoming events
               </p>
-              <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2">
+              <p
+                class="text-sm md:text-base text-gray-500 dark:text-gray-400 mt-2"
+              >
                 Browse events and get your tickets now!
               </p>
               <NuxtLink to="/eventPage" class="mt-4 md:mt-6 text-center">

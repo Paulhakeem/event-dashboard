@@ -29,27 +29,35 @@ const eventSchema = new mongoose.Schema({
 });
 
 // whenever events are queried, ensure statuses are updated based on dates
-eventSchema.pre(/^find/, async function(next) {
+eventSchema.pre(/^find/, async function (next) {
   try {
     const now = new Date();
-    
+
     // Get today's date range (start and end of day)
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    
+    const todayStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const todayEnd = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+    );
+
     // Mark today's events as live
     await this.model.updateMany(
       {
         date: { $gte: todayStart, $lt: todayEnd },
-        status: { $ne: "completed" }
+        status: { $ne: "completed" },
       },
-      { $set: { status: "live" } }
+      { $set: { status: "live" } },
     );
-    
+
     // Mark past events as completed
     await this.model.updateMany(
       { date: { $lt: todayStart }, status: { $ne: "completed" } },
-      { $set: { status: "completed" } }
+      { $set: { status: "completed" } },
     );
   } catch (err) {
     console.error("Error auto-updating event statuses:", err);

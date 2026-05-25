@@ -39,10 +39,11 @@
         <!-- Member Since -->
         <p class="text-gray-400 dark:text-neutral-500 text-xs italic">
           Member since: {{ formatDate(user.joinedAt) }}
-        </p>•
+        </p>
+        •
         <!-- Role -->
         <span
-          class=" px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class="px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
           {{ user.role || "Member" }}
         </span>
@@ -53,16 +54,10 @@
         ></div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-          <div class="stat-card">
-            <Icon name="mdi:calendar-check" class="text-indigo-500 text-2xl" />
-            <p class="stat-number">15</p>
-            <span>Attended</span>
-          </div>
-
+        <div class="grid grid-cols-2 lg:grid-cols-2 gap-4 w-full">
           <div class="stat-card">
             <Icon name="mdi:calendar-clock" class="text-pink-500 text-2xl" />
-            <p class="stat-number">3</p>
+            <p class="stat-number">{{ events?.length }}</p>
             <span>Upcoming</span>
           </div>
 
@@ -71,15 +66,12 @@
               name="mdi:ticket-confirmation"
               class="text-green-500 text-2xl"
             />
-            <p class="stat-number">8</p>
+            <p class="stat-number">{{ booking?.length }}</p>
             <span>Bookings</span>
           </div>
           <div class="stat-card">
-            <Icon
-              name="ri:live-fill"
-              class="text-red-500 text-2xl"
-            />
-            <p class="stat-number">8</p>
+            <Icon name="ri:live-fill" class="text-red-500 text-2xl" />
+            <p class="stat-number">{{ liveEvents.length }}</p>
             <span>Live Events</span>
           </div>
 
@@ -135,6 +127,7 @@
 
 <script setup>
 const { user, logout } = useAuth();
+const { events } = totalEvents();
 
 // open update profile modal
 const open = ref(false);
@@ -154,5 +147,10 @@ const formatDate = (date) => {
 const { booking } = useBookingData();
 const totalSpent = computed(() => {
   return booking.value.reduce((total, b) => total + (b.amount || 0), 0);
+});
+
+// get the events with live status
+const liveEvents = computed(() => {
+  return events.value.filter((event) => event.status === "live");
 });
 </script>

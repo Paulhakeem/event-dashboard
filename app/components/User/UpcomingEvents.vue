@@ -1,17 +1,18 @@
 <template>
   <div
-    class="bg-white dark:bg-neutral-900 w-full p-6 rounded-2xl shadow-md border border-gray-100 dark:border-neutral-800"
+    class="bg-white dark:bg-neutral-900 w-full p-4 sm:p-6 rounded-3xl shadow-md border border-gray-100 dark:border-neutral-800 transition-all duration-200"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6"
+    >
+      <h2
+        class="text-lg sm:text-xl font-semibold text-gray-800 dark:text-white"
+      >
         Upcoming Events
       </h2>
 
-      <Icon
-        name="mdi:calendar-month"
-        class="text-2xl text-indigo-500"
-      />
+      <Icon name="mdi:calendar-month" class="text-2xl text-indigo-500" />
     </div>
 
     <!-- Loading -->
@@ -48,12 +49,12 @@
     <!-- Events Grid -->
     <div
       v-else
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+      class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6"
     >
       <div
         v-for="event in events"
         :key="event._id"
-        class="group flex flex-col bg-white/80 dark:bg-neutral-800/80 backdrop-blur-lg rounded-xl p-5 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300"
+        class="group flex flex-col min-h-72 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-lg rounded-3xl p-4 sm:p-5 border border-gray-200 dark:border-neutral-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition duration-300"
       >
         <!-- Title -->
         <h3
@@ -63,7 +64,9 @@
         </h3>
 
         <!-- Meta -->
-        <div class="flex flex-col space-y-2 text-sm text-gray-500 dark:text-neutral-400">
+        <div
+          class="flex flex-col space-y-2 text-sm text-gray-500 dark:text-neutral-400"
+        >
           <span class="flex items-center">
             <Icon name="mdi:calendar" class="mr-2 text-indigo-500" />
             {{ formatDate(event.date) }}
@@ -76,18 +79,21 @@
         </div>
 
         <!-- Description -->
-        <p class="mt-3 text-gray-600 dark:text-neutral-300 text-sm line-clamp-3">
+        <p
+          class="mt-3 text-gray-600 dark:text-neutral-300 text-sm line-clamp-3"
+        >
           {{ event.description }}
         </p>
 
-        <!-- CTA -->
-        <NuxtLink :to="`/events/${event._id}`" class="mt-4">
-          <button
-            class="w-full py-2.5 rounded-lg bg-gradient-to-r from-[#9d4e8a] to-[#6b46c1] text-white text-sm font-semibold shadow hover:shadow-lg hover:scale-[1.02] transition"
-          >
-            View Details
-          </button>
-        </NuxtLink>
+        <div class="mt-auto pt-4">
+          <NuxtLink :to="`/events/${event._id}`" class="block">
+            <button
+              class="w-full py-2.5 rounded-2xl bg-linear-to-r from-[#9d4e8a] to-[#6b46c1] text-white text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition"
+            >
+              View Details
+            </button>
+          </NuxtLink>
+        </div>
       </div>
     </div>
   </div>
