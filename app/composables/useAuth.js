@@ -35,7 +35,6 @@ const scheduleLogoutOnExpiry = (rawToken, logoutFn) => {
   }
 };
 
-
 export const useAuth = () => {
   const user = useState("auth_user", () => null);
   const token = useState("auth_token", () => null);
@@ -49,17 +48,20 @@ export const useAuth = () => {
       if (isTokenExpired(savedToken)) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+      } else if (savedUser && savedUser !== "undefined") {
+        try {
+          user.value = JSON.parse(savedUser);
+          token.value = savedToken;
+        } catch (e) {
+          console.error("Invalid user JSON in localStorage", e);
+          user.value = null;
+          token.value = null;
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
       } else {
-        token.value = savedToken;
-      }
-    }
-
-    if (savedUser && savedUser !== "undefined") {
-      try {
-        user.value = JSON.parse(savedUser);
-      } catch (e) {
-        console.error("Invalid user JSON in localStorage", e);
-        user.value = null;
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       }
     }
 
@@ -70,7 +72,7 @@ export const useAuth = () => {
         user.value = null;
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        navigateTo("/");
+        navigateTo("/login");
       });
     }
   }
@@ -101,7 +103,7 @@ export const useAuth = () => {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     }
-    navigateTo("/");
+    navigateTo("/login");
   };
 
   return { user, token, setAuth, logout };

@@ -41,7 +41,10 @@
                   ]"
                 >
                   <span
-                    :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']"
+                    :class="[
+                      selected ? 'font-medium' : 'font-normal',
+                      'block truncate',
+                    ]"
                   >
                     {{ item.name }}
                   </span>
@@ -62,12 +65,13 @@
 </template>
 
 <script setup>
+import { userDropdown } from "~/composables/userDropdown";
 import {
   Listbox,
   ListboxButton,
   ListboxOptions,
   ListboxOption,
-} from '@headlessui/vue'
+} from "@headlessui/vue";
 
-const { items, selectedItem } = userDropdown()
+const { items, selectedItem } = userDropdown();
 </script>

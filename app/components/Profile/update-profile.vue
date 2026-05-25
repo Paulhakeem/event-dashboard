@@ -67,7 +67,7 @@
 
 <script setup>
 const { firstName, lastName, loading, updateProfile } = profileEditing();
-const { token } = useAuth();
+const { token, logout } = useAuth();
 const config = useRuntimeConfig();
 // delete account logic
 const deleteAccount = async () => {
@@ -87,10 +87,8 @@ const deleteAccount = async () => {
   });
 
   if (res.ok) {
-    // Redirect to homepage or login page after deletion using nuxt router
-    const router = useRouter();
     alert("Your account has been deleted successfully.");
-    router.push("/login");
+    logout();
   } else {
     // Handle error
     const errorData = await res.json();

@@ -1,5 +1,22 @@
+import { jwtDecode } from "jwt-decode";
+
+const isTokenExpired = (rawToken) => {
+  if (!rawToken) return true;
+  try {
+    const decoded = jwtDecode(rawToken);
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
+
 export default defineNuxtRouteMiddleware((to) => {
-  const { user } = useAuth();
+  const { user, token, logout } = useAuth();
+
+  if (process.client && token.value && isTokenExpired(token.value)) {
+    logout();
+    return navigateTo("/login");
+  }
 
   const publicPages = [
     "/",
@@ -21,8 +38,8 @@ export default defineNuxtRouteMiddleware((to) => {
       user.value.role === "admin"
         ? `/admin/${user.value.id}`
         : user.value.role === "organiser"
-        ? `/organiser/${user.value.id}`
-        : `/user/${user.value.id}`
+          ? `/organiser/${user.value.id}`
+          : `/user/${user.value.id}`,
     );
   }
 

@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import UpcomingEvents from "~/components/User/UpcomingEvents.vue";
 export const userDropdown = () => {
   const items = [

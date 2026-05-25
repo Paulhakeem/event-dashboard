@@ -1,11 +1,11 @@
 <template>
- <div class="w-48 ">
-    <Listbox v-model="selectedPerson">
+  <div class="w-full sm:w-48 z-10">
+    <Listbox v-model="selectedStatus">
       <div class="relative mt-1">
         <ListboxButton
           class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm"
         >
-          <span class="block truncate">{{ selectedPerson.name }}</span>
+          <span class="block truncate">{{ selectedStatus.name }}</span>
           <span
             class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
           >
@@ -27,9 +27,9 @@
           >
             <ListboxOption
               v-slot="{ active, selected }"
-              v-for="person in people"
-              :key="person.name"
-              :value="person"
+              v-for="statusItem in status"
+              :key="statusItem.name"
+              :value="statusItem"
               as="template"
             >
               <li
@@ -43,13 +43,13 @@
                     selected ? 'font-medium' : 'font-normal',
                     'block truncate',
                   ]"
-                  >{{ person.name }}</span
+                  >{{ statusItem.name }}</span
                 >
                 <span
                   v-if="selected"
                   class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600"
                 >
-                 <Icon name="mdi:check" class="h-5 w-5" aria-hidden="true" />
+                  <Icon name="mdi:check" class="h-5 w-5" aria-hidden="true" />
                 </span>
               </li>
             </ListboxOption>
@@ -61,20 +61,19 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 import {
   Listbox,
   ListboxLabel,
   ListboxButton,
   ListboxOptions,
   ListboxOption,
-} from '@headlessui/vue'
+} from "@headlessui/vue";
 
-const people = [
-  { name: 'All Categories' },
-  { name: 'Entertainment' },
-  { name: 'All Upcoming Events' },
-]
-const selectedPerson = ref(people[0])
+const status = [
+  { name: "All Categories" },
+  { name: "Entertainment" },
+  { name: "All Upcoming Events" },
+];
+const selectedStatus = ref(status[0]);
 </script>
-
