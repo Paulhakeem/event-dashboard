@@ -23,6 +23,9 @@ export default defineNuxtConfig({
         striptags: resolve(__dirname, "shims/striptags.js"),
       },
     },
+    optimizeDeps: {
+      include: ["better-auth"],
+    },
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
@@ -52,6 +55,9 @@ export default defineNuxtConfig({
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     // openAI
     deepseekApiKey: process.env.DEEPSEEK_API,
+    // better auth
+    betterAuthClientId: process.env.BETTER_AUTH_CLIENT_ID,
+    betterAuthClientSecret: process.env.BETTER_AUTH_CLIENT_SECRET,
 
     public: {
       // 🌍 Client-available (unsafe)
