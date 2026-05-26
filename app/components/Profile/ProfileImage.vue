@@ -56,24 +56,47 @@
     <p class="text-xs text-gray-500 dark:text-neutral-400">
       JPG, PNG • Max 10MB
     </p>
-    <p v-if="message" :class="messageClass" class="text-sm mt-2">{{ message }}</p>
+    <p v-if="message" :class="messageClass" class="text-sm mt-2">
+      {{ message }}
+    </p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onUnmounted, watch } from "vue";
+import { useAuth } from "~/composables/useAuth";
+import useFormAuth from "~/composables/FormAuth";
+
 const { user, token, setAuth } = useAuth();
-const { previewImageFile, previewImage } = FormAuth();
+const { previewImageFile, previewImage } = useFormAuth();
 
 const selectedFile = ref(null);
 const localPreview = ref(null);
 const isUploading = ref(false);
-const message = ref('');
+const message = ref("");
 
-const currentImage = computed(() => user.value?.profileImage || null);
+const currentImage = computed(
+  () => user.value?.profileImage || previewImage.value || null,
+);
+
+const isAuthenticated = computed(() => Boolean(token && token.value));
 
 const messageClass = computed(() => {
-  return message.value && message.value.toLowerCase().includes('success') ? 'text-green-600' : 'text-red-600';
+  return message.value && message.value.toLowerCase().includes("success")
+    ? "text-green-600"
+    : "text-red-600";
+});
+
+// revoke object URL when component unmounts or when preview changes
+watch(localPreview, (val, old) => {
+  if (old) URL.revokeObjectURL(old);
+});
+
+onUnmounted(() => {
+  if (localPreview.value) {
+    URL.revokeObjectURL(localPreview.value);
+    localPreview.value = null;
+  }
 });
 
 const onFileChange = (e) => {
@@ -81,10 +104,12 @@ const onFileChange = (e) => {
   if (!file) return;
 
   // If user is authenticated, keep local selection for upload
-  if (token && token.value) {
+  if (isAuthenticated.value) {
     selectedFile.value = file;
+    // revoke previous preview if present
+    if (localPreview.value) URL.revokeObjectURL(localPreview.value);
     localPreview.value = URL.createObjectURL(file);
-    message.value = '';
+    message.value = "";
     return;
   }
 
@@ -93,16 +118,16 @@ const onFileChange = (e) => {
 };
 
 const uploadImage = async () => {
-  if (!selectedFile.value || !token || !token.value) return;
+  if (!selectedFile.value || !isAuthenticated.value) return;
   isUploading.value = true;
-  message.value = '';
+  message.value = "";
 
   try {
     const formData = new FormData();
-    formData.append('profileImage', selectedFile.value);
+    formData.append("profileImage", selectedFile.value);
 
-    const res = await fetch('/api/users/profile-image', {
-      method: 'POST',
+    const res = await fetch("/api/users/profile-image", {
+      method: "POST",
       body: formData,
       headers: {
         Authorization: `Bearer ${token.value}`,
@@ -110,18 +135,21 @@ const uploadImage = async () => {
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.statusMessage || data.message || 'Upload failed');
+    if (!res.ok)
+      throw new Error(data.statusMessage || data.message || "Upload failed");
 
-    // Update global auth user
+    // Update global auth user without changing token
     setAuth({ token: token.value, user: data.user });
-    message.value = 'Profile image updated successfully';
+    message.value = "Profile image updated successfully";
+
+    // clear selection and revoke preview
+    if (localPreview.value) URL.revokeObjectURL(localPreview.value);
     selectedFile.value = null;
     localPreview.value = null;
   } catch (err) {
-    message.value = err.message || 'Upload failed';
+    message.value = err.message || "Upload failed";
   } finally {
     isUploading.value = false;
   }
 };
-
 </script>
