@@ -29,7 +29,7 @@
               <h2
                 class="text-base sm:text-lg font-bold text-gray-900 capitalize truncate"
               >
-                {{ user.role }}
+                {{ user?.role || '' }}
               </h2>
             </div>
           </div>
@@ -136,6 +136,7 @@ const itemSelected = (menu) => {
 };
 
 const fetchNotificationCount = async () => {
+  if (!token.value) return;
   try {
     const res = await $fetch("/api/notification/notifications", {
       method: "GET",
@@ -145,7 +146,9 @@ const fetchNotificationCount = async () => {
     });
     notificationCount.value = res.notifications?.length || 0;
   } catch (err) {
-    console.error("Failed to fetch notifications:", err);
+    if (err?.response?.status !== 401) {
+      console.error("Failed to fetch notifications:", err);
+    }
   }
 };
 

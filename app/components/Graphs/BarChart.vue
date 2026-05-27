@@ -46,6 +46,7 @@
 
 <script setup>
 const config = useRuntimeConfig()
+const { token } = useAuth();
 const RevenueData = ref([]);
 
 const RevenueCategoriesMultple = {
@@ -61,7 +62,11 @@ const total = ref({ total: 0 });
 
 onMounted(async () => {
   try {
-    const res = await $fetch(`${config.public.totalAmountApi}`);
+    const res = await $fetch(`${config.public.totalAmountApi}`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
     if (res?.success) {
       total.value = { total: res.total || 0 };
     }
@@ -71,7 +76,11 @@ onMounted(async () => {
   }
   // fetch monthly stats for events and users
   try {
-    const stats = await $fetch(`${config.public.monthlyStatsApi}`);
+    const stats = await $fetch(`${config.public.monthlyStatsApi}`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
     if (stats?.success && Array.isArray(stats.monthly)) {
       RevenueData.value = stats.monthly.map((m) => ({
         month: m.month,

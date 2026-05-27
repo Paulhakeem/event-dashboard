@@ -148,7 +148,7 @@
 </template>
 <script setup>
 
-const { user, logout } = useAuth();
+const { user, token, logout } = useAuth();
 const { users } = totalUsers();
 const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
@@ -177,7 +177,11 @@ const cancelledSummary = ref({ cancelledCount: 0, totalRefunded: 0 });
 
 onMounted(async () => {
   try {
-    const res = await $fetch(`${config.public.totalAmountApi}`);
+    const res = await $fetch(`${config.public.totalAmountApi}`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
     if (res?.success) {
       total.value = { total: res.total || 0 };
     }
@@ -186,7 +190,11 @@ onMounted(async () => {
     total.value = { total: 0 };
   }
   try {
-    const res = await $fetch(`${config.public.cancelledSummaryApi}`);
+    const res = await $fetch(`${config.public.cancelledSummaryApi}`, {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+      },
+    });
     if (res?.success) {
       cancelledSummary.value = res;
     }

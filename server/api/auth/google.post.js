@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
   }
 
   //   split name into first and last name
-  const [firstName, ...lastNameParts] = name.split(" ") || ["user"];
+  const [firstName, ...lastNameParts] = (name || "user").split(" ");
   const lastName = lastNameParts.join(" ") || " ";
 
   let user = await User.findOne({ email });
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
     if (!user.googleId) {
       user.googleId = googleId;
       user.isEmailVerified = true; // Google already verified their email
-      if (!user.profileImage && picture) user.profilePicture = picture;
+      if (!user.profileImage && picture) user.profileImage = picture;
       await user.save();
     }
   } else {
@@ -46,13 +47,20 @@ export default defineEventHandler(async (event) => {
       isEmailVerified: true,
       role: "user",
       password: null, // No password for Google accounts
-      profilePicture: picture || null,
+      profileImage: picture || null,
     });
-    await user.save();
   }
 
   //   Generate JWT token
-  const token = user.generateAuthToken();
+  const token = jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    config.secretStr,
+    { expiresIn: "1d" }
+  );
   return {
     success: true,
     token,

@@ -11,24 +11,22 @@
 <script setup>
 const onGoogleSuccess = async (e) => {
   const { email, name, picture, sub } = e.claims;
-  const user = $fetch("/api/auth/google", {
+  const data = await $fetch("/api/auth/google", {
     method: "POST",
     body: { email, name, picture, googleId: sub },
   });
 
-  // Save user to your app state/cookie/session
-  console.log("Google user:", user);
+  if (!data?.success) return;
 
-  // Save user to state/cookie
   const authUser = useCookie("user");
-  authUser.value = JSON.stringify(user);
-  // Redirect based on role
-  if (user.role === "admin") {
-    navigateTo(`/admin/${user.id}`);
-  } else if (user.role === "organiser") {
-    navigateTo(`/organiser/${user.id}`);
+  authUser.value = JSON.stringify(data);
+
+  if (data.user.role === "admin") {
+    navigateTo(`/admin/${data.user.id}`);
+  } else if (data.user.role === "organiser") {
+    navigateTo(`/organiser/${data.user.id}`);
   } else {
-    navigateTo(`/user/${user.id}`);
+    navigateTo(`/user/${data.user.id}`);
   }
 };
 
