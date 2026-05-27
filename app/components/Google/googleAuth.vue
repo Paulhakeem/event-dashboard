@@ -33,6 +33,7 @@ const onGoogleSuccess = async (e) => {
 };
 
 const onGoogleError = (error) => {
-  console.error("Google login error:", error);
+  // error popup
+  alert("Google login failed: " + error.message);
 };
 </script>
