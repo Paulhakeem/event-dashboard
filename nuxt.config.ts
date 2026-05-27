@@ -23,9 +23,6 @@ export default defineNuxtConfig({
         striptags: resolve(__dirname, "shims/striptags.js"),
       },
     },
-    optimizeDeps: {
-      include: ["better-auth"],
-    },
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
