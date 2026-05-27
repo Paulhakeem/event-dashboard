@@ -14,7 +14,7 @@
 
       <form class="w-full">
         <!-- allow user to uload profile image -->
-         <ProfileImage/>
+        <ProfileImage />
         <!-- end -->
         <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
 
@@ -111,10 +111,14 @@
         </button>
       </div>
     </div>
+
+    <!--  -->
+    <GoogleAuth />
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
+import GoogleAuth from "../Google/googleAuth.vue";
 const {
   firstName,
   lastName,
@@ -130,9 +134,9 @@ const adminExists = ref(false);
 
 onMounted(async () => {
   try {
-    const res = await $fetch('/api/auth/admin-exists');
+    const res = await $fetch("/api/auth/admin-exists");
     adminExists.value = !!res?.exists;
-    if (adminExists.value && role.value === 'admin') role.value = 'user';
+    if (adminExists.value && role.value === "admin") role.value = "user";
   } catch (e) {
     adminExists.value = false;
   }

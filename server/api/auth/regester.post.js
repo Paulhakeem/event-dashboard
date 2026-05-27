@@ -141,7 +141,10 @@ export default defineEventHandler(async (event) => {
       `,
     });
   } else {
-    console.warn("SMTP credentials missing; logged verification code instead:", verificationCode);
+    console.warn(
+      "SMTP credentials missing; logged verification code instead:",
+      verificationCode,
+    );
   }
 
   /* ---------- RESPONSE (NO TOKEN YET) ---------- */

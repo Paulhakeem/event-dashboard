@@ -13,7 +13,8 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
-    password: { type: String, required: true, select: false},
+    password: { type: String, required: true, select: false },
+    googleId: { type: String, unique: true, sparse: true, default: null },
     role: {
       type: String,
       enum: ["admin", "organiser", "user"],

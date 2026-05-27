@@ -15,7 +15,15 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts"],
+  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-google-auth"],
+
+  // google auth configuration
+  googleAuth: {
+    clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    autoLoadScript: true, // load Google script automatically
+    promptOneTap: true, // show One Tap prompt
+    enableServerVerify: true, // enable server-side token verification endpoint
+  },
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -52,9 +60,6 @@ export default defineNuxtConfig({
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     // openAI
     deepseekApiKey: process.env.DEEPSEEK_API,
-    // better auth
-    betterAuthClientId: process.env.BETTER_AUTH_CLIENT_ID,
-    betterAuthClientSecret: process.env.BETTER_AUTH_CLIENT_SECRET,
 
     public: {
       // 🌍 Client-available (unsafe)
