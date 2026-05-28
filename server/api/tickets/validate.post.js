@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   ticket.used = true;
+  ticket.usedAt = new Date();
   await ticket.save();
 
   return {

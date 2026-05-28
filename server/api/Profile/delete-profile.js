@@ -3,26 +3,42 @@ import { requireAuth } from "~~/server/utils/requireAuth";
 import connectDB from "~~/server/utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { Event } from "~~/server/models/Events.js";
+import { Ticket } from "~~/server/models/Ticket";
+import { CancelledTicket } from "~~/server/models/CancelledTickets";
+import { Notification } from "~~/server/models/Notification";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
-  const user = await requireAuth(event);
-  if (!user) {
+  const authUser = await requireAuth(event);
+  if (!authUser) {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
   try {
-    // check if user is organizer and delete events if they are an organizer
-    if (user.role === "organiser") {
-      await Event.deleteMany({ organizer: user.id });
-    }
+    const userId = authUser.id;
 
-    // Delete the user
-    await User.findByIdAndDelete(user.id);
-    // Delete all bookings associated with the user
-    await TotalBooking.deleteMany({ userId: user.id });
+    // Delete events created by the user (any role that creates events)
+    await Event.deleteMany({ createdBy: userId });
+
+    // Delete bookings where the user was the booker or the organiser
+    await TotalBooking.deleteMany({
+      $or: [{ createdBy: userId }, { organiserId: userId }],
+    });
+
+    // Delete tickets owned by the user
+    await Ticket.deleteMany({ userId });
+
+    // Delete cancelled ticket records linked to the user
+    await CancelledTicket.deleteMany({ user: userId });
+
+    // Delete notifications addressed to the user
+    await Notification.deleteMany({ recipientUser: userId });
+
+    // Delete the user account
+    await User.findByIdAndDelete(userId);
+
     return {
-      message: "Profile and associated bookings deleted successfully",
+      message: "Profile and all associated data deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting profile:", error);

@@ -74,11 +74,12 @@
         <button
           type="submit"
           :disabled="isLoading"
-          class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
+          class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
         >
           {{ isLoading ? "Logging In..." : "Log In" }}
         </button>
       </form>
+      <GoogleAuth />
     </div>
   </div>
 </template>
@@ -103,8 +104,6 @@ const login = async () => {
     });
     console.log(data);
     setAuth(data);
-
-  
 
     if (data.user.role === "admin") {
       navigateTo(`/admin/${data.user.id}`);

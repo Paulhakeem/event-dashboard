@@ -9,6 +9,7 @@ const TicketSchema = new mongoose.Schema({
  ticketType: { type: String, required: true },
  amount: { type: Number, required: true },
  used: { type: Boolean, default: false },
+ usedAt: { type: Date, default: null },
  createdAt: { type: Date, default: Date.now },
 });
 export const Ticket = mongoose.model('Ticket', TicketSchema);

@@ -203,7 +203,17 @@ export default defineEventHandler(async (event) => {
   });
 
   // -------------------- GENERATE TICKET -------------------- */
-  const ticketCode = generateTicketCode();
+  let ticketCode;
+  let retries = 3;
+  while (retries > 0) {
+    ticketCode = generateTicketCode();
+    const exists = await Ticket.findOne({ ticketCode });
+    if (!exists) break;
+    retries--;
+  }
+  if (retries === 0) {
+    throw createError({ statusCode: 500, statusMessage: "Failed to generate unique ticket code" });
+  }
 
   await Ticket.create({
     ticketCode,
