@@ -8,13 +8,17 @@
     >
       <div class="shrink-0">
         <img
+          v-if="user?.profileImage"
           class="w-9 sm:w-10 h-9 sm:h-10 rounded-full object-cover"
-          :src="
-            user?.profileImage ||
-            'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=facearea&facepad=2&w=320&h=320&q=80'
-          "
+          :src="user.profileImage"
           alt="User Avatar"
         />
+        <div
+          v-else
+          class="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-[#9c4e8b] flex items-center justify-center text-white text-sm font-semibold"
+        >
+          {{ (user?.firstName?.[0] || '?').toUpperCase() }}
+        </div>
       </div>
       <div class="flex-1 min-w-0 hidden sm:block">
         <p class="text-sm font-semibold text-gray-900 truncate">
