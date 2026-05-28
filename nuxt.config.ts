@@ -31,6 +31,9 @@ export default defineNuxtConfig({
         striptags: resolve(__dirname, "shims/striptags.js"),
       },
     },
+    optimizeDeps: {
+      include: ["jwt-decode", "vue-chrts"],
+    },
   },
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
