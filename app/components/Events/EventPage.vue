@@ -129,13 +129,21 @@
             <!-- CTA Button -->
             <NuxtLink :to="`/events/${event._id}`">
               <button
-                :disabled="event.status === 'cancelled'"
+                :disabled="
+                  event.status === 'cancelled' ||
+                  event.status === 'completed' ||
+                  event.status === 'live'
+                "
                 class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {{
                   event.status === "cancelled"
                     ? "Event Cancelled"
-                    : "View & Book"
+                    : event.status === "completed"
+                      ? "Event Completed"
+                      : event.status === "live"
+                        ? "Event Live"
+                        : "View & Book"
                 }}
               </button>
             </NuxtLink>
