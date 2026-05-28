@@ -9,6 +9,8 @@
 </template>
 
 <script setup>
+const { setAuth } = useAuth();
+
 const onGoogleSuccess = async (e) => {
   const { email, name, picture, sub } = e.claims;
   const data = await $fetch("/api/auth/google", {
@@ -18,8 +20,7 @@ const onGoogleSuccess = async (e) => {
 
   if (!data?.success) return;
 
-  const authUser = useCookie("user");
-  authUser.value = JSON.stringify(data);
+  setAuth(data);
 
   if (data.user.role === "admin") {
     navigateTo(`/admin/${data.user.id}`);

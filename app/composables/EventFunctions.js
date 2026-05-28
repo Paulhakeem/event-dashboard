@@ -7,7 +7,7 @@ export default function useEventFunctions() {
 
   const errorMessage = ref("");
 
-  onMounted(async () => {
+  const fetchEvents = async () => {
     try {
       const res = await $fetch(`${config.public.eventApi}`);
       if (res.success) {
@@ -15,10 +15,13 @@ export default function useEventFunctions() {
       }
     } catch (error) {
       errorMessage.value = error.message;
+      throw error;
     } finally {
       pendings.value = false;
     }
-  });
+  };
 
-  return { eventPosters, pendings, errorMessage };
+  onMounted(fetchEvents);
+
+  return { eventPosters, pendings, errorMessage, fetchEvents };
 }

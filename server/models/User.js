@@ -13,7 +13,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
-    password: { type: String, required: true, select: false },
+    password: {
+      type: String,
+      select: false,
+      required: function () {
+        return !this.googleId; // required only if NOT a Google signup
+      },
+    },
     googleId: { type: String, unique: true, sparse: true, default: null },
     role: {
       type: String,

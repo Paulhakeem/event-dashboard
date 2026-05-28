@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     api_secret: config.cloudinaryApiSecret,
   });
 
-  const { name, email, picture, googleId } = readBody(event);
+  const { name, email, picture, googleId } = await readBody(event);
 
   if (!email || !googleId) {
     throw createError({
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
       role: user.role,
     },
     config.secretStr,
-    { expiresIn: "1d" }
+    { expiresIn: "1d" },
   );
   return {
     success: true,
