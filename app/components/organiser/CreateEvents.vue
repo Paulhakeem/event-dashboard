@@ -63,20 +63,49 @@
           </div>
 
           <div class="bg-white rounded-2xl shadow p-6">
-            <h3 class="text-lg font-semibold mb-4">Pricing & Tickets</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div class="p-4 border rounded-lg">
-                <label class="block text-xs text-gray-600 mb-2">Regular</label>
-                <input v-model.number="form.regular" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold">Pricing & Tickets</h3>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <span class="text-sm text-gray-600">Free Entry</span>
+                <input type="checkbox" :checked="freeEntry" @change="toggleFreeEntry" class="w-5 h-5 accent-purple-600" />
+              </label>
+            </div>
+
+            <div class="space-y-3" :class="{ 'opacity-50 pointer-events-none': freeEntry }">
+              <div
+                v-for="(ticket, index) in customTickets"
+                :key="index"
+                class="flex items-center gap-3 p-3 border rounded-lg"
+              >
+                <input
+                  v-model="ticket.name"
+                  type="text"
+                  placeholder="Ticket name e.g. Gold"
+                  :disabled="freeEntry"
+                  class="flex-1 p-2 border rounded outline-none"
+                />
+                <input
+                  v-model.number="ticket.price"
+                  type="number"
+                  min="0"
+                  placeholder="Price"
+                  :disabled="freeEntry"
+                  class="w-32 p-2 border rounded outline-none"
+                />
+                <button
+                  type="button"
+                  @click="removeTicketType(index)"
+                  class="text-red-500 hover:text-red-700 text-lg px-2"
+                >✕</button>
               </div>
-              <div class="p-4 border rounded-lg">
-                <label class="block text-xs text-gray-600 mb-2">VIP</label>
-                <input v-model.number="form.vip" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
-              </div>
-              <div class="p-4 border rounded-lg">
-                <label class="block text-xs text-gray-600 mb-2">VVIP</label>
-                <input v-model.number="form.vvip" type="number" min="0" placeholder="Leave empty to disable" class="w-full p-2 outline-none" />
-              </div>
+              <button
+                type="button"
+                @click="addTicketType"
+                :disabled="freeEntry"
+                class="text-sm text-purple-600 hover:text-purple-800 font-medium"
+              >
+                + Add ticket type
+              </button>
             </div>
 
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -123,9 +152,19 @@
           <div class="bg-white rounded-2xl shadow p-4">
             <h4 class="text-sm font-semibold text-gray-700">Tickets</h4>
             <div class="mt-3 space-y-2">
-              <div class="flex justify-between text-sm"><span>Regular</span><span>{{ form.regular || '—' }}</span></div>
-              <div class="flex justify-between text-sm"><span>VIP</span><span>{{ form.vip || '—' }}</span></div>
-              <div class="flex justify-between text-sm"><span>VVIP</span><span>{{ form.vvip || '—' }}</span></div>
+              <template v-if="freeEntry">
+                <div class="flex justify-between text-sm text-green-600 font-medium"><span>Free Entry</span><span>✓</span></div>
+              </template>
+              <template v-else-if="customTickets.length > 0">
+                <div v-for="t in customTickets" :key="t.name + t.price" class="flex justify-between text-sm">
+                  <span>{{ t.name || 'Unnamed' }}</span><span>{{ t.price ? 'KES ' + t.price : 'Free' }}</span>
+                </div>
+              </template>
+              <template v-else>
+                <div class="flex justify-between text-sm"><span>Regular</span><span>{{ form.regular ? 'KES ' + form.regular : '—' }}</span></div>
+                <div class="flex justify-between text-sm"><span>VIP</span><span>{{ form.vip ? 'KES ' + form.vip : '—' }}</span></div>
+                <div class="flex justify-between text-sm"><span>VVIP</span><span>{{ form.vvip ? 'KES ' + form.vvip : '—' }}</span></div>
+              </template>
               <div class="flex justify-between text-sm pt-2 border-t mt-2"><span>Available</span><span>{{ form.TicketQuantity || 0 }}</span></div>
             </div>
           </div>
@@ -137,5 +176,5 @@
 </template>
 
 <script setup>
-const { form, isLoading, previewImage, onFileChange, submitEvent } = orgCreateEvent();
+const { form, isLoading, previewImage, freeEntry, customTickets, clearForm, addTicketType, removeTicketType, onFileChange, toggleFreeEntry, submitEvent } = orgCreateEvent();
 </script>

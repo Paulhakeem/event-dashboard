@@ -15,9 +15,16 @@
           ></div>
 
           <img
-            src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80"
+            v-if="user?.profileImage"
+            :src="user.profileImage"
             class="relative w-28 h-28 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-xl"
           />
+          <div
+            v-else
+            class="relative w-28 h-28 rounded-full bg-[#9c4e8b] flex items-center justify-center text-white text-3xl font-bold border-4 border-white dark:border-neutral-800 shadow-xl"
+          >
+            {{ (user?.firstName?.[0] || '?').toUpperCase() }}
+          </div>
 
           <span
             class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
@@ -28,18 +35,18 @@
         <h2
           class="mt-5 text-2xl font-bold text-gray-800 dark:text-white capitalize"
         >
-          {{ user.firstName }} {{ user.lastName }}
+          {{ user?.firstName || 'User' }} {{ user?.lastName || '' }}
         </h2>
 
         <p class="text-gray-500 dark:text-neutral-400 text-sm">
-          {{ user.email }}
+          {{ user?.email || '' }}
         </p>
 
         <!-- Role -->
         <span
           class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
-          {{ user.role }}
+          {{ user?.role || '' }}
         </span>
 
         <!-- Divider -->
@@ -96,7 +103,9 @@
         <div class="grid grid-cols-3 gap-4 w-full pt-10">
           <div class="stat-card hover:border-pink-400">
             <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
-            <p class="stat-number">{{ cancelledSummary?.cancelledCount || 0 }}</p>
+            <p class="stat-number">
+              {{ cancelledSummary?.cancelledCount || 0 }}
+            </p>
             <span>Refunded</span>
           </div>
           <div class="stat-card hover:border-pink-400">
@@ -129,7 +138,7 @@
         <!-- Buttons -->
         <div class="flex gap-3 mt-8 w-full">
           <button
-           @click="toggle"
+            @click="toggle"
             class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
@@ -147,7 +156,6 @@
   </div>
 </template>
 <script setup>
-
 const { user, token, logout } = useAuth();
 const { users } = totalUsers();
 const { events } = totalEvents();

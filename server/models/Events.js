@@ -10,6 +10,10 @@ const eventSchema = new mongoose.Schema({
   regular: { type: Number, default: 0 },
   vip: { type: Number, default: 0 },
   vvip: { type: Number, default: 0 },
+  customTickets: [{
+    name: { type: String, required: true },
+    price: { type: Number, required: true },
+  }],
   status: {
     type: String,
     enum: ["upcoming", "ongoing", "completed", "cancelled", "pending", "live"],

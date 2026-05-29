@@ -20,11 +20,22 @@ export default defineEventHandler(async (event) => {
   const normalizedEmail = email.toLowerCase();
 
   // Find user
-  const user = await User.findOne({ email: normalizedEmail }).select("+password");
+  const user = await User.findOne({ email: normalizedEmail }).select(
+    "+password",
+  );
   if (!user) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid email or password",
+    });
+  }
+
+  // check if user login with google
+  if (!user.password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "This account uses Google sign-in. Please login with Google.",
     });
   }
 
@@ -53,7 +64,7 @@ export default defineEventHandler(async (event) => {
       role: user.role,
     },
     config.secretStr,
-    { expiresIn: "1d" }
+    { expiresIn: "1d" },
   );
 
   return {

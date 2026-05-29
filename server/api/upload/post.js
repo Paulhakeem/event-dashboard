@@ -50,6 +50,11 @@ export default defineEventHandler(async (event) => {
   const regular = fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
   const vip = fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
   const vvip = fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
+  let customTickets = [];
+  try {
+    const raw = fields.customTickets?.[0];
+    if (raw) customTickets = JSON.parse(raw);
+  } catch { customTickets = []; }
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
@@ -89,10 +94,11 @@ export default defineEventHandler(async (event) => {
     regular,
     vip,
     vvip,
+    customTickets: customTickets.length > 0 ? customTickets : undefined,
     TicketQuantity,
     status,
     eventType,
-    image: uploadResult.secure_url, // cloudinary URL
+    image: uploadResult.secure_url,
     createdBy: user._id,
   });
 

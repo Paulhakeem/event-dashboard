@@ -19,8 +19,43 @@ const config = useRuntimeConfig()
   const isLoading = ref(false);
   const previewImage = ref(null);
   const file = ref(null);
+  const freeEntry = ref(false);
+  const customTickets = ref([]);
 
-  //   Handle image selection and preview
+  const addTicketType = () => {
+    customTickets.value.push({ name: "", price: 0 });
+  };
+
+  const removeTicketType = (index) => {
+    customTickets.value.splice(index, 1);
+  };
+
+  const toggleFreeEntry = () => {
+    freeEntry.value = !freeEntry.value;
+    if (freeEntry.value) {
+      customTickets.value.forEach(t => t.price = 0);
+    }
+  };
+
+  const clearForm = () => {
+    Object.assign(form, {
+      title: "",
+      description: "",
+      date: "",
+      location: "",
+      eventType: "other",
+      regular: "",
+      vip: "",
+      vvip: "",
+      TicketQuantity: 0,
+      status: "upcoming",
+    });
+    freeEntry.value = false;
+    customTickets.value = [];
+    previewImage.value = null;
+    file.value = null;
+  };
+
   const onFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
@@ -38,25 +73,15 @@ const config = useRuntimeConfig()
       formData.append("date", form.date);
       formData.append("location", form.location);
       formData.append("eventType", form.eventType);
-      formData.append("regular", form.regular);
-      formData.append("vip", form.vip);
-      formData.append("vvip", form.vvip);
+      formData.append("regular", form.regular ?? 0);
+      formData.append("vip", form.vip ?? 0);
+      formData.append("vvip", form.vvip ?? 0);
+      formData.append("customTickets", JSON.stringify(customTickets.value));
       formData.append("TicketQuantity", form.TicketQuantity);
       formData.append("status", form.status);
       if (file.value) {
         formData.append("image", file.value);
       }
-      // optional ticket prices (only append if defined)
-      if (
-        form.regular !== "" &&
-        form.regular !== null &&
-        form.regular !== undefined
-      )
-        formData.append("regular", form.regular);
-      if (form.vip !== "" && form.vip !== null && form.vip !== undefined)
-        formData.append("vip", form.vip);
-      if (form.vvip !== "" && form.vvip !== null && form.vvip !== undefined)
-        formData.append("vvip", form.vvip);
 
       const response = await $fetch(`${config.public.organiserCreateEventApi}`, {
         method: "POST",
@@ -67,21 +92,7 @@ const config = useRuntimeConfig()
       });
 
       alert("✅ " + response.message);
-      // Reset form
-      Object.assign(form, {
-        title: "",
-        description: "",
-        date: "",
-        location: "",
-        eventType: "other",
-        regular: "",
-        vip: "",
-        vvip: "",
-        TicketQuantity: 0,
-        status: "upcoming",
-      });
-      previewImage.value = null;
-      file.value = null;
+      clearForm();
     } catch (err) {
       const message =
         err.res?.statusMessage ||
@@ -97,7 +108,13 @@ const config = useRuntimeConfig()
     form,
     isLoading,
     previewImage,
+    freeEntry,
+    customTickets,
+    clearForm,
+    addTicketType,
+    removeTicketType,
     onFileChange,
+    toggleFreeEntry,
     submitEvent,
   };
 };

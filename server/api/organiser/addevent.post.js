@@ -53,6 +53,11 @@ export default defineEventHandler(async (event) => {
     fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
   const vvip =
     fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
+  let customTickets = [];
+  try {
+    const raw = fields.customTickets?.[0];
+    if (raw) customTickets = JSON.parse(raw);
+  } catch { customTickets = []; }
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
   // Force events created by organisers to be pending approval by admin
   const status = "pending";
@@ -102,6 +107,7 @@ export default defineEventHandler(async (event) => {
     regular,
     vip,
     vvip,
+    customTickets: customTickets.length > 0 ? customTickets : undefined,
     TicketQuantity,
     status,
     eventType,

@@ -14,10 +14,7 @@
           ></div>
 
           <img
-            :src="
-              user.avatar ||
-              'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80'
-            "
+            :src="user.profileImage"
             class="relative w-28 h-28 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-xl"
           />
 
