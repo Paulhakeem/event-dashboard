@@ -7,13 +7,12 @@ const eventSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   location: { type: String, required: true },
   TicketQuantity: { type: Number, required: true, default: 0 },
-  regular: { type: Number, default: 0 },
-  vip: { type: Number, default: 0 },
-  vvip: { type: Number, default: 0 },
-  customTickets: [{
-    name: { type: String, required: true },
-    price: { type: Number, required: true },
-  }],
+  customTickets: [
+    {
+      name: { type: String, required: true },
+      price: { type: Number, required: true },
+    },
+  ],
   status: {
     type: String,
     enum: ["upcoming", "ongoing", "completed", "cancelled", "pending", "live"],

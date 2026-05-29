@@ -92,29 +92,20 @@
             </p>
 
             <!-- Tickets Info -->
-            <div class="grid grid-cols-3 gap-2 mb-4">
+            <div
+              v-if="event.customTickets?.length"
+              class="grid grid-cols-3 gap-2 mb-4"
+            >
               <div
-                class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
+                v-for="(ticket, i) in event.customTickets"
+                :key="ticket.name + i"
+                class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-200 cursor-pointer"
               >
-                <p class="text-xs font-semibold text-[#9c4e8b]">Regular</p>
-                <p class="text-sm font-bold text-gray-900">
-                  Ksh {{ event.regular }}
+                <p class="text-xs font-semibold text-[#9c4e8b]">
+                  {{ ticket.name }}
                 </p>
-              </div>
-              <div
-                class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
-              >
-                <p class="text-xs font-semibold text-[#9c4e8b]">VIP</p>
                 <p class="text-sm font-bold text-gray-900">
-                  Ksh {{ event.vip }}
-                </p>
-              </div>
-              <div
-                class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
-              >
-                <p class="text-xs font-semibold text-[#9c4e8b]">VVIP</p>
-                <p class="text-sm font-bold text-gray-900">
-                  Ksh {{ event.vvip }}
+                  Ksh {{ ticket.price }}
                 </p>
               </div>
             </div>

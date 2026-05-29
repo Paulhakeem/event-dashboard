@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema(
         return !this.googleId; // required only if NOT a Google signup
       },
     },
-    googleId: { type: String, unique: true, sparse: true, default: null },
+    googleId: { type: String, unique: true, sparse: true },
     role: {
       type: String,
       enum: ["admin", "organiser", "user"],
