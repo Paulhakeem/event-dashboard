@@ -8,22 +8,28 @@ export default defineEventHandler(async () => {
     // get all bookings
     const bookings = await TotalBooking.find().sort({ bookedAt: 1 }).lean();
 
-    // get stats per events (group by eventName & userEmail)
+    // get stats per events (group by eventName)
     const stats = await TotalBooking.aggregate([
       {
         $group: {
-          _id: "$eventName",
-          uniqueUsers: { $addToSet: "$userEmail" },
+          _id: { eventName: "$eventName", ticketType: "$ticketType" },
+          count: { $sum: 1 },
           totalRevenue: { $sum: "$amount" },
-          regular: {
-            $sum: { $cond: [{ $eq: ["$ticketType", "regular"] }, 1, 0] },
+          uniqueUsers: { $addToSet: "$userEmail" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.eventName",
+          ticketTypes: {
+            $push: {
+              name: "$_id.ticketType",
+              count: "$count",
+            },
           },
-          vip: {
-            $sum: { $cond: [{ $eq: ["$ticketType", "vip"] }, 1, 0] },
-          },
-          vvip: {
-            $sum: { $cond: [{ $eq: ["$ticketType", "vvip"] }, 1, 0] },
-          },
+          totalRevenue: { $sum: "$totalRevenue" },
+          uniqueUsers: { $addToSet: { $each: "$uniqueUsers" } },
+          totalBookings: { $sum: "$count" },
         },
       },
       {
@@ -32,24 +38,11 @@ export default defineEventHandler(async () => {
           eventName: "$_id",
           totalUsers: { $size: "$uniqueUsers" },
           totalRevenue: 1,
-          regular: 1,
-          vip: 1,
-          vvip: 1,
+          totalBookings: 1,
+          ticketTypes: 1,
         },
       },
     ]);
-
-    // converts stats to a map keyed by eventName
-    const statsMap = {};
-    stats.forEach((s) => {
-      statsMap[s.eventName] = s;
-    });
-
-    // Return a de-duplicated events summary (top-level stats per event)
-    return {
-      success: true,
-      events: stats,
-    };
   } catch (error) {
     return { success: false, message: error.message };
   }

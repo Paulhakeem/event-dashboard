@@ -101,87 +101,37 @@
             </h3>
 
             <!-- TICKET OPTIONS -->
-            <div class="space-y-3 mb-8">
-              <!-- REGULAR -->
+            <div v-if="event?.customTickets?.length" class="space-y-3 mb-8">
               <label
+                v-for="ticket in event.customTickets"
+                :key="ticket.name"
                 class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
                 :class="
-                  ticketType === 'regular'
+                  ticketType === ticket.name
                     ? 'border-[#9c4e8b] bg-purple-50'
                     : 'border-gray-200'
                 "
               >
                 <input
                   type="radio"
-                  value="regular"
+                  :value="ticket.name"
                   v-model="ticketType"
-                  :disabled="!event?.regular"
+                  :disabled="!ticket.price && ticket.price !== 0"
                   class="w-5 h-5 text-[#9c4e8b]"
                 />
 
                 <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">Regular Ticket</p>
-                  <p class="text-sm text-gray-600">Standard access</p>
+                  <p class="font-semibold text-gray-900">{{ ticket.name }} Ticket</p>
                 </div>
 
                 <span class="text-lg font-bold text-[#9c4e8b]">
-                  Ksh {{ event?.regular || "Not set" }}
+                  Ksh {{ ticket.price ?? "Not set" }}
                 </span>
               </label>
+            </div>
 
-              <!-- VIP -->
-              <label
-                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
-                :class="
-                  ticketType === 'vip'
-                    ? 'border-[#9c4e8b] bg-purple-50'
-                    : 'border-gray-200'
-                "
-              >
-                <input
-                  type="radio"
-                  value="vip"
-                  v-model="ticketType"
-                  :disabled="!event?.vip"
-                  class="w-5 h-5 text-[#9c4e8b]"
-                />
-
-                <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">VIP Ticket ⭐</p>
-                  <p class="text-sm text-gray-600">Premium experience</p>
-                </div>
-
-                <span class="text-lg font-bold text-[#9c4e8b]">
-                  Ksh {{ event?.vip || "Not set" }}
-                </span>
-              </label>
-
-              <!-- VVIP -->
-              <label
-                class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition"
-                :class="
-                  ticketType === 'vvip'
-                    ? 'border-[#9c4e8b] bg-purple-50'
-                    : 'border-gray-200'
-                "
-              >
-                <input
-                  type="radio"
-                  value="vvip"
-                  v-model="ticketType"
-                  :disabled="!event?.vvip"
-                  class="w-5 h-5 text-[#9c4e8b]"
-                />
-
-                <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">VVIP Ticket 👑</p>
-                  <p class="text-sm text-gray-600">Exclusive access</p>
-                </div>
-
-                <span class="text-lg font-bold text-[#9c4e8b]">
-                  Ksh {{ event?.vvip || "Not set" }}
-                </span>
-              </label>
+            <div class="flex items-center justify-between text-sm text-gray-600 mb-6">
+              <span>🎟️ {{ event?.TicketQuantity || 0 }} tickets available</span>
             </div>
 
             <!-- PHONE INPUT -->
@@ -211,7 +161,7 @@
               @click="handleBooking"
               :disabled="
                 !isBookable ||
-                paymentStatus !== 'idle'
+                (paymentStatus !== 'idle' && paymentStatus !== 'failed')
               "
               class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
               :class="{

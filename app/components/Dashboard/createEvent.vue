@@ -1,59 +1,115 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-
       <!-- Form Column -->
       <div class="lg:col-span-2">
         <div class="mb-6">
           <h1 class="text-3xl font-bold text-[#9d4e8a]">Create an Event</h1>
-          <p class="mt-2 text-gray-600">Quickly create and publish events with a beautiful preview.</p>
+          <p class="mt-2 text-gray-600">
+            Quickly create and publish events with a beautiful preview.
+          </p>
         </div>
 
         <form @submit.prevent="submitEvent" class="space-y-6">
           <div class="bg-white rounded-2xl shadow p-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Event Image</label>
-            <label for="dropzone-file" class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-purple-400 transition">
+            <label class="block text-sm font-semibold text-gray-700 mb-2"
+              >Event Image</label
+            >
+            <label
+              for="dropzone-file"
+              class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-purple-400 transition"
+            >
               <template v-if="previewImage">
                 <img :src="previewImage" class="object-cover w-full h-full" />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end p-4">
-                  <span class="text-white text-sm">Preview - click to change</span>
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent flex items-end p-4"
+                >
+                  <span class="text-white text-sm"
+                    >Preview - click to change</span
+                  >
                 </div>
               </template>
               <template v-else>
                 <div class="flex flex-col items-center justify-center">
-                  <Icon name="mdi:cloud-upload" class="text-4xl text-gray-400" />
-                  <p class="text-sm text-gray-500 mt-2">Click to upload or drag & drop</p>
+                  <Icon
+                    name="mdi:cloud-upload"
+                    class="text-4xl text-gray-400"
+                  />
+                  <p class="text-sm text-gray-500 mt-2">
+                    Click to upload or drag & drop
+                  </p>
                 </div>
               </template>
-              <input id="dropzone-file" type="file" class="hidden" @change="onFileChange" />
+              <input
+                id="dropzone-file"
+                type="file"
+                class="hidden"
+                @change="onFileChange"
+              />
             </label>
           </div>
 
           <div class="bg-white rounded-2xl shadow p-6 space-y-4">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Title *</label>
-              <input v-model="form.title" required placeholder="Summer Music Festival" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Event Title *</label
+              >
+              <input
+                v-model="form.title"
+                required
+                placeholder="Summer Music Festival"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+              />
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
-              <textarea v-model="form.description" rows="4" required placeholder="Describe your event" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none resize-none"></textarea>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Description *</label
+              >
+              <textarea
+                v-model="form.description"
+                rows="4"
+                required
+                placeholder="Describe your event"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none resize-none"
+              ></textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Location *</label>
-                <input v-model="form.location" required placeholder="Nairobi, Kenya" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Location *</label
+                >
+                <input
+                  v-model="form.location"
+                  required
+                  placeholder="Nairobi, Kenya"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
-                <input v-model="form.date" required type="date" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none" />
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Date *</label
+                >
+                <input
+                  v-model="form.date"
+                  required
+                  type="date"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                />
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2">Event Type</label>
-              <select v-model="form.eventType" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none">
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Event Type</label
+              >
+              <select
+                v-model="form.eventType"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+              >
                 <option value="other">Select type</option>
                 <option value="Entertainment">Entertainment</option>
                 <option value="Arts & Culture">Arts & Culture</option>
@@ -67,10 +123,18 @@
               <h3 class="text-lg font-semibold">Pricing & Tickets</h3>
               <label class="flex items-center gap-2 cursor-pointer">
                 <span class="text-sm text-gray-600">Free Entry</span>
-                <input type="checkbox" :checked="freeEntry" @change="toggleFreeEntry" class="w-5 h-5 accent-purple-600" />
+                <input
+                  type="checkbox"
+                  :checked="freeEntry"
+                  @change="toggleFreeEntry"
+                  class="w-5 h-5 accent-purple-600"
+                />
               </label>
             </div>
-            <div class="space-y-3" :class="{ 'opacity-50 pointer-events-none': freeEntry }">
+            <div
+              class="space-y-3"
+              :class="{ 'opacity-50 pointer-events-none': freeEntry }"
+            >
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
@@ -95,7 +159,9 @@
                   type="button"
                   @click="removeTicketType(index)"
                   class="text-red-500 hover:text-red-700 text-lg px-2"
-                >✕</button>
+                >
+                  ✕
+                </button>
               </div>
               <button
                 type="button"
@@ -109,12 +175,25 @@
 
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Total Tickets</label>
-                <input v-model.number="form.TicketQuantity" required type="number" min="0" class="w-full p-3 border rounded-lg" />
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Total Tickets</label
+                >
+                <input
+                  v-model.number="form.TicketQuantity"
+                  required
+                  type="number"
+                  min="0"
+                  class="w-full p-3 border rounded-lg"
+                />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                <select v-model="form.status" class="w-full p-3 border rounded-lg">
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Status</label
+                >
+                <select
+                  v-model="form.status"
+                  class="w-full p-3 border rounded-lg"
+                >
                   <option value="pending">Pending</option>
                   <option value="upcoming">Upcoming</option>
                   <option value="ongoing">Ongoing</option>
@@ -125,11 +204,25 @@
             </div>
 
             <div class="mt-6 flex gap-4">
-              <button type="submit" :disabled="isLoading" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60">
-                <Icon v-if="isLoading" name="mdi:loading" class="inline mr-2 animate-spin" />
-                {{ isLoading ? 'Creating Event...' : 'Create Event' }}
+              <button
+                type="submit"
+                :disabled="isLoading"
+                class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60"
+              >
+                <Icon
+                  v-if="isLoading"
+                  name="mdi:loading"
+                  class="inline mr-2 animate-spin"
+                />
+                {{ isLoading ? "Creating Event..." : "Create Event" }}
               </button>
-              <button type="reset" @click="clearForm" class="px-6 py-3 border rounded-lg">Clear</button>
+              <button
+                type="reset"
+                @click="clearForm"
+                class="px-6 py-3 border rounded-lg"
+              >
+                Clear
+              </button>
             </div>
           </div>
         </form>
@@ -140,43 +233,71 @@
         <div class="sticky top-20 space-y-4">
           <div class="bg-white rounded-2xl shadow p-6">
             <div class="h-40 rounded-lg overflow-hidden bg-gray-100">
-              <img v-if="previewImage" :src="previewImage" class="w-full h-full object-cover" />
-              <div v-else class="w-full h-full flex items-center justify-center text-gray-400">Preview</div>
+              <img
+                v-if="previewImage"
+                :src="previewImage"
+                class="w-full h-full object-cover"
+              />
+              <div
+                v-else
+                class="w-full h-full flex items-center justify-center text-gray-400"
+              >
+                Preview
+              </div>
             </div>
-            <h3 class="mt-4 text-lg font-bold">{{ form.title || 'Untitled Event' }}</h3>
-            <p class="text-sm text-gray-500 mt-2">{{ form.date ? new Date(form.date).toDateString() : 'Date not set' }}</p>
-            <p class="mt-3 text-gray-700 text-sm">{{ form.description ? form.description.slice(0, 120) + (form.description.length > 120 ? '...' : '') : 'No description yet' }}</p>
+            <h3 class="mt-4 text-lg font-bold">
+              {{ form.title || "Untitled Event" }}
+            </h3>
+            <p class="text-sm text-gray-500 mt-2">
+              {{
+                form.date ? new Date(form.date).toDateString() : "Date not set"
+              }}
+            </p>
+            <p class="mt-3 text-gray-700 text-sm">
+              {{
+                form.description
+                  ? form.description.slice(0, 120) +
+                    (form.description.length > 120 ? "..." : "")
+                  : "No description yet"
+              }}
+            </p>
           </div>
 
           <div class="bg-white rounded-2xl shadow p-4">
             <h4 class="text-sm font-semibold text-gray-700">Tickets</h4>
             <div class="mt-3 space-y-2">
               <template v-if="freeEntry">
-                <div class="flex justify-between text-sm text-green-600 font-medium"><span>Free Entry</span><span>✓</span></div>
-              </template>
-              <template v-else-if="customTickets.length > 0">
-                <div v-for="t in customTickets" :key="t.name + t.price" class="flex justify-between text-sm">
-                  <span>{{ t.name || 'Unnamed' }}</span><span>{{ t.price ? 'KES ' + t.price : 'Free' }}</span>
+                <div
+                  class="flex justify-between text-sm text-green-600 font-medium"
+                >
+                  <span>Free Entry</span><span>✓</span>
                 </div>
               </template>
-              <template v-else>
-                <div class="flex justify-between text-sm"><span>Regular</span><span>{{ form.regular ? 'KES ' + form.regular : '—' }}</span></div>
-                <div class="flex justify-between text-sm"><span>VIP</span><span>{{ form.vip ? 'KES ' + form.vip : '—' }}</span></div>
-                <div class="flex justify-between text-sm"><span>VVIP</span><span>{{ form.vvip ? 'KES ' + form.vvip : '—' }}</span></div>
+              <template v-else-if="customTickets.length > 0">
+                <div
+                  v-for="t in customTickets"
+                  :key="t.name + t.price"
+                  class="flex justify-between text-sm"
+                >
+                  <span>{{ t.name || "Unnamed" }}</span
+                  ><span>{{ t.price ? "KES " + t.price : "Free" }}</span>
+                </div>
               </template>
-              <div class="flex justify-between text-sm pt-2 border-t mt-2"><span>Available</span><span>{{ form.TicketQuantity || 0 }}</span></div>
+              <div class="flex justify-between text-sm pt-2 border-t mt-2">
+                <span>Available</span
+                ><span>{{ form.TicketQuantity || 0 }}</span>
+              </div>
             </div>
           </div>
         </div>
       </aside>
-
     </div>
   </div>
 </template>
 
 <script setup>
 const { token } = useAuth();
-const config = useRuntimeConfig()
+const config = useRuntimeConfig();
 const form = reactive({
   title: "",
   description: "",
@@ -208,7 +329,7 @@ const removeTicketType = (index) => {
 const toggleFreeEntry = () => {
   freeEntry.value = !freeEntry.value;
   if (freeEntry.value) {
-    customTickets.value.forEach(t => t.price = 0);
+    customTickets.value.forEach((t) => (t.price = 0));
   }
 };
 

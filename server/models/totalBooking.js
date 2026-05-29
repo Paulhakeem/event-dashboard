@@ -44,7 +44,6 @@ const totalBookingSchema = new mongoose.Schema(
     },
     ticketType: {
       type: String,
-      enum: ["regular", "vip", "vvip"],
       required: true,
     },
     amount: {

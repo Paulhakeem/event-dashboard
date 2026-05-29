@@ -9,9 +9,7 @@ export default function updateEvent(eventsRef = null) {
     date: "",
     location: "",
     TicketQuantity: 0,
-    regular: 0,
-    vip: 0,
-    vvip: 0,
+    customTickets: [],
     status: "upcoming",
     eventType: "other",
   });
@@ -28,6 +26,14 @@ export default function updateEvent(eventsRef = null) {
     }
   };
 
+  const addTicket = () => {
+    editForm.value.customTickets.push({ name: "", price: 0 });
+  };
+
+  const removeTicket = (index) => {
+    editForm.value.customTickets.splice(index, 1);
+  };
+
   const openEdit = (ev) => {
     editingEvent.value = ev._id;
     editForm.value = {
@@ -37,9 +43,9 @@ export default function updateEvent(eventsRef = null) {
       date: ev.date ? new Date(ev.date).toISOString().slice(0, 10) : "",
       location: ev.location || "",
       TicketQuantity: ev.TicketQuantity || 0,
-      regular: ev.regular || 0,
-      vip: ev.vip || 0,
-      vvip: ev.vvip || 0,
+      customTickets: ev.customTickets
+        ? ev.customTickets.map((t) => ({ name: t.name, price: t.price }))
+        : [],
       status: ev.status || "upcoming",
       eventType: ev.eventType || "other",
     };
@@ -76,5 +82,7 @@ export default function updateEvent(eventsRef = null) {
     openEdit,
     closeEdit,
     submitUpdate,
+    addTicket,
+    removeTicket,
   };
 }

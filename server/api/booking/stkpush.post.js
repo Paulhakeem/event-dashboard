@@ -60,26 +60,18 @@ export default defineEventHandler(async (event) => {
   }
 
   // Verify ticket type
-  let amount = null;
+  const matchedTicket = eventData.customTickets?.find(
+    (t) => t.name === ticketType,
+  );
 
-  if (ticketType === "regular") {
-    amount = eventData.regular;
-  }
-
-  if (ticketType === "vip") {
-    amount = eventData.vip;
-  }
-
-  if (ticketType === "vvip") {
-    amount = eventData.vvip;
-  }
-
-  if (!amount) {
+  if (!matchedTicket || !matchedTicket.price) {
     throw createError({
       statusCode: 404,
       statusMessage: "Ticket type not found",
     });
   }
+
+  const amount = matchedTicket.price;
 
   // Daraja credentials
   const {

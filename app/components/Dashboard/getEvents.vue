@@ -11,9 +11,6 @@
                 <th scope="col" class="px-6 py-4 text-white">Event</th>
                 <th scope="col" class="px-6 py-4 text-white">Date</th>
                 <th scope="col" class="px-6 py-4 text-white">Location</th>
-                <th scope="col" class="px-6 py-4 text-white">Regular Ticket</th>
-                <th scope="col" class="px-6 py-4 text-white">VIP Ticket</th>
-                <th scope="col" class="px-6 py-4 text-white">VVIP Ticket</th>
                 <th scope="col" class="px-6 py-4 text-white">Event Type</th>
                 <th scope="col" class="px-6 py-4 text-white">Capacity</th>
                 <th scope="col" class="px-6 py-4 text-white">Status</th>
@@ -39,19 +36,18 @@
                   {{ event.location }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
-                  ksh {{ event.regular }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium">
-                  ksh {{ event.vip }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium">
-                  ksh {{ event.vvip }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 font-medium">
                   {{ event.eventType }}
                 </td>
                 <td class="whitespace-nowrap px-6 py-4 font-medium">
-                  <span :class="event.ticketsRemaining === 0 ? 'text-red-500' : event.ticketsRemaining < 10 ? 'text-yellow-500' : 'text-green-500'">
+                  <span
+                    :class="
+                      event.ticketsRemaining === 0
+                        ? 'text-red-500'
+                        : event.ticketsRemaining < 10
+                          ? 'text-yellow-500'
+                          : 'text-green-500'
+                    "
+                  >
                     {{ event.ticketsSold || 0 }}/{{ event.TicketQuantity || 0 }}
                   </span>
                 </td>
@@ -64,8 +60,12 @@
                 <td
                   class="whitespace-nowrap px-6 py-4 font-medium text-gray-500"
                 >
-                  <button @click="openEdit(event)" class="cursor-pointer">
+                  <button
+                    @click="openEdit(event)"
+                    class="bg-blue-500 text-white hover:bg-blue-600 px-4 py-2 flex items-center gap-2 rounded-md cursor-pointer"
+                  >
                     <Icon name="solar:pen-bold" />
+                    Edit
                   </button>
                 </td>
                 <td
@@ -73,9 +73,10 @@
                 >
                   <button
                     @click="removeEvent(event._id)"
-                    class="cursor-pointer"
+                    class="bg-red-500 text-white hover:bg-red-600 px-4 py-2 flex items-center gap-2 rounded-md cursor-pointer"
                   >
                     <Icon name="vaadin:close" />
+                    Delete
                   </button>
                 </td>
               </tr>
@@ -141,43 +142,45 @@
               class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
             />
           </div>
-          <!-- regular ticket -->
-          <div class="flex flex-col">
-            <label for="regular" class="text-sm font-medium text-gray-700 mb-1"
-              >💵 Regular Price</label
+          <!-- Custom Tickets -->
+          <div class="flex flex-col col-span-2">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-medium text-gray-700"
+                >🎟️ Ticket Types</label
+              >
+              <button
+                @click="addTicket"
+                type="button"
+                class="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+              >
+                + Add Ticket
+              </button>
+            </div>
+            <div
+              v-for="(ticket, i) in editForm.customTickets"
+              :key="i"
+              class="flex items-center gap-2 mb-2"
             >
-            <input
-              id="regular"
-              v-model.number="editForm.regular"
-              placeholder="Regular price"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-green-400 focus:border-green-400 transition"
-            />
-          </div>
-
-          <!-- VIP Price -->
-          <div class="flex flex-col">
-            <label for="vip" class="text-sm font-medium text-gray-700 mb-1"
-              >🌟 VIP Price</label
-            >
-            <input
-              id="vip"
-              v-model.number="editForm.vip"
-              placeholder="VIP price"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition"
-            />
-          </div>
-
-          <!-- VVIP Price -->
-          <div class="flex flex-col">
-            <label for="vvip" class="text-sm font-medium text-gray-700 mb-1"
-              >👑 VVIP Price</label
-            >
-            <input
-              id="vvip"
-              v-model.number="editForm.vvip"
-              placeholder="VVIP price"
-              class="border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition"
-            />
+              <input
+                v-model="ticket.name"
+                placeholder="Ticket name"
+                class="flex-1 border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+              />
+              <input
+                v-model.number="ticket.price"
+                type="number"
+                min="0"
+                placeholder="Price"
+                class="w-28 border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+              />
+              <button
+                @click="removeTicket(i)"
+                type="button"
+                class="text-red-500 hover:text-red-700 text-xl leading-none px-1"
+              >
+                &times;
+              </button>
+            </div>
           </div>
 
           <!-- Status -->
@@ -266,25 +269,29 @@ const {
   openEdit,
   closeEdit,
   submitUpdate,
+  addTicket,
+  removeTicket,
 } = updateEvent(events);
 
 const statusClass = (status) => {
   const map = {
-    upcoming: 'text-blue-500',
-    ongoing: 'text-yellow-500',
-    live: 'text-green-500',
-    completed: 'text-gray-500',
-    cancelled: 'text-red-500',
-    pending: 'text-orange-500',
+    upcoming: "text-blue-500",
+    ongoing: "text-yellow-500",
+    live: "text-green-500",
+    completed: "text-gray-500",
+    cancelled: "text-red-500",
+    pending: "text-orange-500",
   };
-  return map[status] || 'text-gray-500';
+  return map[status] || "text-gray-500";
 };
 </script>
 
 <style scoped>
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 .modal-enter-from {
   opacity: 0;

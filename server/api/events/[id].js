@@ -47,9 +47,7 @@ export default defineEventHandler(async (event) => {
         "date",
         "location",
         "TicketQuantity",
-        "regular",
-        "vip",
-        "vvip",
+        "customTickets",
         "status",
         "eventType",
       ];

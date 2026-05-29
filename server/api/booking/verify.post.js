@@ -46,22 +46,19 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
 
-  /* -------------------- TICKET PRICE MAP -------------------- */
-  const priceMap = {
-    regular: eventData.regular,
-    vip: eventData.vip,
-    vvip: eventData.vvip,
-  };
+  /* -------------------- TICKET PRICE LOOKUP -------------------- */
+  const matchedTicket = eventData.customTickets?.find(
+    (t) => t.name === ticketType,
+  );
 
-  const expectedAmount = priceMap[ticketType];
-
-  // if the selected ticket type is not configured for this event, reject
-  if (expectedAmount === undefined || expectedAmount === null) {
+  if (!matchedTicket || matchedTicket.price === undefined || matchedTicket.price === null) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid or unavailable ticket type selected",
     });
   }
+
+  const expectedAmount = matchedTicket.price;
 
   /* -------------------- VERIFY DARAJA M-PESA -------------------- */
   // Get Daraja credentials from config
