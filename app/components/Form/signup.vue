@@ -13,9 +13,6 @@
       </p>
 
       <form class="w-full">
-        <!-- allow user to uload profile image -->
-        <ProfileImage />
-        <!-- end -->
         <p class="text-red-500 italic text-sm">{{ errorMessage }}</p>
 
         <div class="mt-6 grid gap-4 lg:gap-6">
