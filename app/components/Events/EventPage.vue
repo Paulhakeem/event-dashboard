@@ -12,15 +12,42 @@
         </p>
       </div>
 
-      <!-- Loading State -->
+      <!-- Skeleton Loading State -->
       <div
         v-if="pendings"
-        class="flex flex-col items-center justify-center py-20 text-center"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
       >
         <div
-          class="w-12 h-12 border-4 border-[#9c4e8b] border-t-transparent rounded-full animate-spin mb-4"
-        ></div>
-        <p class="text-gray-500 text-lg">Loading events...</p>
+          v-for="n in 6"
+          :key="n"
+          class="rounded-2xl overflow-hidden shadow-lg bg-white animate-pulse"
+        >
+          <!-- Image Skeleton -->
+          <div class="h-64 bg-gray-200"></div>
+
+          <!-- Content Skeleton -->
+          <div class="p-6 space-y-4">
+            <!-- Title -->
+            <div class="h-5 bg-gray-200 rounded-full w-3/4"></div>
+            <!-- Location -->
+            <div class="h-4 bg-gray-200 rounded-full w-1/2"></div>
+            <!-- Date -->
+            <div class="h-4 bg-gray-200 rounded-full w-2/5"></div>
+            <!-- Description lines -->
+            <div class="space-y-2">
+              <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+              <div class="h-3 bg-gray-200 rounded-full w-4/5"></div>
+            </div>
+            <!-- Ticket chips -->
+            <div class="grid grid-cols-3 gap-2">
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+            </div>
+            <!-- Button -->
+            <div class="h-10 bg-gray-200 rounded-lg w-full"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Events Grid -->
@@ -127,16 +154,16 @@
               <div
                 class="flex items-center justify-between text-xs text-gray-600 mb-4"
               >
-                <span>🎟️ {{ event.TicketQuantity || 0 }} tickets available</span>
+                <span
+                  >🎟️ {{ event.TicketQuantity || 0 }} tickets available</span
+                >
               </div>
 
               <!-- CTA Button -->
               <NuxtLink :to="`/events/${event._id}`">
                 <button
                   :disabled="
-                    event.status === 'cancelled' ||
-                    event.status === 'completed' ||
-                    event.status === 'live'
+                    event.status === 'cancelled' || event.status === 'completed'
                   "
                   class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
@@ -156,8 +183,8 @@
         </div>
       </template>
 
-      <!-- Empty State -->
-      <template v-else-if="!pendings">
+      <!-- Empty State: done loading, zero events -->
+      <template v-else-if="!pendings && filteredEventPosters.length === 0">
         <div
           class="flex flex-col items-center justify-center py-20 text-center"
         >
@@ -174,33 +201,56 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="1.5"
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">
-            No Events Yet
-          </h3>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">No Events Found</h3>
           <p class="text-gray-500 text-lg max-w-md">
-            There are no events available at the moment. Check back later for new
-            and exciting events.
+            There are no events available at the moment. Check back later for
+            new and exciting events.
           </p>
+          <!-- API / network error -->
           <div
             v-if="errorMessage"
             class="mt-4 px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
           >
             {{ errorMessage }}
           </div>
+
+          <!-- Retry Button -->
+          <button
+            @click="fetchEvents"
+            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Try Again
+          </button>
         </div>
       </template>
     </div>
   </div>
 </template>
-<script setup>
-const { eventPosters, pendings, errorMessage } = EventFunctions();
 
-// Computed property to filter out pending events
-const filteredEventPosters = computed(() => {
-  return eventPosters.value.filter((event) => event.status !== "pending");
-});
+<script setup>
+const { eventPosters, pendings, errorMessage, fetchEvents } = EventFunctions();
+
+onMounted(() => fetchEvents());
+
+// Filter out pending events
+const filteredEventPosters = computed(() =>
+  eventPosters.value.filter((event) => event.status !== "pending"),
+);
 </script>

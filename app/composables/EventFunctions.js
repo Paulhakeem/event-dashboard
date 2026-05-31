@@ -1,6 +1,5 @@
-
 export default function useEventFunctions() {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const eventPosters = ref([]);
 
   const pendings = ref(true);
@@ -8,8 +7,10 @@ export default function useEventFunctions() {
   const errorMessage = ref("");
 
   const fetchEvents = async () => {
+    pendings.value = true;
+    errorMessage.value = "";
     try {
-      const res = await $fetch(`${config.public.eventApi}/fetch`);
+      const res = await $fetch(`${config.public.totalEventsApi}`);
       if (res.success) {
         eventPosters.value = res.events || [];
       } else {
@@ -22,8 +23,6 @@ export default function useEventFunctions() {
       pendings.value = false;
     }
   };
-
-  onMounted(fetchEvents);
 
   return { eventPosters, pendings, errorMessage, fetchEvents };
 }

@@ -32,7 +32,7 @@
       </p>
 
       <button
-        @click="ongoingEvents"
+        @click="fetchEvents"
         class="mt-4 px-4 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
       >
         Retry
@@ -73,7 +73,9 @@
   </div>
 </template>
 <script setup>
-const {eventPosters, errorMessage, pendings} = EventFunctions();
+const {eventPosters, errorMessage, pendings, fetchEvents} = EventFunctions();
+
+onMounted(() => fetchEvents());
 
 // get events with ongoing status
 const ongoingEvents = computed(() => {

@@ -1,5 +1,4 @@
 <template>
-  <!-- Events Section -->
   <div
     class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
   >
@@ -12,20 +11,39 @@
         </p>
       </div>
 
-      <!-- Loading State -->
-      <!-- FIX: was v-if="pendings" (undefined variable), corrected to v-if="loading" -->
+      <!-- 1. SKELETON LOADING STATE -->
       <div
         v-if="loading"
-        class="flex flex-col items-center justify-center py-20 text-center"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
       >
         <div
-          class="w-12 h-12 border-4 border-[#9c4e8b] border-t-transparent rounded-full animate-spin mb-4"
-        ></div>
-        <p class="text-gray-500 text-lg">Loading events...</p>
+          v-for="n in 6"
+          :key="n"
+          class="rounded-2xl overflow-hidden shadow-lg bg-white animate-pulse"
+        >
+          <!-- Image Skeleton -->
+          <div class="h-64 bg-gray-200"></div>
+          <!-- Content Skeleton -->
+          <div class="p-6 space-y-4">
+            <div class="h-5 bg-gray-200 rounded-full w-3/4"></div>
+            <div class="h-4 bg-gray-200 rounded-full w-1/2"></div>
+            <div class="h-4 bg-gray-200 rounded-full w-2/5"></div>
+            <div class="space-y-2">
+              <div class="h-3 bg-gray-200 rounded-full w-full"></div>
+              <div class="h-3 bg-gray-200 rounded-full w-4/5"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 rounded-lg"></div>
+            </div>
+            <div class="h-10 bg-gray-200 rounded-lg w-full"></div>
+          </div>
+        </div>
       </div>
 
-      <!-- Events Grid -->
-      <template v-else-if="filteredEvents.length > 0">
+      <!-- 2. EVENTS GRID (done loading, has events) -->
+      <template v-else-if="!loading && filteredEvents.length > 0">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
             v-for="event in filteredEvents"
@@ -73,14 +91,12 @@
 
             <!-- Content -->
             <div class="p-6">
-              <!-- Title -->
               <h3
                 class="text-xl font-bold text-gray-900 group-hover:text-[#9c4e8b] transition mb-2 line-clamp-2"
               >
                 {{ event.title }}
               </h3>
 
-              <!-- Location and Date -->
               <div class="space-y-2 mb-4">
                 <div class="flex items-center text-gray-600 text-sm">
                   <span class="mr-2">📍</span>
@@ -100,12 +116,10 @@
                 </div>
               </div>
 
-              <!-- Description -->
               <p class="text-gray-600 text-sm mb-4 line-clamp-2 min-h-10">
                 {{ event.description }}
               </p>
 
-              <!-- Tickets Info -->
               <div
                 v-if="event.customTickets?.length"
                 class="grid grid-cols-3 gap-2 mb-4"
@@ -124,7 +138,6 @@
                 </div>
               </div>
 
-              <!-- Tickets Available -->
               <div
                 class="flex items-center justify-between text-xs text-gray-600 mb-4"
               >
@@ -133,12 +146,10 @@
                 >
               </div>
 
-              <!-- CTA Button -->
               <NuxtLink :to="`/events/${event._id}`">
                 <button
                   :disabled="
-                    event.status === 'cancelled' ||
-                    event.status === 'completed'
+                    event.status === 'cancelled' || event.status === 'completed'
                   "
                   class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
@@ -158,8 +169,8 @@
         </div>
       </template>
 
-      <!-- Empty State -->
-      <template v-else-if="filteredEvents.length === 0">
+      <!-- 3. EMPTY STATE (done loading, no events) -->
+      <template v-else-if="!loading && filteredEvents.length === 0">
         <div
           class="flex flex-col items-center justify-center py-20 text-center"
         >
@@ -176,21 +187,44 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="1.5"
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">No Events Yet</h3>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">No Events Found</h3>
           <p class="text-gray-500 text-lg max-w-md">
             There are no events available at the moment. Check back later for
             new and exciting events.
           </p>
+
+          <!-- Error message -->
           <div
             v-if="errorMessage"
             class="mt-4 px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
           >
             {{ errorMessage }}
           </div>
+
+          <!-- Retry Button -->
+          <button
+            @click="fetchEvents"
+            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+            Try Again
+          </button>
         </div>
       </template>
     </div>
@@ -202,22 +236,34 @@ const events = ref([]);
 const loading = ref(true);
 const errorMessage = ref("");
 
-// Computed property to filter out pending events
-const filteredEvents = computed(() => {
-  return events.value.filter((event) => event.status !== "pending");
-});
+// Filter out pending events
+const filteredEvents = computed(() =>
+  events.value.filter((event) => event.status !== "pending"),
+);
 
-onMounted(async () => {
+// Extracted into a named function so the retry button can call it
+const fetchEvents = async () => {
   loading.value = true;
+  errorMessage.value = "";
   try {
     const res = await $fetch("/api/events/fetch");
-    if (res.success) {
+    if (Array.isArray(res)) {
+      events.value = res;
+    } else if (res?.success) {
       events.value = res.events || [];
+    } else if (res?.events) {
+      events.value = res.events || [];
+    } else {
+      events.value = [];
     }
   } catch (error) {
-    errorMessage.value = error.message;
+    events.value = [];
+    errorMessage.value =
+      error?.data?.message || error.message || "Failed to load events.";
   } finally {
     loading.value = false;
   }
-});
+};
+
+onMounted(fetchEvents);
 </script>
