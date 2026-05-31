@@ -3,7 +3,7 @@ export default function useEventBooking() {
   const { user } = useAuth();
   const route = useRoute();
 
-  const id = route.params.id;
+  const id = computed(() => route.params.id);
 
   const event = ref({});
   const ticketType = ref(null);
@@ -18,11 +18,12 @@ export default function useEventBooking() {
 
   /* ---------------- LOAD EVENT ---------------- */
 
-  onMounted(async () => {
+  watchEffect(async () => {
+    if (!id.value) return;
     try {
       loading.value = true;
 
-      const res = await $fetch(`${config.public.bookingEvent}/${id}`);
+      const res = await $fetch(`${config.public.bookingEvent}/${id.value}`);
 
       event.value = res.eventData;
     } catch (err) {
@@ -101,7 +102,7 @@ export default function useEventBooking() {
         method: "POST",
         body: {
           phone,
-          eventId: id,
+          eventId: id.value,
           userEmail: user.value.email,
           ticketType: ticketType.value,
         },
@@ -141,7 +142,7 @@ export default function useEventBooking() {
         }
       };
 
-      tryVerify(res.checkoutRequestID);
+      await tryVerify(res.checkoutRequestID);
     } catch (err) {
       paymentStatus.value = "failed";
       alert(err?.data?.statusMessage || "Payment initiation failed");

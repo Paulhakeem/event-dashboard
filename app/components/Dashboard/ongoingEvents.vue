@@ -61,12 +61,12 @@
         :key="event._id"
         class="border p-4 rounded"
       >
-        <h3 class="text-md font-medium">{{ event.name }}</h3>
+        <h3 class="text-md font-medium">{{ event.title }}</h3>
         <p class="text-sm text-gray-600">
           {{ new Date(event.date).toLocaleString() }}
         </p>
         <p class="text-sm text-gray-600">
-          Tickets Left: {{ event.TicketQuantity }}
+          Tickets Left: {{ event.ticketsRemaining ?? event.TicketQuantity }}
         </p>
       </li>
     </ul>

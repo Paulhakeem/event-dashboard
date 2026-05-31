@@ -14,14 +14,14 @@ export async function updateEventStatuses() {
     await Event.updateMany(
       {
         date: { $gte: todayStart, $lt: todayEnd },
-        status: { $ne: "completed" }
+        status: { $nin: ["completed", "cancelled"] }
       },
       { $set: { status: "live" } }
     );
     
     // Mark past events as completed
     await Event.updateMany(
-      { date: { $lt: todayStart }, status: { $ne: "completed" } },
+      { date: { $lt: todayStart }, status: { $nin: ["completed", "cancelled"] } },
       { $set: { status: "completed" } }
     );
   } catch (err) {

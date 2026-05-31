@@ -43,6 +43,8 @@ export default defineEventHandler(async () => {
         },
       },
     ]);
+
+    return { success: true, events: stats };
   } catch (error) {
     return { success: false, message: error.message };
   }

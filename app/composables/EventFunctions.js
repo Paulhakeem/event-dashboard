@@ -9,9 +9,11 @@ export default function useEventFunctions() {
 
   const fetchEvents = async () => {
     try {
-      const res = await $fetch(`${config.public.eventApi}`);
+      const res = await $fetch(`${config.public.eventApi}/fetch`);
       if (res.success) {
         eventPosters.value = res.events || [];
+      } else {
+        errorMessage.value = res.message || "Failed to load events";
       }
     } catch (error) {
       errorMessage.value = error.message;

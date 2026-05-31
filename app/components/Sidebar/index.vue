@@ -18,7 +18,11 @@
 
           <!-- Logo -->
           <div class="flex items-center text-lg">
-           <img src="/logo/VELORA.png" alt="Logo" class="h-20 w-auto object-contain" />
+            <img
+              :src="logo"
+              alt="Logo"
+              class="h-20 w-auto object-contain"
+            />
           </div>
 
           <!-- Auth Buttons -->
@@ -76,11 +80,7 @@
             @click="toggleMenu"
             class="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-lg transition"
           >
-            <Icon
-              class="text-white"
-              size="28"
-              name="material-symbols:close"
-            />
+            <Icon class="text-white" size="28" name="material-symbols:close" />
           </button>
 
           <!-- Logo -->
@@ -130,6 +130,8 @@
 </template>
 
 <script setup>
+import logo from "~/assets/logo/VELORA.png";
+
 const { menu, openMenu, toggleMenu } = Header();
 
 const { user } = useAuth();

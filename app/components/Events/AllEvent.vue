@@ -138,8 +138,7 @@
                 <button
                   :disabled="
                     event.status === 'cancelled' ||
-                    event.status === 'completed' ||
-                    event.status === 'live'
+                    event.status === 'completed'
                   "
                   class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
@@ -160,8 +159,7 @@
       </template>
 
       <!-- Empty State -->
-      <!-- FIX: was v-else-if="loading" (loading is false here, so it never showed), corrected to v-else -->
-      <template v-else>
+      <template v-else-if="filteredEvents.length === 0">
         <div
           class="flex flex-col items-center justify-center py-20 text-center"
         >

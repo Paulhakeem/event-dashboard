@@ -47,6 +47,7 @@
                     'bg-blue-500': event.status === 'ongoing',
                     'bg-gray-500': event.status === 'completed',
                     'bg-red-500': event.status === 'cancelled',
+                    'bg-yellow-500': event.status === 'live',
                   }"
                   class="px-3 py-1 rounded-full text-white text-xs font-semibold capitalize shadow-md"
                 >

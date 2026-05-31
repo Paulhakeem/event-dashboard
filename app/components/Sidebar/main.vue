@@ -6,7 +6,11 @@
         <div class="flex items-center gap-3 flex-shrink-0 mr-16">
           <!-- adding logo -->
 
-          <img src="/logo/VELORA.png" alt="Logo" class="h-20 w-auto object-contain" />
+          <img
+            :src="logo"
+            alt="Logo"
+            class="h-20 w-auto object-contain"
+          />
         </div>
 
         <!-- Center Menu -->
@@ -70,6 +74,8 @@
 </template>
 
 <script setup>
+import logo from "~/assets/logo/VELORA.png";
+
 const { menu } = Header();
 const { user } = useAuth();
 </script>

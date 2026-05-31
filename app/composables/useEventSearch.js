@@ -12,15 +12,13 @@ export default function useEventSearch() {
 
     isLoading.value = true;
     try {
-      const { data } = await useFetch(`${config.public.searchApi}`, {
+      const data = await $fetch(`${config.public.searchApi}`, {
         params: { q: search.value },
       });
       if (data) {
-        console.log(data);
-        results.value = data.value.events || [];
+        results.value = data.events || [];
       } else {
         results.value = [];
-        console.error(data.value.message);
       }
     } catch (error) {
       console.error("Error fetching search results:", error);
