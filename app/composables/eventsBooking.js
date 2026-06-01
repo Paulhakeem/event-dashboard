@@ -5,7 +5,6 @@ export default function getBookingEvents() {
   const loading = ref(false);
   const error = ref("");
 
-  // completely different shapes, so they must not share the same ref.
   const eventsBooked = ref([]); // raw events: used by the table
   const aggregatedEvents = ref([]); // grouped by name: used by charts/stats
 

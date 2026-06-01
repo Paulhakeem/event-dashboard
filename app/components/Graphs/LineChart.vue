@@ -1,53 +1,146 @@
 <template>
   <div
-    class="p-4 md:p-5 min-h-40 flex flex-col bg-white border border-gray-200 shadow-2xs rounded-xl dark:bg-neutral-800 dark:border-neutral-700"
+    class="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-purple-50 to-blue-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 backdrop-blur-xl shadow-xl p-6 h-5/6"
   >
+    <!-- Decorative Background -->
+    <div
+      class="absolute top-0 right-0 w-56 h-56 bg-purple-500/10 rounded-full blur-3xl"
+    ></div>
+
+    <div
+      class="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"
+    ></div>
+
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
+    <div class="relative z-10 flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-neutral-200">Event popularity</h2>
-        <p class="text-sm text-gray-500 dark:text-neutral-500">Top events by bookings (percentage of total bookings)</p>
+        <h2
+          class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+        >
+          Event Popularity
+        </h2>
+
+        <p class="text-sm text-gray-500 dark:text-neutral-400 mt-1">
+          Top performing events by bookings
+        </p>
       </div>
-      <div class="text-sm text-gray-600 dark:text-neutral-400">Top 5</div>
+
+      <span
+        class="px-4 py-1.5 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-xs font-semibold"
+      >
+        Top 5 Events
+      </span>
     </div>
 
-    <!-- chart graph -->
-    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
-      <!-- Pie chart (CSS conic) -->
+    <!-- Error State -->
+    <div
+      v-if="error"
+      class="relative z-10 text-center py-8 text-red-500 font-medium"
+    >
+      {{ error }}
+    </div>
+
+    <!-- Content -->
+    <div
+      v-else
+      class="relative z-10 flex flex-col lg:flex-row items-center gap-8"
+    >
+      <!-- Donut Chart -->
       <div class="flex-shrink-0">
         <div
-          role="img"
-          :aria-label="`Top events pie chart`"
-          class="relative w-44 h-44 md:w-56 md:h-56 rounded-full shadow-inner"
+          class="relative w-56 h-56 rounded-full shadow-lg transition-all duration-1000"
           :style="pieStyle"
         >
-          <div class="absolute inset-0 flex items-center justify-center">
+          <!-- Inner Circle -->
+          <div
+            class="absolute inset-[24px] bg-white dark:bg-neutral-900 rounded-full flex items-center justify-center shadow-inner"
+          >
             <div class="text-center">
-              <div class="text-sm text-gray-600 dark:text-neutral-300">Bookings</div>
-              <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ totalBookings }}</div>
+              <div class="text-xs uppercase tracking-widest text-gray-500">
+                Total
+              </div>
+
+              <div class="text-4xl font-bold text-gray-900 dark:text-white">
+                {{ totalBookings }}
+              </div>
+
+              <div class="text-sm text-purple-500 font-medium">Bookings</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- List of top events -->
+      <!-- Event List -->
       <div class="flex-1 w-full">
-        <ul class="space-y-3">
-          <li v-if="loading" class="text-sm text-gray-500">Loading…</li>
-          <li v-else-if="!topEvents.length" class="text-sm text-gray-500">No bookings yet</li>
-          <li v-else v-for="(e, idx) in topEvents" :key="e.eventName" class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <span :style="{background: colors[idx % colors.length]}" class="inline-block w-3 h-3 rounded-full"></span>
-              <div>
-                <div class="font-medium text-gray-800 dark:text-neutral-100">{{ e.eventName }}</div>
-                <div class="text-xs text-gray-500">{{ e.totalBookings }} bookings</div>
+        <ul class="space-y-4">
+          <!-- Loading -->
+          <template v-if="loading">
+            <li
+              v-for="n in 5"
+              :key="n"
+              class="animate-pulse p-4 rounded-2xl bg-white/60 dark:bg-neutral-800/50"
+            >
+              <div class="h-4 bg-gray-200 rounded w-40 mb-3"></div>
+              <div class="h-2 bg-gray-200 rounded"></div>
+            </li>
+          </template>
+
+          <!-- Empty -->
+          <li
+            v-else-if="!topEvents.length"
+            class="text-center text-gray-500 py-8"
+          >
+            No bookings available yet
+          </li>
+
+          <!-- Event Items -->
+          <li
+            v-else
+            v-for="(e, idx) in topEvents"
+            :key="e.eventName"
+            class="group p-4 rounded-2xl bg-white/70 dark:bg-neutral-800/60 backdrop-blur hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+          >
+            <div class="flex items-start justify-between">
+              <div class="flex gap-3">
+                <!-- Rank Badge -->
+                <div
+                  class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow"
+                  :style="{ background: colors[idx % colors.length] }"
+                >
+                  #{{ idx + 1 }}
+                </div>
+
+                <div>
+                  <h3 class="font-semibold text-gray-800 dark:text-white">
+                    {{ e.eventName }}
+                  </h3>
+
+                  <p class="text-xs text-gray-500 dark:text-neutral-400">
+                    {{ e.totalBookings }} bookings
+                  </p>
+                </div>
               </div>
+
+              <!-- Percentage Pill -->
+              <span
+                class="px-3 py-1 rounded-full text-xs font-semibold text-white shadow"
+                :style="{ background: colors[idx % colors.length] }"
+              >
+                {{ e.percentage.toFixed(1) }}%
+              </span>
             </div>
-            <div class="flex items-center gap-3">
-              <div class="text-sm text-gray-600 dark:text-neutral-300">{{ e.percentage.toFixed(1) }}%</div>
-              <div class="w-32 bg-gray-100 dark:bg-neutral-700 rounded-full h-2 overflow-hidden">
-                <div :style="{ width: e.percentage + '%', background: colors[idx % colors.length] }" class="h-full"></div>
-              </div>
+
+            <!-- Progress Bar -->
+            <div
+              class="mt-4 h-2.5 bg-gray-100 dark:bg-neutral-700 rounded-full overflow-hidden"
+            >
+              <div
+                class="h-full rounded-full transition-all duration-1000 ease-out"
+                :style="{
+                  width: e.percentage + '%',
+                  background: colors[idx % colors.length],
+                }"
+              ></div>
             </div>
           </li>
         </ul>
@@ -57,50 +150,67 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-
 const loading = ref(true);
+const error = ref("");
 const stats = ref([]);
 
-// colors for bars / pie segments
-const colors = ['#9d4e8a', '#3a83f6', '#16c851', '#f59e0b', '#ef4444'];
+const colors = ["#8B5CF6", "#3B82F6", "#06B6D4", "#10B981", "#F59E0B"];
 
-// fetch booking stats from server
-const { data, pending, error } = await useFetch('/api/events/bookedEvents');
-loading.value = pending.value;
-if (data.value && data.value.events) {
-  // `events` is a deduplicated summary per event from the server
-  const arr = data.value.events.map((s) => {
-    const totalBookings = (s.regular || 0) + (s.vip || 0) + (s.vvip || 0);
-    return { eventName: s.eventName, totalBookings };
-  });
+try {
+  const res = await $fetch("/api/events/bookedEvents");
 
-  const grandTotal = arr.reduce((s, it) => s + it.totalBookings, 0);
-  stats.value = arr
-    .sort((a, b) => b.totalBookings - a.totalBookings)
-    .slice(0, 5)
-    .map((it) => ({ ...it, percentage: grandTotal ? (it.totalBookings / grandTotal) * 100 : 0 }));
+  if (res?.success && res.events?.length) {
+    const arr = res.events.map((event) => ({
+      eventName: event.eventName,
+      totalBookings: event.totalBookings || 0,
+    }));
+
+    const grandTotal = arr.reduce((sum, item) => sum + item.totalBookings, 0);
+
+    stats.value = arr
+      .sort((a, b) => b.totalBookings - a.totalBookings)
+      .slice(0, 5)
+      .map((item) => ({
+        ...item,
+        percentage: grandTotal ? (item.totalBookings / grandTotal) * 100 : 0,
+      }));
+  } else {
+    error.value = res?.message || "No booking statistics available.";
+  }
+} catch (err) {
+  error.value =
+    err?.data?.message || err?.message || "Failed to load booking statistics.";
+} finally {
+  loading.value = false;
 }
-loading.value = false;
 
 const topEvents = computed(() => stats.value);
-const totalBookings = computed(() => stats.value.reduce((s, it) => s + it.totalBookings, 0));
 
-// pie CSS: build conic-gradient from top three percentages
+const totalBookings = computed(() =>
+  stats.value.reduce((sum, item) => sum + item.totalBookings, 0),
+);
+
+/**
+ * Donut Chart
+ */
 const pieStyle = computed(() => {
-  const percents = stats.value.slice(0, 3).map((s) => Math.max(0, Math.min(100, s.percentage || 0)));
-  const stops = [];
-  let acc = 0;
-  for (let i = 0; i < 3; i++) {
-    const pct = percents[i] || 0;
-    const start = acc;
-    const end = acc + pct;
-    stops.push(`${colors[i] || '#ddd'} ${start}% ${end}%`);
-    acc = end;
-  }
-  // remainder
-  if (acc < 100) stops.push(`#e6e6e6 ${acc}% 100%`);
+  let current = 0;
+  const segments = [];
 
-  return { background: `conic-gradient(${stops.join(',')})` };
+  stats.value.forEach((item, index) => {
+    const next = current + item.percentage;
+
+    segments.push(`${colors[index % colors.length]} ${current}% ${next}%`);
+
+    current = next;
+  });
+
+  if (current < 100) {
+    segments.push(`#e5e7eb ${current}% 100%`);
+  }
+
+  return {
+    background: `conic-gradient(${segments.join(", ")})`,
+  };
 });
 </script>
