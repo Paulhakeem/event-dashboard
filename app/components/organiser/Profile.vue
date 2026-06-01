@@ -61,7 +61,7 @@
               name="mdi:ticket-confirmation"
               class="text-green-500 text-2xl"
             />
-            <p class="stat-number">{{ totalBookedEvents.length }}</p>
+            <p class="stat-number">{{ totalBookedEvents }}</p>
             <span>Booked</span>
           </div>
 

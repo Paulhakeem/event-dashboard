@@ -6,19 +6,9 @@
     >
       <div class="flex items-center justify-between">
         <span class="text-sm font-medium">Total Income</span>
-        <svg
-          class="w-6 h-6 opacity-80"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 8c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z" />
-          <path d="M12 2v2m0 16v2m10-10h-2M4 12H2" />
-        </svg>
+        <span class="opacity-80">💰</span>
       </div>
       <p class="text-2xl font-bold mt-2">Ksh {{ totalIncome }}</p>
-      <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
     <!-- Total Events -->
@@ -27,20 +17,9 @@
     >
       <div class="flex items-center justify-between">
         <span class="text-sm font-medium">Total Events</span>
-        <svg
-          class="w-6 h-6 opacity-80"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V9H3v10a2 2 0 002 2z"
-          />
-        </svg>
+        <span class="opacity-80">📅</span>
       </div>
       <p class="text-2xl font-bold mt-2">{{ events.length }}</p>
-      <p class="text-sm mt-1 text-green-200">+0%</p>
     </div>
 
     <!-- Booked Events -->
@@ -49,38 +28,26 @@
     >
       <div class="flex items-center justify-between">
         <span class="text-sm font-medium">Booked Events</span>
-        <svg
-          class="w-6 h-6 opacity-80"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path d="M5 13l4 4L19 7" />
-        </svg>
+        <span class="opacity-80">✔</span>
       </div>
-      <p class="text-2xl font-bold mt-2">{{ totalBookedEvents.length }}</p>
-      <p class="text-sm mt-1 text-green-200">+0%</p>
+
+      <p class="text-2xl font-bold mt-2">
+        {{ totalBookedEvents }}
+      </p>
     </div>
 
     <!-- Cancelled Events -->
     <div
-      class="bg-linear-to-r from-red-600 to-pink-600 rounded-xl shadow-lg p-6 text-white hover:scale-105 transform transition"
+      class="bg-gradient-to-r from-red-600 to-pink-600 rounded-xl shadow-lg p-6 text-white hover:scale-105 transform transition"
     >
       <div class="flex items-center justify-between">
         <span class="text-sm font-medium">Cancelled Events</span>
-        <svg
-          class="w-6 h-6 opacity-80"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          viewBox="0 0 24 24"
-        >
-          <path d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <span class="opacity-80">✖</span>
       </div>
-      <p class="text-2xl font-bold mt-2">{{ cancelledEvents.length }}</p>
-      <p class="text-sm mt-1 text-red-200">+0%</p>
+
+      <p class="text-2xl font-bold mt-2">
+        {{ cancelledEvents.length }}
+      </p>
     </div>
   </div>
 </template>
@@ -88,46 +55,54 @@
 <script setup>
 const { events } = organiserEvents();
 const { token } = useAuth();
+const config = useRuntimeConfig();
+
 const cancelledEvents = ref([]);
 const totalBookedEvents = ref([]);
 const totalIncome = ref(0);
-const config = useRuntimeConfig()
-// cancelled events
-watch(
-  events,
-  () => {
+
+/**
+ * Load ALL dashboard data once
+ */
+const loadDashboard = async () => {
+  try {
+    // Cancelled events (local filter)
     cancelledEvents.value = events.value.filter(
-      (event) => event.status === "cancelled",
+      (e) => e.status === "cancelled",
     );
-  },
-  { immediate: true },
-);
 
-// total amaunt for all events
-watch(
-  events,
-  async () => {
-    const res = await $fetch(`${config.public.organiserTotalAmount}`, {
+    // Total income
+    const incomeRes = await $fetch(config.public.organiserTotalAmount, {
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
     });
-    totalIncome.value = res.totalIncome;
-  },
-  { immediate: true },
-);
 
-// get total booked events
-watch(
-  events,
-  async () => {
-    const res = await $fetch(`${config.public.organiserBookingEvents}`, {
+    totalIncome.value = incomeRes?.totalIncome || 0;
+
+    // Booked events
+    const bookedRes = await $fetch(config.public.organiserBookingEvents, {
       headers: {
         Authorization: `Bearer ${token.value}`,
       },
     });
-    totalBookedEvents.value = res.totalBookedEvents;
-  },
-  { immediate: true },
-);
+
+    // IMPORTANT: handle different API shapes safely
+    totalBookedEvents.value =
+      bookedRes?.totalBookedEvents ||
+      bookedRes?.data ||
+      bookedRes?.events ||
+      [];
+  } catch (err) {
+    console.error("Dashboard load error:", err);
+    totalBookedEvents.value = [];
+  }
+};
+
+/**
+ * Run once when component is ready
+ */
+onMounted(async () => {
+  await loadDashboard();
+});
 </script>
