@@ -45,42 +45,6 @@
         </div>
       </div>
 
-      <!-- KPI Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <!-- Revenue -->
-        <div
-          class="bg-white/70 dark:bg-neutral-800/60 backdrop-blur rounded-2xl p-5 border border-white/50"
-        >
-          <p class="text-xs text-gray-500 mb-2">Revenue</p>
-
-          <h3 class="text-2xl font-bold text-green-500">
-            KES {{ (total.total || 0).toLocaleString() }}
-          </h3>
-        </div>
-
-        <!-- Events -->
-        <div
-          class="bg-white/70 dark:bg-neutral-800/60 backdrop-blur rounded-2xl p-5 border border-white/50"
-        >
-          <p class="text-xs text-gray-500 mb-2">Events</p>
-
-          <h3 class="text-2xl font-bold text-blue-500">
-            {{ totalEvents }}
-          </h3>
-        </div>
-
-        <!-- Users -->
-        <div
-          class="bg-white/70 dark:bg-neutral-800/60 backdrop-blur rounded-2xl p-5 border border-white/50"
-        >
-          <p class="text-xs text-gray-500 mb-2">Users</p>
-
-          <h3 class="text-2xl font-bold text-purple-500">
-            {{ totalUsers }}
-          </h3>
-        </div>
-      </div>
-
       <!-- Loading -->
       <div v-if="loading" class="animate-pulse">
         <div class="h-80 rounded-3xl bg-gray-200 dark:bg-neutral-700"></div>
