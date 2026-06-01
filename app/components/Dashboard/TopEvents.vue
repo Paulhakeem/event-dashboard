@@ -24,22 +24,6 @@
           </td>
         </tr>
 
-        <!-- if length is 0 -->
-        <tr v-else-if="eventsBooked.length === 0">
-          <td colspan="3" class="px-6 py-10">
-            <div
-              class="flex flex-col items-center justify-center text-gray-500"
-            >
-              <div
-                class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 text-lg"
-              >
-                📋
-              </div>
-              <p class="mt-3 text-sm font-medium">No booked events found</p>
-            </div>
-          </td>
-        </tr>
-
         <!-- ERROR STATE -->
         <tr v-else-if="error">
           <td colspan="3" class="px-6 py-10">
@@ -65,6 +49,22 @@
               >
                 Retry
               </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- if length is 0 -->
+        <tr v-else-if="eventsBooked.length === 0">
+          <td colspan="3" class="px-6 py-10">
+            <div
+              class="flex flex-col items-center justify-center text-gray-500"
+            >
+              <div
+                class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 text-lg"
+              >
+                📋
+              </div>
+              <p class="mt-3 text-sm font-medium">No booked events found</p>
             </div>
           </td>
         </tr>

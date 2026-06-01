@@ -63,7 +63,7 @@ export default function useEventBooking() {
 
       alert("Payment successful 🎉 Check your email");
     } catch (err) {
-      alert(err?.data?.statusMessage || "Payment verification failed");
+      throw err;
     } finally {
       loading.value = false;
     }
@@ -129,7 +129,7 @@ export default function useEventBooking() {
             // If it's last attempt → fail
             if (i === retries - 1) {
               paymentStatus.value = "failed";
-              alert("Payment not confirmed. Please try again.");
+              alert(err?.data?.statusMessage || "Payment not confirmed. Please try again.");
               return;
             }
 
