@@ -1,12 +1,11 @@
 export default function getBookingEvents() {
   const config = useRuntimeConfig();
 
-  // Separate loading/error per function so they don't interfere
-  const loading = ref(false);
+  const loading = ref(true);
   const error = ref("");
 
-  const eventsBooked = ref([]); // raw events: used by the table
-  const aggregatedEvents = ref([]); // grouped by name: used by charts/stats
+  const eventsBooked = ref([]);
+  const aggregatedEvents = ref([]);
 
   // ── Raw bookings (full event detail for the table) ──────────────────────
   const fetchBookedEvents = async () => {
@@ -17,9 +16,11 @@ export default function getBookingEvents() {
       if (res?.success && res.events) {
         eventsBooked.value = res.events;
       } else {
+        eventsBooked.value = [];
         error.value = res?.message || "Failed to load booked events";
       }
     } catch (err) {
+      eventsBooked.value = [];
       error.value = err?.message || "Failed to load booked events";
     } finally {
       loading.value = false;
@@ -32,9 +33,13 @@ export default function getBookingEvents() {
     error.value = "";
     try {
       const res = await $fetch(`${config.public.bookedEvents}`);
-      if (res?.success && res.events) {
+      if (res?.success && Array.isArray(res.events)) {
         const eventMap = {};
+
         res.events.forEach((event) => {
+          // FIX: guard against events with no eventName
+          if (!event?.eventName) return;
+
           if (!eventMap[event.eventName]) {
             eventMap[event.eventName] = {
               name: event.eventName,
@@ -42,24 +47,31 @@ export default function getBookingEvents() {
               totalIncome: 0,
             };
           }
-          eventMap[event.eventName].totalBookings += event.totalBookings || 0;
-          eventMap[event.eventName].totalIncome += event.totalRevenue || 0;
+
+          eventMap[event.eventName].totalBookings += Number(
+            event.totalBookings || 0,
+          );
+          eventMap[event.eventName].totalIncome += Number(
+            event.totalRevenue || 0,
+          );
         });
 
         aggregatedEvents.value = Object.values(eventMap)
           .sort((a, b) => b.totalBookings - a.totalBookings)
           .slice(0, 5);
       } else {
+        aggregatedEvents.value = [];
         error.value = res?.message || "Failed to fetch booked events data";
       }
     } catch (err) {
-      error.value = "Failed to fetch booked events data";
+      aggregatedEvents.value = [];
+      error.value = err?.message || "Failed to fetch booked events data";
     } finally {
       loading.value = false;
     }
   };
 
-  // Runs both in parallel; shared loading/error covers both.
+  // ── Fetch both in parallel ────────
   const fetchAll = async () => {
     loading.value = true;
     error.value = "";
@@ -75,10 +87,10 @@ export default function getBookingEvents() {
   return {
     loading,
     error,
-    eventsBooked, // use in the bookings table
-    aggregatedEvents, // use in charts / stats overview
+    eventsBooked,
+    aggregatedEvents,
     fetchBookedEvents,
     aggregateBookings,
-    fetchAll, // call this if you need both at the same time
+    fetchAll,
   };
 }

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-purple-50 to-blue-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 backdrop-blur-xl shadow-xl p-6 h-5/6"
+    class="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-purple-50 to-blue-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 backdrop-blur-xl shadow-xl p-6 h-full"
   >
     <!-- Decorative Background -->
     <div
