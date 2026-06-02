@@ -98,7 +98,6 @@ const fetchBookedEvents = async () => {
       },
     });
 
-    console.log("API response for top booked events:", res);
     const top = Array.isArray(res?.topBookedEvents)
       ? res.topBookedEvents
       : Array.isArray(res)

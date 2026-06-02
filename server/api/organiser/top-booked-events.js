@@ -1,24 +1,24 @@
+import mongoose from "mongoose";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import connectDB from "~~/server/utils/mongoose.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
-  await connectDB();
-  const user = await requireAuth(event);
-
-  if (!user || user.role !== "organiser") {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Access denied. Organisers only.",
-    });
-  }
-
-  //   get the top booked events for the organiser
   try {
+    await connectDB();
+    const user = await requireAuth(event);
+
+    if (!user || user.role !== "organiser") {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Access denied. Organisers only.",
+      });
+    }
+
     const topBookedEvents = await TotalBooking.aggregate([
       {
         $match: {
-          organiserId: user.id,
+          organiserId: new mongoose.Types.ObjectId(user.id),
           status: { $in: ["success", "confirmed"] },
         },
       },
@@ -40,14 +40,13 @@ export default defineEventHandler(async (event) => {
         },
       },
     ]);
-    return {
-      success: true,
-      topBookedEvents,
-    };
+
+    return { success: true, topBookedEvents };
   } catch (err) {
     throw createError({
-      statusCode: 500,
-      message: err.message,
+      statusCode: err.statusCode || 500,
+      statusMessage:
+        err.statusMessage || err.message || "Internal server error",
     });
   }
 });

@@ -54,7 +54,7 @@
         </tr>
 
         <!-- if length is 0 -->
-        <tr v-else-if="eventsBooked.length === 0">
+        <tr v-else-if="aggregatedEvents.length === 0">
           <td colspan="3" class="px-6 py-10">
             <div
               class="flex flex-col items-center justify-center text-gray-500"
@@ -72,7 +72,7 @@
         <!-- booked events data -->
         <tr
           v-else
-          v-for="(event, index) in eventsBooked"
+          v-for="(event, index) in aggregatedEvents"
           :key="index"
           class="border-b hover:bg-gray-50"
         >
@@ -87,7 +87,7 @@
 
 <script setup>
 // get top 5 booked events
-const { loading, eventsBooked, error, aggregateBookings } = eventsBooking();
+const { loading, aggregatedEvents, error, aggregateBookings } = eventsBooking();
 
 onMounted(() => {
   aggregateBookings();

@@ -137,7 +137,7 @@
       </div>
 
       <div class="space-y-4">
-        <OrganiserTopBookedEvents />
+        <OrganiserTopEvents />
       </div>
     </div>
   </div>

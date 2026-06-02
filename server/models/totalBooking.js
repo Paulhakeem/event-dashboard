@@ -57,7 +57,7 @@ const totalBookingSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const TotalBooking =
   mongoose.models.TotalBooking ||
