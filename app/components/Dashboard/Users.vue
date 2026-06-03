@@ -1,5 +1,5 @@
 <template>
-  <!-- Card -->
+  <!-- Create admin modal -->
   <admin-create-modal
     :show="showModal"
     @close="showModal = false"
@@ -9,198 +9,325 @@
     <admin-create-new-admin />
   </admin-create-modal>
 
-  <div class="flex flex-col">
+  <div
+    class="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden"
+  >
+    <!-- ── HEADER ───────────────────────────────────────── -->
     <div
-      class="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500"
+      class="px-5 py-4 flex flex-col gap-3 border-b border-gray-100 sm:flex-row sm:items-center sm:justify-between"
     >
-      <div class="min-w-full inline-block align-middle">
-        <div
-          class="bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden dark:bg-neutral-800 dark:border-neutral-700"
-        >
-          <!-- Header -->
-          <div
-            class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-neutral-700"
+      <!-- Left: role filters + search -->
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <!-- Role filter pills -->
+        <div class="flex flex-wrap gap-1.5">
+          <button
+            v-for="r in roles"
+            :key="r.value"
+            @click="setRole(r.value)"
+            :class="[
+              'px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-150',
+              selectedRole === r.value
+                ? r.active
+                : 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+            ]"
           >
-            <div class="flex items-center gap-3">
-              <div class="flex items-center gap-2">
-                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'all' ? 'bg-[#9c4e8b] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('all')">All</button>
-                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'user' ? 'bg-[#3b82f6] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('user')">Users</button>
-                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'organiser' ? 'bg-[#f59e0b] text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('organiser')">Organisers</button>
-                <button :class="['px-3 py-1 rounded-full text-sm font-medium', selectedRole === 'admin' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700']" @click="setRole('admin')">Admins</button>
-              </div>
+            {{ r.label }}
+          </button>
+        </div>
 
-              <div class="ml-4">
-                <input v-model="searchQuery" type="search" placeholder="Search by name or email" class="px-3 py-2 rounded-lg border border-gray-200 focus:ring-1 focus:ring-[#9c4e8b] focus:border-transparent" />
-              </div>
-            </div>
+        <!-- Search -->
+        <div class="relative">
+          <Icon
+            name="material-symbols:search"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+          />
+          <input
+            v-model="searchQuery"
+            type="search"
+            placeholder="Search name or email…"
+            class="pl-8 pr-4 py-2 text-xs rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/20 focus:border-[#9c4e8b] outline-none transition-all w-full sm:w-52"
+          />
+        </div>
+      </div>
 
-            <div>
-              <div class="inline-flex gap-x-2">
-                <button @click="resetFilters" class="py-2 px-3 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50">Reset</button>
+      <!-- Right: reset + add admin -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button
+          @click="resetFilters"
+          class="px-3 py-2 text-xs font-semibold rounded-xl border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          Reset
+        </button>
+        <button
+          v-if="user.role === 'admin'"
+          @click="showModal = true"
+          class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition-colors shadow-sm"
+        >
+          <Icon name="tdesign:add" class="text-sm" />
+          Add Admin
+        </button>
+      </div>
+    </div>
 
-                <button
-                  @click="showModal = true"
-                  v-if="user.role === 'admin'"
-                  class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white hover:bg-[#cb35a3]"
-                >
-                  <icon name="tdesign:add" class="w-42" />
-                  Add Admin
-                </button>
-              </div>
-            </div>
+    <!-- ── MOBILE: Card list (< md) ─────────────────────── -->
+    <div class="block md:hidden divide-y divide-gray-50">
+      <!-- Empty -->
+      <div
+        v-if="filteredUsers.length === 0"
+        class="flex flex-col items-center justify-center py-14 gap-3 text-center"
+      >
+        <div
+          class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center"
+        >
+          <Icon
+            name="material-symbols:person-off"
+            class="text-xl text-[#9c4e8b]"
+          />
+        </div>
+        <p class="text-sm font-medium text-gray-600">No users found</p>
+        <p class="text-xs text-gray-400">
+          Try adjusting your filters or search query.
+        </p>
+      </div>
+
+      <!-- Cards -->
+      <div
+        v-else
+        v-for="person in filteredUsers"
+        :key="person._id"
+        class="flex items-center justify-between gap-3 px-5 py-4 hover:bg-gray-50/60 transition-colors"
+      >
+        <!-- Avatar + info -->
+        <div class="flex items-center gap-3 min-w-0">
+          <div
+            class="w-10 h-10 rounded-full bg-[#9c4e8b]/10 flex items-center justify-center flex-shrink-0 text-sm font-bold text-[#9c4e8b] uppercase"
+          >
+            {{ (person.firstName?.[0] || "") + (person.lastName?.[0] || "") }}
           </div>
-          <!-- End Header -->
-
-          <!-- Table -->
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50 text-center justify-center items-center">
-              <tr>
-                <th class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-end">
-                  <div class="flex items-center gap-x-2">
-                    <span
-                      class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
-                    >
-                      Name
-                    </span>
-                  </div>
-                </th>
-
-                <th class="px-6 py-3 text-end">
-                  <div class="flex items-center gap-x-2">
-                    <span
-                      class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
-                    >
-                      role
-                    </span>
-                  </div>
-                </th>
-
-                <th class="px-6 py-3 text-start">
-                  <div class="flex items-center gap-x-2">
-                    <span
-                      class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
-                    >
-                      events att
-                    </span>
-                  </div>
-                </th>
-
-                <th class="px-6 py-3 text-start">
-                  <div class="flex items-center gap-x-2">
-                    <span
-                      class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
-                    >
-                      joined
-                    </span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
-                <tr v-for="person in filteredUsers" :key="person._id">
-                <td class="size-px whitespace-nowrap">
-                  <div class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3">
-                    <div class="flex items-center gap-x-3">
-                      <img
-                        class="inline-block size-9.5 rounded-full"
-                        src="https://images.unsplash.com/photo-1541101767792-f9b2b1c4f127?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&&auto=format&fit=facearea&facepad=3&w=320&h=320&q=80"
-                        alt="Avatar"
-                      />
-                      <div class="grow">
-                        <span class="block text-sm font-semibold text-gray-800 dark:text-neutral-200">{{ person.firstName }} {{ person.lastName }}</span>
-                        <span class="block text-sm text-gray-500 dark:text-neutral-500">{{ person.email }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="h-px w-32 whitespace-nowrap">
-                  <div class="px-6 py-3">
-                    <span v-if="person.role === 'admin'" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-semibold">Admin</span>
-                    <span v-else-if="person.role === 'organiser'" class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 text-xs font-semibold">Organiser</span>
-                    <span v-else class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-semibold">User</span>
-                  </div>
-                </td>
-                <td class="size-px whitespace-nowrap">
-                  <div class="px-6 py-3">
-                    <span
-                      class="py-1 px-1.5 inline-flex items-center gap-x-1 text-xs font-medium bg-teal-100 text-teal-800 rounded-full dark:bg-teal-500/10 dark:text-teal-500"
-                    >
-                      {{ person.events }}
-                    </span>
-                  </div>
-                </td>
-                <td class="size-px whitespace-nowrap">
-                  <div class="px-6 py-3">
-                    <span class="text-sm text-gray-500 dark:text-neutral-500">{{
-                      formatDate(person.joinedAt)
-                    }}</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <!-- End Table -->
-
-          <!-- Footer -->
-          <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-neutral-700">
-            <div>
-              <p class="text-sm text-gray-600 dark:text-neutral-400">
-                <span class="font-semibold text-gray-800 dark:text-neutral-200">{{ users.length }}</span>
-                Total users
-              </p>
-            </div>
-            <div class="mt-2 md:mt-0">
-              <p class="text-sm text-gray-600 dark:text-neutral-400">
-                <span class="font-semibold text-gray-800 dark:text-neutral-200">{{ filteredUsers.length }}</span>
-                Shown
-              </p>
-            </div>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gray-900 truncate">
+              {{ person.firstName }} {{ person.lastName }}
+            </p>
+            <p class="text-xs text-gray-400 truncate">{{ person.email }}</p>
           </div>
-          <!-- End Footer -->
+        </div>
+
+        <!-- Right: role + joined -->
+        <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+          <span
+            :class="roleBadge(person.role)"
+            class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+          >
+            {{ person.role }}
+          </span>
+          <span class="text-xs text-gray-400">{{
+            formatDate(person.joinedAt)
+          }}</span>
         </div>
       </div>
     </div>
+
+    <!-- ── DESKTOP: Table (≥ md) ─────────────────────────── -->
+    <div class="hidden md:block overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-100">
+          <tr>
+            <th
+              class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide"
+            >
+              User
+            </th>
+            <th
+              class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide"
+            >
+              Role
+            </th>
+            <th
+              class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide"
+            >
+              Events
+            </th>
+            <th
+              class="px-5 py-3.5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wide"
+            >
+              Joined
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          <!-- Empty -->
+          <tr v-if="filteredUsers.length === 0">
+            <td colspan="4" class="py-16 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <div
+                  class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center"
+                >
+                  <Icon
+                    name="material-symbols:person-off"
+                    class="text-xl text-[#9c4e8b]/60"
+                  />
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-600">
+                    No users found
+                  </p>
+                  <p class="text-xs text-gray-400 mt-0.5">
+                    Try adjusting your filters.
+                  </p>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Rows -->
+          <tr
+            v-else
+            v-for="person in filteredUsers"
+            :key="person._id"
+            class="hover:bg-[#f5eef9]/30 transition-colors duration-150"
+          >
+            <!-- Name + email + avatar initials -->
+            <td class="px-5 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-full bg-[#9c4e8b]/10 flex items-center justify-center flex-shrink-0 text-xs font-bold text-[#9c4e8b] uppercase"
+                >
+                  {{
+                    (person.firstName?.[0] || "") + (person.lastName?.[0] || "")
+                  }}
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">
+                    {{ person.firstName }} {{ person.lastName }}
+                  </p>
+                  <p class="text-xs text-gray-400">{{ person.email }}</p>
+                </div>
+              </div>
+            </td>
+
+            <!-- Role badge -->
+            <td class="px-5 py-4 whitespace-nowrap">
+              <span
+                :class="roleBadge(person.role)"
+                class="px-2.5 py-1 rounded-full text-xs font-semibold capitalize"
+              >
+                {{ person.role }}
+              </span>
+            </td>
+
+            <!-- Events attended -->
+            <td class="px-5 py-4 whitespace-nowrap">
+              <span
+                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-semibold"
+              >
+                <Icon name="material-symbols:event" class="text-xs" />
+                {{ person.events || 0 }}
+              </span>
+            </td>
+
+            <!-- Joined date -->
+            <td class="px-5 py-4 whitespace-nowrap text-xs text-gray-400">
+              {{ formatDate(person.joinedAt) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── FOOTER ───────────────────────────────────────── -->
+    <div
+      class="px-5 py-3.5 border-t border-gray-100 flex items-center justify-between flex-wrap gap-2"
+    >
+      <p class="text-xs text-gray-400">
+        Showing
+        <span class="font-semibold text-gray-700">{{
+          filteredUsers.length
+        }}</span>
+        of
+        <span class="font-semibold text-gray-700">{{
+          users?.length || 0
+        }}</span>
+        users
+      </p>
+
+      <!-- Role counts -->
+      <div class="flex items-center gap-3 text-xs text-gray-400">
+        <span class="flex items-center gap-1">
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-green-500 inline-block"
+          ></span>
+          {{ roleCount("admin") }} admins
+        </span>
+        <span class="flex items-center gap-1">
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-yellow-500 inline-block"
+          ></span>
+          {{ roleCount("organiser") }} organisers
+        </span>
+        <span class="flex items-center gap-1">
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-[#9c4e8b] inline-block"
+          ></span>
+          {{ roleCount("user") }} users
+        </span>
+      </div>
+    </div>
   </div>
-  <!-- End Card -->
 </template>
 
 <script setup>
 const { users } = totalUsers();
 const { user } = useAuth();
 
-// filters
-const selectedRole = ref('all');
-const searchQuery = ref('');
+const selectedRole = ref("all");
+const searchQuery = ref("");
+const showModal = ref(false);
+
+const roles = [
+  { value: "all", label: "All", active: "bg-[#9c4e8b] text-white" },
+  { value: "user", label: "Users", active: "bg-blue-500 text-white" },
+  {
+    value: "organiser",
+    label: "Organisers",
+    active: "bg-yellow-500 text-white",
+  },
+  { value: "admin", label: "Admins", active: "bg-green-500 text-white" },
+];
 
 const setRole = (r) => {
   selectedRole.value = r;
 };
-
 const resetFilters = () => {
-  selectedRole.value = 'all';
-  searchQuery.value = '';
+  selectedRole.value = "all";
+  searchQuery.value = "";
 };
 
-// format date
 const formatDate = (date) => {
-  if (!date) return "";
+  if (!date) return "—";
   return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
   });
 };
 
-const showModal = ref(false);
+const roleBadge = (role) =>
+  ({
+    admin: "bg-green-100 text-green-700",
+    organiser: "bg-yellow-100 text-yellow-700",
+    user: "bg-purple-100 text-[#9c4e8b]",
+  })[role] ?? "bg-gray-100 text-gray-600";
+
+const roleCount = (r) => (users.value || []).filter((u) => u.role === r).length;
 
 const filteredUsers = computed(() => {
   const q = searchQuery.value.trim().toLowerCase();
   return (users.value || []).filter((u) => {
-    if (selectedRole.value !== 'all' && u.role !== selectedRole.value) return false;
+    if (selectedRole.value !== "all" && u.role !== selectedRole.value)
+      return false;
     if (!q) return true;
-    const name = `${u.firstName || ''} ${u.lastName || ''}`.toLowerCase();
-    return name.includes(q) || (u.email || '').toLowerCase().includes(q);
+    const name = `${u.firstName || ""} ${u.lastName || ""}`.toLowerCase();
+    return name.includes(q) || (u.email || "").toLowerCase().includes(q);
   });
 });
 </script>

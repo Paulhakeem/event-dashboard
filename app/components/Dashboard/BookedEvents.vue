@@ -84,10 +84,7 @@
               scope="col"
               class="px-6 py-4 font-semibold capitalize whitespace-nowrap"
             >
-              {{ type.name }}<br />
-              <span class="text-xs font-normal"
-                >Ksh {{ Number(type.price || 0).toLocaleString() }}</span
-              >
+              Total Tickets<br />
             </th>
             <th scope="col" class="px-6 py-4 font-semibold whitespace-nowrap">
               Attendees
@@ -111,7 +108,7 @@
             <td
               v-for="type in ticketTypes"
               :key="type.name"
-              class="px-6 py-4 text-gray-700 font-semibold text-center"
+              class="px-6 py-4 text-gray-700 font-semibold text-center items-center flex"
             >
               {{ getTicketCount(event, type.name) }}
             </td>
@@ -122,10 +119,14 @@
         </tbody>
       </table>
     </div>
+    <!-- total tickets -->
+    <TotalTickets />
   </div>
 </template>
 
 <script setup>
+import TotalTickets from "./TotalTickets.vue";
+
 const { eventsBooked, loading, error, fetchBookedEvents } = eventsBooking();
 
 const localLoading = ref(true);
@@ -137,8 +138,6 @@ const fetchData = async () => {
   try {
     await fetchBookedEvents();
 
-    // FIX 3: composable sets error.value on failure but doesn't throw,
-    // so we must check it manually after the await.
     if (error.value) {
       localError.value = error.value;
     }
