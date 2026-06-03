@@ -3,7 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=6144 nuxt build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -53,6 +53,7 @@
     "@iconify-json/svg-spinners": "^1.2.4",
     "@types/node": "^24.5.2",
     "baseline-browser-mapping": "^2.9.18",
+    "cross-env": "^10.1.0",
     "oxc-parser": "^0.96.0",
     "typescript": "^5.9.2"
   }

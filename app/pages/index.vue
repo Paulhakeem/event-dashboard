@@ -1,3 +1,22 @@
+<script setup>
+useHead({
+  title: "Home",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Velora Events is a modern platform for discovering, booking, and managing events with ease.",
+    },
+    { property: "og:title", content: "Velora Events - Home" },
+    {
+      property: "og:description",
+      content: "Discover, book, and manage amazing events all in one place.",
+    },
+    { name: "twitter:card", content: "summary_large_image" },
+  ],
+});
+</script>
+
 <template>
   <div>
     <!-- Hero Section -->

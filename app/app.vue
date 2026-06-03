@@ -12,9 +12,7 @@ useHead({
   <div>
     <NuxtRouteAnnouncer />
     <NuxtLayout>
-      <ClientOnly>
-        <NuxtPage />
-      </ClientOnly>
+      <NuxtPage />
     </NuxtLayout>
   </div>
 </template>

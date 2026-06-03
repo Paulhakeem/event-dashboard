@@ -4,6 +4,28 @@ import { resolve } from "path";
 export default defineNuxtConfig({
   app: {
     head: {
+      title: "Velora Events Dashboard",
+      titleTemplate: "%s | Velora Events",
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "description",
+          content:
+            "Velora Events Dashboard helps organisers and attendees discover, manage, and book events in one place.",
+        },
+        {
+          property: "og:title",
+          content: "Velora Events Dashboard",
+        },
+        {
+          property: "og:description",
+          content:
+            "Discover, book, and manage amazing events all in one place.",
+        },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
       link: [
         {
           rel: "stylesheet",
@@ -67,6 +89,10 @@ export default defineNuxtConfig({
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      googleAuth: {
+        clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+        promptOneTap: true,
+      },
       // api request
       createEventApi: process.env.CREATE_EVENT_API,
       eventApi: process.env.EVENT_API,
