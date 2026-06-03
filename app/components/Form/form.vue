@@ -79,7 +79,7 @@
           {{ isLoading ? "Logging In..." : "Log In" }}
         </button>
       </form>
-      <GoogleAuth />
+      <google-auth />
     </div>
   </div>
 </template>

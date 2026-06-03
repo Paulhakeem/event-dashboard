@@ -1,9 +1,11 @@
 <template>
-  <GoogleLoginButton
-    :verify-on-server="false"
-    @success="onGoogleSuccess"
-    @error="onGoogleError"
-  />
+  <ClientOnly>
+    <GoogleLoginButton
+      :verify-on-server="false"
+      @success="onGoogleSuccess"
+      @error="onGoogleError"
+    />
+  </ClientOnly>
 </template>
 
 <script setup>
