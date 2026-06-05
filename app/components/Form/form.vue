@@ -102,7 +102,6 @@ const login = async () => {
         password: password.value,
       },
     });
-    console.log(data);
     setAuth(data);
 
     if (data.user.role === "admin") {
