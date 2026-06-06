@@ -1,137 +1,60 @@
 <template>
-  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-    <!-- Users -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <div
-      class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-cyan-500 p-[1px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+      v-for="card in cards"
+      :key="card.label"
+      class="relative overflow-hidden rounded-2xl p-[1px] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      :style="{
+        background: `linear-gradient(135deg, ${card.from}, ${card.to})`,
+      }"
     >
-      <div
-        class="h-full rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur p-6"
-      >
-        <div class="flex items-start justify-between">
-          <div>
+      <div class="h-full rounded-2xl bg-white p-5">
+        <div class="flex items-start justify-between gap-2">
+          <!-- Text -->
+          <div class="min-w-0">
             <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-500"
+              class="text-xs font-semibold uppercase tracking-widest text-gray-400 truncate"
             >
-              Total Users
+              {{ card.label }}
             </p>
-
-            <h2 class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">
-              {{ users.length }}
+            <h2 class="mt-3 text-3xl font-bold text-gray-900 leading-none">
+              <span
+                v-if="card.loading"
+                class="inline-block w-12 h-7 bg-gray-100 rounded-lg animate-pulse"
+              ></span>
+              <span v-else>{{ card.value }}</span>
             </h2>
-
-            <div
-              class="mt-3 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold"
-            >
-              <Icon name="streamline:graph-arrow-increase" />
-              +0.5%
+            <div class="mt-2.5 flex items-center gap-1">
+              <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+                :style="{ background: card.from + '18', color: card.from }"
+              >
+                <Icon :name="card.trendIcon" class="text-xs" />
+                {{ card.trend }}
+              </span>
             </div>
           </div>
 
+          <!-- Icon -->
           <div
-            class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center"
+            class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+            :style="{ background: card.from + '15' }"
           >
             <Icon
-              name="solar:users-group-rounded-bold"
-              class="text-3xl text-blue-500"
+              :name="card.icon"
+              class="text-2xl"
+              :style="{ color: card.from }"
             />
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Events -->
-    <div
-      class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 p-[1px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-    >
-      <div
-        class="h-full rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur p-6"
-      >
-        <div class="flex items-start justify-between">
-          <div>
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-500"
-            >
-              Total Events
-            </p>
-
-            <h2 class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">
-              {{ events.length }}
-            </h2>
-
-            <p class="mt-3 text-sm text-gray-500">Active events</p>
-          </div>
-
-          <div
-            class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center"
-          >
-            <Icon name="solar:calendar-bold" class="text-3xl text-purple-500" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bookings -->
-    <div
-      class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 to-green-500 p-[1px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-    >
-      <div
-        class="h-full rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur p-6"
-      >
-        <div class="flex items-start justify-between">
-          <div>
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-500"
-            >
-              Event Bookings
-            </p>
-
-            <h2 class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">
-              {{ loading ? "..." : eventsBooked.length }}
-            </h2>
-
-            <p class="mt-3 text-sm text-gray-500">Total reservations</p>
-          </div>
-
-          <div
-            class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center"
-          >
-            <Icon name="solar:ticket-bold" class="text-3xl text-green-500" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cancelled -->
-    <div
-      class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 to-orange-500 p-[1px] transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
-    >
-      <div
-        class="h-full rounded-3xl bg-white/95 dark:bg-neutral-900/95 backdrop-blur p-6"
-      >
-        <div class="flex items-start justify-between">
-          <div>
-            <p
-              class="text-xs font-semibold uppercase tracking-widest text-gray-500"
-            >
-              Cancelled
-            </p>
-
-            <h2 class="mt-4 text-4xl font-bold text-gray-900 dark:text-white">
-              {{ cancelledEvents.length }}
-            </h2>
-
-            <p class="mt-3 text-sm text-red-500">Cancelled bookings</p>
-          </div>
-
-          <div
-            class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center"
-          >
-            <Icon
-              name="solar:close-circle-bold"
-              class="text-3xl text-red-500"
-            />
-          </div>
-        </div>
+        <!-- Bottom accent bar -->
+        <div
+          class="absolute bottom-0 left-0 h-0.5 w-full opacity-60"
+          :style="{
+            background: `linear-gradient(to right, ${card.from}, ${card.to})`,
+          }"
+        ></div>
       </div>
     </div>
   </div>
@@ -141,16 +64,146 @@
 const { users } = totalUsers();
 const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
+const { token } = useAuth();
 
-// Booking composable
 const { eventsBooked, loading, error, fetchBookedEvents } = eventsBooking();
 
-// Load bookings when component mounts
-onMounted(async () => {
-  await fetchBookedEvents();
+const totalTicketCount = ref(0);
+const cancelledTicketCount = ref(0);
+const ticketsLoading = ref(true);
+const cancelledLoading = ref(true);
 
-  if (error.value) {
-    console.error("Booking Error:", error.value);
+onMounted(async () => {
+  // Bookings
+  await fetchBookedEvents();
+  if (error.value) console.error("Booking Error:", error.value);
+
+  // Total tickets
+  try {
+    const res = await $fetch("/api/tickets/ticket-filter", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: { filter: "totalTickets" },
+    });
+    totalTicketCount.value = Array.isArray(res.tickets)
+      ? res.tickets.length
+      : res.total || 0;
+  } catch (err) {
+    console.error("Error fetching total tickets:", err);
+  } finally {
+    ticketsLoading.value = false;
+  }
+
+  // Cancelled tickets
+  try {
+    const res = await $fetch("/api/tickets/cancelled-summary", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token.value}` },
+      body: { filter: "cancelledTickets" },
+    });
+    cancelledTicketCount.value = Array.isArray(res.tickets)
+      ? res.tickets.length
+      : res.total || 0;
+  } catch (err) {
+    console.error("Error fetching cancelled tickets:", err);
+  } finally {
+    cancelledLoading.value = false;
   }
 });
+
+const totalOrganisers = computed(
+  () => (users.value || []).filter((u) => u.role === "organiser").length,
+);
+
+const liveEvents = computed(
+  () =>
+    (events.value || []).filter(
+      (e) => e.status === "live" || e.status === "ongoing",
+    ).length,
+);
+
+// FIX: each card now has its own correct color, icon, and value
+const cards = computed(() => [
+  {
+    label: "Total Users",
+    value: users.value?.length ?? 0,
+    loading: false,
+    icon: "solar:users-group-rounded-bold",
+    from: "#3b82f6",
+    to: "#06b6d4",
+    trend: "All time",
+    trendIcon: "material-symbols:person",
+  },
+  {
+    label: "Total Events",
+    value: events.value?.length ?? 0,
+    loading: false,
+    icon: "solar:calendar-bold",
+    from: "#9c4e8b",
+    to: "#ec4899",
+    trend: "All events",
+    trendIcon: "material-symbols:event",
+  },
+  {
+    label: "Event Bookings",
+    value: loading.value ? "…" : (eventsBooked.value?.length ?? 0),
+    loading: loading.value,
+    icon: "solar:ticket-bold",
+    from: "#10b981",
+    to: "#34d399",
+    trend: "Reservations",
+    trendIcon: "material-symbols:confirmation-number",
+  },
+  {
+    label: "Cancelled Events",
+    value: cancelledEvents.value?.length ?? 0,
+    loading: false,
+    icon: "solar:close-circle-bold",
+    from: "#ef4444",
+    to: "#f97316",
+    trend: "Cancelled",
+    trendIcon: "material-symbols:cancel",
+  },
+  {
+    label: "Total Organisers",
+    value: totalOrganisers.value,
+    loading: false,
+    icon: "solar:user-id-bold",
+    from: "#f59e0b",
+    to: "#fbbf24",
+    trend: "Organisers",
+    trendIcon: "material-symbols:manage-accounts",
+  },
+  {
+    label: "Tickets Sold",
+    value: totalTicketCount.value,
+    loading: ticketsLoading.value,
+    icon: "solar:ticket-sale-bold",
+    from: "#8b5cf6",
+    to: "#a78bfa",
+    trend: "All tickets",
+    trendIcon: "material-symbols:confirmation-number",
+  },
+  {
+    label: "Live Events",
+    value: liveEvents.value,
+    loading: false,
+    icon: "solar:play-circle-bold",
+    from: "#06b6d4",
+    to: "#67e8f9",
+    trend: "Now live",
+    trendIcon: "material-symbols:live-tv",
+  },
+  {
+    label: "Cancelled Tickets",
+    // FIX: was showing liveEvents — now correctly shows cancelledTicketCount
+    value: cancelledTicketCount.value,
+    loading: cancelledLoading.value,
+    icon: "solar:ticket-bold",
+    from: "#64748b",
+    to: "#94a3b8",
+    trend: "Refunded",
+    trendIcon: "material-symbols:cancel",
+  },
+]);
 </script>

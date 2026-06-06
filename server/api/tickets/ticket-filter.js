@@ -30,8 +30,6 @@ export default defineEventHandler(async (event) => {
       eventTitles = await TotalBooking.distinct("eventName");
     } else {
       // Organiser — get only event names from their own events
-      // Using TotalBooking.distinct() avoids hitting the Event pre-hook
-      // which auto-updates statuses on every find() query (wasteful here)
       eventTitles = await TotalBooking.distinct("eventName", {
         organiserId: new mongoose.Types.ObjectId(user.id),
       });
