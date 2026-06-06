@@ -57,8 +57,11 @@ export default defineEventHandler(async (event) => {
   try {
     const raw = fields.customTickets?.[0];
     if (raw) customTickets = JSON.parse(raw);
-  } catch { customTickets = []; }
+  } catch {
+    customTickets = [];
+  }
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
+  const freeEntry = String(fields.freeEntry?.[0] || "false") === "true";
   // Force events created by organisers to be pending approval by admin
   const status = "pending";
   const eventType = String(fields.eventType?.[0] || "other");
@@ -102,6 +105,7 @@ export default defineEventHandler(async (event) => {
   const newEvent = new Event({
     title,
     description,
+    freeEntry,
     location,
     date,
     regular,
@@ -147,4 +151,3 @@ export default defineEventHandler(async (event) => {
     };
   }
 });
-

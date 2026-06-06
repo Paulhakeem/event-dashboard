@@ -1,7 +1,6 @@
-
 export const orgCreateEvent = () => {
   const { token } = useAuth();
-const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const form = reactive({
     title: "",
     description: "",
@@ -33,7 +32,7 @@ const config = useRuntimeConfig()
   const toggleFreeEntry = () => {
     freeEntry.value = !freeEntry.value;
     if (freeEntry.value) {
-      customTickets.value.forEach(t => t.price = 0);
+      customTickets.value.forEach((t) => (t.price = 0));
     }
   };
 
@@ -77,19 +76,23 @@ const config = useRuntimeConfig()
       formData.append("vip", form.vip ?? 0);
       formData.append("vvip", form.vvip ?? 0);
       formData.append("customTickets", JSON.stringify(customTickets.value));
+      formData.append("freeEntry", String(freeEntry.value));
       formData.append("TicketQuantity", form.TicketQuantity);
       formData.append("status", form.status);
       if (file.value) {
         formData.append("image", file.value);
       }
 
-      const response = await $fetch(`${config.public.organiserCreateEventApi}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token._value}`,
+      const response = await $fetch(
+        `${config.public.organiserCreateEventApi}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token._value}`,
+          },
+          body: formData,
         },
-        body: formData,
-      });
+      );
 
       alert("✅ " + response.message);
       clearForm();

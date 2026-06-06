@@ -144,26 +144,54 @@
                 <span
                   >🎟️ {{ event.TicketQuantity || 0 }} tickets available</span
                 >
+                <span
+                  v-if="event.freeEntry"
+                  class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-[11px] font-semibold uppercase"
+                >
+                  Free Event
+                </span>
               </div>
 
-              <NuxtLink :to="`/events/${event._id}`">
+              <template v-if="!event.freeEntry">
+                <NuxtLink :to="`/events/${event._id}`">
+                  <button
+                    :disabled="
+                      event.status === 'cancelled' ||
+                      event.status === 'completed'
+                    "
+                    class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
+                    {{
+                      event.status === "cancelled"
+                        ? "Event Cancelled"
+                        : event.status === "completed"
+                          ? "Event Completed"
+                          : event.status === "live"
+                            ? "Event Live"
+                            : "View & Book"
+                    }}
+                  </button>
+                </NuxtLink>
+              </template>
+              <template v-else>
                 <button
-                  :disabled="
-                    event.status === 'cancelled' || event.status === 'completed'
-                  "
-                  class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  disabled
+                  class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-300/30 border border-emerald-200/50 opacity-95 cursor-not-allowed"
                 >
-                  {{
-                    event.status === "cancelled"
-                      ? "Event Cancelled"
-                      : event.status === "completed"
-                        ? "Event Completed"
-                        : event.status === "live"
-                          ? "Event Live"
-                          : "View & Book"
-                  }}
+                  <span class="inline-flex items-center justify-center gap-2">
+                    <span class="text-lg">🌿</span>
+                    <span>
+                      {{
+                        event.status === "cancelled"
+                          ? "Event Cancelled"
+                          : event.status === "completed"
+                            ? "Event Completed"
+                            : "Free Event — Join Now"
+                      }}
+                    </span>
+                  </span>
                 </button>
-              </NuxtLink>
+              </template>
             </div>
           </div>
         </div>

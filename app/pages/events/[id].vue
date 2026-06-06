@@ -101,7 +101,19 @@
             </h3>
 
             <!-- TICKET OPTIONS -->
-            <div v-if="event?.customTickets?.length" class="space-y-3 mb-8">
+            <div
+              v-if="event?.freeEntry"
+              class="mb-8 p-4 bg-green-50 rounded-xl border border-green-100 text-green-700"
+            >
+              <p class="font-semibold">Free Event</p>
+              <p class="text-sm text-gray-600 mt-1">
+                This event is free entry, so the payment button is disabled.
+              </p>
+            </div>
+            <div
+              v-else-if="event?.customTickets?.length"
+              class="space-y-3 mb-8"
+            >
               <label
                 v-for="ticket in event.customTickets"
                 :key="ticket.name"
@@ -121,7 +133,9 @@
                 />
 
                 <div class="ml-3 flex-1">
-                  <p class="font-semibold text-gray-900">{{ ticket.name }} Ticket</p>
+                  <p class="font-semibold text-gray-900">
+                    {{ ticket.name }} Ticket
+                  </p>
                 </div>
 
                 <span class="text-lg font-bold text-[#9c4e8b]">
@@ -130,7 +144,9 @@
               </label>
             </div>
 
-            <div class="flex items-center justify-between text-sm text-gray-600 mb-6">
+            <div
+              class="flex items-center justify-between text-sm text-gray-600 mb-6"
+            >
               <span>🎟️ {{ event?.TicketQuantity || 0 }} tickets available</span>
             </div>
 
@@ -201,7 +217,8 @@
               </svg>
 
               <!-- TEXT STATES -->
-              <span v-if="paymentStatus === 'idle'">Pay with M-Pesa</span>
+              <span v-if="event?.freeEntry">Free Event</span>
+              <span v-else-if="paymentStatus === 'idle'">Pay with M-Pesa</span>
               <span v-else-if="paymentStatus === 'sending'"
                 >Sending STK...</span
               >
@@ -259,6 +276,7 @@ const isBookable = computed(() => {
   return (
     ticketType.value &&
     phone.value &&
+    !ev.freeEntry &&
     ev.status !== "cancelled" &&
     ev.status !== "completed" &&
     ev.TicketQuantity > 0

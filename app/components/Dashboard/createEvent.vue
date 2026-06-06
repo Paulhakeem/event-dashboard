@@ -376,6 +376,7 @@ const submitEvent = async () => {
     formData.append("vip", form.vip ?? 0);
     formData.append("vvip", form.vvip ?? 0);
     formData.append("customTickets", JSON.stringify(customTickets.value));
+    formData.append("freeEntry", String(freeEntry.value));
     formData.append("TicketQuantity", form.TicketQuantity);
     formData.append("status", form.status);
     formData.append("image", file.value);

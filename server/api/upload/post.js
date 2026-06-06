@@ -47,19 +47,33 @@ export default defineEventHandler(async (event) => {
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
-  const regular = fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
-  const vip = fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
-  const vvip = fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
+  const regular =
+    fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
+  const vip =
+    fields.vip?.[0] !== undefined ? Number(fields.vip?.[0]) : undefined;
+  const vvip =
+    fields.vvip?.[0] !== undefined ? Number(fields.vvip?.[0]) : undefined;
   let customTickets = [];
   try {
     const raw = fields.customTickets?.[0];
     if (raw) customTickets = JSON.parse(raw);
-  } catch { customTickets = []; }
+  } catch {
+    customTickets = [];
+  }
   const TicketQuantity = Number(fields.TicketQuantity?.[0] || 0);
+  const freeEntry = String(fields.freeEntry?.[0] || "false") === "true";
   const status = String(fields.status?.[0] || "upcoming");
   const eventType = String(fields.eventType?.[0] || "other");
 
-  if (!title || !description || !location || !date || !eventType || !status || !files.image?.[0]) {
+  if (
+    !title ||
+    !description ||
+    !location ||
+    !date ||
+    !eventType ||
+    !status ||
+    !files.image?.[0]
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "All fields are required",
@@ -89,6 +103,7 @@ export default defineEventHandler(async (event) => {
   const newEvent = new Event({
     title,
     description,
+    freeEntry,
     location,
     date: new Date(date),
     regular,

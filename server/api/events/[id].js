@@ -6,10 +6,10 @@ import { markPastEventsCompleted } from "../../utils/eventStatus.js";
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
   const method = event.node.req.method;
-  
+
   try {
     await connectDB();
-    
+
     if (method === "GET") {
       // make sure status is up-to-date before returning individual event
       await markPastEventsCompleted();
@@ -50,6 +50,7 @@ export default defineEventHandler(async (event) => {
         "customTickets",
         "status",
         "eventType",
+        "freeEntry",
       ];
       const update = {};
       for (const key of allowed) {
@@ -58,20 +59,24 @@ export default defineEventHandler(async (event) => {
         }
       }
       if (Object.keys(update).length === 0) {
-        throw createError({ statusCode: 400, statusMessage: "No valid fields to update" });
+        throw createError({
+          statusCode: 400,
+          statusMessage: "No valid fields to update",
+        });
       }
 
       // Get the current event to check if status is changing
       const currentEvent = await Event.findById(id);
       const eventTitle = body.title || currentEvent?.title || "Event";
       // treat transition from 'pending' -> 'upcoming' as approval
-      const isApproved = body.status === "upcoming" && currentEvent?.status === "pending";
+      const isApproved =
+        body.status === "upcoming" && currentEvent?.status === "pending";
 
       const updatedEvent = await Event.findByIdAndUpdate(id, update, {
         new: true,
         runValidators: true,
       });
-      
+
       if (!updatedEvent) {
         throw createError({
           statusCode: 404,

@@ -4,6 +4,7 @@ const eventSchema = new mongoose.Schema({
   image: { type: String, required: true },
   title: { type: String, required: true },
   description: { type: String, required: true },
+  freeEntry: { type: Boolean, default: false },
   date: { type: Date, required: true },
   location: { type: String, required: true },
   TicketQuantity: { type: Number, required: true, default: 0 },
