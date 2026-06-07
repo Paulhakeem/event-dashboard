@@ -66,6 +66,7 @@ const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
 const { token } = useAuth();
 
+const config = useRuntimeConfig();
 const { eventsBooked, loading, error, fetchBookedEvents } = eventsBooking();
 
 const totalTicketCount = ref(0);
@@ -96,14 +97,11 @@ onMounted(async () => {
 
   // Cancelled tickets
   try {
-    const res = await $fetch("/api/tickets/cancelled-summary", {
-      method: "POST",
+    const res = await $fetch(`${config.public.cancelledSummaryApi}`, {
+      method: "GET",
       headers: { Authorization: `Bearer ${token.value}` },
-      body: { filter: "cancelledTickets" },
     });
-    cancelledTicketCount.value = Array.isArray(res.tickets)
-      ? res.tickets.length
-      : res.total || 0;
+    cancelledTicketCount.value = res?.cancelledCount ?? 0;
   } catch (err) {
     console.error("Error fetching cancelled tickets:", err);
   } finally {
@@ -122,7 +120,6 @@ const liveEvents = computed(
     ).length,
 );
 
-// FIX: each card now has its own correct color, icon, and value
 const cards = computed(() => [
   {
     label: "Total Users",
@@ -196,7 +193,6 @@ const cards = computed(() => [
   },
   {
     label: "Cancelled Tickets",
-    // FIX: was showing liveEvents — now correctly shows cancelledTicketCount
     value: cancelledTicketCount.value,
     loading: cancelledLoading.value,
     icon: "solar:ticket-bold",
