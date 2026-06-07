@@ -203,11 +203,15 @@
               </div>
             </div>
 
+            <div class="mt-4 text-sm text-yellow-700 mb-4" v-if="!canSubmit">
+              Please select Free Entry or add at least one ticket type before
+              creating the event.
+            </div>
             <div class="mt-6 flex gap-4">
               <button
                 type="submit"
-                :disabled="isLoading"
-                class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60"
+                :disabled="isLoading || !canSubmit"
+                class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Icon
                   v-if="isLoading"
@@ -325,6 +329,10 @@ const addTicketType = () => {
 const removeTicketType = (index) => {
   customTickets.value.splice(index, 1);
 };
+
+const canSubmit = computed(
+  () => freeEntry.value || customTickets.value.length > 0,
+);
 
 const toggleFreeEntry = () => {
   freeEntry.value = !freeEntry.value;

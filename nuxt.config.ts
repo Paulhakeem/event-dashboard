@@ -39,12 +39,12 @@ export default defineNuxtConfig({
   css: ["~/assets/css/index.css"],
   modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-google-auth"],
 
-  // google auth configuration
+  // google auth configuration is required by nuxt-google-auth and will also populate runtimeConfig.public.googleAuth
   googleAuth: {
     clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
-    autoLoadScript: true, // load Google script automatically
-    promptOneTap: true, // show One Tap prompt
-    enableServerVerify: true, // enable server-side token verification endpoint
+    autoLoadScript: true,
+    promptOneTap: true,
+    enableServerVerify: true,
   },
   vite: {
     plugins: [tailwindcss()],
@@ -89,10 +89,6 @@ export default defineNuxtConfig({
     public: {
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      googleAuth: {
-        clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
-        promptOneTap: true,
-      },
       // api request
       createEventApi: process.env.CREATE_EVENT_API,
       eventApi: process.env.EVENT_API,
