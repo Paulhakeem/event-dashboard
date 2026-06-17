@@ -37,7 +37,13 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-google-auth"],
+  modules: [
+    "@nuxt/icon",
+    "@nuxt/image",
+    "nuxt-charts",
+    "nuxt-google-auth",
+    "nuxt-recaptcha",
+  ],
 
   // google auth configuration is required by nuxt-google-auth and will also populate runtimeConfig.public.googleAuth
   googleAuth: {
@@ -65,6 +71,8 @@ export default defineNuxtConfig({
     // 🔒 Server-only (safe)
     mongoUrl: process.env.CONNECTION_STR,
     secretStr: process.env.SECRET_STR,
+    // reCAPTCHA secret (server-only). Prefer `RECAPTCHA_SECRET_KEY` in env.
+    recaptchaSecret: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
     // email
     emailUsername: process.env.EMAIL_USERNAME,
     emailPass: process.env.EMAIL_PASSWORD,
@@ -87,6 +95,7 @@ export default defineNuxtConfig({
     deepseekApiKey: process.env.DEEPSEEK_API,
 
     public: {
+      recaptchaSecret: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
       // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
       // api request
