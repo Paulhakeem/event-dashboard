@@ -138,14 +138,14 @@
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
-                class="flex items-center gap-3 p-3 border rounded-lg"
+                class="flex flex-col sm:flex-row items-center gap-3 p-3 border rounded-lg"
               >
                 <input
                   v-model="ticket.name"
                   type="text"
                   placeholder="Ticket name e.g. Gold"
                   :disabled="freeEntry"
-                  class="flex-1 p-2 border rounded outline-none"
+                  class="flex-1 w-full min-w-0 p-2 border rounded outline-none"
                 />
                 <input
                   v-model.number="ticket.price"
@@ -153,12 +153,12 @@
                   min="0"
                   placeholder="Price"
                   :disabled="freeEntry"
-                  class="w-32 p-2 border rounded outline-none"
+                  class="w-full sm:w-32 p-2 border rounded outline-none"
                 />
                 <button
                   type="button"
                   @click="removeTicketType(index)"
-                  class="text-red-500 hover:text-red-700 text-lg px-2"
+                  class="self-end sm:self-auto text-red-500 hover:text-red-700 text-lg px-2"
                 >
                   ✕
                 </button>
