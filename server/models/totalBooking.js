@@ -56,6 +56,9 @@ const totalBookingSchema = new mongoose.Schema(
     transactionId: {
       type: String,
     },
+    verifiedAt: {
+      type: Date,
+    },
   },
   { timestamps: true },
 );

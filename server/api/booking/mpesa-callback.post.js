@@ -7,43 +7,69 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
 
-    // Safaricom sends the response in Result object
-    if (body.Result && body.Result.ResultCode === 0) {
-      const resultParams = body.Result.ResultParameters?.ResultParameter || [];
-      
-      // Extract transaction details
-      const transactionId = resultParams.find(p => p.Key === "TransactionID")?.Value;
-      const amount = parseInt(resultParams.find(p => p.Key === "Amount")?.Value) || 0;
-      const mpesaReceiptNumber = resultParams.find(p => p.Key === "ReceiptNumber")?.Value;
+    if (!body.Result) {
+      console.error("M-Pesa callback error: missing Result object", body);
+      return {
+        ResultCode: 1,
+        ResultDesc: "Invalid callback payload",
+      };
+    }
 
-      // CheckoutRequestID comes from body.Result.CheckoutRequestID
-      const checkoutId = body.Result?.CheckoutRequestID;
+    const resultParams = body.Result.ResultParameters?.ResultParameter || [];
+    const checkoutId = body.Result?.CheckoutRequestID;
+    const resultCode = body.Result?.ResultCode;
+    const resultDesc = body.Result?.ResultDesc;
 
-      if (checkoutId) {
-        // Update booking using checkout request id and attach receipt/transaction info
-        await TotalBooking.updateOne(
-          { reference: checkoutId },
-          { 
-            status: "success",
-            mpesaReceiptNumber,
-            transactionId,
-            amount,
-            verifiedAt: new Date(),
-          }
-        );
-      }
+    if (!checkoutId) {
+      console.error("M-Pesa callback missing CheckoutRequestID", body);
+      return {
+        ResultCode: 1,
+        ResultDesc: "Missing CheckoutRequestID",
+      };
+    }
 
+    const transactionId = resultParams.find(
+      (p) => p.Key === "TransactionID" || p.Key === "MpesaReceiptNumber",
+    )?.Value;
+    const amount = Number(resultParams.find((p) => p.Key === "Amount")?.Value);
+    const mpesaReceiptNumber = resultParams.find(
+      (p) => p.Key === "MpesaReceiptNumber" || p.Key === "ReceiptNumber",
+    )?.Value;
+
+    const existingBooking = await TotalBooking.findOne({
+      reference: checkoutId,
+    });
+
+    if (!existingBooking) {
+      console.warn("M-Pesa callback received for unknown booking", checkoutId);
       return {
         ResultCode: 0,
         ResultDesc: "Received successfully",
       };
-    } else {
-      console.error("M-Pesa callback error:", body.Result?.ResultDesc);
-      return {
-        ResultCode: 1,
-        ResultDesc: "Transaction failed",
-      };
     }
+
+    const updateFields = {
+      mpesaReceiptNumber,
+      transactionId,
+      verifiedAt: new Date(),
+    };
+
+    if (!Number.isNaN(amount)) {
+      updateFields.amount = amount;
+    }
+
+    if (resultCode === 0 || resultCode === "0") {
+      updateFields.status = "success";
+    } else {
+      updateFields.status = "failed";
+    }
+
+    await TotalBooking.updateOne({ reference: checkoutId }, updateFields);
+
+    return {
+      ResultCode: 0,
+      ResultDesc: "Received successfully",
+    };
   } catch (error) {
     console.error("Callback processing error:", error);
     return {

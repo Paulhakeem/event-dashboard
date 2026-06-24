@@ -51,7 +51,11 @@ export default defineEventHandler(async (event) => {
     (t) => t.name === ticketType,
   );
 
-  if (!matchedTicket || matchedTicket.price === undefined || matchedTicket.price === null) {
+  if (
+    !matchedTicket ||
+    matchedTicket.price === undefined ||
+    matchedTicket.price === null
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid or unavailable ticket type selected",
@@ -209,7 +213,10 @@ export default defineEventHandler(async (event) => {
     retries--;
   }
   if (retries === 0) {
-    throw createError({ statusCode: 500, statusMessage: "Failed to generate unique ticket code" });
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to generate unique ticket code",
+    });
   }
 
   await Ticket.create({
@@ -376,11 +383,12 @@ export default defineEventHandler(async (event) => {
     });
 
     /* -------------------- EMAIL USER -------------------- */
-    await transporter.sendMail({
-      from: `"Volara Events" <${config.emailUsername}>`,
-      to: userData.email,
-      subject: `Booking Confirmed – ${eventData.title} 🎉`,
-      html: `
+    try {
+      await transporter.sendMail({
+        from: `"Volara Events" <${config.emailUsername}>`,
+        to: userData.email,
+        subject: `Booking Confirmed – ${eventData.title} 🎉`,
+        html: `
         <h2>Hello ${userData.firstName || ""} ${userData.lastName || ""}</h2>
         <p>Your booking was successful!</p>
 
@@ -399,14 +407,17 @@ export default defineEventHandler(async (event) => {
 
       <p>Thank you for booking with us 🙏</p>
       `,
-      attachments: [
-        {
-          filename: "ticket.pdf",
-          content: pdfBuffer,
-          contentType: "application/pdf",
-        },
-      ],
-    });
+        attachments: [
+          {
+            filename: "ticket.pdf",
+            content: pdfBuffer,
+            contentType: "application/pdf",
+          },
+        ],
+      });
+    } catch (err) {
+      console.error("Error sending email to user:", err);
+    }
 
     /* -------------------- EMAIL ADMIN -------------------- */
     const admin = await User.findOne({ role: "admin" });

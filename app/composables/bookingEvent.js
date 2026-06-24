@@ -111,7 +111,7 @@ export default function useEventBooking() {
       alert("STK Push sent. Enter your M-Pesa PIN to complete payment.");
 
       // wait before verifying
-      const tryVerify = async (id, retries = 5) => {
+      const tryVerify = async (id, retries = 3) => {
         paymentStatus.value = "verifying";
 
         for (let i = 0; i < retries; i++) {
@@ -129,14 +129,17 @@ export default function useEventBooking() {
             // If it's last attempt → fail
             if (i === retries - 1) {
               paymentStatus.value = "failed";
-              alert(err?.data?.statusMessage || "Payment not confirmed. Please try again.");
+              alert(
+                err?.data?.statusMessage ||
+                  "Payment not confirmed. Please try again.",
+              );
               return;
             }
 
             // ⏳ Still waiting for user payment
             paymentStatus.value = "waiting";
 
-            await new Promise((res) => setTimeout(res, 5000));
+            await new Promise((res) => setTimeout(res, 15000));
             paymentStatus.value = "verifying";
           }
         }

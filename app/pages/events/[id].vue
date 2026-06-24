@@ -254,15 +254,8 @@
 import useEventBooking from "~/composables/bookingEvent";
 import { computed, ref } from "vue";
 
-const {
-  event,
-  loading,
-  paymentStatus,
-  error,
-  successMessage,
-  bookAndPay,
-  ticketType,
-} = useEventBooking();
+const { event, paymentStatus, error, successMessage, bookAndPay, ticketType } =
+  useEventBooking();
 
 const { user } = useAuth();
 
