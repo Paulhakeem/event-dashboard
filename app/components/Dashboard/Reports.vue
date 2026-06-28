@@ -130,6 +130,8 @@
         </div>
       </div>
     </div>
+
+    <!-- graph charts -->
   </div>
 </template>
 
