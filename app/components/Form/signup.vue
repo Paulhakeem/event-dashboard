@@ -77,7 +77,7 @@
             <input
               v-model="password"
               type="password"
-              placeholder="Create a strong password"
+              placeholder="Password should be at least 8 characters"
               aria-label="Password"
               required
               minlength="6"

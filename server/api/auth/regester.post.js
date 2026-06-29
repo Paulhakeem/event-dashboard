@@ -68,6 +68,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (password.length < 8) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    });
+  }
   /* ---------- CHECK EXISTING USER ---------- */
   const existingUser = await User.findOne({ email });
   if (existingUser) {

@@ -45,7 +45,7 @@
           </p>
           <p class="text-2xl font-bold text-white leading-none">
             <span class="text-sm font-semibold text-white/70 mr-0.5">KSH</span>
-            1,000
+            0.00
           </p>
           <!-- Trend -->
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
@@ -53,7 +53,7 @@
               name="material-symbols:trending-up"
               class="text-green-300 text-sm"
             />
-            <span class="text-green-300 font-semibold">+12%</span>
+            <span class="text-green-300 font-semibold">+0%</span>
             vs last month
           </div>
         </div>
@@ -83,14 +83,14 @@
           </p>
           <p class="text-2xl font-bold text-white leading-none">
             <span class="text-sm font-semibold text-white/70 mr-0.5">KSH</span>
-            1,000
+            0.00
           </p>
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
             <Icon
               name="material-symbols:trending-down"
               class="text-red-200 text-sm"
             />
-            <span class="text-red-200 font-semibold">-3%</span>
+            <span class="text-red-200 font-semibold">-0%</span>
             vs last month
           </div>
         </div>
@@ -118,21 +118,30 @@
           >
             Total Tickets
           </p>
-          <p class="text-2xl font-bold text-white leading-none">10,000</p>
+          <p class="text-2xl font-bold text-white leading-none">0</p>
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
             <Icon
               name="material-symbols:trending-up"
               class="text-green-300 text-sm"
             />
-            <span class="text-green-300 font-semibold">+8%</span>
+            <span class="text-green-300 font-semibold">+0%</span>
             vs last month
           </div>
         </div>
       </div>
     </div>
-
-    <!-- graph charts -->
+  </div>
+  <!-- graphs section -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+    <GraphsRevenueRefund
+      :revenue-data="revenueByMonth"
+      :refund-data="refundsByMonth"
+    />
+    <GraphsRefundTickets
+      :total-tickets="totalTickets"
+      :cancelled-tickets="cancelledTickets"
+    />
   </div>
 </template>
 
-<script setup></script>
+<script></script>
