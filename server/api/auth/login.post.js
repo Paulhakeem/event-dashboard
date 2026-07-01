@@ -16,6 +16,15 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  // password length check
+  if (password.length < 8) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "Password must be at least 8 characters long and contains special characters",
+    });
+  }
+
   // normalize email
   const normalizedEmail = email.toLowerCase();
 
@@ -26,7 +35,7 @@ export default defineEventHandler(async (event) => {
   if (!user) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Invalid email or password",
+      statusMessage: "User account not found. Please register first.",
     });
   }
 
