@@ -116,6 +116,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import GoogleAuth from "../Google/googleAuth.vue";
+
 const {
   firstName,
   lastName,

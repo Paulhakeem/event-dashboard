@@ -13,15 +13,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
     },
-    // password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character
+    // password is hashed before storage, so validation is handled at signup/reset time
     password: {
       type: String,
       select: false,
       required: function () {
         return !this.googleId; // required only if NOT a Google signup
       },
-      match:
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
     },
     googleId: { type: String, unique: true, sparse: true },
     role: {

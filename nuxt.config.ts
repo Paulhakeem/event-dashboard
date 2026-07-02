@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
+
 export default defineNuxtConfig({
   app: {
     head: {
@@ -14,10 +15,7 @@ export default defineNuxtConfig({
           content:
             "Velora Events Dashboard helps organisers and attendees discover, manage, and book events in one place.",
         },
-        {
-          property: "og:title",
-          content: "Velora Events Dashboard",
-        },
+        { property: "og:title", content: "Velora Events Dashboard" },
         {
           property: "og:description",
           content:
@@ -34,24 +32,54 @@ export default defineNuxtConfig({
       ],
     },
   },
+
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   css: ["~/assets/css/index.css"],
-  modules: [
-    "@nuxt/icon",
-    "@nuxt/image",
-    "nuxt-charts",
-    "nuxt-google-auth",
-    "nuxt-recaptcha",
-  ],
+  modules: ["@nuxt/icon", "@nuxt/image", "nuxt-charts", "nuxt-google-auth"],
 
-  // google auth configuration is required by nuxt-google-auth and will also populate runtimeConfig.public.googleAuth
+  routeRules: {
+    "/**": {
+      headers: {
+        "Content-Security-Policy": [
+          "default-src 'self'",
+          "base-uri 'self'",
+          "form-action 'self'",
+          "frame-ancestors 'self'",
+          "object-src 'none'",
+          // script-src: covers eval/inline and all needed Google script origins
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com https://apis.google.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com",
+          // script-src-elem: explicitly covers <script src="..."> tags
+          "script-src-elem 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com",
+          // style-src: added https://accounts.google.com for GSI stylesheet
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
+          // style-src-elem: explicitly covers <link rel="stylesheet"> tags
+          // without this, browser blocks the GSI stylesheet even if style-src allows it
+          "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
+          "font-src 'self' https://fonts.gstatic.com data:",
+          "img-src 'self' data: https: blob:",
+          // connect-src: added Google OAuth and Accounts endpoints
+          "connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com https:",
+          // frame-src: added accounts.google.com for One Tap iframe
+          "frame-src 'self' https://accounts.google.com https://www.google.com https://www.gstatic.com",
+          "upgrade-insecure-requests",
+        ].join("; "),
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "SAMEORIGIN",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+        "X-XSS-Protection": "1; mode=block",
+      },
+    },
+  },
+
   googleAuth: {
     clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
     autoLoadScript: true,
     promptOneTap: true,
     enableServerVerify: true,
   },
+
   vite: {
     plugins: [tailwindcss()],
     resolve: {
@@ -63,23 +91,18 @@ export default defineNuxtConfig({
       include: ["jwt-decode", "vue-chrts"],
     },
   },
+
   runtimeConfig: {
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     cloudinaryPresetName: process.env.CLOUDINARY_PRESET_NAME,
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    // 🔒 Server-only (safe)
     mongoUrl: process.env.CONNECTION_STR,
     secretStr: process.env.SECRET_STR,
-    // reCAPTCHA secret (server-only). Prefer `RECAPTCHA_SECRET_KEY` in env.
-    recaptchaSecret: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
-    // email
     emailUsername: process.env.EMAIL_USERNAME,
     emailPass: process.env.EMAIL_PASSWORD,
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
-
-    // Daraja M-Pesa
     darajaConsumerKey: process.env.MPESA_CONSUMER_KEY,
     darajaConsumerSecret: process.env.MPESA_CONSUMER_SECRET,
     darajaUrl: process.env.DARAJA_URL,
@@ -89,16 +112,11 @@ export default defineNuxtConfig({
     darajaPasskey: process.env.MPESA_PASSKEY,
     appUrl: process.env.APP_URL,
     mpesaShortCode: process.env.MPESA_SHORT_CODE,
-    // paystack
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
-    // openAI
     deepseekApiKey: process.env.DEEPSEEK_API,
 
     public: {
-      recaptchaSecret: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
-      // 🌍 Client-available (unsafe)
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
-      // api request
       createEventApi: process.env.CREATE_EVENT_API,
       eventApi: process.env.EVENT_API,
       bookingEvent: process.env.BOOKING_EVENTS,

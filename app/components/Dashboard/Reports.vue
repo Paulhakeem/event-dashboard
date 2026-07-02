@@ -142,6 +142,9 @@
       :cancelled-tickets="cancelledTickets"
     />
   </div>
+  <div>
+    <GraphsTraffic />
+  </div>
 </template>
 
 <script></script>

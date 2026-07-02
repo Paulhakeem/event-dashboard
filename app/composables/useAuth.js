@@ -39,57 +39,14 @@ export const useAuth = () => {
   const user = useState("auth_user", () => null);
   const token = useState("auth_token", () => null);
 
-  // Restore from localStorage (client only)
-  if (process.client && !token.value) {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
-
-    if (savedToken && savedToken !== "undefined") {
-      if (isTokenExpired(savedToken)) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      } else if (savedUser && savedUser !== "undefined") {
-        try {
-          user.value = JSON.parse(savedUser);
-          token.value = savedToken;
-        } catch (e) {
-          console.error("Invalid user JSON in localStorage", e);
-          user.value = null;
-          token.value = null;
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-        }
-      } else {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
-    }
-
-    // Schedule logout when token expires
-    if (token.value) {
-      scheduleLogoutOnExpiry(token.value, () => {
-        token.value = null;
-        user.value = null;
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        navigateTo("/login");
-      });
-    }
-  }
-
   const setAuth = (data) => {
-    token.value = data.token;
-    user.value = data.user;
+    token.value = data?.token ?? null;
+    user.value = data?.user ?? null;
 
-    if (process.client) {
-      localStorage.setItem("token", data.token ?? "");
-      localStorage.setItem("user", JSON.stringify(data.user ?? {}));
-      // Reschedule logout timer with new token
+    if (process.client && data?.token) {
       scheduleLogoutOnExpiry(data.token, () => {
         token.value = null;
         user.value = null;
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
         navigateTo("/");
       });
     }
@@ -99,10 +56,6 @@ export const useAuth = () => {
     clearLogoutTimer();
     token.value = null;
     user.value = null;
-    if (process.client) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-    }
     navigateTo("/login");
   };
 

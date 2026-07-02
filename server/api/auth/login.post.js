@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
+import { setAuthCookie } from "../../utils/authCookie.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -75,6 +76,8 @@ export default defineEventHandler(async (event) => {
     config.secretStr,
     { expiresIn: "1d" },
   );
+
+  setAuthCookie(event, token, config);
 
   return {
     success: true,

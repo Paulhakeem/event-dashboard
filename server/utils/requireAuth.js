@@ -1,22 +1,22 @@
 import jwt from "jsonwebtoken";
 import { createError } from "h3";
+import { getAuthToken } from "./authCookie.js";
+
 export function requireAuth(event) {
   const config = useRuntimeConfig();
-  const authHeader = event.node.req.headers.authorization;
+  const token = getAuthToken(event);
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  if (!token) {
     throw createError({
       statusCode: 401,
       statusMessage: "Authorization token missing",
     });
   }
 
-  const token = authHeader.split(" ")[1];
-
   try {
     const decoded = jwt.verify(token, config.secretStr);
-    event.context.user = decoded
-    return decoded; // return user payload
+    event.context.user = decoded;
+    return decoded;
   } catch (err) {
     throw createError({
       statusCode: 401,

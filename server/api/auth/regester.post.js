@@ -5,6 +5,7 @@ import fs from "fs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import nodemailer from "nodemailer";
+// import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
 
 /* ---------------- SPAM EMAIL BLOCK ---------------- */
 const blockedDomains = [
@@ -52,6 +53,7 @@ export default defineEventHandler(async (event) => {
   const email = fields.email?.toString().trim().toLowerCase();
   const password = fields.password?.toString().trim();
   const role = fields.role?.toString().trim() || "user";
+  // const recaptchaToken = fields.recaptchaToken?.toString().trim();
 
   /* ---------- BASIC VALIDATION ---------- */
   if (!firstName || !lastName || !email || !password) {
@@ -65,6 +67,25 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: "Disposable or invalid email is not allowed",
+    });
+  }
+
+  // const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
+  // if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
+  //   throw createError({
+  //     statusCode: 400,
+  //     statusMessage:
+  //       recaptchaResult?.message || "reCAPTCHA verification failed",
+  //   });
+  // }
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!passwordRegex.test(password)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
     });
   }
 
