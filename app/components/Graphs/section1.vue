@@ -64,49 +64,16 @@
 const { users } = totalUsers();
 const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
-const { token } = useAuth();
-
-const config = useRuntimeConfig();
-const { eventsBooked, loading, error, fetchBookedEvents } = eventsBooking();
-
-const totalTicketCount = ref(0);
-const cancelledTicketCount = ref(0);
-const ticketsLoading = ref(true);
-const cancelledLoading = ref(true);
+const { eventsBooked, loading, fetchBookedEvents } = eventsBooking();
+const {
+  totalTicketCount,
+  cancelledTicketCount,
+  ticketsLoading,
+  cancelledLoading,
+} = useTickets();
 
 onMounted(async () => {
-  // Bookings
   await fetchBookedEvents();
-  if (error.value) console.error("Booking Error:", error.value);
-
-  // Total tickets
-  try {
-    const res = await $fetch("/api/tickets/ticket-filter", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token.value}` },
-      body: { filter: "totalTickets" },
-    });
-    totalTicketCount.value = Array.isArray(res.tickets)
-      ? res.tickets.length
-      : res.total || 0;
-  } catch (err) {
-    console.error("Error fetching total tickets:", err);
-  } finally {
-    ticketsLoading.value = false;
-  }
-
-  // Cancelled tickets
-  try {
-    const res = await $fetch(`${config.public.cancelledSummaryApi}`, {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token.value}` },
-    });
-    cancelledTicketCount.value = res?.cancelledCount ?? 0;
-  } catch (err) {
-    console.error("Error fetching cancelled tickets:", err);
-  } finally {
-    cancelledLoading.value = false;
-  }
 });
 
 const totalOrganisers = computed(
@@ -153,7 +120,7 @@ const cards = computed(() => [
   },
   {
     label: "Cancelled Events",
-    value: cancelledEvents.value?.length ?? 0,
+    value: cancelledEvents?.value?.length ?? 0,
     loading: false,
     icon: "solar:close-circle-bold",
     from: "#ef4444",

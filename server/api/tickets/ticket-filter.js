@@ -21,7 +21,17 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const { eventName, ticketType, used } = getQuery(event);
+    const body = await readBody(event).catch(() => ({}));
+    const query = getQuery(event);
+    const {
+      eventName,
+      ticketType,
+      used,
+      filter: filterValue,
+    } = {
+      ...query,
+      ...body,
+    };
 
     let eventTitles = [];
 
@@ -69,6 +79,10 @@ export default defineEventHandler(async (event) => {
     // Optional: filter by used status (convert query string to boolean)
     if (used !== undefined) {
       filter.used = used === "true";
+    }
+
+    if (filterValue === "cancelledTickets") {
+      filter.status = "cancelled";
     }
 
     const tickets = await Ticket.find(filter).sort({ createdAt: -1 }).lean();

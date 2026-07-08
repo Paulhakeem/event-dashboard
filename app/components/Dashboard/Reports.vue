@@ -45,7 +45,7 @@
           </p>
           <p class="text-2xl font-bold text-white leading-none">
             <span class="text-sm font-semibold text-white/70 mr-0.5">KSH</span>
-            0.00
+            {{ totalRevenue }}
           </p>
           <!-- Trend -->
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
@@ -83,7 +83,7 @@
           </p>
           <p class="text-2xl font-bold text-white leading-none">
             <span class="text-sm font-semibold text-white/70 mr-0.5">KSH</span>
-            0.00
+            {{ totalRefund }}
           </p>
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
             <Icon
@@ -98,7 +98,7 @@
 
       <!-- Total Orders -->
       <div
-        class="relative overflow-hidden rounded-2xl bg-linear-to-br from-[#3b82f6] to-[#2563eb] p-5 shadow-lg shadow-blue-500/20 hover:-translate-y-1 transition-transform duration-200"
+        class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#3b82f6] to-[#2563eb] p-5 shadow-lg shadow-blue-500/20 hover:-translate-y-1 transition-transform duration-200"
       >
         <div
           class="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-white/10 blur-xl"
@@ -118,7 +118,9 @@
           >
             Total Tickets
           </p>
-          <p class="text-2xl font-bold text-white leading-none">0</p>
+          <p class="text-2xl font-bold text-white leading-none">
+            {{ totalTicketCount }}
+          </p>
           <div class="mt-3 flex items-center gap-1 text-xs text-white/60">
             <Icon
               name="material-symbols:trending-up"
@@ -137,14 +139,15 @@
       :revenue-data="revenueByMonth"
       :refund-data="refundsByMonth"
     />
-    <GraphsRefundTickets
-      :total-tickets="totalTickets"
-      :cancelled-tickets="cancelledTickets"
-    />
+    <GraphsRefundTickets />
   </div>
   <div>
     <GraphsTraffic />
   </div>
 </template>
 
-<script></script>
+<script setup>
+const { totalTicketCount, cancelledTicketCount } = useTickets();
+
+const { totalRevenue, loading, totalRefund } = useReport();
+</script>

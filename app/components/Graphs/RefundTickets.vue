@@ -48,8 +48,11 @@
         <p
           class="flex items-center gap-1 text-xs text-green-600 font-semibold mt-1.5"
         >
-          <Icon name="material-symbols:trending-up" class="text-sm" />
-          +18% vs last period
+          <Icon
+            :name="ticketTrend.startsWith('-') ? 'material-symbols:trending-down' : 'material-symbols:trending-up'"
+            class="text-sm"
+          />
+          {{ ticketTrend }} vs last period
         </p>
       </div>
 
@@ -66,8 +69,11 @@
         <p
           class="flex items-center gap-1 text-xs text-red-500 font-semibold mt-1.5"
         >
-          <Icon name="material-symbols:trending-down" class="text-sm" />
-          -5% vs last period
+          <Icon
+            :name="cancelledTrend.startsWith('-') ? 'material-symbols:trending-down' : 'material-symbols:trending-up'"
+            class="text-sm"
+          />
+          {{ cancelledTrend }} vs last period
         </p>
       </div>
 
@@ -112,68 +118,40 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-defineOptions({
-  tags: ["barcharts", "tickets"],
-});
-
-type DataProps = {
-  month: string;
-  tickets: number;
-  cancelled: number;
-};
+<script setup>
+const {
+  totalTicketCount: totalTickets,
+  cancelledTicketCount: totalCancelled,
+  ticketChartData,
+  cancellationRate,
+  cancelledTrend,
+  ticketTrend,
+} = useTickets();
 
 const currentYear = new Date().getFullYear();
-
-// Replace with real API data from your tickets composable
-const chartData: DataProps[] = [
-  { month: "january", tickets: 320, cancelled: 40 },
-  { month: "february", tickets: 480, cancelled: 55 },
-  { month: "march", tickets: 390, cancelled: 38 },
-  { month: "april", tickets: 520, cancelled: 70 },
-  { month: "may", tickets: 410, cancelled: 48 },
-  { month: "june", tickets: 580, cancelled: 62 },
-  { month: "july", tickets: 490, cancelled: 53 },
-  { month: "august", tickets: 620, cancelled: 44 },
-  { month: "september", tickets: 540, cancelled: 67 },
-  { month: "october", tickets: 710, cancelled: 80 },
-  { month: "november", tickets: 650, cancelled: 72 },
-  { month: "december", tickets: 830, cancelled: 95 },
-];
 
 const categories = {
   tickets: { name: "Tickets Sold", color: "#9c4e8b" },
   cancelled: { name: "Cancelled", color: "#ef4444" },
 };
 
-const options = {
-  data: chartData,
+const chartData = computed(() => ticketChartData.value);
+
+const options = computed(() => ({
+  data: chartData.value,
   categories,
   valueLabel: {
-    label: (d: { y: number }) => d.y.toString(),
+    label: (d) => d.y.toString(),
     labelSpacing: 16,
     labelFontSize: 10,
     color: "var(--ui-text)",
   },
-  xNumTicks: 12,
-  xAxis: "month" as keyof DataProps,
+  xNumTicks: chartData.value.length,
+  xAxis: "month",
   groupPadding: 0,
   barPadding: 0.25,
-  xFormatter: (_tick: number, i?: number) =>
-    chartData[typeof i !== "undefined" ? i : _tick]?.month ?? "",
-  yFormatter: (tick: number) => tick.toString(),
-};
-
-// Summary computeds
-const totalTickets = computed(() =>
-  chartData.reduce((s, d) => s + d.tickets, 0),
-);
-const totalCancelled = computed(() =>
-  chartData.reduce((s, d) => s + d.cancelled, 0),
-);
-const cancellationRate = computed(() =>
-  totalTickets.value > 0
-    ? ((totalCancelled.value / totalTickets.value) * 100).toFixed(1)
-    : "0.0",
-);
+  xFormatter: (_tick, i) =>
+    chartData.value[typeof i !== "undefined" ? i : _tick]?.month ?? "",
+  yFormatter: (tick) => tick.toString(),
+}));
 </script>

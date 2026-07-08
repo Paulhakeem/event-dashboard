@@ -126,7 +126,6 @@ onMounted(async () => {
         Authorization: `Bearer ${token.value}`,
       },
     });
-
     if (res?.success) {
       total.value = {
         total: res.total || 0,
