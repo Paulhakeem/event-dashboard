@@ -7,15 +7,15 @@ import axios from "axios";
 import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
+import QRCode from "qrcode"; // npm install qrcode
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const body = await readBody(event);
 
-  // in Daraja flow `reference` will be the CheckoutRequestID returned from STK push
   const { reference, ticketType, eventName, userEmail } = body;
 
-  /* -------------------- BASIC VALIDATION -------------------- */
+  /* ── BASIC VALIDATION ─────────────────────────────────────── */
   if (!eventName || !userEmail || !reference || !ticketType) {
     throw createError({
       statusCode: 400,
@@ -26,13 +26,12 @@ export default defineEventHandler(async (event) => {
 
   await connectDB();
 
-  /* -------------------- FIND EVENT -------------------- */
+  /* ── FIND EVENT ───────────────────────────────────────────── */
   const eventData = await Event.findOne({ title: eventName });
   if (!eventData) {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
 
-  /* -------------------- CHECK IF EVENT IS CANCELLED/COMPLETED -------------------- */
   if (eventData.status === "cancelled" || eventData.status === "completed") {
     throw createError({
       statusCode: 400,
@@ -40,17 +39,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  /* -------------------- FIND USER -------------------- */
+  /* ── FIND USER ────────────────────────────────────────────── */
   const userData = await User.findOne({ email: userEmail });
   if (!userData) {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
 
-  /* -------------------- TICKET PRICE LOOKUP -------------------- */
+  /* ── TICKET PRICE LOOKUP ──────────────────────────────────── */
   const matchedTicket = eventData.customTickets?.find(
     (t) => t.name === ticketType,
   );
-
   if (
     !matchedTicket ||
     matchedTicket.price === undefined ||
@@ -61,11 +59,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid or unavailable ticket type selected",
     });
   }
-
   const expectedAmount = matchedTicket.price;
 
-  /* -------------------- VERIFY DARAJA M-PESA -------------------- */
-  // Get Daraja credentials from config
+  /* ── VERIFY DARAJA M-PESA ─────────────────────────────────── */
   const consumerKey = config.darajaConsumerKey;
   const consumerSecret = config.darajaConsumerSecret;
   const darajaUrl = config.darajaUrl || "https://sandbox.safaricom.co.ke";
@@ -74,33 +70,27 @@ export default defineEventHandler(async (event) => {
   if (!consumerKey || !consumerSecret || !passkey) {
     throw createError({
       statusCode: 500,
-      statusMessage: "Daraja API credentials not configured (missing passkey?)",
+      statusMessage: "Daraja API credentials not configured",
     });
   }
 
-  // Get access token
   let accessToken;
   try {
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString(
       "base64",
     );
-    const tokenResponse = await axios.get(
+    const tokenRes = await axios.get(
       `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
-      {
-        headers: {
-          Authorization: `Basic ${auth}`,
-        },
-      },
+      { headers: { Authorization: `Basic ${auth}` } },
     );
-    accessToken = tokenResponse.data.access_token;
-  } catch (err) {
+    accessToken = tokenRes.data.access_token;
+  } catch {
     throw createError({
       statusCode: 500,
       statusMessage: "Failed to get Daraja access token",
     });
   }
 
-  // query STK push status using CheckoutRequestID
   let darajaData;
   try {
     const timestamp = new Date()
@@ -111,29 +101,24 @@ export default defineEventHandler(async (event) => {
       `${config.mpesaShortCode}${passkey}${timestamp}`,
     ).toString("base64");
 
-    const queryPayload = {
-      BusinessShortCode: config.mpesaShortCode,
-      Password: password,
-      Timestamp: timestamp,
-      CheckoutRequestID: reference,
-    };
-
-    const checkResponse = await axios.post(
+    const checkRes = await axios.post(
       `${darajaUrl}/mpesa/stkpushquery/v1/query`,
-      queryPayload,
+      {
+        BusinessShortCode: config.mpesaShortCode,
+        Password: password,
+        Timestamp: timestamp,
+        CheckoutRequestID: reference,
+      },
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
-    if (
-      checkResponse.data.ResultCode !== 0 &&
-      checkResponse.data.ResultCode !== "0"
-    ) {
+    if (checkRes.data.ResultCode !== 0 && checkRes.data.ResultCode !== "0") {
       throw createError({
         statusCode: 400,
         statusMessage: "M-Pesa STK push verification failed",
       });
     }
-    darajaData = checkResponse.data;
+    darajaData = checkRes.data;
   } catch (err) {
     throw createError({
       statusCode: 400,
@@ -142,7 +127,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  /* -------------------- AMOUNT VALIDATION -------------------- */
+  /* ── AMOUNT VALIDATION ────────────────────────────────────── */
   const paidAmount =
     parseInt(
       darajaData.ResultParameters?.ResultParameter?.find(
@@ -162,19 +147,13 @@ export default defineEventHandler(async (event) => {
       (p) => p.Key === "MpesaReceiptNumber",
     )?.Value || reference;
 
-  /* -------------------- PREVENT DUPLICATE BOOKINGS -------------------- */
-  const existingBooking = await TotalBooking.findOne({
-    reference,
-  });
-
+  /* ── PREVENT DUPLICATE BOOKINGS ───────────────────────────── */
+  const existingBooking = await TotalBooking.findOne({ reference });
   if (existingBooking) {
-    return {
-      message: "Booking already confirmed",
-      booking: existingBooking,
-    };
+    return { message: "Booking already confirmed", booking: existingBooking };
   }
 
-  /* -------------------- DECREMENT TICKET QUANTITY ATOMICALLY -------------------- */
+  /* ── DECREMENT TICKET QUANTITY ATOMICALLY ─────────────────── */
   const updatedEvent = await Event.findOneAndUpdate(
     {
       _id: eventData._id,
@@ -184,12 +163,11 @@ export default defineEventHandler(async (event) => {
     { $inc: { TicketQuantity: -1 } },
     { new: true },
   );
-
   if (!updatedEvent) {
     throw createError({ statusCode: 400, statusMessage: "Tickets sold out" });
   }
 
-  /* -------------------- SAVE BOOKING -------------------- */
+  /* ── SAVE BOOKING ─────────────────────────────────────────── */
   const booking = await TotalBooking.create({
     eventName: eventData.title,
     userEmail: userData.email,
@@ -198,12 +176,11 @@ export default defineEventHandler(async (event) => {
     ticketType,
     amount: expectedAmount,
     bookedAt: new Date(),
-    // record who booked and who created the event
     createdBy: userData._id,
     organiserId: eventData.createdBy,
   });
 
-  // -------------------- GENERATE TICKET -------------------- */
+  /* ── GENERATE UNIQUE TICKET CODE ──────────────────────────── */
   let ticketCode;
   let retries = 3;
   while (retries > 0) {
@@ -230,121 +207,139 @@ export default defineEventHandler(async (event) => {
     amount: expectedAmount,
   });
 
-  /* -------------------- CREATE TICKET PDF -------------------- */
-  function generateTicketPdfBuffer(details) {
+  /* ── GENERATE TICKET PDF ──────────────────────────────────── */
+  // QR code payload — contains all verifiable details
+  // Scan this at the entrance to verify authenticity
+  const qrPayload = JSON.stringify({
+    code: ticketCode,
+    event: eventData.title,
+    type: ticketType,
+    email: userData.email,
+    ref: transactionId,
+    amount: expectedAmount,
+    issued: new Date().toISOString(),
+  });
+
+  // Generate QR code as PNG buffer
+  const qrBuffer = await QRCode.toBuffer(qrPayload, {
+    type: "png",
+    width: 90, // small — fits neatly on ticket
+    margin: 1,
+    errorCorrectionLevel: "H", // high correction — more secure
+    color: { dark: "#0f172a", light: "#ffffff" },
+  });
+
+  async function generateTicketPdf(details) {
     return new Promise((resolve, reject) => {
       try {
-        // refreshed compact ticket: 210 x 300 points (~3" x 4.2")
-        const doc = new PDFDocument({ size: [210, 300], margin: 12 });
+        // Compact ticket: 250 × 320 pt (~3.5" × 4.5")
+        const doc = new PDFDocument({ size: [250, 320], margin: 0 });
         const chunks = [];
-        doc.on("data", (chunk) => chunks.push(chunk));
+        doc.on("data", (c) => chunks.push(c));
         doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-        // Base
-        doc.rect(0, 0, 210, 300).fill("#ffffff");
+        // ── Background ──────────────────────────────────────────
+        doc.rect(0, 0, 250, 320).fill("#ffffff");
 
-        // Left accent strip
-        doc.save();
-        doc.roundedRect(6, 10, 34, 280, 6).fill("#9c4e8b");
+        // ── Top colour band ──────────────────────────────────────
+        doc.rect(0, 0, 250, 56).fill("#9c4e8b");
+
+        // Event title in band
         doc
           .fillColor("#ffffff")
           .font("Helvetica-Bold")
-          .fontSize(10)
-          .text("LB", 14, 34, { width: 18, align: "center" });
-        doc.restore();
+          .fontSize(11)
+          .text(details.eventTitle, 16, 12, { width: 218, align: "left" });
 
-        // Header area
-        doc
-          .fillColor("#0f172a")
-          .font("Helvetica-Bold")
-          .fontSize(12)
-          .text(details.eventTitle, 52, 14, { width: 146 });
+        // Date + location in band
         doc
           .font("Helvetica")
           .fontSize(8)
-          .fillColor("#6b7280")
-          .text(details.eventDate, 52, 32);
-        doc.text(details.location, 52, 44);
-
-        // Divider
-        doc.moveTo(52, 64).lineTo(196, 64).strokeColor("#e6e6e6").stroke();
-
-        // Ticket code block
-        doc.roundedRect(52, 72, 118, 56, 6).fill("#f8fafc");
-        doc
-          .fillColor("#111827")
-          .font("Courier-Bold")
-          .fontSize(16)
-          .text(details.ticketCode, 52, 90, { width: 118, align: "center" });
-
-        // Ticket type badge
-        doc.roundedRect(52, 132, 62, 20, 6).fill("#eef2ff");
-        doc
-          .fillColor("#4f46e5")
-          .font("Helvetica-Bold")
-          .fontSize(9)
-          .text(details.ticketType.toUpperCase(), 52, 136, {
-            width: 62,
-            align: "center",
+          .fillColor("#f3e8f9")
+          .text(`${details.eventDate}  ·  ${details.location}`, 16, 32, {
+            width: 218,
+            align: "left",
           });
 
-        // Purchaser info
+        // ── Tear-off dashed line ─────────────────────────────────
         doc
-          .fillColor("#111827")
-          .font("Helvetica")
-          .fontSize(9)
-          .text("Name", 52, 160);
-        doc
-          .font("Helvetica-Bold")
-          .text(details.name || "-", 100, 160, { width: 96 });
-
-        doc.font("Helvetica").fontSize(9).text("Email", 52, 176);
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(8)
-          .text(details.email || "-", 100, 176, { width: 96 });
-
-        // Right perforated stub
-        doc
-          .moveTo(170, 10)
-          .lineTo(170, 290)
-          .dash(2, { space: 3 })
-          .strokeColor("#e5e7eb")
+          .moveTo(0, 56)
+          .lineTo(250, 56)
+          .dash(3, { space: 4 })
+          .strokeColor("#d8b4fe")
+          .lineWidth(0.5)
           .stroke();
         if (typeof doc.undash === "function") doc.undash();
 
+        // ── Left body: holder info ───────────────────────────────
+        const LX = 16;
+        let LY = 68;
+
+        const row = (label, value) => {
+          doc
+            .font("Helvetica")
+            .fontSize(7)
+            .fillColor("#6b7280")
+            .text(label, LX, LY);
+          doc
+            .font("Helvetica-Bold")
+            .fontSize(8)
+            .fillColor("#111827")
+            .text(value, LX, LY + 10, { width: 138 });
+          LY += 28;
+        };
+
+        row("TICKET HOLDER", details.name || "—");
+        row("EMAIL", details.email);
+        row("TICKET TYPE", details.ticketType.toUpperCase());
+        row("AMOUNT PAID", `KES ${details.amount}`);
+        row("REFERENCE", details.reference);
+
+        // ── Ticket code ──────────────────────────────────────────
+        doc.roundedRect(LX, LY, 140, 26, 4).fill("#f1f5f9");
         doc
-          .font("Helvetica")
-          .fontSize(8)
-          .fillColor("#374151")
-          .text("AMOUNT", 174, 26, { width: 32, align: "center" });
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(10)
-          .text(`KES ${details.amount}`, 174, 40, {
-            width: 32,
+          .font("Courier-Bold")
+          .fontSize(13)
+          .fillColor("#9c4e8b")
+          .text(details.ticketCode, LX, LY + 6, {
+            width: 140,
             align: "center",
           });
+        LY += 34;
 
-        doc
-          .font("Helvetica")
-          .fontSize(7)
-          .fillColor("#6b7280")
-          .text("REF", 174, 66, { width: 32, align: "center" });
-        doc
-          .font("Helvetica")
-          .fontSize(7)
-          .text(details.reference, 172, 76, { width: 36, align: "center" });
+        // ── QR code (right side) ─────────────────────────────────
+        // QR sits in the right column, vertically centred in body
+        doc.image(details.qrBuffer, 162, 66, { width: 72, height: 72 });
 
-        // Footer small note
+        // "SCAN TO VERIFY" label under QR
         doc
           .font("Helvetica")
-          .fontSize(7)
-          .fillColor("#6b7280")
-          .text("Present this ticket at the entrance.", 52, 220, {
-            width: 110,
-            align: "center",
-          });
+          .fontSize(6)
+          .fillColor("#9ca3af")
+          .text("SCAN TO VERIFY", 162, 142, { width: 72, align: "center" });
+
+        // ── Vertical divider between body columns ────────────────
+        doc
+          .moveTo(154, 60)
+          .lineTo(154, 300)
+          .dash(2, { space: 3 })
+          .strokeColor("#e5e7eb")
+          .lineWidth(0.5)
+          .stroke();
+        if (typeof doc.undash === "function") doc.undash();
+
+        // ── Footer ───────────────────────────────────────────────
+        doc.rect(0, 296, 250, 24).fill("#f8fafc");
+        doc
+          .font("Helvetica")
+          .fontSize(6.5)
+          .fillColor("#9ca3af")
+          .text(
+            "Present this ticket at the entrance · Not transferable · Volora Events",
+            0,
+            304,
+            { width: 250, align: "center" },
+          );
 
         doc.end();
       } catch (err) {
@@ -353,19 +348,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const pdfBuffer = await generateTicketPdfBuffer({
+  const pdfBuffer = await generateTicketPdf({
     eventTitle: eventData.title,
     eventDate: new Date(eventData.date).toDateString(),
     location: eventData.location,
     ticketCode,
     ticketType,
     amount: expectedAmount,
-    reference: reference,
+    reference: transactionId,
     name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
     email: userData.email,
+    qrBuffer, // pass QR image buffer directly to pdfkit
   });
 
-  /* -------------------- EMAIL (if SMTP configured) -------------------- */
+  /* ── SEND EMAILS ──────────────────────────────────────────── */
   if (
     config.smtpHost &&
     config.smtpPort &&
@@ -376,40 +372,46 @@ export default defineEventHandler(async (event) => {
       host: config.smtpHost,
       port: Number(config.smtpPort),
       secure: Number(config.smtpPort) === 465,
-      auth: {
-        user: config.emailUsername,
-        pass: config.emailPass,
-      },
+      auth: { user: config.emailUsername, pass: config.emailPass },
     });
 
-    /* -------------------- EMAIL USER -------------------- */
+    const holderName =
+      `${userData.firstName || ""} ${userData.lastName || ""}`.trim();
+
+    // Email to user
     try {
       await transporter.sendMail({
-        from: `"Volara Events" <${config.emailUsername}>`,
+        from: `"Volora Events" <${config.emailUsername}>`,
         to: userData.email,
         subject: `Booking Confirmed – ${eventData.title} 🎉`,
         html: `
-        <h2>Hello ${userData.firstName || ""} ${userData.lastName || ""}</h2>
-        <p>Your booking was successful!</p>
-
-        <p><strong>Event:</strong> ${eventData.title}</p>
-        <p><strong>Ticket Type:</strong> ${ticketType.toUpperCase()}</p>
-        <p><strong>Amount Paid:</strong> KES ${expectedAmount}</p>
-        <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
-        <p><strong>Location:</strong> ${eventData.location}</p>
-        <p><strong>Reference:</strong> ${transactionId}</p>
-        
-        <br/>
-         <h3>🎟️ Ticket Code</h3>
-      <p style="font-size:18px"><strong>${ticketCode}</strong></p>
-
-      <p>Your ticket PDF is attached to this email. Please download and present it at the entrance.</p>
-
-      <p>Thank you for booking with us 🙏</p>
-      `,
+          <div style="font-family:sans-serif;max-width:520px;margin:auto">
+            <div style="background:#9c4e8b;padding:24px;border-radius:12px 12px 0 0">
+              <h2 style="color:#fff;margin:0">Booking Confirmed! 🎉</h2>
+            </div>
+            <div style="padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
+              <p>Hi <strong>${holderName}</strong>,</p>
+              <p>Your ticket for <strong>${eventData.title}</strong> is confirmed.</p>
+              <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
+                <tr><td style="padding:8px 0;color:#6b7280">Event</td><td style="padding:8px 0"><strong>${eventData.title}</strong></td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Date</td><td style="padding:8px 0">${new Date(eventData.date).toDateString()}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Location</td><td style="padding:8px 0">${eventData.location}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Ticket Type</td><td style="padding:8px 0">${ticketType.toUpperCase()}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Amount Paid</td><td style="padding:8px 0">KES ${expectedAmount}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Reference</td><td style="padding:8px 0"><code>${transactionId}</code></td></tr>
+              </table>
+              <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;margin:16px 0">
+                <p style="margin:0 0 6px;color:#6b7280;font-size:12px">YOUR TICKET CODE</p>
+                <p style="font-family:monospace;font-size:22px;font-weight:bold;color:#9c4e8b;margin:0">${ticketCode}</p>
+              </div>
+              <p style="font-size:13px;color:#6b7280">Your ticket PDF is attached. Present it (printed or on your phone) at the entrance.</p>
+              <p>Thank you for booking with Volora Events 🙏</p>
+            </div>
+          </div>
+        `,
         attachments: [
           {
-            filename: "ticket.pdf",
+            filename: `ticket-${ticketCode}.pdf`,
             content: pdfBuffer,
             contentType: "application/pdf",
           },
@@ -419,39 +421,43 @@ export default defineEventHandler(async (event) => {
       console.error("Error sending email to user:", err);
     }
 
-    /* -------------------- EMAIL ADMIN -------------------- */
+    // Email to admin
     const admin = await User.findOne({ role: "admin" });
-
     if (admin) {
-      await transporter.sendMail({
-        from: `"Volara Events" <${config.emailUsername}>`,
-        to: admin.email,
-        subject: `New Booking – ${eventData.title}`,
-        html: `
-          <h2>New Booking Alert 📢</h2>
-          <p><strong>Event:</strong> ${eventData.title}</p>
-          <p><strong>User:</strong> ${userData.firstName || ""} ${
-            userData.lastName || ""
-          }</p>
-          <p><strong>Email:</strong> ${userData.email}</p>
-          <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
-          <p><strong>Amount:</strong> KES ${expectedAmount}</p>
-          <p><strong>Reference:</strong> ${transactionId}</p>
-        `,
-        attachments: [
-          {
-            filename: "ticket.pdf",
-            content: pdfBuffer,
-            contentType: "application/pdf",
-          },
-        ],
-      });
+      try {
+        await transporter.sendMail({
+          from: `"Volora Events" <${config.emailUsername}>`,
+          to: admin.email,
+          subject: `New Booking – ${eventData.title}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:520px;margin:auto">
+              <h2>New Booking Alert 📢</h2>
+              <p><strong>Event:</strong> ${eventData.title}</p>
+              <p><strong>User:</strong> ${holderName}</p>
+              <p><strong>Email:</strong> ${userData.email}</p>
+              <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
+              <p><strong>Amount:</strong> KES ${expectedAmount}</p>
+              <p><strong>Reference:</strong> ${transactionId}</p>
+              <p><strong>Ticket Code:</strong> <code>${ticketCode}</code></p>
+            </div>
+          `,
+          attachments: [
+            {
+              filename: `ticket-${ticketCode}.pdf`,
+              content: pdfBuffer,
+              contentType: "application/pdf",
+            },
+          ],
+        });
+      } catch (err) {
+        console.error("Error sending email to admin:", err);
+      }
     }
   } else {
     console.warn("SMTP not configured; skipping booking notification emails.");
   }
 
-  /* -------------------- RESPONSE -------------------- */
+  /* ── RESPONSE ─────────────────────────────────────────────── */
   return {
     message: "Booking verified and saved successfully",
     booking,

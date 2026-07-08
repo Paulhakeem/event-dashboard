@@ -88,7 +88,7 @@ export default defineNuxtConfig({
       },
     },
     optimizeDeps: {
-      include: ["jwt-decode", "vue-chrts"],
+      include: ["@headlessui/vue", "jwt-decode", "vue-chrts"],
     },
   },
 
