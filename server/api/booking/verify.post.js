@@ -208,25 +208,15 @@ export default defineEventHandler(async (event) => {
   });
 
   /* ── GENERATE TICKET PDF ──────────────────────────────────── */
-  // QR code payload — contains all verifiable details
-  // Scan this at the entrance to verify authenticity
-  const qrPayload = JSON.stringify({
-    code: ticketCode,
-    event: eventData.title,
-    type: ticketType,
-    email: userData.email,
-    ref: transactionId,
-    amount: expectedAmount,
-    issued: new Date().toISOString(),
-  });
+  const qrPayload = ticketCode;
 
-  // Generate QR code as PNG buffer
+  // Pure black on white = maximum contrast = easiest to scan
   const qrBuffer = await QRCode.toBuffer(qrPayload, {
     type: "png",
-    width: 90, // small — fits neatly on ticket
-    margin: 1,
-    errorCorrectionLevel: "H", // high correction — more secure
-    color: { dark: "#0f172a", light: "#ffffff" },
+    width: 200,
+    margin: 2,
+    errorCorrectionLevel: "L",
+    color: { dark: "#000000", light: "#ffffff" },
   });
 
   async function generateTicketPdf(details) {
@@ -308,15 +298,14 @@ export default defineEventHandler(async (event) => {
         LY += 34;
 
         // ── QR code (right side) ─────────────────────────────────
-        // QR sits in the right column, vertically centred in body
-        doc.image(details.qrBuffer, 162, 66, { width: 72, height: 72 });
+        doc.image(details.qrBuffer, 158, 68, { width: 80, height: 80 });
 
         // "SCAN TO VERIFY" label under QR
         doc
           .font("Helvetica")
           .fontSize(6)
-          .fillColor("#9ca3af")
-          .text("SCAN TO VERIFY", 162, 142, { width: 72, align: "center" });
+          .fillColor("#6b7280")
+          .text("SCAN TO VERIFY", 158, 152, { width: 80, align: "center" });
 
         // ── Vertical divider between body columns ────────────────
         doc
