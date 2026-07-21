@@ -1,11 +1,23 @@
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import { sendResetEmail } from "~~/server/utils/mailer.js";
+import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
 
 export default defineEventHandler(async (event) => {
-  const { email } = await readBody(event);
+  const config = useRuntimeConfig();
+  const { email, recaptchaToken } = await readBody(event);
 
   await connectDB();
+
+  // reCAPTCHA verification
+  const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
+  if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        recaptchaResult?.message || "reCAPTCHA verification failed",
+    });
+  }
 
   const user = await User.findOne({ email });
   if (!user) {

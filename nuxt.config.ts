@@ -114,6 +114,7 @@ export default defineNuxtConfig({
     mpesaShortCode: process.env.MPESA_SHORT_CODE,
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     deepseekApiKey: process.env.DEEPSEEK_API,
+    recaptchaSecretKey: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
 
     public: {
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
@@ -151,6 +152,7 @@ export default defineNuxtConfig({
       profileDeleteApi: process.env.PROFILE_DELETE_API,
       ticketCancelApi: process.env.TICKET_CANCEL_API,
       cancelledSummaryApi: process.env.CANCELLED_SUMMARY_API,
+      recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY,
     },
   },
 });

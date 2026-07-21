@@ -3,7 +3,7 @@ export async function verifyRecaptcha(token, config) {
     return { success: false, message: "Missing reCAPTCHA token" };
   }
 
-  const secret = config?.recaptchaSecret;
+  const secret = config?.recaptchaSecretKey;
   if (!secret) {
     if (process.env.NODE_ENV !== "production") {
       return {
@@ -19,21 +19,25 @@ export async function verifyRecaptcha(token, config) {
     };
   }
 
-  const params = new URLSearchParams();
-  params.append("secret", secret);
-  params.append("response", token);
-
   try {
-    const verify = await $fetch("https://www.google.com/recaptcha/api/siteverify", {
-      method: "POST",
-      body: params,
-    });
+    const formData = new URLSearchParams();
+    formData.append("secret", secret);
+    formData.append("response", token);
 
-    return verify;
+    const result = await $fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        body: formData,
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      },
+    );
+
+    return result;
   } catch (err) {
     return {
       success: false,
-      message: "Verification failed",
+      message: "reCAPTCHA verification request failed",
       error: String(err),
     };
   }

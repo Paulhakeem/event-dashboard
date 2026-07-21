@@ -70,10 +70,13 @@
           />
         </div>
 
+        <!-- reCAPTCHA -->
+        <GoogleRecaptchaWidget v-model="recaptchaToken" />
+
         <!-- Login Button -->
         <button
           type="submit"
-          :disabled="isLoading"
+          :disabled="isLoading || !recaptchaToken"
           class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
         >
           {{ isLoading ? "Logging In..." : "Log In" }}
@@ -87,6 +90,7 @@
 <script setup>
 const email = ref("");
 const password = ref("");
+const recaptchaToken = ref("");
 const errorMessage = ref("");
 const isLoading = ref(false);
 const { setAuth } = useAuth();
@@ -100,6 +104,7 @@ const login = async () => {
       body: {
         email: email.value,
         password: password.value,
+        recaptchaToken: recaptchaToken.value,
       },
     });
     setAuth(data);

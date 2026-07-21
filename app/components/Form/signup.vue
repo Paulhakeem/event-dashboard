@@ -97,11 +97,15 @@
         <option v-if="!adminExists" value="admin">Admin</option>
       </select>
 
+      <!-- reCAPTCHA -->
+      <GoogleRecaptchaWidget v-model="recaptchaToken" />
+
       <!-- Submit button -->
       <div class="mt-6 grid">
         <button
           @click="signup"
           type="submit"
+          :disabled="!recaptchaToken"
           class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
         >
           {{ isLoading ? "Sending veryfication code..." : "Verify email" }}
@@ -124,6 +128,7 @@ const {
   password,
   errorMessage,
   role,
+  recaptchaToken,
   signup,
   isLoading,
 } = FormAuth();

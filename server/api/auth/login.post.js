@@ -3,17 +3,28 @@ import bcrypt from "bcryptjs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import { setAuthCookie } from "../../utils/authCookie.js";
+import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   await connectDB();
 
-  const { email, password } = await readBody(event);
+  const { email, password, recaptchaToken } = await readBody(event);
 
   if (!email || !password) {
     throw createError({
       statusCode: 400,
       statusMessage: "Email and password are required",
+    });
+  }
+
+  // reCAPTCHA verification
+  const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
+  if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        recaptchaResult?.message || "reCAPTCHA verification failed",
     });
   }
 

@@ -59,8 +59,12 @@
             </div>
             <!-- End Form Group -->
 
+            <!-- reCAPTCHA -->
+            <GoogleRecaptchaWidget v-model="recaptchaToken" />
+
             <button
               type="submit"
+              :disabled="!recaptchaToken"
               class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-[#9c4e8b] text-white disabled:opacity-50 disabled:pointer-events-none"
             >
               Reset password
@@ -79,6 +83,7 @@ import { ref } from 'vue';
 const emit = defineEmits(["close", "sent"]);
 
 const email = ref("");
+const recaptchaToken = ref("");
 const isLoading = ref(false);
 
 const forgetPassword = async () => {
@@ -86,7 +91,7 @@ const forgetPassword = async () => {
   try {
     const res = await $fetch("/api/auth/forgot-password", {
       method: "POST",
-      body: { email: email.value },
+      body: { email: email.value, recaptchaToken: recaptchaToken.value },
     });
     if (res?.message) {
       alert(res.message);
