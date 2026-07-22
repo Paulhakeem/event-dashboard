@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({
   modelValue: { type: String, default: "" },
@@ -38,18 +38,20 @@ const onRecaptchaError = () => {
 const renderWidget = () => {
   if (!window.grecaptcha || !widgetContainer.value) return;
 
-  try {
-    widgetId = window.grecaptcha.render(widgetContainer.value, {
-      sitekey: siteKey,
-      callback: onRecaptchaSuccess,
-      "expired-callback": onRecaptchaExpired,
-      "error-callback": onRecaptchaError,
-      theme: "light",
-      size: "normal",
-    });
-  } catch (e) {
-    error.value = "reCAPTCHA failed to initialize.";
-  }
+  window.grecaptcha.ready(() => {
+    try {
+      widgetId = window.grecaptcha.render(widgetContainer.value, {
+        sitekey: siteKey,
+        callback: onRecaptchaSuccess,
+        "expired-callback": onRecaptchaExpired,
+        "error-callback": onRecaptchaError,
+        theme: "light",
+        size: "normal",
+      });
+    } catch (e) {
+      error.value = "reCAPTCHA failed to initialize.";
+    }
+  });
 };
 
 const reset = () => {
@@ -68,12 +70,10 @@ onMounted(() => {
   }
 
   const script = document.createElement("script");
-  script.src = `https://www.google.com/recaptcha/api.js?render=explicit`;
+  script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
   script.async = true;
   script.defer = true;
-  script.onload = () => {
-    renderWidget();
-  };
+  script.onload = () => renderWidget();
   script.onerror = () => {
     error.value = "Failed to load reCAPTCHA script.";
   };

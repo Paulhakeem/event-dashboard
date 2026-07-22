@@ -5,7 +5,8 @@ import { resolve } from "path";
 export default defineNuxtConfig({
   app: {
     head: {
-      title: "Velora Events Dashboard",
+      title:
+        "Digital Online Events Booking Platform, Discover, Book, and Manage Events",
       titleTemplate: "%s | Velora Events",
       meta: [
         { charset: "utf-8" },
