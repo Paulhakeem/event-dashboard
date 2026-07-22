@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  title: "Home",
+  title: "Events Booking Platform - Discover, Book, and Manage Events",
   meta: [
     {
       name: "description",
