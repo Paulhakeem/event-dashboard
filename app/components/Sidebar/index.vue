@@ -18,11 +18,7 @@
 
           <!-- Logo -->
           <div class="flex items-center text-lg">
-            <img
-              :src="logo"
-              alt="Logo"
-              class="h-20 w-auto object-contain"
-            />
+            <img :src="logo" alt="Logo" class="h-15 w-auto object-contain" />
           </div>
 
           <!-- Auth Buttons -->
