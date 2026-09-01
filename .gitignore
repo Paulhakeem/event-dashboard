@@ -23,3 +23,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Analysis files
+ADMIN_DASHBOARD_ANALYSIS.md
