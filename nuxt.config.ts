@@ -116,6 +116,7 @@ export default defineNuxtConfig({
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     deepseekApiKey: process.env.DEEPSEEK_API,
     recaptchaSecretKey: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
+    mailgunApiKey: process.env.MAILGUN_API_KEY,
 
     public: {
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
