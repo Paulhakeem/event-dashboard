@@ -1,9 +1,9 @@
 export const totalUsers = () => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig();
   const { token } = useAuth();
   const users = ref([]);
 
-  onMounted(async () => {
+  const fetchUsers = async () => {
     try {
       const res = await $fetch(`${config.public.usersApi}`, {
         headers: {
@@ -15,6 +15,8 @@ export const totalUsers = () => {
     } catch (error) {
       window.alert(error.message);
     }
-  });
-  return { users };
+  };
+
+  onMounted(fetchUsers);
+  return { users, fetchUsers };
 };

@@ -27,11 +27,28 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "organiser", "user"],
       default: "user",
     },
+    permissions: {
+      type: [String],
+      default: [],
+    },
+    accountStatus: {
+      type: String,
+      enum: ["active", "suspended"],
+      default: "active",
+    },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationCode: String,
     emailVerificationExpires: Date,
     resetCode: { type: String },
     resetCodeExpires: { type: Date },
+    activityLog: [
+      {
+        action: { type: String, required: true },
+        performedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        details: { type: String },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     joinedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },

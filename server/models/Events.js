@@ -16,7 +16,16 @@ const eventSchema = new mongoose.Schema({
   ],
   status: {
     type: String,
-    enum: ["upcoming", "ongoing", "completed", "cancelled", "pending", "live"],
+    enum: [
+      "upcoming",
+      "ongoing",
+      "completed",
+      "cancelled",
+      "pending",
+      "live",
+      "inactive",
+      "archived",
+    ],
     default: "upcoming",
   },
   eventType: {
@@ -53,14 +62,17 @@ eventSchema.pre(/^find/, async function (next) {
     await this.model.updateMany(
       {
         date: { $gte: todayStart, $lt: todayEnd },
-        status: { $ne: "completed" },
+        status: { $nin: ["completed", "cancelled", "inactive", "archived"] },
       },
       { $set: { status: "live" } },
     );
 
     // Mark past events as completed
     await this.model.updateMany(
-      { date: { $lt: todayStart }, status: { $ne: "completed" } },
+      {
+        date: { $lt: todayStart },
+        status: { $nin: ["completed", "cancelled", "inactive", "archived"] },
+      },
       { $set: { status: "completed" } },
     );
   } catch (err) {

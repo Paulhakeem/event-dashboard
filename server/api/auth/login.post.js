@@ -68,6 +68,13 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (user.accountStatus === "suspended") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "This account has been suspended",
+    });
+  }
+
   // Password check
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
