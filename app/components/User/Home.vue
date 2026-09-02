@@ -7,7 +7,9 @@
       class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+        <h2
+          class="text-base md:text-lg font-semibold text-gray-800 dark:text-white"
+        >
           Tickets Purchased
         </h2>
         <span
@@ -16,7 +18,11 @@
           <Icon name="mdi:ticket" class="text-lg md:text-xl" />
         </span>
       </div>
-      <p class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ booking?.length }}</p>
+      <p
+        class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+      >
+        {{ paidBookings }}
+      </p>
       <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
         Total tickets bought
       </p>
@@ -27,7 +33,9 @@
       class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+        <h2
+          class="text-base md:text-lg font-semibold text-gray-800 dark:text-white"
+        >
           Free Registrations
         </h2>
         <span
@@ -36,9 +44,13 @@
           <Icon name="mdi:calendar" class="text-lg md:text-xl" />
         </span>
       </div>
-      <p class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">0</p>
+      <p
+        class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+      >
+        {{ freeRegistrations }}
+      </p>
       <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-        No registrations
+        Free event registrations
       </p>
     </div>
 
@@ -47,7 +59,9 @@
       class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+        <h2
+          class="text-base md:text-lg font-semibold text-gray-800 dark:text-white"
+        >
           Attended Events
         </h2>
         <span
@@ -56,11 +70,13 @@
           <Icon name="mdi:account-check" class="text-lg md:text-xl" />
         </span>
       </div>
-      <p class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-        {{ booking?.length }}
+      <p
+        class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+      >
+        {{ attendedEvents }}
       </p>
       <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-        Events you've joined
+        Events with a past date
       </p>
     </div>
 
@@ -69,7 +85,9 @@
       class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-base md:text-lg font-semibold text-gray-800 dark:text-white">
+        <h2
+          class="text-base md:text-lg font-semibold text-gray-800 dark:text-white"
+        >
           Total Spent
         </h2>
         <span
@@ -79,20 +97,38 @@
         </span>
       </div>
 
-      <p class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+      <p
+        class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
+      >
         <span class="text-xs md:text-sm">ksh</span>
-        {{ totalSpent }}
+        {{ totalSpent.toLocaleString() }}
       </p>
       <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
         Amount spent on tickets
       </p>
     </div>
   </div>
+  <SpendingHistory />
   <UserDashboard />
 </template>
 
 <script setup>
 const { booking } = useBookingData();
+const { events } = userUpcomingEvents();
+
+const paidBookings = computed(
+  () => booking.value.filter((item) => Number(item.amount || 0) > 0).length,
+);
+const freeRegistrations = computed(
+  () => booking.value.filter((item) => Number(item.amount || 0) === 0).length,
+);
+const attendedEvents = computed(
+  () =>
+    booking.value.filter((item) => {
+      const date = item.date || item.eventDate;
+      return date && new Date(date) < new Date();
+    }).length,
+);
 const totalSpent = computed(() => {
   return booking.value.reduce((total, b) => total + (b.amount || 0), 0);
 });

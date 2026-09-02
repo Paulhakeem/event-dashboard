@@ -3,13 +3,14 @@ export default function useTicketCancellation() {
   const config = useRuntimeConfig();
   const cancellationLoading = ref(false);
   const cancelTicket = async (ticketId) => {
-    cancellationLoading.value = true;
     if (
       !confirm(
         "Are you sure you want to cancel this ticket? This action cannot be undone.",
       )
     )
       return;
+
+    cancellationLoading.value = true;
     try {
       const response = await $fetch("/api/tickets/cancel-ticket", {
         method: "POST",
@@ -22,6 +23,7 @@ export default function useTicketCancellation() {
         alert(
           "Your ticket has been cancelled. Check your email for confirmation.",
         );
+        return true;
       } else {
         throw new Error(response.message || "Failed to cancel ticket");
       }
@@ -34,6 +36,7 @@ export default function useTicketCancellation() {
   };
   return {
     loading: cancellationLoading,
+    cancellationLoading,
     cancelTicket,
   };
 }

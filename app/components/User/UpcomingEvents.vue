@@ -93,6 +93,13 @@
               View Details
             </button>
           </NuxtLink>
+          <button
+            type="button"
+            class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#9d4e8a] px-3 py-2 text-sm font-semibold text-[#9d4e8a]"
+            @click="downloadCalendar(event)"
+          >
+            <Icon name="mdi:calendar-plus" /> Add to calendar
+          </button>
         </div>
       </div>
     </div>
@@ -109,5 +116,44 @@ const formatDate = (date) => {
     month: "short",
     year: "numeric",
   });
+};
+
+const calendarText = (value) =>
+  String(value || "")
+    .replace(/[\\,;]/g, "\\$&")
+    .replace(/\n/g, "\\n");
+const toCalendarDate = (date) =>
+  new Date(date)
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
+const downloadCalendar = (event) => {
+  const start = toCalendarDate(event.date);
+  const end = toCalendarDate(
+    new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000),
+  );
+  const ics = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Velora Events//User Dashboard//EN",
+    "BEGIN:VEVENT",
+    `UID:${event._id}@velora-events`,
+    `DTSTAMP:${toCalendarDate(new Date())}`,
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:${calendarText(event.title)}`,
+    `LOCATION:${calendarText(event.location)}`,
+    `DESCRIPTION:${calendarText(event.description)}`,
+    "END:VEVENT",
+    "END:VCALENDAR",
+  ].join("\r\n");
+  const url = URL.createObjectURL(
+    new Blob([ics], { type: "text/calendar;charset=utf-8" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${event.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.ics`;
+  link.click();
+  URL.revokeObjectURL(url);
 };
 </script>

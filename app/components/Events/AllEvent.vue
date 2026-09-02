@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
+    class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
   >
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
@@ -83,9 +83,25 @@
                 </span>
               </div>
 
+              <button
+                v-if="user"
+                type="button"
+                class="absolute right-4 bottom-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-xl text-pink-600 shadow-lg"
+                :aria-label="
+                  isFavorite(event._id) ? 'Remove saved event' : 'Save event'
+                "
+                @click.stop="toggleFavorite(event._id)"
+              >
+                <Icon
+                  :name="
+                    isFavorite(event._id) ? 'mdi:heart' : 'mdi:heart-outline'
+                  "
+                />
+              </button>
+
               <!-- Gradient Overlay -->
               <div
-                class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"
+                class="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"
               ></div>
             </div>
 
@@ -159,7 +175,7 @@
                       event.status === 'cancelled' ||
                       event.status === 'completed'
                     "
-                    class="w-full bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    class="w-full bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {{
                       event.status === "cancelled"
@@ -176,7 +192,7 @@
               <template v-else>
                 <button
                   disabled
-                  class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-300/30 border border-emerald-200/50 opacity-95 cursor-not-allowed"
+                  class="w-full bg-linear-to-r from-emerald-500 to-teal-600 text-white font-semibold py-3 rounded-2xl shadow-lg shadow-emerald-300/30 border border-emerald-200/50 opacity-95 cursor-not-allowed"
                 >
                   <span class="inline-flex items-center justify-center gap-2">
                     <span class="text-lg">🌿</span>
@@ -236,7 +252,7 @@
           <!-- Retry Button -->
           <button
             @click="fetchEvents"
-            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
           >
             <svg
               class="w-4 h-4"
@@ -263,6 +279,8 @@
 const events = ref([]);
 const loading = ref(true);
 const errorMessage = ref("");
+const { user } = useAuth();
+const { isFavorite, toggleFavorite } = useFavorites();
 
 // Filter out pending events
 const filteredEvents = computed(() =>

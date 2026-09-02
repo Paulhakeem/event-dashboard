@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-center mt-12 px-4">
     <div
-      class="relative w-full max-w-lg rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
+      class="relative w-full max-w-lg rounded-3xl p-px bg-linear-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
     >
       <!-- Card -->
       <div
@@ -10,7 +10,7 @@
         <!-- Avatar -->
         <div class="relative group">
           <div
-            class="absolute inset-0 rounded-full bg-gradient-to-tr from-pink-500 to-indigo-500 blur-xl opacity-70 group-hover:opacity-100 transition"
+            class="absolute inset-0 rounded-full bg-linear-to-tr from-pink-500 to-indigo-500 blur-xl opacity-70 group-hover:opacity-100 transition"
           ></div>
 
           <img
@@ -40,7 +40,7 @@
         •
         <!-- Role -->
         <span
-          class="px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class="px-4 py-1 text-xs rounded-full bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-md"
         >
           {{ user.role || "Member" }}
         </span>
@@ -83,7 +83,8 @@
         <div
           class="mt-4 w-full text-center bg-gray-50 dark:bg-neutral-800 p-3 rounded-xl text-sm text-gray-600 dark:text-neutral-300"
         >
-          🎟 You have <b>2 upcoming events</b> this week
+          <Icon name="mdi:calendar-check" class="mr-1" />
+          You have <b>{{ events?.length || 0 }} upcoming events</b> available
         </div>
 
         <!-- Update Profile Modal -->
@@ -105,7 +106,7 @@
         <div class="flex gap-3 mt-6 w-full">
           <button
             @click="toggle"
-            class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
+            class="flex-1 py-2.5 rounded-xl bg-linear-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
           </button>

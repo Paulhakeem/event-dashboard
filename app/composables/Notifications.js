@@ -96,16 +96,22 @@ export default function useNotifications() {
   });
 
   // delete event
-  const deleteNotification = async (id, index) => {
+  const deleteNotification = async (id, index = -1) => {
     if (!confirm("Are you sure you want to delete this notification?")) return;
     try {
       await $fetch(`${config.public.deleteNotification}/${id}`, {
         method: "DELETE",
         headers: {
-          Authorization: `Bearer ${token._value}`,
+          Authorization: `Bearer ${token.value}`,
         },
       });
-      removeNotification(index);
+      const notificationIndex =
+        index >= 0
+          ? index
+          : notifications.value.findIndex(
+              (notification) => notification._id === id,
+            );
+      if (notificationIndex >= 0) removeNotification(notificationIndex);
     } catch (err) {
       error.value = err.message;
     }
