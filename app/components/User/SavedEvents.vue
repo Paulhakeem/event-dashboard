@@ -58,6 +58,7 @@
               {{ event.title }}
             </h3>
             <button
+              v-if="canFavorite"
               type="button"
               class="text-pink-600"
               aria-label="Remove saved event"
@@ -82,6 +83,8 @@
 
 <script setup>
 const { favorites, loading, error, toggleFavorite } = useFavorites();
+const { user } = useAuth();
+const canFavorite = computed(() => user.value?.role === "user");
 const formatDate = (date) =>
   new Date(date).toLocaleDateString("en-KE", {
     day: "numeric",

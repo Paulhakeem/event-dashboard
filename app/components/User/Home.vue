@@ -1,5 +1,18 @@
 <template>
   <div
+    v-if="error || errorMessage"
+    class="mx-4 mb-4 flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between"
+  >
+    <span>Some dashboard data could not be loaded.</span>
+    <button
+      type="button"
+      class="font-semibold underline"
+      @click="Promise.all([fetchBookings(), fetchUpcomingEvents()])"
+    >
+      Retry
+    </button>
+  </div>
+  <div
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 px-4 sm:px-6 md:px-8 py-6 md:py-8"
   >
     <!-- Tickets Purchased -->
@@ -113,8 +126,9 @@
 </template>
 
 <script setup>
-const { booking } = useBookingData();
-const { events } = userUpcomingEvents();
+const { booking, loading, error, fetchBookings } = useBookingData();
+const { events, eventsLoading, errorMessage, fetchUpcomingEvents } =
+  userUpcomingEvents();
 
 const paidBookings = computed(
   () => booking.value.filter((item) => Number(item.amount || 0) > 0).length,

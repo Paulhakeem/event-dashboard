@@ -1,5 +1,6 @@
 import connectDB from "../../utils/mongoose.js";
 import { Event } from "~~/server/models/Events";
+import { requireAuth } from "../../utils/requireAuth.js";
 import axios from "axios";
 
 const sanitizeForMpesa = (str) => {
@@ -15,9 +16,11 @@ const sanitizeForMpesa = (str) => {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+  const authUser = requireAuth(event);
   const body = await readBody(event);
 
-  const { phone, eventId, userEmail, ticketType } = body;
+  const { phone, eventId, ticketType } = body;
+  const userEmail = authUser.email;
 
   if (!phone || !eventId || !userEmail || !ticketType) {
     throw createError({

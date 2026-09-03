@@ -106,6 +106,11 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const { userSidebarMenu } = userDashboardBar();
+const route = useRoute();
+const { user } = useAuth();
+if (user.value?.id && String(route.params.id) !== String(user.value.id)) {
+  await navigateTo(`/user/${user.value.id}`, { replace: true });
+}
 const currentComponent = ref(userSidebarMenu[0]?.component ?? null);
 const sidebarOpen = ref(false);
 const isMobile = ref(false);

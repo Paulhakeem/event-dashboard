@@ -97,6 +97,20 @@
 
             <!-- Empty state -->
             <div
+              v-else-if="errorMessage"
+              class="text-center flex-1 flex flex-col justify-center"
+            >
+              <p class="text-sm text-red-600">{{ errorMessage }}</p>
+              <button
+                type="button"
+                class="mt-4 text-sm font-semibold text-[#9d4e8a] underline"
+                @click="fetchUpcomingEvents"
+              >
+                Retry
+              </button>
+            </div>
+
+            <div
               v-else-if="events?.length === 0"
               class="text-center flex-1 flex flex-col justify-center"
             >
@@ -134,6 +148,7 @@
 </template>
 
 <script setup>
-const { booking, loading } = useBookingData();
-const { events, eventsLoading } = userUpcomingEvents();
+const { booking, loading, error, fetchBookings } = useBookingData();
+const { events, eventsLoading, errorMessage, fetchUpcomingEvents } =
+  userUpcomingEvents();
 </script>

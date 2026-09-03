@@ -3,6 +3,7 @@ import connectDB from "~~/server/utils/mongoose";
 import { Event } from "~~/server/models/Events";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { Notification } from "~~/server/models/Notification";
+import { Ticket } from "~~/server/models/Ticket";
 
 const requireAdmin = (event) => {
   const header = getHeader(event, "authorization");
@@ -73,6 +74,11 @@ export default defineEventHandler(async (event) => {
 
   const action = body.action;
   const update = body.update || {};
+  const isApproved = action === "approve";
+  const isCancelled =
+    action === "status" &&
+    update.status === "cancelled" &&
+    current.status !== "cancelled";
   if (action === "approve") update.status = "upcoming";
   if (action === "reject") update.status = "cancelled";
   if (!["approve", "reject", "status", "update"].includes(action)) {
@@ -129,6 +135,35 @@ export default defineEventHandler(async (event) => {
       event: current._id,
       read: false,
     });
+  }
+
+  if (isApproved) {
+    await Notification.create({
+      title: "New event available",
+      message: `A new event, "${updatedEvent.title}", is now available to browse and book.`,
+      recipientRole: "user",
+      event: current._id,
+      meta: { type: "new_event" },
+      read: false,
+    });
+  }
+
+  if (isCancelled) {
+    const ticketHolders = await Ticket.find({ eventId: current._id }).distinct(
+      "userId",
+    );
+    if (ticketHolders.length) {
+      await Notification.insertMany(
+        ticketHolders.map((recipientUser) => ({
+          title: "Event cancelled",
+          message: `The event "${updatedEvent.title}" has been cancelled.`,
+          recipientUser,
+          event: current._id,
+          meta: { type: "event_cancelled" },
+          read: false,
+        })),
+      );
+    }
   }
   return { success: true, updatedEvent, performedBy: admin.id };
 });

@@ -7,6 +7,12 @@ import { requireAuth } from "~~/server/utils/requireAuth.js";
 export default defineEventHandler(async (event) => {
   await connectDB();
   const authUser = requireAuth(event);
+  if (authUser.role !== "user") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Only users can save events",
+    });
+  }
   const { eventId } = await readBody(event);
 
   if (!mongoose.isValidObjectId(eventId)) {

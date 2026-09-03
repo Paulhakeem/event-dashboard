@@ -35,6 +35,7 @@ export default function useFavorites() {
       await navigateTo("/login");
       return;
     }
+    if (user.value.role !== "user") return false;
 
     const response = await $fetch("/api/users/favorites", {
       method: "POST",

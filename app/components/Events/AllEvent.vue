@@ -84,7 +84,7 @@
               </div>
 
               <button
-                v-if="user"
+                v-if="canFavorite"
                 type="button"
                 class="absolute right-4 bottom-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-xl text-pink-600 shadow-lg"
                 :aria-label="
@@ -281,6 +281,7 @@ const loading = ref(true);
 const errorMessage = ref("");
 const { user } = useAuth();
 const { isFavorite, toggleFavorite } = useFavorites();
+const canFavorite = computed(() => user.value?.role === "user");
 
 // Filter out pending events
 const filteredEvents = computed(() =>

@@ -8,12 +8,16 @@ import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode"; // npm install qrcode
+import { Notification } from "../../models/Notification";
+import { requireAuth } from "../../utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+  const authUser = requireAuth(event);
   const body = await readBody(event);
 
-  const { reference, ticketType, eventName, userEmail } = body;
+  const { reference, ticketType, eventName } = body;
+  const userEmail = authUser.email;
 
   /* ── BASIC VALIDATION ─────────────────────────────────────── */
   if (!eventName || !userEmail || !reference || !ticketType) {
@@ -207,8 +211,26 @@ export default defineEventHandler(async (event) => {
     amount: expectedAmount,
   });
 
+  try {
+    await Notification.create({
+      title: "Booking confirmed",
+      message: `Your booking for "${eventData.title}" (${ticketType}) was confirmed successfully.`,
+      recipientUser: userData._id,
+      event: eventData._id,
+      meta: { type: "booking_confirmed" },
+      read: false,
+    });
+  } catch (notificationError) {
+    console.error("Failed to create booking notification:", notificationError);
+  }
+
   /* ── GENERATE TICKET PDF ──────────────────────────────────── */
-  const qrPayload = ticketCode;
+  const qrPayload = [
+    `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
+    `Event: ${eventData.title}`,
+    `Ticket type: ${ticketType}`,
+    `Ticket code: ${ticketCode}`,
+  ].join("\n");
 
   // Pure black on white = maximum contrast = easiest to scan
   const qrBuffer = await QRCode.toBuffer(qrPayload, {
@@ -222,39 +244,39 @@ export default defineEventHandler(async (event) => {
   async function generateTicketPdf(details) {
     return new Promise((resolve, reject) => {
       try {
-        // Compact ticket: 250 × 320 pt (~3.5" × 4.5")
-        const doc = new PDFDocument({ size: [250, 320], margin: 0 });
+        // Business-card ticket: 3.5 × 2 inches (252 × 144 pt)
+        const doc = new PDFDocument({ size: [252, 144], margin: 0 });
         const chunks = [];
         doc.on("data", (c) => chunks.push(c));
         doc.on("end", () => resolve(Buffer.concat(chunks)));
 
         // ── Background ──────────────────────────────────────────
-        doc.rect(0, 0, 250, 320).fill("#ffffff");
+        doc.rect(0, 0, 252, 144).fill("#ffffff");
 
         // ── Top colour band ──────────────────────────────────────
-        doc.rect(0, 0, 250, 56).fill("#9c4e8b");
+        doc.rect(0, 0, 252, 32).fill("#9c4e8b");
 
         // Event title in band
         doc
           .fillColor("#ffffff")
           .font("Helvetica-Bold")
-          .fontSize(11)
-          .text(details.eventTitle, 16, 12, { width: 218, align: "left" });
+          .fontSize(8)
+          .text(details.eventTitle, 8, 7, { width: 236, align: "left" });
 
         // Date + location in band
         doc
           .font("Helvetica")
-          .fontSize(8)
+          .fontSize(6)
           .fillColor("#f3e8f9")
-          .text(`${details.eventDate}  ·  ${details.location}`, 16, 32, {
-            width: 218,
+          .text(`${details.eventDate}  ·  ${details.location}`, 8, 20, {
+            width: 236,
             align: "left",
           });
 
         // ── Tear-off dashed line ─────────────────────────────────
         doc
-          .moveTo(0, 56)
-          .lineTo(250, 56)
+          .moveTo(0, 32)
+          .lineTo(252, 32)
           .dash(3, { space: 4 })
           .strokeColor("#d8b4fe")
           .lineWidth(0.5)
@@ -262,55 +284,54 @@ export default defineEventHandler(async (event) => {
         if (typeof doc.undash === "function") doc.undash();
 
         // ── Left body: holder info ───────────────────────────────
-        const LX = 16;
-        let LY = 68;
+        const LX = 8;
+        let LY = 40;
 
         const row = (label, value) => {
           doc
             .font("Helvetica")
-            .fontSize(7)
+            .fontSize(5)
             .fillColor("#6b7280")
             .text(label, LX, LY);
           doc
             .font("Helvetica-Bold")
-            .fontSize(8)
+            .fontSize(6)
             .fillColor("#111827")
-            .text(value, LX, LY + 10, { width: 138 });
-          LY += 28;
+            .text(value, LX, LY + 7, { width: 150 });
+          LY += 16;
         };
 
         row("TICKET HOLDER", details.name || "—");
-        row("EMAIL", details.email);
         row("TICKET TYPE", details.ticketType.toUpperCase());
         row("AMOUNT PAID", `KES ${details.amount}`);
         row("REFERENCE", details.reference);
 
         // ── Ticket code ──────────────────────────────────────────
-        doc.roundedRect(LX, LY, 140, 26, 4).fill("#f1f5f9");
+        doc.roundedRect(LX, LY, 150, 16, 3).fill("#f1f5f9");
         doc
           .font("Courier-Bold")
-          .fontSize(13)
+          .fontSize(8)
           .fillColor("#9c4e8b")
           .text(details.ticketCode, LX, LY + 6, {
-            width: 140,
+            width: 150,
             align: "center",
           });
-        LY += 34;
+        LY += 20;
 
         // ── QR code (right side) ─────────────────────────────────
-        doc.image(details.qrBuffer, 158, 68, { width: 80, height: 80 });
+        doc.image(details.qrBuffer, 174, 40, { width: 68, height: 68 });
 
         // "SCAN TO VERIFY" label under QR
         doc
           .font("Helvetica")
-          .fontSize(6)
+          .fontSize(5)
           .fillColor("#6b7280")
-          .text("SCAN TO VERIFY", 158, 152, { width: 80, align: "center" });
+          .text("SCAN TO VERIFY", 174, 111, { width: 68, align: "center" });
 
         // ── Vertical divider between body columns ────────────────
         doc
-          .moveTo(154, 60)
-          .lineTo(154, 300)
+          .moveTo(168, 36)
+          .lineTo(168, 128)
           .dash(2, { space: 3 })
           .strokeColor("#e5e7eb")
           .lineWidth(0.5)
@@ -318,16 +339,16 @@ export default defineEventHandler(async (event) => {
         if (typeof doc.undash === "function") doc.undash();
 
         // ── Footer ───────────────────────────────────────────────
-        doc.rect(0, 296, 250, 24).fill("#f8fafc");
+        doc.rect(0, 128, 252, 16).fill("#f8fafc");
         doc
           .font("Helvetica")
-          .fontSize(6.5)
+          .fontSize(5)
           .fillColor("#9ca3af")
           .text(
             "Present this ticket at the entrance · Not transferable · Volora Events",
             0,
-            304,
-            { width: 250, align: "center" },
+            133,
+            { width: 252, align: "center" },
           );
 
         doc.end();

@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const tickets = await Ticket.find({ userEmail: user?.email })
+      .populate("userId", "firstName lastName")
       .sort({ createdAt: -1 })
       .lean();
 

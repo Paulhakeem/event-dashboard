@@ -53,6 +53,13 @@
         Loading your tickets...
       </div>
 
+      <div
+        v-else-if="ticketsError"
+        class="py-10 text-center text-sm text-red-600"
+      >
+        {{ ticketsError }} Please refresh and try again.
+      </div>
+
       <!-- Empty State -->
       <div v-else-if="filteredTickets.length === 0" class="text-center py-10">
         <div class="flex justify-center mb-3">
@@ -234,13 +241,25 @@ const {
   activeFilter,
   filteredTickets,
   ticketsLoading,
+  ticketsError,
 } = useTickets();
 const selectedTicket = ref(null);
 const ticketQr = ref("");
 
 const openTicket = async (ticket) => {
   selectedTicket.value = ticket;
-  ticketQr.value = await QRCode.toDataURL(ticket.ticketCode || ticket._id, {
+  const userName =
+    ticket.userName ||
+    ticket.name ||
+    `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim() ||
+    "Ticket holder";
+  const qrPayload = [
+    `Name: ${userName}`,
+    `Event: ${ticket.eventName}`,
+    `Ticket type: ${ticket.ticketType}`,
+    `Ticket code: ${ticket.ticketCode || ticket._id}`,
+  ].join("\n");
+  ticketQr.value = await QRCode.toDataURL(qrPayload, {
     width: 240,
     margin: 1,
     errorCorrectionLevel: "M",

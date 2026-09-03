@@ -1,5 +1,6 @@
 import { Event } from "../../models/Events.js";
 import { Notification } from "../../models/Notification.js";
+import { Ticket } from "../../models/Ticket.js";
 import connectDB from "../../utils/mongoose.js";
 import { markPastEventsCompleted } from "../../utils/eventStatus.js";
 
@@ -71,6 +72,8 @@ export default defineEventHandler(async (event) => {
       // treat transition from 'pending' -> 'upcoming' as approval
       const isApproved =
         body.status === "upcoming" && currentEvent?.status === "pending";
+      const isCancelled =
+        body.status === "cancelled" && currentEvent?.status !== "cancelled";
 
       const updatedEvent = await Event.findByIdAndUpdate(id, update, {
         new: true,
@@ -98,6 +101,43 @@ export default defineEventHandler(async (event) => {
           await notification.save();
         } catch (err) {
           console.error("Failed to create approval notification:", err);
+        }
+      }
+
+      if (isApproved) {
+        try {
+          await Notification.create({
+            title: "New event available",
+            message: `A new event, "${updatedEvent.title}", is now available to browse and book.`,
+            recipientRole: "user",
+            event: updatedEvent._id,
+            meta: { type: "new_event" },
+            read: false,
+          });
+        } catch (err) {
+          console.error("Failed to create new-event notifications:", err);
+        }
+      }
+
+      if (isCancelled) {
+        try {
+          const ticketHolders = await Ticket.find({
+            eventId: updatedEvent._id,
+          }).distinct("userId");
+          if (ticketHolders.length) {
+            await Notification.insertMany(
+              ticketHolders.map((recipientUser) => ({
+                title: "Event cancelled",
+                message: `The event "${updatedEvent.title}" has been cancelled.`,
+                recipientUser,
+                event: updatedEvent._id,
+                meta: { type: "event_cancelled" },
+                read: false,
+              })),
+            );
+          }
+        } catch (err) {
+          console.error("Failed to create cancellation notifications:", err);
         }
       }
 

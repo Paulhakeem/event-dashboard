@@ -8,6 +8,7 @@ export default function useTickets() {
   const cancelledTicketCount = ref(0);
   const ticketsLoading = ref(true);
   const cancelledLoading = ref(true);
+  const ticketsError = ref("");
 
   const ticketChartData = computed(() => {
     const months = Array.from({ length: 12 }, (_, index) => ({
@@ -84,15 +85,21 @@ export default function useTickets() {
   );
 
   onMounted(async () => {
-    await fetchBookedEvents();
-    if (error?.value) console.error("Booking Error:", error.value);
-    const res = await $fetch(`${config.public.ticketsEvents}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-      },
-    });
-    tickets.value = Array.isArray(res?.tickets) ? res.tickets : [];
+    ticketsError.value = "";
+    try {
+      await fetchBookedEvents();
+      if (error?.value) console.error("Booking Error:", error.value);
+      const res = await $fetch(`${config.public.ticketsEvents}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+      tickets.value = Array.isArray(res?.tickets) ? res.tickets : [];
+    } catch (err) {
+      ticketsError.value =
+        err?.data?.message || err?.message || "Unable to load tickets.";
+    }
 
     // Total tickets
     try {
@@ -178,5 +185,6 @@ export default function useTickets() {
     ticketChartData,
     ticketsLoading,
     cancelledLoading,
+    ticketsError,
   };
 }
