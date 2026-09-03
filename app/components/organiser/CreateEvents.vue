@@ -189,18 +189,13 @@
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Status</label
+                  >Approval status</label
                 >
-                <select
-                  v-model="form.status"
-                  class="w-full p-3 border rounded-lg"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+                <input
+                  value="Pending admin approval"
+                  readonly
+                  class="w-full p-3 border rounded-lg bg-gray-50 text-gray-600"
+                />
               </div>
             </div>
 

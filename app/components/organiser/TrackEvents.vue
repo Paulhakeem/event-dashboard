@@ -113,15 +113,17 @@
               <td class="px-6 py-4 text-center">
                 <div class="flex justify-center gap-2">
                   <button
+                    @click="openEdit(event)"
                     class="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7a3968] transition"
                   >
                     Edit
                   </button>
-                  <button
+                  <NuxtLink
+                    :to="`/events/${event._id}`"
                     class="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
                   >
                     View
-                  </button>
+                  </NuxtLink>
                 </div>
               </td>
             </tr>
@@ -140,9 +142,19 @@
         <OrganiserTopEvents />
       </div>
     </div>
+
+    <UpdateEventEditEvent
+      v-if="editingEvent"
+      :editing-event="editingEvent"
+      :edit-form="editForm"
+      @close="closeEdit"
+      @save="submitUpdate"
+    />
   </div>
 </template>
 
 <script setup>
 const { events, loading, error, formatDate } = organiserEvents();
+const { editingEvent, editForm, openEdit, closeEdit, submitUpdate } =
+  updateEvent(events);
 </script>

@@ -105,15 +105,47 @@ export const orgNotifications = () => {
   const markAsRead = async (notif) => {
     if (notif.read) return;
     notif.read = true;
-    // Optional: sync with backend
+    try {
+      await $fetch(`/api/notification/${notif._id}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token.value}` },
+        body: { read: true },
+      });
+    } catch {
+      notif.read = false;
+    }
   };
 
-  const markAllAsRead = () => {
-    notifications.value.forEach((n) => (n.read = true));
+  const markAllAsRead = async () => {
+    const unread = notifications.value.filter((n) => !n.read);
+    unread.forEach((n) => (n.read = true));
+    try {
+      await Promise.all(
+        unread.map((notification) =>
+          $fetch(`/api/notification/${notification._id}`, {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${token.value}` },
+            body: { read: true },
+          }),
+        ),
+      );
+    } catch {
+      await fetchNotifications();
+    }
   };
 
-  const deleteNotification = (notifId) => {
-    notifications.value = notifications.value.filter((n) => n._id !== notifId);
+  const deleteNotification = async (notifId) => {
+    try {
+      await $fetch(`/api/notification/${notifId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token.value}` },
+      });
+      notifications.value = notifications.value.filter(
+        (n) => n._id !== notifId,
+      );
+    } catch (error) {
+      errorMessage.value = error.message || "Failed to delete notification";
+    }
   };
 
   const retryLoad = () => {

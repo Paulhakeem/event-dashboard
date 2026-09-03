@@ -3,6 +3,7 @@ import { Notification } from "../../models/Notification.js";
 import { Ticket } from "../../models/Ticket.js";
 import connectDB from "../../utils/mongoose.js";
 import { markPastEventsCompleted } from "../../utils/eventStatus.js";
+import { requireAuth } from "../../utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
   const { id } = event.context.params;
@@ -25,13 +26,21 @@ export default defineEventHandler(async (event) => {
     }
 
     if (method === "DELETE") {
-      const deleteEvent = await Event.findByIdAndDelete(id);
-      if (!deleteEvent) {
+      const authUser = await requireAuth(event);
+      const currentEvent = await Event.findById(id);
+      if (!currentEvent) {
         throw createError({
           statusCode: 404,
           statusMessage: "Event not found",
         });
       }
+      if (
+        authUser.role !== "admin" &&
+        String(currentEvent.createdBy) !== String(authUser.id)
+      ) {
+        throw createError({ statusCode: 403, statusMessage: "Access denied" });
+      }
+      await Event.deleteOne({ _id: currentEvent._id });
       return {
         success: true,
         message: "Event deleted successfully",
@@ -40,6 +49,7 @@ export default defineEventHandler(async (event) => {
 
     // Update event fields
     if (method === "PATCH") {
+      const authUser = await requireAuth(event);
       const body = await readBody(event);
       const allowed = [
         "image",
@@ -68,6 +78,18 @@ export default defineEventHandler(async (event) => {
 
       // Get the current event to check if status is changing
       const currentEvent = await Event.findById(id);
+      if (!currentEvent) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Event not found",
+        });
+      }
+      if (
+        authUser.role !== "admin" &&
+        String(currentEvent.createdBy) !== String(authUser.id)
+      ) {
+        throw createError({ statusCode: 403, statusMessage: "Access denied" });
+      }
       const eventTitle = body.title || currentEvent?.title || "Event";
       // treat transition from 'pending' -> 'upcoming' as approval
       const isApproved =
@@ -120,6 +142,17 @@ export default defineEventHandler(async (event) => {
       }
 
       if (isCancelled) {
+        if (updatedEvent.createdBy) {
+          await Notification.create({
+            title: "Event Cancelled",
+            message: `Your event "${updatedEvent.title}" has been cancelled by an administrator.`,
+            recipientRole: "organiser",
+            recipientUser: updatedEvent.createdBy,
+            event: updatedEvent._id,
+            meta: { type: "event_cancelled" },
+            read: false,
+          });
+        }
         try {
           const ticketHolders = await Ticket.find({
             eventId: updatedEvent._id,

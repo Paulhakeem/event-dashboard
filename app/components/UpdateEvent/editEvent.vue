@@ -1,7 +1,5 @@
 <template>
-<div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-  >
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
     <div class="w-full max-w-2xl rounded bg-white p-6">
       <h3 class="mb-4 text-lg font-medium">Edit Event</h3>
       <div class="grid gap-3 md:grid-cols-2">
@@ -66,5 +64,15 @@
 </template>
 
 <script setup>
-const { editingEvent, editForm, closeEdit, submitUpdate } = updateEvent();
+const props = defineProps({
+  editingEvent: { type: [String, Number], default: null },
+  editForm: { type: Object, default: null },
+});
+const emit = defineEmits(["close", "save"]);
+const localEditor = updateEvent();
+const editForm = props.editForm || localEditor.editForm;
+const closeEdit = () =>
+  props.editForm ? emit("close") : localEditor.closeEdit();
+const submitUpdate = () =>
+  props.editForm ? emit("save") : localEditor.submitUpdate();
 </script>

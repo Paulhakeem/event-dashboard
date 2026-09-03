@@ -12,7 +12,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 403, message: "Access denied" });
   }
   //    get notification by recipient role and id
-  const notifications = await Notification.find({ recipientRole: user.role }).sort({
+  const notifications = await Notification.find({
+    recipientRole: user.role,
+  }).sort({
     createdAt: -1,
   });
   return { notifications };

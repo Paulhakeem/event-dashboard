@@ -92,15 +92,6 @@
           </div>
         </div>
 
-        <!-- users & organisers -->
-        <div class="grid grid-cols-3 gap-4 w-full pt-10">
-          <div class="stat-card hover:border-pink-400">
-            <Icon name="majesticons:user" class="text-pink-500 text-2xl" />
-            <p class="stat-number">0</p>
-            <span>Refunded</span>
-          </div>
-        </div>
-
         <!-- Update Profile Modal -->
         <Transition name="fade">
           <div
