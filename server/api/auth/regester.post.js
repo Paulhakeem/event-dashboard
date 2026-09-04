@@ -52,7 +52,6 @@ export default defineEventHandler(async (event) => {
   const lastName = fields.lastName?.toString().trim();
   const email = fields.email?.toString().trim().toLowerCase();
   const password = fields.password?.toString().trim();
-  const role = fields.role?.toString().trim() || "user";
   const recaptchaToken = fields.recaptchaToken?.toString().trim();
 
   /* ---------- BASIC VALIDATION ---------- */
@@ -138,7 +137,7 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
-    role,
+    role: "user",
     isEmailVerified: false,
     emailVerificationCode: verificationCode,
     emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins

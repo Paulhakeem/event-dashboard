@@ -87,16 +87,6 @@
         </div>
       </form>
 
-      <!-- Role Dropdown -->
-      <select
-        v-model="role"
-        aria-label="Select role"
-        class="mt-6 p-2 border border-gray-300 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300 w-full"
-      >
-        <option value="user">User</option>
-        <option v-if="!adminExists" value="admin">Admin</option>
-      </select>
-
       <!-- reCAPTCHA -->
       <GoogleRecaptchaWidget v-model="recaptchaToken" />
 
@@ -118,7 +108,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import GoogleAuth from "../Google/googleAuth.vue";
 
 const {
@@ -127,21 +117,8 @@ const {
   email,
   password,
   errorMessage,
-  role,
   recaptchaToken,
   signup,
   isLoading,
 } = FormAuth();
-
-const adminExists = ref(false);
-
-onMounted(async () => {
-  try {
-    const res = await $fetch("/api/auth/admin-exists");
-    adminExists.value = !!res?.exists;
-    if (adminExists.value && role.value === "admin") role.value = "user";
-  } catch (e) {
-    adminExists.value = false;
-  }
-});
 </script>

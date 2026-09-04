@@ -8,7 +8,6 @@ export default function useFormAuth() {
   const lastName = ref("");
   const email = ref("");
   const password = ref("");
-  const role = ref("user");
   const recaptchaToken = ref("");
 
   // state
@@ -65,7 +64,6 @@ export default function useFormAuth() {
       formData.append("lastName", lastName.value);
       formData.append("email", email.value);
       formData.append("password", password.value);
-      formData.append("role", role.value);
       formData.append("recaptchaToken", recaptchaToken.value);
 
       if (imageFile.value) {
@@ -98,7 +96,6 @@ export default function useFormAuth() {
     lastName,
     email,
     password,
-    role,
     recaptchaToken,
     previewImage,
     isLoading,
