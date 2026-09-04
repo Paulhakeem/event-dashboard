@@ -116,54 +116,57 @@ export default defineEventHandler(async (event) => {
 
     let emailNote = "";
 
-    // 8. Send email to user
-    if (transporter && user.email) {
-      await transporter.sendMail({
-        from: `"Velora Events" <${config.emailUsername}>`,
-        to: user.email,
-        subject: "Ticket Cancellation Confirmation",
-        html: `
-        <h2>Ticket Cancelled</h2>
-        <p>Hello ${user.name},</p>
-        <p>Your ticket cancellation for <strong>${eventDetails.title}</strong> has been completed.</p>
-        <p><strong>Original amount:</strong> KES ${originalAmount.toFixed(2)}</p>
-        <p><strong>Cancellation deduction (5%):</strong> KES ${deduction.toFixed(2)}</p>
-        <p><strong>Refund amount:</strong> KES ${refundAmount.toFixed(2)}</p>
-        <p style="margin-top: 0.5rem;">
-          Your refund will be processed to your original payment method within 7 working days, depending on your bank or payment provider.
-        </p>
-        <p style="margin-top: 0.5rem; color: #555;">
-          If you do not receive this confirmation email within 10 minutes, please check your spam folder or contact support.
-        </p>
-        <br/>
-        <p>Thank you for using Velora Events.</p>
-      `,
-      });
-
-      // 9. Send email to admin
-      const admin = await User.findOne({ role: "admin" });
-
-      if (admin) {
-        await transporter.sendMail({
-          from: `"Velora Events" <${config.emailUsername}>`,
-          to: admin.email,
-          subject: "Ticket Cancelled Notification",
-          html: `
-          <h3>Ticket Cancellation</h3>
-          <p>A ticket has been cancelled for <strong>${eventDetails.title}</strong>. Here are the user details:</p>
-          <p><strong>User Name:</strong> ${user.firstName || user.name || "User"}</p>
-          <p><strong>User Email:</strong> ${user.email}</p>
-            <p><strong>Refund Amount:</strong> KES ${refundAmount.toFixed(2)}</p>
-            <p><strong>Cancellation Deduction:</strong> KES ${deduction.toFixed(2)} (5%)</p>
-        `,
-        });
-      }
-    } else if (!transporter) {
+    if (!transporter) {
       emailNote =
         " Email notifications were not sent because SMTP is not configured.";
-    } else if (!user.email) {
-      emailNote =
-        " Email notifications were not sent because the user has no email address.";
+    } else {
+      const holderName =
+        `${user.firstName || ""} ${user.lastName || ""}`.trim() || "User";
+      const refundSummary = `
+        <p><strong>Original amount:</strong> KES ${originalAmount.toFixed(2)}</p>
+        <p><strong>Cancellation deduction (5%):</strong> KES ${deduction.toFixed(2)}</p>
+        <p><strong>Total refund:</strong> KES ${refundAmount.toFixed(2)}</p>
+        <p>Your refund will be processed within 7 working days.</p>`;
+      const from = `"Velora Events" <${config.emailUsername}>`;
+
+      const emailJobs = [];
+      if (user.email) {
+        emailJobs.push({
+          to: user.email,
+          subject: "Ticket Cancellation Confirmation",
+          html: `<h2>Ticket Cancelled</h2><p>Hello ${holderName},</p><p>Your ticket for <strong>${eventDetails.title}</strong> has been cancelled.</p>${refundSummary}<p>Thank you for using Velora Events.</p>`,
+        });
+      }
+
+      const admins = await User.find({ role: "admin" }).select("email").lean();
+      admins
+        .filter((admin) => admin.email)
+        .forEach((admin) => {
+          emailJobs.push({
+            to: admin.email,
+            subject: "Ticket Cancelled Notification",
+            html: `<h3>Ticket Cancellation</h3><p><strong>${holderName}</strong> cancelled a ticket for <strong>${eventDetails.title}</strong>.</p><p><strong>User email:</strong> ${user.email}</p>${refundSummary}`,
+          });
+        });
+
+      if (organiser?.email) {
+        emailJobs.push({
+          to: organiser.email,
+          subject: "Ticket Cancelled For Your Event",
+          html: `<h3>Ticket Cancellation</h3><p>${holderName} cancelled a ticket for your event, <strong>${eventDetails.title}</strong>.</p><p><strong>User email:</strong> ${user.email}</p>${refundSummary}`,
+        });
+      }
+
+      const deliveryResults = await Promise.allSettled(
+        emailJobs.map((mail) => transporter.sendMail({ from, ...mail })),
+      );
+      const failedEmails = deliveryResults.filter(
+        (result) => result.status === "rejected",
+      ).length;
+      if (failedEmails) {
+        emailNote = ` ${failedEmails} cancellation email(s) could not be delivered.`;
+        console.error("Cancellation email delivery failure:", deliveryResults);
+      }
     }
 
     return {

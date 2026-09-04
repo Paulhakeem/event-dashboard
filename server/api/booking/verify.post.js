@@ -212,14 +212,34 @@ export default defineEventHandler(async (event) => {
   });
 
   try {
-    await Notification.create({
-      title: "Booking confirmed",
-      message: `Your booking for "${eventData.title}" (${ticketType}) was confirmed successfully.`,
-      recipientUser: userData._id,
-      event: eventData._id,
-      meta: { type: "booking_confirmed" },
-      read: false,
-    });
+    const bookerName =
+      `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+      userData.email;
+
+    await Notification.insertMany([
+      {
+        title: "Booking confirmed",
+        message: `Your booking for "${eventData.title}" (${ticketType}) was confirmed successfully.`,
+        recipientUser: userData._id,
+        event: eventData._id,
+        meta: { type: "booking_confirmed" },
+        read: false,
+      },
+      {
+        title: "New event booking",
+        message: `${bookerName} booked "${eventData.title}" (${ticketType}).`,
+        recipientRole: "admin",
+        event: eventData._id,
+        meta: {
+          type: "booking_created",
+          bookerId: userData._id,
+          bookerName,
+          ticketType,
+          amount: expectedAmount,
+        },
+        read: false,
+      },
+    ]);
   } catch (notificationError) {
     console.error("Failed to create booking notification:", notificationError);
   }
