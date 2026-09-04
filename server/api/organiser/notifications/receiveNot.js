@@ -11,9 +11,9 @@ export default defineEventHandler(async (event) => {
   if (user.role !== "organiser") {
     throw createError({ statusCode: 403, message: "Access denied" });
   }
-  //    get notification by recipient role and id
+  // Organisers should only see notifications addressed to their account.
   const notifications = await Notification.find({
-    recipientRole: user.role,
+    recipientUser: user.id,
   }).sort({
     createdAt: -1,
   });

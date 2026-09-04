@@ -5,7 +5,7 @@ export default function useTicketCancellation() {
   const cancelTicket = async (ticketId) => {
     if (
       !confirm(
-        "Are you sure you want to cancel this ticket? This action cannot be undone.",
+        "Cancel ticket?\n\nThis action cannot be reversed. Your refund will be processed within 7 working days, less a 5% cancellation deduction.\n\nDo you want to continue?",
       )
     )
       return;
@@ -20,8 +20,12 @@ export default function useTicketCancellation() {
         body: { ticketId },
       });
       if (response) {
+        const refundAmount = Number(response.refundAmount || 0).toLocaleString(
+          "en-KE",
+          { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+        );
         alert(
-          "Your ticket has been cancelled. Check your email for confirmation.",
+          `Ticket cancelled successfully. Your refund of KES ${refundAmount} (after the 5% deduction) will be processed within 7 working days. Check your notifications and email for confirmation.`,
         );
         return true;
       } else {
