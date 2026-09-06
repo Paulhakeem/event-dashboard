@@ -3,6 +3,7 @@ import Events from "@/components/Dashboard/Events.vue";
 import Graph from "@/components/Dashboard/Graph.vue";
 import Notifications from "@/components/Dashboard/Notifications.vue";
 import Reports from "@/components/Dashboard/Reports.vue";
+import BookingManagement from "@/components/Dashboard/BookingManagement.vue";
 
 export const dashboardSidebar = () => {
   const sidebarMenu = [
@@ -19,6 +20,11 @@ export const dashboardSidebar = () => {
       component: Notifications,
     },
     { name: "Reports", icon: "material-symbols:report", component: Reports },
+    {
+      name: "Booking Management",
+      icon: "material-symbols:calendar-today",
+      component: BookingManagement,
+    },
   ];
 
   return { sidebarMenu };
