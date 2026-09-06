@@ -2,6 +2,7 @@ import { Ticket } from "~~/server/models/Ticket";
 import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
 import { Notification } from "~~/server/models/Notification";
+import { TotalBooking } from "~~/server/models/totalBooking";
 import connectDB from "~~/server/utils/mongoose";
 import { requireAuth } from "~~/server/utils/requireAuth";
 import nodemailer from "nodemailer";
@@ -50,6 +51,13 @@ export default defineEventHandler(async (event) => {
     ticket.status = "cancelled";
     ticket.cancelledAt = new Date();
     await ticket.save();
+
+    await TotalBooking.findByIdAndUpdate(ticket.bookingId, {
+      status: "cancelled",
+      refundStatus: "pending",
+      refundAmount,
+      refundReason: "User ticket cancellation",
+    });
 
     const organiser = eventDetails.createdBy
       ? await User.findOne({ _id: eventDetails.createdBy, role: "organiser" })

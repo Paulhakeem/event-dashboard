@@ -59,6 +59,27 @@ const totalBookingSchema = new mongoose.Schema(
     verifiedAt: {
       type: Date,
     },
+    refundStatus: {
+      type: String,
+      enum: ["not_requested", "pending", "processing", "completed", "failed"],
+      default: "not_requested",
+    },
+    refundAmount: { type: Number, default: 0 },
+    refundReason: String,
+    refundReference: String,
+    refundProcessedAt: Date,
+    disputeStatus: {
+      type: String,
+      enum: ["none", "open", "investigating", "resolved", "rejected"],
+      default: "none",
+    },
+    disputeReason: String,
+    disputeNote: String,
+    disputedAt: Date,
+    reconciled: { type: Boolean, default: false },
+    reconciledAt: Date,
+    reconciliationNote: String,
+    lastActionBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true },
 );
