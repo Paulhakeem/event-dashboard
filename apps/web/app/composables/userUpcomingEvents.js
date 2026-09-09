@@ -1,0 +1,39 @@
+import { ref, onMounted } from "vue";
+
+export default function userUpcomingEvents() {
+  const config = useRuntimeConfig();
+  const { token } = useAuth();
+  const events = ref([]);
+  const eventsLoading = ref(true);
+  const errorMessage = ref(null);
+
+  const fetchUpcomingEvents = async () => {
+    eventsLoading.value = true;
+    errorMessage.value = null;
+    try {
+      const res = await $fetch(`${config.public.upcomingEvents}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+      if (res.success) {
+        events.value = res.events || [];
+      }
+    } catch (error) {
+      console.error("Failed to fetch events:", error);
+      errorMessage.value = error.message || "Failed to load events";
+    } finally {
+      eventsLoading.value = false;
+    }
+  };
+
+  onMounted(fetchUpcomingEvents);
+
+  return {
+    events,
+    eventsLoading,
+    errorMessage,
+    fetchUpcomingEvents,
+  };
+}

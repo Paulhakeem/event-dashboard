@@ -1,0 +1,57 @@
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    profileImage: { type: String },
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    },
+    // password is hashed before storage, so validation is handled at signup/reset time
+    password: {
+      type: String,
+      select: false,
+      required: function () {
+        return !this.googleId; // required only if NOT a Google signup
+      },
+    },
+    googleId: { type: String, unique: true, sparse: true },
+    role: {
+      type: String,
+      enum: ["admin", "organiser", "user"],
+      default: "user",
+    },
+    permissions: {
+      type: [String],
+      default: [],
+    },
+    accountStatus: {
+      type: String,
+      enum: ["active", "suspended"],
+      default: "active",
+    },
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationCode: String,
+    emailVerificationExpires: Date,
+    resetCode: { type: String },
+    resetCodeExpires: { type: Date },
+    activityLog: [
+      {
+        action: { type: String, required: true },
+        performedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        details: { type: String },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    favoriteEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Event" }],
+    joinedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+);
+export const User = mongoose.models.User || mongoose.model("User", userSchema);

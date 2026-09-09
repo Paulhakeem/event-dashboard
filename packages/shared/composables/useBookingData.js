@@ -1,0 +1,40 @@
+import { ref, onMounted } from "vue";
+import { useRuntimeConfig } from "#imports";
+import { $fetch } from "ofetch";
+import { useAuth } from "./useAuth.js";
+
+export default function useBookingData() {
+  const config = useRuntimeConfig();
+  const { token } = useAuth();
+  const loading = ref(true);
+  const booking = ref([]);
+  const error = ref(null);
+
+  const fetchBookings = async () => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const res = await $fetch(`${config.public.bookingData}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+      booking.value = res.bookings || [];
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+      error.value = err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  onMounted(fetchBookings);
+
+  return {
+    booking,
+    loading,
+    error,
+    fetchBookings,
+  };
+}

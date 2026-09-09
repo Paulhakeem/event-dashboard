@@ -33,19 +33,19 @@ jobs:
             echo "🔄 Starting zero-downtime deployment..."
             mkdir -p /var/www "$ENV_BACKUP_DIR"
 
-            # ── 1. Backup .env from /var/www/velora-events BEFORE anything ──
+            # ── 1. Backup .env from the live web app BEFORE anything ──
             echo "💾 Backing up .env from live directory..."
-            if [ -f "$LIVE_DIR/.env" ]; then
+            if [ -f "$LIVE_DIR/apps/web/.env" ]; then
               TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-              cp "$LIVE_DIR/.env" "$ENV_SAFE"
-              cp "$LIVE_DIR/.env" "$ENV_BACKUP_DIR/.env.$TIMESTAMP"
+              cp "$LIVE_DIR/apps/web/.env" "$ENV_SAFE"
+              cp "$LIVE_DIR/apps/web/.env" "$ENV_BACKUP_DIR/.env.$TIMESTAMP"
               # Keep only the 5 most recent timestamped backups
               ls -t "$ENV_BACKUP_DIR"/.env.* 2>/dev/null | tail -n +6 | xargs -r rm --
-              echo "✅ .env backed up from $LIVE_DIR (timestamped: $TIMESTAMP)"
+              echo "✅ .env backed up from $LIVE_DIR/apps/web (timestamped: $TIMESTAMP)"
             elif [ -f "$ENV_SAFE" ]; then
-              echo "⚠️  No live .env found in $LIVE_DIR — existing backup at $ENV_SAFE will be used"
+              echo "⚠️  No live .env found in $LIVE_DIR/apps/web — existing backup at $ENV_SAFE will be used"
             else
-              echo "❌ No .env found anywhere — please manually place a .env in $LIVE_DIR or $ENV_SAFE before deploying"
+              echo "❌ No .env found anywhere — please manually place a .env in apps/web before deploying"
               exit 1
             fi
 
@@ -58,8 +58,8 @@ jobs:
             # ── 3. Retrieve .env into the build ─────────────────────────────
             echo "🔑 Retrieving .env into build..."
             if [ -f "$ENV_SAFE" ]; then
-              cp "$ENV_SAFE" "$BUILD_DIR/.env"
-              echo "✅ .env restored from backup into $BUILD_DIR"
+              cp "$ENV_SAFE" "$BUILD_DIR/apps/web/.env"
+              echo "✅ .env restored from backup into $BUILD_DIR/apps/web"
             else
               echo "❌ No .env backup found — aborting"
               exit 1
@@ -72,7 +72,7 @@ jobs:
             pnpm install --no-frozen-lockfile --ignore-scripts
             pnpm approve-builds --yes
             pnpm rebuild
-            echo "🏗️  Building Nuxt app..."
+            echo "🏗️  Building Nuxt web app..."
             pnpm run build
             echo "✅ Build complete"
 
@@ -86,7 +86,7 @@ jobs:
             # ── 6. Fix permissions ───────────────────────────────────────────
             chown -R www-data:www-data "$LIVE_DIR"
             chmod -R 755 "$LIVE_DIR"
-            chmod 600 "$LIVE_DIR/.env"
+            chmod 600 "$LIVE_DIR/apps/web/.env"
 
             # ── 7. Restart app with PM2 ──────────────────────────────────────
             echo "♻️  Restarting app with PM2..."

@@ -1,75 +1,64 @@
-# Nuxt Minimal Starter
+# Velora Events — Monorepo
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Digital online events booking platform. Discover, book, and manage events with separate **web** and **admin** applications sharing a common package.
+
+## Structure
+
+```
+├── apps/
+│   ├── web/      # Public website — @velora/web (Nuxt)
+│   └── admin/    # Admin dashboard — @velora/admin (Nuxt)
+├── packages/
+│   └── shared/   # Shared composables & components — @velora/shared
+├── ecosystem.config.cjs  # PM2 production config (web app)
+└── pnpm-workspace.yaml
+```
+
+Each app is a self-contained Nuxt application with its own `app/` (pages, components, composables), `server/` (API routes, models, utils), and `public/`. The backend (MongoDB, authentication, payments, notifications) is deployed with the web app.
+
+## Requirements
+
+- Node.js 20+
+- pnpm 11+
 
 ## Setup
 
-Make sure to install dependencies:
-
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+Create a `.env` file inside `apps/web/` (and `apps/admin/`) with the environment variables referenced in each app's `nuxt.config.ts`. See the root `.gitignore` — env files are not committed.
 
-Start the development server on `http://localhost:3000`:
+## Development
+
+Run both apps in parallel:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+Run a single app:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+pnpm dev:web     # public website  → http://localhost:3000
+pnpm dev:admin   # admin dashboard → http://localhost:3001
 ```
 
-Locally preview production build:
+## Build
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+pnpm build            # build both apps
+pnpm build:web        # build the public website
+pnpm build:admin      # build the admin dashboard
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Production (PM2)
+
+Build the web app, then start it with PM2:
+
+```bash
+pnpm build:web
+pm2 startOrReload ecosystem.config.cjs --update-env
+```
+
+The PM2 config (`.env` path, port, memory limits) lives in `ecosystem.config.cjs` at the repo root.

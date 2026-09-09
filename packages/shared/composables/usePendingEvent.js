@@ -1,0 +1,92 @@
+import { ref, onMounted } from "vue";
+import { useRuntimeConfig } from "#imports";
+import { $fetch } from "ofetch";
+import { useAuth } from "./useAuth.js";
+
+export default function usePendingEvent() {
+  const config = useRuntimeConfig()
+//  get all the pending events
+ const { token } = useAuth();
+  const pendingEvents = ref([]);
+  const loading = ref(false);
+  const error = ref(null);
+
+  // Fetch pending events
+  const fetchPendingEvents = async () => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const res = await $fetch(`${config.public.pendingEventApi}`, {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+
+      const events = res?.events || [];
+      pendingEvents.value = events.filter(
+        (event) => event.status === "pending"
+      );
+    } catch (err) {
+      console.error(err);
+      error.value = "Failed to fetch pending events";
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Approve event
+  const approveEvent = async (eventId) => {
+    try {
+      await $fetch(`${config.public.approvedEvent}/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          // use 'upcoming' which represents an approved/live event per schema
+          status: "upcoming",
+        },
+      });
+
+      alert("✅ Event approved! Organiser has been notified.");
+      await fetchPendingEvents();
+    } catch (err) {
+      alert("Failed to approve event");
+    }
+  };
+
+  // Reject event
+  const rejectEvent = async (eventId) => {
+    if (!confirm("Are you sure you want to reject this event?")) return;
+
+    try {
+      await $fetch(`${config.public.rejectedEvents}/${eventId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          status: "cancelled",
+        },
+      });
+
+      await fetchPendingEvents();
+    } catch (err) {
+      alert("Failed to reject event");
+    }
+  };
+
+  onMounted(fetchPendingEvents);
+
+  return {
+    pendingEvents,
+    loading,
+    error,
+    fetchPendingEvents,
+    approveEvent,
+    rejectEvent,
+  };
+}

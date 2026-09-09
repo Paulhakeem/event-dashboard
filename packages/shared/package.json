@@ -1,0 +1,21 @@
+{
+  "name": "@velora/shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./module": "./module.js",
+    "./composables/*": "./composables/*.js",
+    "./components/*": "./components/*.vue"
+  },
+  "dependencies": {
+    "jwt-decode": "^4.0.0",
+    "ofetch": "^1.4.1"
+  },
+  "peerDependencies": {
+    "nuxt": "^4.1.2",
+    "vue": "^3.5.21"
+  }
+}

@@ -1,0 +1,114 @@
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { User } from "../../models/User.js";
+import connectDB from "../../utils/mongoose.js";
+import { setAuthCookie } from "../../utils/authCookie.js";
+import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
+
+export default defineEventHandler(async (event) => {
+  const config = useRuntimeConfig();
+  await connectDB();
+
+  const { email, password, recaptchaToken } = await readBody(event);
+
+  if (!email || !password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Email and password are required",
+    });
+  }
+
+  // reCAPTCHA verification
+  const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
+  if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        recaptchaResult?.message || "reCAPTCHA verification failed",
+    });
+  }
+
+  // password length check
+  if (password.length < 8) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "Password must be at least 8 characters long and contains special characters",
+    });
+  }
+
+  // normalize email
+  const normalizedEmail = email.toLowerCase();
+
+  // Find user
+  const user = await User.findOne({ email: normalizedEmail }).select(
+    "+password",
+  );
+  if (!user) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "User account not found. Please register first.",
+    });
+  }
+
+  // check if user login with google
+  if (!user.password) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "This account uses Google sign-in. Please login with Google.",
+    });
+  }
+
+  // ✅ Correct verification check
+  if (!user.isEmailVerified) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Please verify your email before logging in",
+    });
+  }
+
+  if (user.accountStatus === "suspended") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "This account has been suspended",
+    });
+  }
+
+  // Password check
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid email or password",
+    });
+  }
+
+  // JWT
+  const token = jwt.sign(
+    {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    },
+    config.secretStr,
+    { expiresIn: "1d" },
+  );
+
+  setAuthCookie(event, token, config);
+
+  return {
+    success: true,
+    message: "Login successful",
+    token,
+    user: {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      profileImage: user.profileImage,
+      role: user.role,
+      joinedAt: user.joinedAt,
+    },
+  };
+});
