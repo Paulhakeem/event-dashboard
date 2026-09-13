@@ -135,6 +135,124 @@
           </div>
         </Transition>
 
+        <!-- Two-Factor Authentication -->
+        <div
+          class="w-full border-t border-gray-200 dark:border-neutral-700 mt-6 pt-6"
+        >
+          <div class="flex items-center justify-between">
+            <div class="text-left">
+              <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+                Two-Factor Authentication
+              </h3>
+              <p class="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">
+                {{
+                  mfaEnabled
+                    ? "Enabled — a code is required at login."
+                    : "Disabled — protect your account with an authenticator app."
+                }}
+              </p>
+            </div>
+            <button
+              @click="mfaEnabled ? (disableModal = true) : startMfaSetup()"
+              :disabled="mfaLoading"
+              class="px-4 py-2 rounded-lg text-sm font-semibold transition disabled:opacity-50"
+              :class="
+                mfaEnabled
+                  ? 'border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
+                  : 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow hover:scale-[1.02]'
+              "
+            >
+              {{ mfaLoading ? "Please wait..." : mfaEnabled ? "Disable" : "Enable" }}
+            </button>
+          </div>
+
+          <div
+            v-if="mfaSetup"
+            class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-left"
+          >
+            <p class="text-sm text-gray-700 dark:text-neutral-300 mb-3">
+              Scan this QR code with your authenticator app (Google Authenticator,
+              Authy, etc.), then enter the 6-digit code to confirm.
+            </p>
+            <div class="flex justify-center">
+              <img
+                v-if="mfaSetup.qrDataUrl"
+                :src="mfaSetup.qrDataUrl"
+                alt="TOTP QR code"
+                class="w-48 h-48 rounded-lg bg-white p-2"
+              />
+            </div>
+            <p
+              v-if="mfaSetup.secret"
+              class="mt-3 text-center text-xs text-gray-500 dark:text-neutral-400 break-all font-mono"
+            >
+              Secret: {{ mfaSetup.secret }}
+            </p>
+            <input
+              v-model="mfaVerifyCode"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="6-digit code"
+              class="mt-3 w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
+            />
+            <button
+              @click="confirmMfaEnable"
+              :disabled="!mfaVerifyCode || mfaLoading"
+              class="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold shadow hover:scale-[1.02] transition disabled:opacity-50"
+            >
+              {{ mfaLoading ? "Verifying..." : "Confirm & Enable" }}
+            </button>
+            <button
+              @click="cancelMfaSetup"
+              class="mt-2 w-full py-2 rounded-lg text-sm text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Disable MFA modal -->
+        <div
+          v-if="disableModal"
+          @click.self="disableModal = false"
+          class="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
+        >
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-lg shadow-lg p-6 w-full max-w-sm"
+          >
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-white">
+              Disable Two-Factor Authentication
+            </h3>
+            <p class="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+              Enter your current authenticator code to confirm.
+            </p>
+            <input
+              v-model="mfaVerifyCode"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="6-digit code"
+              class="mt-3 w-full px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
+            />
+            <div class="flex gap-3 mt-4">
+              <button
+                @click="disableModal = false"
+                class="flex-1 py-2 rounded-lg text-sm text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-white border border-gray-200 dark:border-neutral-700 transition"
+              >
+                Cancel
+              </button>
+              <button
+                @click="confirmMfaDisable"
+                :disabled="!mfaVerifyCode || mfaLoading"
+                class="flex-1 py-2 rounded-lg bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition disabled:opacity-50"
+              >
+                {{ mfaLoading ? "Disabling..." : "Disable" }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Buttons -->
         <div class="flex gap-3 mt-8 w-full">
           <button
@@ -214,4 +332,94 @@ onMounted(async () => {
 const editProfile = () => {
   // handle profile edit
 };
+
+// ---- Two-Factor Authentication ----
+const mfaEnabled = ref(false);
+const mfaSetup = ref(null);
+const mfaVerifyCode = ref("");
+const mfaLoading = ref(false);
+const disableModal = ref(false);
+const mfaMessage = ref("");
+
+const headers = computed(() => ({
+  Authorization: `Bearer ${token.value}`,
+}));
+
+const loadMfaStatus = async () => {
+  try {
+    const res = await $fetch("/api/profile/mfa/status", {
+      headers: headers.value,
+    });
+    mfaEnabled.value = Boolean(res?.mfaEnabled);
+  } catch (error) {
+    console.error("Error fetching MFA status:", error);
+  }
+};
+
+const startMfaSetup = async () => {
+  mfaLoading.value = true;
+  mfaSetup.value = null;
+  try {
+    const res = await $fetch("/api/profile/mfa/setup", {
+      method: "POST",
+      headers: headers.value,
+    });
+    mfaSetup.value = res;
+  } catch (error) {
+    mfaMessage.value =
+      error?.data?.statusMessage || "Failed to start setup";
+    console.error(error);
+  } finally {
+    mfaLoading.value = false;
+  }
+};
+
+const confirmMfaEnable = async () => {
+  mfaLoading.value = true;
+  try {
+    await $fetch("/api/profile/mfa/enable", {
+      method: "POST",
+      headers: headers.value,
+      body: { code: mfaVerifyCode.value },
+    });
+    mfaEnabled.value = true;
+    mfaSetup.value = null;
+    mfaVerifyCode.value = "";
+    mfaMessage.value = "Two-factor authentication enabled.";
+  } catch (error) {
+    mfaMessage.value =
+      error?.data?.statusMessage || "Invalid code. Try again.";
+  } finally {
+    mfaLoading.value = false;
+  }
+};
+
+const cancelMfaSetup = () => {
+  mfaSetup.value = null;
+  mfaVerifyCode.value = "";
+};
+
+const confirmMfaDisable = async () => {
+  mfaLoading.value = true;
+  try {
+    await $fetch("/api/profile/mfa/disable", {
+      method: "POST",
+      headers: headers.value,
+      body: { code: mfaVerifyCode.value },
+    });
+    mfaEnabled.value = false;
+    disableModal.value = false;
+    mfaVerifyCode.value = "";
+    mfaMessage.value = "Two-factor authentication disabled.";
+  } catch (error) {
+    mfaMessage.value =
+      error?.data?.statusMessage || "Invalid code. Try again.";
+  } finally {
+    mfaLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadMfaStatus();
+});
 </script>

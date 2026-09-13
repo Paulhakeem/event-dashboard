@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema(
     emailVerificationExpires: Date,
     resetCode: { type: String },
     resetCodeExpires: { type: Date },
+    mfaEnabled: { type: Boolean, default: false },
+    mfaSecret: { type: String, select: false },
     activityLog: [
       {
         action: { type: String, required: true },

@@ -3,7 +3,7 @@ import { Ticket } from "../../models/Ticket.js";
 import { requireAuth } from "../../utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
-  const scanner = requireAuth(event);
+  const scanner = await requireAuth(event);
   if (!scanner || !["admin", "organiser"].includes(scanner.role)) {
     throw createError({
       statusCode: 403,

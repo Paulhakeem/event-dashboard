@@ -39,11 +39,27 @@
           />
         </div>
 
-        <GoogleRecaptchaWidget ref="recaptchaWidget" v-model="recaptchaToken" />
+        <div v-if="mfaRequired">
+          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+            Two-Factor Code
+          </label>
+          <input
+            v-model="mfaCode"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            placeholder="123456 (from your authenticator app)"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300"
+          />
+          <p class="mt-2 text-sm text-gray-500 dark:text-neutral-400">
+            Enter the 6-digit code from your authenticator app.
+          </p>
+        </div>
 
         <button
           type="submit"
-          :disabled="isLoading || !recaptchaToken"
+          :disabled="isLoading"
           class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
         >
           {{ isLoading ? "Logging In..." : "Log In" }}
@@ -56,10 +72,10 @@
 <script setup>
 const email = ref("");
 const password = ref("");
-const recaptchaToken = ref("");
+const mfaCode = ref("");
+const mfaRequired = ref(false);
 const errorMessage = ref("");
 const isLoading = ref(false);
-const recaptchaWidget = ref(null);
 const { setAuth } = useAuth();
 
 const login = async () => {
@@ -72,14 +88,13 @@ const login = async () => {
       body: {
         email: email.value,
         password: password.value,
-        recaptchaToken: recaptchaToken.value,
+        mfaCode: mfaCode.value,
       },
     });
 
     if (data.user.role !== "admin") {
       errorMessage.value = "Access denied. Admin credentials required.";
       setAuth(null);
-      recaptchaWidget.value?.reset();
       return;
     }
 
@@ -87,9 +102,13 @@ const login = async () => {
     navigateTo(`/admin/${data.user.id}`);
   } catch (error) {
     console.log(error);
-    errorMessage.value =
-      error?.data?.statusMessage || "Login failed. Please check your credentials.";
-    recaptchaWidget.value?.reset();
+    if (error?.data?.statusCode === 403 && error?.data?.statusMessage?.includes("Two-factor")) {
+      mfaRequired.value = true;
+      errorMessage.value = error.data.statusMessage;
+    } else {
+      errorMessage.value =
+        error?.data?.statusMessage || "Login failed. Please check your credentials.";
+    }
   } finally {
     isLoading.value = false;
   }

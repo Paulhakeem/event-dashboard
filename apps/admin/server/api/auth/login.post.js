@@ -3,13 +3,18 @@ import bcrypt from "bcryptjs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import { setAuthCookie } from "../../utils/authCookie.js";
-import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
+import { verifyTotp } from "../../utils/mfa.js";
+import { logSecurity } from "../../utils/logSecurity.js";
+
+// Constant-time dummy hash so unknown accounts take similar time to compare.
+const DUMMY_PASSWORD_HASH =
+  "$2b$10$7wwfFlRSDdKO0os0yLq01uZ8ArnunsL1/.kMdt3wyj.UiX.0xRw9u";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   await connectDB();
 
-  const { email, password, recaptchaToken } = await readBody(event);
+  const { email, password, mfaCode } = await readBody(event);
 
   if (
     typeof email !== "string" ||
@@ -23,49 +28,38 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // reCAPTCHA verification
-  const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
-  if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        recaptchaResult?.message || "reCAPTCHA verification failed",
-    });
-  }
-
-  // password length check
-  if (password.length < 8) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        "Password must be at least 8 characters long and contains special characters",
-    });
-  }
-
   // normalize email
-  const normalizedEmail = email.toLowerCase();
+  const normalizedEmail = email.toLowerCase().trim();
 
   // Find user
   const user = await User.findOne({ email: normalizedEmail }).select(
-    "+password",
+    "+password +mfaSecret isEmailVerified accountStatus role firstName lastName profileImage joinedAt",
   );
-  if (!user) {
+
+  // Unknown account or Google-only account → generic message, constant-ish time
+  if (!user || !user.password) {
+    await bcrypt.compare(password, DUMMY_PASSWORD_HASH);
     throw createError({
       statusCode: 400,
-      statusMessage: "User account not found. Please register first.",
+      statusMessage: "Invalid email or password",
     });
   }
 
-  // check if user login with google
-  if (!user.password) {
+  // Password check
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    await logSecurity(event, "login_failed", {
+      email: user.email,
+      role: user.role,
+      userId: user._id,
+      reason: "invalid_password",
+    });
     throw createError({
       statusCode: 400,
-      statusMessage:
-        "This account uses Google sign-in. Please login with Google.",
+      statusMessage: "Invalid email or password",
     });
   }
 
-  // ✅ Correct verification check
   if (!user.isEmailVerified) {
     throw createError({
       statusCode: 403,
@@ -80,13 +74,35 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // Password check
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid email or password",
+  // Admin portal is for admins only
+  if (user.role !== "admin") {
+    await logSecurity(event, "admin_login_denied", {
+      email: user.email,
+      role: user.role,
+      userId: user._id,
     });
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Admin access required",
+    });
+  }
+
+  // Two-factor authentication
+  if (user.mfaEnabled) {
+    const validCode =
+      typeof mfaCode === "string" && verifyTotp(user.mfaSecret, mfaCode);
+    if (!validCode) {
+      await logSecurity(event, "login_failed", {
+        email: user.email,
+        role: user.role,
+        userId: user._id,
+        reason: "invalid_mfa",
+      });
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Two-factor authentication is required for this account",
+      });
+    }
   }
 
   // JWT
@@ -101,6 +117,12 @@ export default defineEventHandler(async (event) => {
   );
 
   setAuthCookie(event, token, config);
+
+  await logSecurity(event, "login_success", {
+    email: user.email,
+    role: user.role,
+    userId: user._id,
+  });
 
   return {
     success: true,

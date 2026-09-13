@@ -57,6 +57,16 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(String(password))) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+    });
+  }
+
   // 🚫 Prevent duplicate admins
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -78,7 +88,7 @@ export default defineEventHandler(async (event) => {
     lastName,
     email,
     password: hashedPassword,
-    role: "organiser",
+    role: "admin",
     isEmailVerified: false,
     emailVerificationCode: verificationCode,
     emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins

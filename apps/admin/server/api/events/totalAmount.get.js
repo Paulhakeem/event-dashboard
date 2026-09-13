@@ -3,7 +3,10 @@ import connectDB from "../../utils/mongoose.js";
 import { TotalBooking } from "../../models/totalBooking.js";
 
 export default defineEventHandler(async (event) => {
-  await requireAuth(event);
+  const admin = await requireAuth(event);
+  if (admin.role !== "admin") {
+    throw createError({ statusCode: 403, statusMessage: "Admin access required" });
+  }
   await connectDB();
   try {
     const totalAmount = await TotalBooking.aggregate([

@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   await connectDB();
 
   // 🔐 Protect this route only
-  const user = requireAuth(event);
+  const user = await requireAuth(event);
   if (!user?.email) {
     return { success: false, message: "Unauthorized" };
   }

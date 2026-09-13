@@ -17,7 +17,7 @@ const sanitizeForMpesa = (str) => {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const authUser = requireAuth(event);
+  const authUser = await requireAuth(event);
   const body = await readBody(event);
 
   const { phone, eventId, ticketType } = body;

@@ -73,6 +73,28 @@
         <!-- reCAPTCHA -->
         <GoogleRecaptchaWidget v-model="recaptchaToken" />
 
+        <!-- Two-Factor Code -->
+        <div v-if="mfaRequired">
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
+            Two-Factor Code
+          </label>
+          <input
+            v-model="mfaCode"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            maxlength="6"
+            placeholder="123456 (from your authenticator app)"
+            aria-label="Two-factor authentication code"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+          />
+          <p class="mt-2 text-sm text-gray-500 dark:text-neutral-400">
+            Enter the 6-digit code from your authenticator app.
+          </p>
+        </div>
+
         <!-- Login Button -->
         <button
           type="submit"
@@ -91,6 +113,8 @@
 const email = ref("");
 const password = ref("");
 const recaptchaToken = ref("");
+const mfaCode = ref("");
+const mfaRequired = ref(false);
 const errorMessage = ref("");
 const isLoading = ref(false);
 const { setAuth } = useAuth();
@@ -105,6 +129,7 @@ const login = async () => {
         email: email.value,
         password: password.value,
         recaptchaToken: recaptchaToken.value,
+        mfaCode: mfaCode.value,
       },
     });
     setAuth(data);
@@ -123,7 +148,10 @@ const login = async () => {
     }
   } catch (error) {
     console.log(error);
-    if (error?.data?.statusCode === 403) {
+    if (error?.data?.statusCode === 403 && error?.data?.statusMessage?.includes("Two-factor")) {
+      mfaRequired.value = true;
+      errorMessage.value = error.data.statusMessage;
+    } else if (error?.data?.statusCode === 403) {
       errorMessage.value = error.data.statusMessage;
     } else if (error?.data?.statusCode === 400) {
       errorMessage.value = error.data.statusMessage;

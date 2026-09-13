@@ -16,21 +16,19 @@ export default defineEventHandler(async (event) => {
   }
 
   const user = await User.findOne({ email: email.trim().toLowerCase() });
-  if (!user) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "User not found",
-    });
-  }
-
-  if (user.isEmailVerified) {
-    return { message: "Email already verified" };
+  if (!user || user.isEmailVerified) {
+    // Generic response to avoid account enumeration
+    return {
+      success: true,
+      message:
+        "If an account exists and verification is pending, a new code has been sent.",
+    };
   }
 
   const code = Math.floor(100000 + Math.random() * 900000).toString();
 
   user.emailVerificationCode = code;
-  user.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000)
+  user.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
   if (config.emailUsername && config.emailPass) {

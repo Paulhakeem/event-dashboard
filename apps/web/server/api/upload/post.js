@@ -1,46 +1,35 @@
-import { User } from "../../models/User.js";
 import { Event } from "../../models/Events.js";
 import connectDB from "../../utils/mongoose.js";
-import jwt from "jsonwebtoken";
+import { requireAuth } from "../../utils/requireAuth.js";
 import formidable from "formidable";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-
-// 🔐 Helper: Verify token
-function verifyToken(token, secret) {
-  try {
-    return jwt.verify(token, secret, { algorithms: ["HS256"] });
-  } catch {
-    throw createError({ statusCode: 401, statusMessage: "Invalid token" });
-  }
-}
+import { assertValidImage } from "../../utils/imageUpload.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
   const config = useRuntimeConfig();
 
-  // 🧠 Configure Cloudinary
   cloudinary.config({
     cloud_name: config.cloudinaryCloudName,
     api_key: config.cloudinaryApiKey,
     api_secret: config.cloudinaryApiSecret,
   });
 
-  // 🔐 Verify user
-  const authHeader = event.node.req.headers.authorization;
-  if (!authHeader) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  }
-  const token = authHeader.split(" ")[1];
-  const decoded = verifyToken(token, config.secretStr);
-
-  const user = await User.findById(decoded.id);
-  if (!user || user.role !== "admin") {
+  // Verify user (also enforces suspension + email verification)
+  const authUser = await requireAuth(event);
+  if (authUser.role !== "admin") {
     throw createError({ statusCode: 403, statusMessage: "Access denied" });
   }
 
-  // 🧾 Parse form data (text + image)
-  const form = formidable({ multiples: false });
+  // Parse form data (text + image)
+  const form = formidable({
+    multiples: false,
+    maxFields: 20,
+    maxFieldSize: 1024 * 1024,
+    maxFileSize: 10 * 1024 * 1024,
+    maxFiles: 1,
+  });
   const [fields, files] = await form.parse(event.node.req);
 
   const title = String(fields.title?.[0] || "");
@@ -80,26 +69,29 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // ☁️ Upload image to Cloudinary
+  // Upload image to Cloudinary (validated type + size)
   const imageFile = files.image[0];
   const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB
-  const uploadedSize = imageFile?.size ?? 0;
-  if (uploadedSize > MAX_IMAGE_BYTES) {
+  if ((imageFile?.size ?? 0) > MAX_IMAGE_BYTES) {
     throw createError({
       statusCode: 400,
-      statusMessage: `File size too large. Got ${uploadedSize}. Maximum is ${MAX_IMAGE_BYTES}.`,
+      statusMessage: `File size too large. Got ${imageFile.size}. Maximum is ${MAX_IMAGE_BYTES}.`,
     });
   }
+  assertValidImage(imageFile);
+
   const uploadResult = await cloudinary.uploader.upload(imageFile.filepath, {
     folder: "events",
     use_filename: true,
     unique_filename: true,
+    allowed_formats: ["jpg", "png", "webp", "gif", "avif"],
+    resource_type: "image",
   });
 
-  // 🧹 Remove temp file (optional but good practice)
+  // Clean up temp file
   fs.unlink(imageFile.filepath, () => {});
 
-  // 💾 Save event in MongoDB
+  // Save event in MongoDB
   const newEvent = new Event({
     title,
     description,
@@ -114,7 +106,7 @@ export default defineEventHandler(async (event) => {
     status,
     eventType,
     image: uploadResult.secure_url,
-    createdBy: user._id,
+    createdBy: authUser.id,
   });
 
   await newEvent.save();

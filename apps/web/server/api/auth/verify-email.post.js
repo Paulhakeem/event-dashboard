@@ -1,5 +1,6 @@
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
+import { logSecurity } from "../../utils/logSecurity.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -25,8 +26,8 @@ export default defineEventHandler(async (event) => {
 
   if (!user) {
     throw createError({
-      statusCode: 404,
-      statusMessage: "User not found",
+      statusCode: 400,
+      statusMessage: "Invalid or expired verification code",
     });
   }
 
@@ -53,6 +54,11 @@ export default defineEventHandler(async (event) => {
   user.emailVerificationExpires = undefined;
 
   await user.save();
+
+  await logSecurity(event, "email_verified", {
+    email: user.email,
+    userId: user._id,
+  });
 
   return {
     message: "Email verified successfully. You can now login.",

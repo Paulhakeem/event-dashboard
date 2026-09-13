@@ -5,7 +5,7 @@ import { requireAuth } from "~~/server/utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
-  const authUser = requireAuth(event);
+  const authUser = await requireAuth(event);
   if (authUser.role !== "user") {
     throw createError({
       statusCode: 403,

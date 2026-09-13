@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
+import { logSecurity } from "../../utils/logSecurity.js";
 
 export default defineEventHandler(async (event) => {
   const { email, code, newPassword } = await readBody(event);
@@ -33,6 +34,10 @@ export default defineEventHandler(async (event) => {
   });
 
   if (!user) {
+    await logSecurity(event, "password_reset_failed", {
+      email: email.trim().toLowerCase(),
+      reason: "invalid_or_expired_code",
+    });
     throw createError({
       statusCode: 400,
       statusMessage: "Invalid or expired reset code",
@@ -47,6 +52,11 @@ export default defineEventHandler(async (event) => {
   user.resetCodeExpires = undefined;
 
   await user.save();
+
+  await logSecurity(event, "password_reset_success", {
+    email: user.email,
+    userId: user._id,
+  });
 
   return {
     message: "Password reset successful",

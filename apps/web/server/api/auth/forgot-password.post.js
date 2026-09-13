@@ -2,6 +2,7 @@ import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import { sendResetEmail } from "~~/server/utils/mailer.js";
 import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
+import { logSecurity } from "../../utils/logSecurity.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -44,6 +45,11 @@ export default defineEventHandler(async (event) => {
 
   // Send email here (nodemailer) — don't crash if mail fails
   await sendResetEmail(email, resetCode);
+
+  await logSecurity(event, "password_reset_requested", {
+    email: user.email,
+    userId: user._id,
+  });
 
   return {
     message: "Password reset code sent to your email",

@@ -6,6 +6,7 @@ import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
 import nodemailer from "nodemailer";
 import { verifyRecaptcha } from "../../utils/verifyRecaptcha.js";
+import { assertValidImage } from "../../utils/imageUpload.js";
 
 /* ---------------- SPAM EMAIL BLOCK ---------------- */
 const blockedDomains = [
@@ -39,7 +40,13 @@ export default defineEventHandler(async (event) => {
   });
 
   // Parse form data
-  const form = formidable({ keepExtensions: true });
+  const form = formidable({
+    keepExtensions: true,
+    maxFields: 20,
+    maxFieldSize: 1024 * 1024,
+    maxFileSize: 5 * 1024 * 1024,
+    maxFiles: 1,
+  });
 
   const { fields, files } = await new Promise((resolve, reject) => {
     form.parse(event.node.req, (err, fields, files) => {
@@ -117,8 +124,12 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    assertValidImage(imageFile);
+
     const upload = await cloudinary.uploader.upload(imageFile.filepath, {
       folder: "profiles",
+      allowed_formats: ["jpg", "png", "webp", "gif", "avif"],
+      resource_type: "image",
     });
 
     imagePath = upload.secure_url;

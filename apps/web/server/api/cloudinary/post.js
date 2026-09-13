@@ -1,7 +1,16 @@
 import crypto from "crypto";
+import { requireAuth } from "../../utils/requireAuth.js";
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
+  const user = await requireAuth(event);
+  if (user.role !== "admin" && user.role !== "organiser") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "Upload access requires an admin or organiser account",
+    });
+  }
+
   try {
     const timestamp = Math.floor(Date.now() / 1000);
     const signatureString = `timestamp=${timestamp}${config.cloudinaryApiSecret}`;
