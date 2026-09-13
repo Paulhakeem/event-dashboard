@@ -2,6 +2,7 @@ import connectDB from "../../utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
+import { PendingPayment } from "~~/server/models/PendingPayment";
 import nodemailer from "nodemailer";
 import axios from "axios";
 import { Ticket } from "~~/server/models/Ticket";
@@ -16,22 +17,34 @@ export default defineEventHandler(async (event) => {
   const authUser = requireAuth(event);
   const body = await readBody(event);
 
-  const { reference, ticketType, eventName } = body;
+  const { reference } = body;
   const userEmail = authUser.email;
 
   /* ── BASIC VALIDATION ─────────────────────────────────────── */
-  if (!eventName || !userEmail || !reference || !ticketType) {
+  if (typeof reference !== "string" || !reference.trim()) {
     throw createError({
       statusCode: 400,
-      statusMessage:
-        "eventName, userEmail, reference and ticketType are required",
+      statusMessage: "A payment reference is required",
     });
   }
 
   await connectDB();
 
+  /* ── RESOLVE SERVER-BOUND PENDING PAYMENT ─────────────────── */
+  const pending = await PendingPayment.findOne({
+    CheckoutRequestID: reference.trim(),
+    userId: authUser.id,
+    status: { $in: ["pending", "confirmed"] },
+  });
+  if (!pending) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No matching payment found for this account",
+    });
+  }
+
   /* ── FIND EVENT ───────────────────────────────────────────── */
-  const eventData = await Event.findOne({ title: eventName });
+  const eventData = await Event.findById(pending.eventId);
   if (!eventData) {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
@@ -49,21 +62,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
 
-  /* ── TICKET PRICE LOOKUP ──────────────────────────────────── */
-  const matchedTicket = eventData.customTickets?.find(
-    (t) => t.name === ticketType,
-  );
-  if (
-    !matchedTicket ||
-    matchedTicket.price === undefined ||
-    matchedTicket.price === null
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid or unavailable ticket type selected",
-    });
-  }
-  const expectedAmount = matchedTicket.price;
+  /* ── TICKET TYPE & PRICE FROM THE PENDING PAYMENT ─────────── */
+  // Never derived from client-supplied ticketType/eventName — the amount was
+  // fixed server-side when the STK push was initiated by this user.
+  const ticketType = pending.ticketType;
+  const expectedAmount = pending.amount;
 
   /* ── VERIFY DARAJA M-PESA ─────────────────────────────────── */
   const consumerKey = config.darajaConsumerKey;
@@ -132,12 +135,22 @@ export default defineEventHandler(async (event) => {
   }
 
   /* ── AMOUNT VALIDATION ────────────────────────────────────── */
-  const paidAmount =
-    parseInt(
-      darajaData.ResultParameters?.ResultParameter?.find(
-        (p) => p.Key === "Amount",
-      )?.Value,
-    ) || expectedAmount;
+  // Prefer the amount relayed by the M-Pesa callback (verified against the
+  // expected amount when it was received). Otherwise, if the query response
+  // includes an amount, validate it. If neither is available, fall back to the
+  // amount bound server-side when this user initiated the STK push — it was
+  // fixed at initiation time and cannot be changed by a client-supplied
+  // event/ticket.
+  let paidAmount;
+  if (pending.status === "confirmed" && Number.isFinite(pending.callbackAmount)) {
+    paidAmount = pending.callbackAmount;
+  } else {
+    const amountParam = darajaData.ResultParameters?.ResultParameter?.find(
+      (p) => p.Key === "Amount",
+    )?.Value;
+    const parsedAmount = amountParam !== undefined ? parseInt(amountParam, 10) : NaN;
+    paidAmount = Number.isNaN(parsedAmount) ? expectedAmount : parsedAmount;
+  }
 
   if (paidAmount !== expectedAmount) {
     throw createError({
@@ -155,6 +168,19 @@ export default defineEventHandler(async (event) => {
   const existingBooking = await TotalBooking.findOne({ reference });
   if (existingBooking) {
     return { message: "Booking already confirmed", booking: existingBooking };
+  }
+
+  /* ── CLAIM THIS PAYMENT ONCE (atomic, race-safe) ──────────── */
+  const claimed = await PendingPayment.findOneAndUpdate(
+    { _id: pending._id, status: { $in: ["pending", "confirmed"] } },
+    { $set: { status: "claimed", claimedAt: new Date() } },
+    { new: true },
+  );
+  if (!claimed) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Payment already processed",
+    });
   }
 
   /* ── DECREMENT TICKET QUANTITY ATOMICALLY ─────────────────── */

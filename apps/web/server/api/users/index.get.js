@@ -15,7 +15,9 @@ export default defineEventHandler(async (event) => {
 
   //   only admins
   try {
-    const user = jwt.verify(token, config.secretStr);
+    const user = jwt.verify(token, config.secretStr, {
+      algorithms: ["HS256"],
+    });
     if (user.role !== "admin") {
       throw createError({ statusCode: 401, statusMessage: "Access denied" });
     }

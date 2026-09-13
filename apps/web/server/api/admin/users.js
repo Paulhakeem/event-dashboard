@@ -14,7 +14,9 @@ const getAdmin = (event) => {
   }
 
   try {
-    const decoded = jwt.verify(token, useRuntimeConfig().secretStr);
+    const decoded = jwt.verify(token, useRuntimeConfig().secretStr, {
+      algorithms: ["HS256"],
+    });
     if (decoded.role !== "admin") throw new Error("Admin access required");
     return decoded;
   } catch {

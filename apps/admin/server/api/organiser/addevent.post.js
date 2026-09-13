@@ -10,7 +10,7 @@ import fs from "fs";
 // 🔐 Helper: Verify token
 function verifyToken(token, secret) {
   try {
-    return jwt.verify(token, secret);
+    return jwt.verify(token, secret, { algorithms: ["HS256"] });
   } catch {
     throw createError({ statusCode: 401, statusMessage: "Invalid token" });
   }

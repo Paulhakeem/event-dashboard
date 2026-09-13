@@ -11,7 +11,12 @@ export default defineEventHandler(async (event) => {
 
   const { email, password, recaptchaToken } = await readBody(event);
 
-  if (!email || !password) {
+  if (
+    typeof email !== "string" ||
+    typeof password !== "string" ||
+    !email ||
+    !password
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "Email and password are required",
@@ -92,7 +97,7 @@ export default defineEventHandler(async (event) => {
       role: user.role,
     },
     config.secretStr,
-    { expiresIn: "1d" },
+    { algorithm: "HS256", expiresIn: "1d" },
   );
 
   setAuthCookie(event, token, config);

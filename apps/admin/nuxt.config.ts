@@ -89,8 +89,9 @@ export default defineNuxtConfig({
     mpesaShortCode: process.env.MPESA_SHORT_CODE,
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     deepseekApiKey: process.env.DEEPSEEK_API,
-    recaptchaSecretKey: process.env.NUXT_PUBLIC_RECAPTCHA_SECRET_KEY,
+    recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
     mailgunApiKey: process.env.MAILGUN_API_KEY,
+    googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
 
     public: {
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,

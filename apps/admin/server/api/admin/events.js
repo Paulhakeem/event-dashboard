@@ -9,7 +9,9 @@ const requireAdmin = (event) => {
   const header = getHeader(event, "authorization");
   const token = header?.startsWith("Bearer ") ? header.slice(7) : null;
   try {
-    const user = jwt.verify(token, useRuntimeConfig().secretStr);
+    const user = jwt.verify(token, useRuntimeConfig().secretStr, {
+      algorithms: ["HS256"],
+    });
     if (user.role !== "admin") throw new Error();
     return user;
   } catch {

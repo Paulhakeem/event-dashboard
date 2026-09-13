@@ -4,37 +4,106 @@ import connectDB from "../../utils/mongoose.js";
 import { v2 as cloudinary } from "cloudinary";
 import { setAuthCookie } from "../../utils/authCookie.js";
 
+const GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo";
+const ALLOWED_ISSUERS = ["https://accounts.google.com", "accounts.google.com"];
+
+async function verifyGoogleIdToken(credential, config) {
+  if (
+    !credential ||
+    typeof credential !== "string" ||
+    credential.length === 0 ||
+    credential.length > 8192
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid Google credential",
+    });
+  }
+
+  let payload;
+  try {
+    payload = await $fetch(GOOGLE_TOKENINFO_URL, {
+      method: "POST",
+      params: { id_token: credential },
+      timeout: 15000,
+    });
+  } catch (err) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Google token could not be verified",
+    });
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Google token could not be verified",
+    });
+  }
+
+  if (config.googleClientId && payload.aud !== config.googleClientId) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Google token audience mismatch",
+    });
+  }
+
+  if (!ALLOWED_ISSUERS.includes(payload.iss)) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Invalid Google token issuer",
+    });
+  }
+
+  const emailVerified =
+    payload.email_verified === true || payload.email_verified === "true";
+  if (!emailVerified || !payload.email || !payload.sub) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Google account email is not verified",
+    });
+  }
+
+  if (payload.exp && Number(payload.exp) * 1000 < Date.now()) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Google token has expired",
+    });
+  }
+
+  return {
+    email: String(payload.email).toLowerCase(),
+    googleId: String(payload.sub),
+    name: typeof payload.name === "string" ? payload.name : "",
+    picture: typeof payload.picture === "string" ? payload.picture : "",
+  };
+}
+
 export default defineEventHandler(async (event) => {
   await connectDB();
 
   // Cloudinary config (kept for future image uploads)
   const config = useRuntimeConfig();
-  if (
-    config.cloudinaryCloudName &&
-    config.cloudinaryApiKey &&
-    config.cloudinaryApiSecret
-  ) {
-    cloudinary.config({
-      cloud_name: config.cloudinaryCloudName,
-      api_key: config.cloudinaryApiKey,
-      api_secret: config.cloudinaryApiSecret,
-    });
-  }
 
   try {
-    const { name, email, picture, googleId } = await readBody(event);
+    const { credential } = await readBody(event);
 
-    if (!email || !googleId) {
+    if (!credential) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Invalid Google credentials",
+        statusMessage: "Google credential is required",
       });
     }
 
+    // Verify the ID token server-side — never trust client-supplied claims
+    const googleUser = await verifyGoogleIdToken(credential, config);
+    const { email, googleId } = googleUser;
+
     // robust name parsing
-    const nameParts = (name || "").trim().split(/\s+/).filter(Boolean);
+    const nameParts = (googleUser.name || "").trim().split(/\s+/).filter(Boolean);
     const firstName = nameParts[0] || "user";
     const lastName = nameParts.slice(1).join(" ") || "";
+    const picture = googleUser.picture;
 
     // ensure JWT secret exists
     if (!config.secretStr) {
@@ -65,19 +134,15 @@ export default defineEventHandler(async (event) => {
         user.isEmailVerified = true; // Google already verified their email
         if (!user.profileImage && picture) user.profileImage = picture;
         await user.save();
+      } else if (user.googleId !== googleId) {
+        // The stored googleId does not match the verified token sub
+        throw createError({
+          statusCode: 409,
+          statusMessage: "Google account already linked to another user",
+        });
       }
     } else {
       // New user via Google — create account (omit password field)
-      // ensure googleId isn't already used
-      const existingGoogleUser = await User.findOne({ googleId });
-      if (existingGoogleUser) {
-        // Rare: googleId exists but email not found — conflict
-        throw createError({
-          statusCode: 409,
-          statusMessage: "Google account already registered",
-        });
-      }
-
       user = await User.create({
         firstName,
         lastName,
@@ -97,7 +162,7 @@ export default defineEventHandler(async (event) => {
         role: user.role,
       },
       config.secretStr,
-      { expiresIn: "1d" },
+      { algorithm: "HS256", expiresIn: "1d" },
     );
 
     setAuthCookie(event, token, config);

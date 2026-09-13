@@ -12,10 +12,15 @@
 const { setAuth } = useAuth();
 
 const onGoogleSuccess = async (e) => {
-  const { email, name, picture, sub } = e.claims;
+  const credential = e.credential;
+  if (!credential) {
+    alert("Google login failed: missing credential");
+    return;
+  }
+
   const data = await $fetch("/api/auth/google", {
     method: "POST",
-    body: { email, name, picture, googleId: sub },
+    body: { credential },
   });
 
   if (!data?.success) return;

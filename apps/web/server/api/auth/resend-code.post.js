@@ -8,7 +8,14 @@ export default defineEventHandler(async (event) => {
 
   const { email } = await readBody(event);
 
-  const user = await User.findOne({ email });
+  if (typeof email !== "string" || !email.trim()) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "A valid email is required",
+    });
+  }
+
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
   if (!user) {
     throw createError({
       statusCode: 404,
@@ -39,12 +46,10 @@ export default defineEventHandler(async (event) => {
 
     await transporter.sendMail({
       from: `"Volar Events" <${config.emailUsername}>`,
-      to: email,
+      to: user.email,
       subject: "Resend verification code",
       html: `<h2>Your new verification code</h2><h1>${code}</h1>`,
     });
-  } else {
-    console.warn("SMTP credentials missing; logged verification code instead:", code);
   }
 
   return {

@@ -14,7 +14,9 @@ export function requireAuth(event) {
   }
 
   try {
-    const decoded = jwt.verify(token, config.secretStr);
+    const decoded = jwt.verify(token, config.secretStr, {
+      algorithms: ["HS256"],
+    });
     event.context.user = decoded;
     return decoded;
   } catch (err) {

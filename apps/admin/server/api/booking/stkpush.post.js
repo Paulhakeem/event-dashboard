@@ -1,5 +1,6 @@
 import connectDB from "../../utils/mongoose.js";
 import { Event } from "~~/server/models/Events";
+import { PendingPayment } from "~~/server/models/PendingPayment";
 import { requireAuth } from "../../utils/requireAuth.js";
 import axios from "axios";
 
@@ -59,6 +60,13 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: "Event not available for booking",
+    });
+  }
+
+  if (!eventData.TicketQuantity || eventData.TicketQuantity <= 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Tickets sold out",
     });
   }
 
@@ -163,19 +171,35 @@ export default defineEventHandler(async (event) => {
       },
     );
 
+    const checkoutRequestID = String(response.data?.CheckoutRequestID || "");
+
+    if (!checkoutRequestID) {
+      throw createError({
+        statusCode: 502,
+        statusMessage: "Safaricom did not return a CheckoutRequestID",
+      });
+    }
+
+    // Persist the intent so verification is bound to this user/event/amount
+    await PendingPayment.create({
+      CheckoutRequestID: checkoutRequestID,
+      userId: authUser.id,
+      userEmail,
+      phone: formattedPhone,
+      eventId: eventData._id,
+      eventName: eventData.title,
+      ticketType,
+      amount,
+    });
+
     return {
       success: true,
-      checkoutRequestID: response.data.CheckoutRequestID,
+      checkoutRequestID,
       transactionId,
       message: "STK push sent successfully",
     };
   } catch (err) {
-    console.error(
-      "STK push error FULL:",
-      JSON.stringify(err.response?.data, null, 2),
-    );
-    console.error("STK push status:", err.response?.status);
-    console.error("STK push payload sent:", JSON.stringify(payload, null, 2));
+    console.error("STK push failed", err.response?.status || err.message);
 
     throw createError({
       statusCode: 500,

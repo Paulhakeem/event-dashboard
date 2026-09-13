@@ -19,12 +19,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const user = await User.findOne({ email });
-  if (!user) {
+  if (typeof email !== "string" || !email.trim()) {
     throw createError({
       statusCode: 400,
-      statusMessage: "User not found",
+      statusMessage: "A valid email is required",
     });
+  }
+
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
+  if (!user) {
+    // Generic response to avoid account enumeration
+    return {
+      message: "If an account exists for this email, a reset code has been sent.",
+    };
   }
 
   // Generate 6-digit code
@@ -36,14 +43,9 @@ export default defineEventHandler(async (event) => {
   await user.save();
 
   // Send email here (nodemailer) — don't crash if mail fails
-  const sendResult = await sendResetEmail(email, resetCode);
-
-  const message = sendResult?.ok
-    ? "Password reset code sent to your email"
-    : "Password reset code generated. Email sending failed or SMTP not configured.";
+  await sendResetEmail(email, resetCode);
 
   return {
-    message,
-    _mail: sendResult?.message || null,
+    message: "Password reset code sent to your email",
   };
 });

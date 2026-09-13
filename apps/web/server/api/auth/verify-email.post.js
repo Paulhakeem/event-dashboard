@@ -8,7 +8,12 @@ export default defineEventHandler(async (event) => {
   const { email, code } = body;
 
   /* ---------- VALIDATION ---------- */
-  if (!email || !code) {
+  if (
+    typeof email !== "string" ||
+    !email.trim() ||
+    typeof code !== "string" ||
+    !/^\d{6}$/.test(code)
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "Email and verification code are required",
@@ -16,7 +21,7 @@ export default defineEventHandler(async (event) => {
   }
 
   /* ---------- FIND USER ---------- */
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await User.findOne({ email: email.trim().toLowerCase() });
 
   if (!user) {
     throw createError({
