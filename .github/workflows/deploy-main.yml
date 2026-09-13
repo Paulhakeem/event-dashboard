@@ -29,24 +29,33 @@ jobs:
             BACKUP_DIR="/var/www/velora-events-backup"
             ENV_BACKUP_DIR="/root/.env-backups/velora-events"
             ENV_SAFE="$ENV_BACKUP_DIR/.env"
+            ENV_ADMIN_SAFE="$ENV_BACKUP_DIR/.env.admin"
 
             echo "🔄 Starting zero-downtime deployment..."
             mkdir -p /var/www "$ENV_BACKUP_DIR"
 
-            # ── 1. Backup .env from the live web app BEFORE anything ──
-            echo "💾 Backing up .env from live directory..."
+            # ── 1. Backup .env files BEFORE anything ──
+            echo "💾 Backing up .env files..."
             if [ -f "$LIVE_DIR/apps/web/.env" ]; then
               TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
               cp "$LIVE_DIR/apps/web/.env" "$ENV_SAFE"
               cp "$LIVE_DIR/apps/web/.env" "$ENV_BACKUP_DIR/.env.$TIMESTAMP"
-              # Keep only the 5 most recent timestamped backups
               ls -t "$ENV_BACKUP_DIR"/.env.* 2>/dev/null | tail -n +6 | xargs -r rm --
-              echo "✅ .env backed up from $LIVE_DIR/apps/web (timestamped: $TIMESTAMP)"
+              echo "✅ Web .env backed up"
             elif [ -f "$ENV_SAFE" ]; then
-              echo "⚠️  No live .env found in $LIVE_DIR/apps/web — existing backup at $ENV_SAFE will be used"
+              echo "⚠️  No live web .env found — existing backup will be used"
             else
-              echo "❌ No .env found anywhere — please manually place a .env in apps/web before deploying"
+              echo "❌ No web .env found anywhere — aborting"
               exit 1
+            fi
+
+            if [ -f "$LIVE_DIR/apps/admin/.env" ]; then
+              cp "$LIVE_DIR/apps/admin/.env" "$ENV_ADMIN_SAFE"
+              echo "✅ Admin .env backed up"
+            elif [ -f "$ENV_ADMIN_SAFE" ]; then
+              echo "⚠️  No live admin .env found — existing backup will be used"
+            else
+              echo "⚠️  No admin .env found — will copy from web .env"
             fi
 
             # ── 2. Clone fresh copy ──────────────────────────────────────────
@@ -55,14 +64,17 @@ jobs:
             git clone git@github-velora:Paulhakeem/event-dashboard.git "$BUILD_DIR"
             echo "✅ Cloned"
 
-            # ── 3. Retrieve .env into the build ─────────────────────────────
-            echo "🔑 Retrieving .env into build..."
-            if [ -f "$ENV_SAFE" ]; then
-              cp "$ENV_SAFE" "$BUILD_DIR/apps/web/.env"
-              echo "✅ .env restored from backup into $BUILD_DIR/apps/web"
+            # ── 3. Restore .env files into the build ─────────────────────────
+            echo "🔑 Restoring .env files..."
+            cp "$ENV_SAFE" "$BUILD_DIR/apps/web/.env"
+            echo "✅ Web .env restored"
+
+            if [ -f "$ENV_ADMIN_SAFE" ]; then
+              cp "$ENV_ADMIN_SAFE" "$BUILD_DIR/apps/admin/.env"
+              echo "✅ Admin .env restored"
             else
-              echo "❌ No .env backup found — aborting"
-              exit 1
+              cp "$ENV_SAFE" "$BUILD_DIR/apps/admin/.env"
+              echo "✅ Admin .env copied from web .env"
             fi
 
             # ── 4. Install dependencies & build ─────────────────────────────
@@ -72,7 +84,7 @@ jobs:
             pnpm install --no-frozen-lockfile --ignore-scripts
             pnpm approve-builds --yes
             pnpm rebuild
-            echo "🏗️  Building Nuxt web app..."
+            echo "🏗️  Building web and admin apps..."
             pnpm run build
             echo "✅ Build complete"
 
@@ -87,13 +99,14 @@ jobs:
             chown -R www-data:www-data "$LIVE_DIR"
             chmod -R 755 "$LIVE_DIR"
             chmod 600 "$LIVE_DIR/apps/web/.env"
+            chmod 600 "$LIVE_DIR/apps/admin/.env"
 
-            # ── 7. Restart app with PM2 ──────────────────────────────────────
-            echo "♻️  Restarting app with PM2..."
+            # ── 7. Restart apps with PM2 ─────────────────────────────────────
+            echo "♻️  Restarting apps with PM2..."
             cd "$LIVE_DIR"
             pm2 startOrReload ecosystem.config.cjs --update-env
             pm2 save
-            echo "✅ PM2 velora-events restarted"
+            echo "✅ PM2 restarted"
 
             echo ""
             echo "🎉 Deployment complete!"
