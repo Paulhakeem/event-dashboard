@@ -15,7 +15,12 @@ export default defineEventHandler(async (event) => {
             {
               recipientUser: user.id,
               "meta.type": {
-                $in: ["event_cancelled", "booking_confirmed", "new_event"],
+                $in: [
+                  "event_cancelled",
+                  "booking_confirmed",
+                  "new_event",
+                  "payment_failed",
+                ],
               },
             },
             { recipientRole: "user", "meta.type": "new_event" },

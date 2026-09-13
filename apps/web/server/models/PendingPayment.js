@@ -28,6 +28,8 @@ const pendingPaymentSchema = new mongoose.Schema(
       default: "pending",
     },
     callbackAmount: { type: Number },
+    resultCode: { type: Number },
+    resultDesc: { type: String },
     mpesaReceiptNumber: { type: String },
     transactionId: { type: String },
     verifiedAt: { type: Date },

@@ -34,12 +34,52 @@ export default defineEventHandler(async (event) => {
   const pending = await PendingPayment.findOne({
     CheckoutRequestID: reference.trim(),
     userId: authUser.id,
-    status: { $in: ["pending", "confirmed"] },
   });
   if (!pending) {
     throw createError({
       statusCode: 400,
       statusMessage: "No matching payment found for this account",
+    });
+  }
+
+  if (pending.status === "claimed") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Payment already processed",
+      data: { final: true },
+    });
+  }
+
+  if (pending.status === "failed") {
+    const desc = (pending.resultDesc || "").toLowerCase();
+    const cancelled = pending.resultCode === 1032;
+    const insufficient =
+      pending.resultCode === 1 ||
+      desc.includes("insufficient") ||
+      desc.includes("balance");
+
+    let message = "Payment not successful. Please try again.";
+    if (cancelled) {
+      message = "Payment was cancelled. Please try again.";
+    } else if (insufficient) {
+      message =
+        "Payment not successful. You do not have enough M-Pesa balance to complete this payment. Top up and try again.";
+    } else if (pending.resultCode === 1037) {
+      message = "Payment failed due to an incorrect M-Pesa PIN. Please try again.";
+    }
+
+    throw createError({
+      statusCode: 400,
+      statusMessage: message,
+      data: { final: true },
+    });
+  }
+
+  if (pending.status === "mismatch") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Payment amount mismatch",
+      data: { final: true },
     });
   }
 
@@ -120,17 +160,41 @@ export default defineEventHandler(async (event) => {
     );
 
     if (checkRes.data.ResultCode !== 0 && checkRes.data.ResultCode !== "0") {
+      const queryResultCode = Number(checkRes.data.ResultCode);
+      const knownErrors = {
+        1: {
+          statusMessage:
+            "Payment not successful. You do not have enough M-Pesa balance to complete this payment.",
+          final: true,
+        },
+        1032: {
+          statusMessage: "Payment was cancelled. Please try again.",
+          final: true,
+        },
+        1037: {
+          statusMessage:
+            "Payment failed due to an incorrect M-Pesa PIN. Please try again.",
+          final: true,
+        },
+      };
+      const mapped = knownErrors[queryResultCode];
+
       throw createError({
         statusCode: 400,
-        statusMessage: "M-Pesa STK push verification failed",
+        statusMessage:
+          mapped?.statusMessage || "M-Pesa STK push verification failed",
+        data: mapped?.final ? { final: true } : undefined,
       });
     }
     darajaData = checkRes.data;
   } catch (err) {
+    if (err?.statusCode) throw err;
+
     throw createError({
       statusCode: 400,
       statusMessage:
-        err.response?.data?.errorMessage || "Payment verification failed",
+        err.response?.data?.errorMessage ||
+        "Payment not successful. Please try again.",
     });
   }
 

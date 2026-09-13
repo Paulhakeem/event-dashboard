@@ -47,6 +47,7 @@ export default function useEventBooking() {
       });
 
       successMessage.value = verifyResponse.message;
+      paymentStatus.value = "success";
 
       if (verifyResponse.ticketPdfBase64) {
         ticketPdfBase64.value = verifyResponse.ticketPdfBase64;
@@ -57,8 +58,6 @@ export default function useEventBooking() {
 
         ticketPdfUrl.value = URL.createObjectURL(blob);
       }
-
-      alert("Payment successful 🎉 Check your email");
     } catch (err) {
       throw err;
     } finally {
@@ -94,6 +93,8 @@ export default function useEventBooking() {
 
     try {
       paymentStatus.value = "sending";
+      error.value = null;
+      successMessage.value = null;
 
       const res = await $fetch(config.public.stkpushApi, {
         method: "POST",
@@ -105,7 +106,6 @@ export default function useEventBooking() {
         },
       });
       paymentStatus.value = "waiting";
-      alert("STK Push sent. Enter your M-Pesa PIN to complete payment.");
 
       // wait before verifying
       const tryVerify = async (id, retries = 3) => {
@@ -123,13 +123,22 @@ export default function useEventBooking() {
           } catch (err) {
             console.log("Retrying verification...", i + 1);
 
+            // Payment was definitively rejected by M-Pesa (insufficient
+            // balance, cancelled, wrong PIN) — stop retrying right away.
+            if (err?.data?.final === true) {
+              paymentStatus.value = "failed";
+              error.value =
+                err?.data?.statusMessage ||
+                "Payment not successful. Please try again.";
+              return;
+            }
+
             // If it's last attempt → fail
             if (i === retries - 1) {
               paymentStatus.value = "failed";
-              alert(
+              error.value =
                 err?.data?.statusMessage ||
-                  "Payment not confirmed. Please try again.",
-              );
+                "Payment not successful. Please try again.";
               return;
             }
 
@@ -145,8 +154,7 @@ export default function useEventBooking() {
       await tryVerify(res.checkoutRequestID);
     } catch (err) {
       paymentStatus.value = "failed";
-      alert(err?.data?.statusMessage || "Payment initiation failed");
-    } finally {
+      error.value = err?.data?.statusMessage || "Payment initiation failed";
     }
   };
 

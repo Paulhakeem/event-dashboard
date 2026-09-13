@@ -1,6 +1,7 @@
 import connectDB from "../../utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking.js";
 import { PendingPayment } from "~~/server/models/PendingPayment.js";
+import { Notification } from "~~/server/models/Notification.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -66,6 +67,8 @@ export default defineEventHandler(async (event) => {
       await PendingPayment.updateOne(
         { _id: pending._id },
         {
+          resultCode,
+          resultDesc,
           mpesaReceiptNumber,
           transactionId,
           callbackAmount: Number.isNaN(amount) ? undefined : amount,
@@ -73,6 +76,47 @@ export default defineEventHandler(async (event) => {
           status,
         },
       );
+
+      if (status === "failed" || status === "mismatch") {
+        try {
+          const rc = Number(resultCode);
+          const desc = (resultDesc || "").toLowerCase();
+          const insufficient =
+            rc === 1 ||
+            desc.includes("insufficient") ||
+            desc.includes("balance");
+
+          let message = "Payment not successful. Please try again.";
+          if (status === "mismatch") {
+            message =
+              "Your payment could not be confirmed because the amount did not match. Please try again.";
+          } else if (rc === 1032) {
+            message = "Your payment was cancelled. Please try again.";
+          } else if (insufficient) {
+            message =
+              "Payment not successful. You do not have enough M-Pesa balance to complete this payment. Top up and try again.";
+          } else if (rc === 1037) {
+            message =
+              "Your payment failed due to an incorrect M-Pesa PIN. Please try again.";
+          }
+
+          await Notification.insertMany([
+            {
+              title: "Payment failed",
+              message: `${message} (${pending.eventName})`,
+              recipientUser: pending.userId,
+              event: pending.eventId,
+              meta: { type: "payment_failed" },
+              read: false,
+            },
+          ]);
+        } catch (notificationError) {
+          console.error(
+            "Failed to create payment failure notification:",
+            notificationError,
+          );
+        }
+      }
     } else {
       console.warn(
         "M-Pesa callback received for unknown pending payment",
