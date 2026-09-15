@@ -48,15 +48,6 @@ export default defineEventHandler(async (event) => {
   const userEmail = requestedUserEmail || authUser.email || null;
 
   if (!phone || !eventId || !userEmail) {
-    console.log("STKPUSH validation failed", {
-      contentType: event.node.req.headers["content-type"],
-      bodyKeys: Object.keys(body),
-      phone,
-      eventId,
-      authEmail: authUser?.email,
-      authId: authUser?.id,
-    });
-
     throw createError({
       statusCode: 400,
       statusMessage: "phone, eventId and userEmail are required",
