@@ -40,6 +40,7 @@ export default function useEventBooking() {
 
       const verifyResponse = await $fetch(config.public.verifyApi, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: {
           reference: checkoutRequestID,
         },
@@ -112,8 +113,22 @@ export default function useEventBooking() {
       error.value = null;
       successMessage.value = null;
 
+      console.log("[booking] stkpush payload:", {
+        phone,
+        eventId: id.value,
+        userEmail: user.value.email,
+        tickets: selectedTickets,
+      });
+
       const res = await $fetch(config.public.stkpushApi, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        query: {
+          phone,
+          eventId: id.value,
+          userEmail: user.value.email,
+          tickets: JSON.stringify(selectedTickets),
+        },
         body: {
           phone,
           eventId: id.value,

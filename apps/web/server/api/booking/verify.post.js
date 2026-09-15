@@ -11,11 +11,15 @@ import PDFDocument from "pdfkit";
 import QRCode from "qrcode"; // npm install qrcode
 import { Notification } from "../../models/Notification";
 import { requireAuth } from "../../utils/requireAuth.js";
+import { parseBody } from "../../utils/parseBody.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const authUser = await requireAuth(event);
-  const body = await readBody(event);
+
+  // Replaces readBody(): proxies/intermediaries that strip or rewrite the
+  // Content-Type header make readBody() return {} and every field looks missing.
+  const body = await parseBody(event);
 
   const { reference } = body;
   const userEmail = authUser.email;

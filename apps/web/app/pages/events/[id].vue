@@ -49,7 +49,10 @@
             <div class="bg-white p-4 rounded-lg shadow-md">
               <p class="text-xs text-gray-500 uppercase">Date</p>
               <p class="text-sm font-semibold text-gray-900">
-                <Icon name="mdi:calendar-month" class="inline mr-1 text-[#9c4e8b]" />
+                <Icon
+                  name="mdi:calendar-month"
+                  class="inline mr-1 text-[#9c4e8b]"
+                />
                 {{
                   new Date(event?.date).toLocaleDateString("en-US", {
                     month: "short",
@@ -140,10 +143,7 @@
                 This event is free entry, so the payment button is disabled.
               </p>
             </div>
-            <div
-              v-else-if="event?.customTickets?.length"
-              class="mb-8"
-            >
+            <div v-else-if="event?.customTickets?.length" class="mb-8">
               <!-- TICKET LINES -->
               <div
                 v-for="(line, index) in ticketLines"
@@ -160,7 +160,9 @@
                     <label
                       class="block text-xs font-semibold text-gray-500 mb-1"
                     >
-                      Ticket Type{{ ticketLines.length > 1 ? " " + (index + 1) : "" }}
+                      Ticket Type{{
+                        ticketLines.length > 1 ? " " + (index + 1) : ""
+                      }}
                     </label>
                     <select
                       :value="line.ticketType"
@@ -274,7 +276,7 @@
 
               <input
                 v-model="phone"
-                placeholder="2547XXXXXXXX"
+                placeholder="+2547XXXXXXXX"
                 class="w-full border rounded-lg p-3 mt-2"
               />
             </div>

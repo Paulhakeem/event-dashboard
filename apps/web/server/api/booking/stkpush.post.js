@@ -2,6 +2,7 @@ import connectDB from "../../utils/mongoose.js";
 import { Event } from "~~/server/models/Events";
 import { PendingPayment } from "~~/server/models/PendingPayment";
 import { requireAuth } from "../../utils/requireAuth.js";
+import { parseBody } from "../../utils/parseBody.js";
 import axios from "axios";
 
 const sanitizeForMpesa = (str) => {
@@ -18,22 +19,62 @@ const sanitizeForMpesa = (str) => {
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const authUser = await requireAuth(event);
-  const body = await readBody(event);
+  const body = await parseBody(event);
+  const query = getQuery(event);
 
-  const { phone, eventId, tickets: rawTickets, ticketType: legacyTicketType, quantity: legacyQuantity } = body;
-  const userEmail = authUser.email;
+  const {
+    tickets: rawTickets,
+    ticketType: legacyTicketType,
+    quantity: legacyQuantity,
+  } = body;
+
+  let phone = body.phone ?? query.phone ?? null;
+  let eventId = body.eventId ?? query.eventId ?? null;
+  if (!phone || !eventId) {
+    console.log("STKPUSH using query fallback", {
+      query,
+      bodyKeys: Object.keys(body),
+    });
+  }
+
+  let resolvedTickets = rawTickets;
+  if (!Array.isArray(resolvedTickets) && query.tickets) {
+    try {
+      resolvedTickets = JSON.parse(String(query.tickets));
+    } catch {}
+  }
+
+  const requestedUserEmail = body.userEmail || query.userEmail || null;
+  const userEmail = requestedUserEmail || authUser.email || null;
 
   if (!phone || !eventId || !userEmail) {
+    console.log("STKPUSH validation failed", {
+      contentType: event.node.req.headers["content-type"],
+      bodyKeys: Object.keys(body),
+      phone,
+      eventId,
+      authEmail: authUser?.email,
+      authId: authUser?.id,
+    });
+
     throw createError({
       statusCode: 400,
       statusMessage: "phone, eventId and userEmail are required",
+      data: {
+        receivedKeys: Object.keys(body),
+        phone: phone ?? null,
+        eventId: eventId ?? null,
+        authEmail: authUser?.email ?? null,
+      },
     });
   }
 
   /* ── NORMALISE TICKETS ARRAY ─────────────────────────────── */
-  let ticketLines = Array.isArray(rawTickets)
-    ? rawTickets
-        .filter((t) => t?.ticketType && Math.floor(Number(t?.quantity) || 0) > 0)
+  let ticketLines = Array.isArray(resolvedTickets)
+    ? resolvedTickets
+        .filter(
+          (t) => t?.ticketType && Math.floor(Number(t?.quantity) || 0) > 0,
+        )
         .map((t) => ({
           ticketType: String(t.ticketType),
           quantity: Math.floor(Number(t.quantity) || 0),
@@ -214,10 +255,11 @@ export default defineEventHandler(async (event) => {
     const checkoutRequestID = String(response.data?.CheckoutRequestID || "");
 
     if (!checkoutRequestID) {
-      throw createError({
-        statusCode: 502,
-        statusMessage: "Safaricom did not return a CheckoutRequestID",
-      });
+      console.error(
+        "STK push no CheckoutRequestID",
+        JSON.stringify(response.data),
+      );
+      throw new Error("Safaricom returned no CheckoutRequestID");
     }
 
     // Persist the intent so verification is bound to this user/event/amount
@@ -241,11 +283,16 @@ export default defineEventHandler(async (event) => {
       message: "STK push sent successfully",
     };
   } catch (err) {
-    console.error("STK push failed", err.response?.status || err.message);
+    const darajaError = err.response?.data || err.data || null;
+    console.error(
+      "STK push failed",
+      darajaError ? JSON.stringify(darajaError) : err.message,
+    );
 
     throw createError({
       statusCode: 500,
       statusMessage: "Failed to initiate STK push",
+      data: darajaError,
     });
   }
 });

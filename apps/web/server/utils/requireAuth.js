@@ -30,7 +30,7 @@ export async function requireAuth(event) {
   await connectDB();
 
   const user = await User.findById(decoded.id).select(
-    "accountStatus isEmailVerified",
+    "accountStatus isEmailVerified email",
   );
   if (!user) {
     throw createError({
@@ -51,6 +51,8 @@ export async function requireAuth(event) {
     });
   }
 
-  event.context.user = decoded;
-  return decoded;
+  // Tokens issued before `email` was added to the payload will lack it here;
+  // always fill it from the DB so callers can rely on authUser.email.
+  event.context.user = { ...decoded, email: user.email };
+  return event.context.user;
 }
