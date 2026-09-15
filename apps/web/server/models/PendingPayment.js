@@ -21,6 +21,15 @@ const pendingPaymentSchema = new mongoose.Schema(
     },
     eventName: { type: String, required: true },
     ticketType: { type: String, required: true },
+    quantity: { type: Number, default: 1, min: 1 },
+    tickets: [
+      {
+        ticketType: { type: String, required: true },
+        quantity: { type: Number, required: true, min: 1 },
+        amount: { type: Number, required: true },
+        _id: false,
+      },
+    ],
     amount: { type: Number, required: true },
     status: {
       type: String,

@@ -28,6 +28,12 @@ importers:
       axios:
         specifier: ^1.13.2
         version: 1.16.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+      cloudinary:
+        specifier: ^2.7.0
+        version: 2.10.0
+      formidable:
+        specifier: ^3.5.4
+        version: 3.5.4
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0

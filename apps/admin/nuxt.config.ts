@@ -102,7 +102,7 @@ export default defineNuxtConfig({
       createAdminApi: "/api/admin/create-admin",
       deleteEvent: "/api/admin/events",
       updateEvent: "/api/admin/events",
-      createEventApi: "/api/organiser/addevent",
+      createEventApi: "/api/upload/post",
       cancelEventsApi: "/api/tickets/cancel-ticket",
       bookingData: "/api/admin/bookings",
       monthlyStatsApi: "/api/stats/monthly",

@@ -20,13 +20,38 @@ export default defineEventHandler(async (event) => {
   const authUser = await requireAuth(event);
   const body = await readBody(event);
 
-  const { phone, eventId, ticketType } = body;
+  const { phone, eventId, tickets: rawTickets, ticketType: legacyTicketType, quantity: legacyQuantity } = body;
   const userEmail = authUser.email;
 
-  if (!phone || !eventId || !userEmail || !ticketType) {
+  if (!phone || !eventId || !userEmail) {
     throw createError({
       statusCode: 400,
-      statusMessage: "phone, eventId, userEmail and ticketType are required",
+      statusMessage: "phone, eventId and userEmail are required",
+    });
+  }
+
+  /* ── NORMALISE TICKETS ARRAY ─────────────────────────────── */
+  let ticketLines = Array.isArray(rawTickets)
+    ? rawTickets
+        .filter((t) => t?.ticketType && Math.floor(Number(t?.quantity) || 0) > 0)
+        .map((t) => ({
+          ticketType: String(t.ticketType),
+          quantity: Math.floor(Number(t.quantity) || 0),
+        }))
+    : [];
+
+  // Legacy single-ticket fallback
+  if (ticketLines.length === 0 && legacyTicketType) {
+    const qty = Math.floor(Number(legacyQuantity) || 1);
+    if (qty >= 1) {
+      ticketLines = [{ ticketType: String(legacyTicketType), quantity: qty }];
+    }
+  }
+
+  if (ticketLines.length === 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Please select at least one ticket type",
     });
   }
 
@@ -63,26 +88,41 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (!eventData.TicketQuantity || eventData.TicketQuantity <= 0) {
+  /* ── VERIFY TICKET TYPES & COMPUTE TOTAL ─────────────────── */
+  const tickets = [];
+  let totalTickets = 0;
+  let amount = 0;
+
+  for (const line of ticketLines) {
+    const matchedTicket = eventData.customTickets?.find(
+      (t) => t.name === line.ticketType,
+    );
+
+    if (!matchedTicket || !matchedTicket.price) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: `Ticket type "${line.ticketType}" not found`,
+      });
+    }
+
+    totalTickets += line.quantity;
+    amount += matchedTicket.price * line.quantity;
+
+    tickets.push({
+      ticketType: line.ticketType,
+      quantity: line.quantity,
+      amount: matchedTicket.price * line.quantity,
+    });
+  }
+
+  if (!eventData.TicketQuantity || eventData.TicketQuantity < totalTickets) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Tickets sold out",
+      statusMessage: "Not enough tickets available",
     });
   }
 
-  // Verify ticket type
-  const matchedTicket = eventData.customTickets?.find(
-    (t) => t.name === ticketType,
-  );
-
-  if (!matchedTicket || !matchedTicket.price) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Ticket type not found",
-    });
-  }
-
-  const amount = matchedTicket.price;
+  const ticketCount = totalTickets;
 
   // Daraja credentials
   const {
@@ -188,7 +228,9 @@ export default defineEventHandler(async (event) => {
       phone: formattedPhone,
       eventId: eventData._id,
       eventName: eventData.title,
-      ticketType,
+      ticketType: tickets[0]?.ticketType,
+      quantity: ticketCount,
+      tickets,
       amount,
     });
 

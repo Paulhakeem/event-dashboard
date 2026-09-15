@@ -119,7 +119,10 @@
                   <p class="truncate">{{ event.location }}</p>
                 </div>
                 <div class="flex items-center text-gray-600 text-sm">
-                  <span class="mr-2">📅</span>
+                  <Icon
+                    name="mdi:calendar-month"
+                    class="mr-2 text-base text-[#9c4e8b]"
+                  />
                   <p>
                     {{
                       new Date(event.date).toLocaleDateString("en-US", {
@@ -129,6 +132,13 @@
                       })
                     }}
                   </p>
+                </div>
+                <div class="pt-1">
+                  <CountdownTimer
+                    :date="event.date"
+                    compact
+                    expired-label="Started"
+                  />
                 </div>
               </div>
 

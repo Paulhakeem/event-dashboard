@@ -6,7 +6,6 @@ export default function useEventBooking() {
   const id = computed(() => route.params.id);
 
   const event = ref({});
-  const ticketType = ref(null);
 
   const loading = ref(false);
   const paymentStatus = ref("idle");
@@ -67,19 +66,36 @@ export default function useEventBooking() {
 
   /* ---------------- BOOK EVENT ---------------- */
 
-  const bookAndPay = async (phone) => {
+  const bookAndPay = async (phone, tickets = []) => {
     if (!user.value) {
       alert("Please login first");
       return;
     }
 
-    if (!ticketType.value) {
-      alert("Please select a ticket type");
+    const selectedTickets = (Array.isArray(tickets) ? tickets : [])
+      .filter((t) => t?.ticketType && Math.floor(Number(t?.quantity) || 0) > 0)
+      .map((t) => ({
+        ticketType: t.ticketType,
+        quantity: Math.floor(Number(t.quantity) || 0),
+      }));
+
+    if (selectedTickets.length === 0) {
+      alert("Please select at least one ticket type");
       return;
     }
 
     if (!phone) {
       alert("Please enter your phone number");
+      return;
+    }
+
+    const totalQuantity = selectedTickets.reduce(
+      (sum, t) => sum + t.quantity,
+      0,
+    );
+
+    if (totalQuantity < 1) {
+      alert("Please select at least one ticket");
       return;
     }
 
@@ -102,7 +118,7 @@ export default function useEventBooking() {
           phone,
           eventId: id.value,
           userEmail: user.value.email,
-          ticketType: ticketType.value,
+          tickets: selectedTickets,
         },
       });
       paymentStatus.value = "waiting";
@@ -174,7 +190,6 @@ export default function useEventBooking() {
 
   return {
     event,
-    ticketType,
     loading,
     paymentStatus,
     error,
