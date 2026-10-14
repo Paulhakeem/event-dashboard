@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "Happitwin events Admin",
-      titleTemplate: "%s | Velora Admin",
+      titleTemplate: "%s | HappiTwin Admin",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
