@@ -106,7 +106,7 @@ export default defineEventHandler(async (event) => {
   });
 
   await transporter.sendMail({
-    from: `"Velora Events" <${config.emailUsername}>`,
+    from: `"Happitwin events" <${config.emailUsername}>`,
     to: email,
     subject: "Verify your email",
     html: `

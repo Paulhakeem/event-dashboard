@@ -119,7 +119,7 @@ const cards = computed(() => [
     prefix: "KES",
     loading: dashboardLoading.value,
     icon: "solar:wallet-money-bold",
-    from: "#9c4e8b",
+    from: "#13284b",
     to: "#ec4899",
     trend: "Revenue",
     trendIcon: "material-symbols:trending-up",

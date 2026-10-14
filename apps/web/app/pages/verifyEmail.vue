@@ -64,7 +64,7 @@ const resend = async () => {
           v-model="code"
           type="text"
           placeholder="Enter code"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#9d4e8a] focus:outline-none"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#13284b] focus:outline-none"
         />
       </div>
 
@@ -72,7 +72,7 @@ const resend = async () => {
       <button
         @click="verify"
         :disabled="loading"
-        class="w-full bg-[#9d4e8a] text-white py-2 rounded-lg font-semibold transition flex items-center justify-center"
+        class="w-full bg-[#13284b] text-white py-2 rounded-lg font-semibold transition flex items-center justify-center"
       >
         <span v-if="loading" class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></span>
         <span>{{ loading ? "Verifying..." : "Verify" }}</span>
@@ -80,7 +80,7 @@ const resend = async () => {
 
       <button
         @click="resend"
-        class="w-full mt-3 text-sm text-[#9d4e8a] hover:text-[#9d4e8a] cursor-pointer transition"
+        class="w-full mt-3 text-sm text-[#13284b] hover:text-[#13284b] cursor-pointer transition"
       >
         Resend Code
       </button>

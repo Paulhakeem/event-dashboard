@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
           {
             role: "system",
             content:
-              "You are a helpful event-booking assistant for Velora Events. Only answer questions about events, bookings, tickets and the platform. Refuse anything else politely.",
+              "You are a helpful event-booking assistant for Happitwin events. Only answer questions about events, bookings, tickets and the platform. Refuse anything else politely.",
           },
           {
             role: "user",

@@ -7,7 +7,7 @@
       <p class="text-center sm:text-left">
         <NuxtLink
           to="/login"
-          class="text-sm text-[#9c4e8b] underline cursor-pointer"
+          class="text-sm text-[#13284b] underline cursor-pointer"
           >Have an account? Login</NuxtLink
         >
       </p>
@@ -31,7 +31,7 @@
                 placeholder="First name"
                 aria-label="First name"
                 required
-                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
+                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
               />
             </div>
 
@@ -48,7 +48,7 @@
                 placeholder="Last name"
                 aria-label="Last name"
                 required
-                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
+                class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
               />
             </div>
           </div>
@@ -65,7 +65,7 @@
               aria-label="Email address"
               autocomplete="email"
               required
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
             />
           </div>
 
@@ -81,7 +81,7 @@
               aria-label="Password"
               required
               minlength="6"
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#9c4e8b] focus:ring-[#9c4e8b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
             />
           </div>
         </div>
@@ -96,7 +96,7 @@
           @click="signup"
           type="submit"
           :disabled="!recaptchaToken"
-          class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#863f76] transition disabled:opacity-50"
+          class="w-full py-3 px-4 inline-flex justify-center items-center gap-x-2 text-sm font-medium rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition disabled:opacity-50"
         >
           {{ isLoading ? "Sending veryfication code..." : "Verify email" }}
         </button>

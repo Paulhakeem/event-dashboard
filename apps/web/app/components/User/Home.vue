@@ -78,7 +78,7 @@
           Attended Events
         </h2>
         <span
-          class="flex items-center justify-center bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300 rounded-full size-8 md:size-10"
+          class="flex items-center justify-center bg-amber-100 text-amber-500 dark:bg-amber-900 dark:text-amber-300 rounded-full size-8 md:size-10"
         >
           <Icon name="mdi:account-check" class="text-lg md:text-xl" />
         </span>

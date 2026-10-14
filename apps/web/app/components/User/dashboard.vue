@@ -17,7 +17,7 @@
               Recent Activity
             </h2>
             <span
-              class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-linear-to-r from-[#16c851] to-[#9d4e8a] text-white shadow-md"
+              class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-linear-to-r from-[#16c851] to-[#13284b] text-white shadow-md"
             >
               <Icon name="mdi:history" class="text-lg md:text-2xl" />
             </span>
@@ -103,7 +103,7 @@
               <p class="text-sm text-red-600">{{ errorMessage }}</p>
               <button
                 type="button"
-                class="mt-4 text-sm font-semibold text-[#9d4e8a] underline"
+                class="mt-4 text-sm font-semibold text-[#13284b] underline"
                 @click="fetchUpcomingEvents"
               >
                 Retry

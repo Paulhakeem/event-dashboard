@@ -15,7 +15,7 @@
         />
         <div
           v-else
-          class="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-[#9c4e8b] flex items-center justify-center text-white text-sm font-semibold"
+          class="w-9 sm:w-10 h-9 sm:h-10 rounded-full bg-[#13284b] flex items-center justify-center text-white text-sm font-semibold"
         >
           {{ (user?.firstName?.[0] || '?').toUpperCase() }}
         </div>

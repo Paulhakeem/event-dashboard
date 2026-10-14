@@ -3,7 +3,7 @@
     <!-- COMPACT (single pill) -->
     <div
       v-if="compact"
-      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#9c4e8b]/10 text-[#9c4e8b] text-[11px] font-semibold"
+      class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#13284b]/10 text-[#13284b] text-[11px] font-semibold"
       :title="expired ? 'Event date has passed' : 'Time until the event starts'"
     >
       <Icon name="mdi:timer-outline" class="text-sm" />
@@ -19,9 +19,9 @@
       <div
         v-for="unit in units"
         :key="unit.label"
-        class="flex flex-col items-center justify-center rounded-xl bg-[#9c4e8b]/10 border border-[#9c4e8b]/20 py-3"
+        class="flex flex-col items-center justify-center rounded-xl bg-[#13284b]/10 border border-[#13284b]/20 py-3"
       >
-        <span class="text-2xl font-bold text-[#9c4e8b] tabular-nums">
+        <span class="text-2xl font-bold text-[#13284b] tabular-nums">
           {{ pad(unit.value) }}
         </span>
         <span class="text-[10px] uppercase tracking-wide text-gray-500">

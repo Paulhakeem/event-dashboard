@@ -16,7 +16,7 @@
       <p class="text-center mb-4">
         <NuxtLink
           to="/signup"
-          class="text-sm text-[#9c4e8b] underline hover:text-[#7c3a6d]"
+          class="text-sm text-[#13284b] underline hover:text-[#0b1730]"
         >
           Don't have an account? Sign up
         </NuxtLink>
@@ -41,7 +41,7 @@
             autocomplete="email"
             placeholder="you@example.com"
             aria-label="Email address"
-            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#13284b] focus:border-[#13284b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#13284b]"
           />
         </div>
 
@@ -66,7 +66,7 @@
             autocomplete="current-password"
             placeholder="Your password"
             aria-label="Password"
-            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#13284b] focus:border-[#13284b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#13284b]"
           />
         </div>
 
@@ -88,7 +88,7 @@
             maxlength="6"
             placeholder="123456 (from your authenticator app)"
             aria-label="Two-factor authentication code"
-            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#9c4e8b]"
+            class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#13284b] focus:border-[#13284b] dark:bg-neutral-900 dark:text-neutral-300 dark:focus:ring-[#13284b]"
           />
           <p class="mt-2 text-sm text-gray-500 dark:text-neutral-400">
             Enter the 6-digit code from your authenticator app.
@@ -99,7 +99,7 @@
         <button
           type="submit"
           :disabled="isLoading || !recaptchaToken"
-          class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
+          class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition disabled:opacity-50"
         >
           {{ isLoading ? "Logging In..." : "Log In" }}
         </button>

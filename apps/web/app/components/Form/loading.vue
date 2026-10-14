@@ -3,7 +3,7 @@
     class="flex flex-col items-center justify-center min-h-[300px] bg-white border border-gray-200 rounded-xl shadow-2xs dark:bg-neutral-900 dark:border-neutral-700"
   >
     <svg
-      class="animate-spin h-10 w-10 text-[#9c4e8b]"
+      class="animate-spin h-10 w-10 text-[#13284b]"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

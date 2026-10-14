@@ -1,4 +1,4 @@
-name: Deploy Velora Events
+name: Deploy Happitwin events
 
 on:
   push:

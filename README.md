@@ -1,4 +1,4 @@
-# Velora Events — Monorepo
+# Happitwin events — Monorepo
 
 Digital online events booking platform. Discover, book, and manage events with separate **web** and **admin** applications sharing a common package.
 

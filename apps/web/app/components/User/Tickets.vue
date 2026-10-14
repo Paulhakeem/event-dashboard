@@ -3,7 +3,7 @@
     <!-- Header -->
     <div>
       <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-        <Icon name="mdi:ticket" class="text-[#9d4e8a]" /> My Tickets
+        <Icon name="mdi:ticket" class="text-[#13284b]" /> My Tickets
       </h2>
       <p class="text-sm text-gray-500">
         View and manage your upcoming and past event tickets here
@@ -18,7 +18,7 @@
         <p class="text-lg font-semibold text-gray-700">My Tickets</p>
         <NuxtLink
           to="/eventPage"
-          class="px-4 py-2 text-sm font-medium text-white bg-[#9d4e8a] rounded-lg shadow transition cursor-pointer"
+          class="px-4 py-2 text-sm font-medium text-white bg-[#13284b] rounded-lg shadow transition cursor-pointer"
         >
           Explore Events
         </NuxtLink>
@@ -33,7 +33,7 @@
           :class="[
             'px-4 py-2 rounded-lg text-sm font-medium',
             activeFilter === option.value
-              ? 'bg-[#9d4e8a] text-white'
+              ? 'bg-[#13284b] text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
           ]"
         >
@@ -48,7 +48,7 @@
       >
         <Icon
           name="svg-spinners:90-ring-with-bg"
-          class="mb-3 text-3xl text-[#9d4e8a]"
+          class="mb-3 text-3xl text-[#13284b]"
         />
         Loading your tickets...
       </div>
@@ -64,7 +64,7 @@
       <div v-else-if="filteredTickets.length === 0" class="text-center py-10">
         <div class="flex justify-center mb-3">
           <div
-            class="w-16 h-16 flex items-center justify-center rounded-full bg-indigo-100 text-[#9d4e8a]"
+            class="w-16 h-16 flex items-center justify-center rounded-full bg-indigo-100 text-[#13284b]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -84,7 +84,7 @@
         </div>
         <p class="text-gray-500">
           You have no tickets yet. <br />
-          <span class="text-[#9d4e8a] font-medium">Explore events</span> and
+          <span class="text-[#13284b] font-medium">Explore events</span> and
           book your tickets to see them here!
         </p>
       </div>
@@ -135,7 +135,7 @@
             </button>
             <button
               type="button"
-              class="px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-medium hover:bg-purple-200 transition"
+              class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-medium hover:bg-amber-200 transition"
               @click="openTicket(ticket)"
             >
               View / Export
@@ -166,9 +166,9 @@
       >
         <div>
           <p
-            class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9d4e8a]"
+            class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#13284b]"
           >
-            Velora Events
+            Happitwin events
           </p>
           <h2 class="mt-1 text-base font-bold">
             {{ selectedTicket.eventName }}
@@ -212,7 +212,7 @@
       <div class="print-hidden mt-4 flex gap-2">
         <button
           type="button"
-          class="flex-1 rounded-lg bg-[#9d4e8a] px-3 py-2 text-xs font-semibold text-white"
+          class="flex-1 rounded-lg bg-[#13284b] px-3 py-2 text-xs font-semibold text-white"
           @click="printTicket"
         >
           Print / Save PDF

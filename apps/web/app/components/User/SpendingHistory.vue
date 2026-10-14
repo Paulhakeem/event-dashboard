@@ -39,7 +39,7 @@
           class="flex h-28 w-full max-w-12 items-end rounded-t-lg bg-gray-100 dark:bg-neutral-700"
         >
           <div
-            class="w-full rounded-t-lg bg-linear-to-t from-[#9d4e8a] to-pink-400 transition-all"
+            class="w-full rounded-t-lg bg-linear-to-t from-[#13284b] to-pink-400 transition-all"
             :style="{ height: `${month.height}%` }"
           ></div>
         </div>

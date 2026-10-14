@@ -1,7 +1,7 @@
 <template>
   <div class="w-full flex justify-center mt-12 px-4">
     <div
-      class="relative w-full max-w-lg rounded-3xl p-px bg-linear-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
+      class="relative w-full max-w-lg rounded-3xl p-px bg-linear-to-br from-pink-500 via-amber-500 to-indigo-500 shadow-2xl"
     >
       <!-- Card -->
       <div
@@ -40,7 +40,7 @@
         •
         <!-- Role -->
         <span
-          class="px-4 py-1 text-xs rounded-full bg-linear-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class="px-4 py-1 text-xs rounded-full bg-linear-to-r from-amber-500 to-pink-500 text-white shadow-md"
         >
           {{ user.role || "Member" }}
         </span>
@@ -106,7 +106,7 @@
         <div class="flex gap-3 mt-6 w-full">
           <button
             @click="toggle"
-            class="flex-1 py-2.5 rounded-xl bg-linear-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
+            class="flex-1 py-2.5 rounded-xl bg-linear-to-r from-pink-600 to-amber-500 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
           </button>

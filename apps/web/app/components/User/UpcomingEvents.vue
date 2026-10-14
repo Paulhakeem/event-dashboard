@@ -88,14 +88,14 @@
         <div class="mt-auto pt-4">
           <NuxtLink :to="`/events/${event._id}`" class="block">
             <button
-              class="w-full py-2.5 rounded-2xl bg-linear-to-r from-[#9d4e8a] to-[#6b46c1] text-white text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition"
+              class="w-full py-2.5 rounded-2xl bg-linear-to-r from-[#13284b] to-[#6b46c1] text-white text-sm font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition"
             >
               View Details
             </button>
           </NuxtLink>
           <button
             type="button"
-            class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#9d4e8a] px-3 py-2 text-sm font-semibold text-[#9d4e8a]"
+            class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-[#13284b] px-3 py-2 text-sm font-semibold text-[#13284b]"
             @click="downloadCalendar(event)"
           >
             <Icon name="mdi:calendar-plus" /> Add to calendar
@@ -135,7 +135,7 @@ const downloadCalendar = (event) => {
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Velora Events//User Dashboard//EN",
+    "PRODID:-//Happitwin events//User Dashboard//EN",
     "BEGIN:VEVENT",
     `UID:${event._id}@velora-events`,
     `DTSTAMP:${toCalendarDate(new Date())}`,

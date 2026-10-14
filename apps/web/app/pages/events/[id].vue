@@ -7,7 +7,7 @@
       <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
         <NuxtLink
           to="/eventPage"
-          class="inline-flex items-center text-[#9c4e8b] hover:text-[#7c3a6d] mb-4 transition"
+          class="inline-flex items-center text-[#13284b] hover:text-[#0b1730] mb-4 transition"
         >
           <Icon name="gg:arrow-left" class="mr-2" />
           Back to Events
@@ -51,7 +51,7 @@
               <p class="text-sm font-semibold text-gray-900">
                 <Icon
                   name="mdi:calendar-month"
-                  class="inline mr-1 text-[#9c4e8b]"
+                  class="inline mr-1 text-[#13284b]"
                 />
                 {{
                   new Date(event?.date).toLocaleDateString("en-US", {
@@ -106,11 +106,11 @@
 
             <!-- EVENT DATE -->
             <div
-              class="flex items-center gap-2 mb-6 p-3 bg-purple-50 rounded-lg border border-purple-100"
+              class="flex items-center gap-2 mb-6 p-3 bg-amber-50 rounded-lg border border-amber-100"
             >
               <Icon
                 name="mdi:calendar-month"
-                class="text-[#9c4e8b] text-xl flex-shrink-0"
+                class="text-[#13284b] text-xl flex-shrink-0"
               />
               <p class="text-sm font-semibold text-gray-900">
                 {{
@@ -151,7 +151,7 @@
                 class="p-4 border-2 rounded-xl mb-3 transition"
                 :class="
                   line.ticketType
-                    ? 'border-[#9c4e8b] bg-purple-50'
+                    ? 'border-[#13284b] bg-amber-50'
                     : 'border-gray-200'
                 "
               >
@@ -167,7 +167,7 @@
                     <select
                       :value="line.ticketType"
                       @change="line.ticketType = $event.target.value"
-                      class="w-full p-2.5 border rounded-lg text-sm font-semibold text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-[#9c4e8b] bg-white"
+                      class="w-full p-2.5 border rounded-lg text-sm font-semibold text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-[#13284b] bg-white"
                     >
                       <option value="" disabled>Select ticket type</option>
                       <option
@@ -219,7 +219,7 @@
                         line.quantity >= remainingForLine(index)
                       "
                       aria-label="Increase quantity"
-                      class="flex h-9 w-9 items-center justify-center rounded-full bg-[#9c4e8b] hover:bg-[#7c3a6d] text-lg font-bold text-white disabled:opacity-40 disabled:cursor-not-allowed transition"
+                      class="flex h-9 w-9 items-center justify-center rounded-full bg-[#13284b] hover:bg-[#0b1730] text-lg font-bold text-white disabled:opacity-40 disabled:cursor-not-allowed transition"
                     >
                       +
                     </button>
@@ -233,7 +233,7 @@
                   <span class="text-gray-600">
                     {{ line.quantity }} × Ksh {{ priceOf(line.ticketType) }}
                   </span>
-                  <span class="font-bold text-[#9c4e8b]">
+                  <span class="font-bold text-[#13284b]">
                     Ksh {{ lineTotal(line).toLocaleString() }}
                   </span>
                 </div>
@@ -243,7 +243,7 @@
               <button
                 type="button"
                 @click="addTicketLine"
-                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-[#9c4e8b]/40 text-[#9c4e8b] font-semibold hover:bg-purple-50 transition"
+                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-[#13284b]/40 text-[#13284b] font-semibold hover:bg-amber-50 transition"
               >
                 <span class="text-lg leading-none">+</span>
                 Add more tickets
@@ -258,7 +258,7 @@
                   🎟️ {{ totalQuantity }}
                   {{ totalQuantity === 1 ? "ticket" : "tickets" }} selected
                 </span>
-                <span class="font-bold text-[#9c4e8b] text-base">
+                <span class="font-bold text-[#13284b] text-base">
                   Total: Ksh {{ totalPrice.toLocaleString() }}
                 </span>
               </div>

@@ -60,6 +60,6 @@ export function verifyTotp(secret, code, window = 1) {
 }
 
 export function buildOtpauth(secret, email) {
-  const issuer = "Velora Events";
+  const issuer = "Happitwin events";
   return `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(email)}?secret=${encodeURIComponent(secret)}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
 }

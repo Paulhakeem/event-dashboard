@@ -77,7 +77,7 @@
               <!-- Event Type Badge -->
               <div class="absolute top-4 left-4">
                 <span
-                  class="bg-[#9c4e8b]/90 px-3 py-1 rounded-full text-white text-xs font-semibold backdrop-blur-sm"
+                  class="bg-[#13284b]/90 px-3 py-1 rounded-full text-white text-xs font-semibold backdrop-blur-sm"
                 >
                   {{ event.eventType || "Event" }}
                 </span>
@@ -108,7 +108,7 @@
             <!-- Content -->
             <div class="p-6">
               <h3
-                class="text-xl font-bold text-gray-900 group-hover:text-[#9c4e8b] transition mb-2 line-clamp-2"
+                class="text-xl font-bold text-gray-900 group-hover:text-[#13284b] transition mb-2 line-clamp-2"
               >
                 {{ event.title }}
               </h3>
@@ -121,7 +121,7 @@
                 <div class="flex items-center text-gray-600 text-sm">
                   <Icon
                     name="mdi:calendar-month"
-                    class="mr-2 text-base text-[#9c4e8b]"
+                    class="mr-2 text-base text-[#13284b]"
                   />
                   <p>
                     {{
@@ -153,9 +153,9 @@
                 <div
                   v-for="(ticket, i) in event.customTickets"
                   :key="ticket.name + i"
-                  class="text-center p-2 bg-purple-50 rounded-lg hover:bg-purple-100 transition duration-200 cursor-pointer"
+                  class="text-center p-2 bg-amber-50 rounded-lg hover:bg-amber-100 transition duration-200 cursor-pointer"
                 >
-                  <p class="text-xs font-semibold text-[#9c4e8b]">
+                  <p class="text-xs font-semibold text-[#13284b]">
                     {{ ticket.name }}
                   </p>
                   <p class="text-sm font-bold text-gray-900">
@@ -185,7 +185,7 @@
                       event.status === 'cancelled' ||
                       event.status === 'completed'
                     "
-                    class="w-full bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    class="w-full bg-linear-to-r from-[#13284b] to-[#0b1730] text-white font-semibold py-2.5 rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {{
                       event.status === "cancelled"
@@ -229,10 +229,10 @@
           class="flex flex-col items-center justify-center py-20 text-center"
         >
           <div
-            class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mb-6"
+            class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6"
           >
             <svg
-              class="w-10 h-10 text-[#9c4e8b]"
+              class="w-10 h-10 text-[#13284b]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -262,7 +262,7 @@
           <!-- Retry Button -->
           <button
             @click="fetchEvents"
-            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
+            class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#13284b] to-[#0b1730] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
           >
             <svg
               class="w-4 h-4"

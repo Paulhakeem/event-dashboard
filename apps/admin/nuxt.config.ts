@@ -5,14 +5,14 @@ import { resolve } from "path";
 export default defineNuxtConfig({
   app: {
     head: {
-      title: "Velora Events Admin",
+      title: "Happitwin events Admin",
       titleTemplate: "%s | Velora Admin",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
-          content: "Velora Events Admin Panel",
+          content: "Happitwin events Admin Panel",
         },
         { name: "robots", content: "noindex,nofollow" },
       ],

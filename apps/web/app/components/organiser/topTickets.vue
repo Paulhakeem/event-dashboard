@@ -13,7 +13,7 @@
       <div class="flex items-center gap-4">
         <span class="flex items-center gap-1.5 text-xs text-gray-500">
           <span
-            class="w-2.5 h-2.5 rounded-full bg-[#9c4e8b] inline-block"
+            class="w-2.5 h-2.5 rounded-full bg-[#13284b] inline-block"
           ></span>
           Tickets
         </span>
@@ -89,7 +89,7 @@
       <p class="text-sm text-red-500">{{ error }}</p>
       <button
         @click="fetchData"
-        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition-colors"
+        class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition-colors"
       >
         <Icon name="material-symbols:refresh" class="text-sm" />
         Retry
@@ -107,8 +107,8 @@
       >
         <defs>
           <linearGradient id="tgTicket" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#9c4e8b" stop-opacity="0.18" />
-            <stop offset="100%" stop-color="#9c4e8b" stop-opacity="0" />
+            <stop offset="0%" stop-color="#13284b" stop-opacity="0.18" />
+            <stop offset="100%" stop-color="#13284b" stop-opacity="0" />
           </linearGradient>
           <linearGradient id="tgRevenue" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#10b981" stop-opacity="0.15" />
@@ -149,7 +149,7 @@
         <path
           :d="ticketLinePath"
           fill="none"
-          stroke="#9c4e8b"
+          stroke="#13284b"
           stroke-width="2"
           stroke-linejoin="round"
           stroke-linecap="round"
@@ -168,7 +168,7 @@
           :cy="pt.y"
           r="3.5"
           fill="white"
-          stroke="#9c4e8b"
+          stroke="#13284b"
           stroke-width="2"
           class="cursor-pointer"
           @mouseenter="handleTip($event, i)"
@@ -219,7 +219,7 @@
         >
           <p class="font-semibold text-sm mb-1.5">{{ MONTHS_FULL[tip.idx] }}</p>
           <p class="flex items-center gap-1.5 text-gray-300">
-            <span class="w-2 h-2 rounded-full bg-[#9c4e8b] inline-block"></span>
+            <span class="w-2 h-2 rounded-full bg-[#13284b] inline-block"></span>
             {{ monthlyData[tip.idx]?.tickets || 0 }} tickets
           </p>
           <p class="flex items-center gap-1.5 text-gray-300 mt-1">

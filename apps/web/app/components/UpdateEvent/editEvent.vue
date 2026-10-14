@@ -54,7 +54,7 @@
         </button>
         <button
           @click="submitUpdate"
-          class="rounded bg-[#9c4e8b] px-4 py-2 text-white"
+          class="rounded bg-[#13284b] px-4 py-2 text-white"
         >
           Save
         </button>

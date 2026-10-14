@@ -2,7 +2,7 @@
   <div class="w-full flex justify-center px-4 py-6">
     <!-- Glow Border -->
     <div
-      class="relative w-full max-w-2xl rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 shadow-2xl"
+      class="relative w-full max-w-2xl rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-amber-500 to-indigo-500 shadow-2xl"
     >
       <!-- Card -->
       <div
@@ -37,7 +37,7 @@
 
         <!-- Role -->
         <span
-          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-md"
         >
           {{ user.role }}
         </span>
@@ -77,8 +77,8 @@
             <span>Pending</span>
           </div>
 
-          <div class="stat-card hover:border-purple-400">
-            <Icon name="mdi:calendar-star" class="text-purple-500 text-2xl" />
+          <div class="stat-card hover:border-amber-400">
+            <Icon name="mdi:calendar-star" class="text-amber-500 text-2xl" />
             <p class="stat-number">{{ ongoingEvents.length }}</p>
             <span>Live</span>
           </div>
@@ -110,7 +110,7 @@
         <div class="flex gap-3 mt-8 w-full">
           <button
             @click="toggle"
-            class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
+            class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-amber-500 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
           >
             Edit Profile
           </button>

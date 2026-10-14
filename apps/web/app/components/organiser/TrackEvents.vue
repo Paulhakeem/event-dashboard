@@ -10,7 +10,7 @@
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center py-12">
       <div
-        class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9c4e8b]"
+        class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13284b]"
       ></div>
     </div>
 
@@ -114,7 +114,7 @@
                 <div class="flex justify-center gap-2">
                   <button
                     @click="openEdit(event)"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7a3968] transition"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition"
                   >
                     Edit
                   </button>

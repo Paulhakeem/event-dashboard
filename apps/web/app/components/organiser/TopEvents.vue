@@ -4,7 +4,7 @@
 
     <div v-if="loading" class="py-8 flex items-center justify-center">
       <div
-        class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-[#9c4e8b]"
+        class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-[#13284b]"
       ></div>
       <p class="ml-4 text-sm text-gray-500">Loading booked events...</p>
     </div>
@@ -34,7 +34,7 @@
     <div v-else class="space-y-4">
       <!-- Top event highlight -->
       <div
-        class="rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white border border-gray-100 flex items-center justify-between"
+        class="rounded-lg p-4 bg-gradient-to-r from-amber-50 to-white border border-gray-100 flex items-center justify-between"
       >
         <div>
           <p class="text-sm text-gray-500">Top Event</p>

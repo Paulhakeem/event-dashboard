@@ -3,10 +3,10 @@
     <!-- Header -->
     <div class="mb-8">
       <div
-        class="bg-gradient-to-r from-[#9c4e8b] to-[#7a3968] rounded-xl p-6 text-white shadow-lg"
+        class="bg-gradient-to-r from-[#13284b] to-[#0b1730] rounded-xl p-6 text-white shadow-lg"
       >
         <h1 class="text-3xl font-bold mb-2">Notifications</h1>
-        <p class="text-purple-100">
+        <p class="text-amber-100">
           Stay updated with your event updates and approval status
         </p>
       </div>
@@ -18,7 +18,7 @@
         class="bg-white rounded-lg p-4 border border-gray-200 shadow-sm hover:shadow-md transition"
       >
         <p class="text-sm text-gray-600">Total Notifications</p>
-        <p class="text-3xl font-bold text-[#9c4e8b]">
+        <p class="text-3xl font-bold text-[#13284b]">
           {{ notifications.length }}
         </p>
       </div>
@@ -46,7 +46,7 @@
           :class="[
             'px-4 py-2 rounded-lg font-medium transition',
             filterType === 'all'
-              ? 'bg-[#9c4e8b] text-white'
+              ? 'bg-[#13284b] text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
           ]"
         >
@@ -99,7 +99,7 @@
     <div v-if="loading" class="flex justify-center py-16">
       <div class="text-center">
         <div
-          class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9c4e8b] mx-auto mb-4"
+          class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13284b] mx-auto mb-4"
         ></div>
         <p class="text-gray-600 font-medium">Loading notifications...</p>
       </div>

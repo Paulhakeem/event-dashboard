@@ -9,7 +9,7 @@
       </h2>
 
       <span
-        class="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+        class="text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
       >
         Ongoing Events
       </span>
@@ -18,7 +18,7 @@
     <!-- LOADING -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-16">
       <div
-        class="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-purple-500"
+        class="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-amber-500"
       ></div>
       <p class="mt-4 text-sm text-gray-500">Loading ongoing events...</p>
     </div>
@@ -104,7 +104,7 @@
           class="mt-3 h-1.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden"
         >
           <div
-            class="h-full bg-purple-500 rounded-full transition-all duration-500"
+            class="h-full bg-amber-500 rounded-full transition-all duration-500"
             :style="{ width: getProgress(event) + '%' }"
           ></div>
         </div>

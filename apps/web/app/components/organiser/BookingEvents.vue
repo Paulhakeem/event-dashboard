@@ -10,7 +10,7 @@
       <div class="flex items-center gap-3">
         <button
           @click="getBookings"
-          class="px-3 py-1.5 text-sm font-medium rounded-md bg-[#9c4e8b] text-white hover:bg-[#7a3968] transition"
+          class="px-3 py-1.5 text-sm font-medium rounded-md bg-[#13284b] text-white hover:bg-[#0b1730] transition"
         >
           Refresh
         </button>
@@ -20,7 +20,7 @@
     <div class="divide-y">
       <div v-if="loadingBookings" class="p-6 flex items-center justify-center">
         <div
-          class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#9c4e8b]"
+          class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#13284b]"
         ></div>
         <p class="ml-4 text-sm text-gray-500">Loading bookings...</p>
       </div>
@@ -52,7 +52,7 @@
           <div class="flex gap-4 items-center text-center">
             <div class="flex-shrink-0 mt-1">
               <div
-                class="h-10 w-10 rounded-md bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center text-purple-700 font-semibold"
+                class="h-10 w-10 rounded-md bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center text-amber-700 font-semibold"
               >
                 E
               </div>

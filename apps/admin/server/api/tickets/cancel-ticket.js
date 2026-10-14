@@ -135,14 +135,14 @@ export default defineEventHandler(async (event) => {
         <p><strong>Cancellation deduction (5%):</strong> KES ${deduction.toFixed(2)}</p>
         <p><strong>Total refund:</strong> KES ${refundAmount.toFixed(2)}</p>
         <p>Your refund will be processed within 7 working days.</p>`;
-      const from = `"Velora Events" <${config.emailUsername}>`;
+      const from = `"Happitwin events" <${config.emailUsername}>`;
 
       const emailJobs = [];
       if (user.email) {
         emailJobs.push({
           to: user.email,
           subject: "Ticket Cancellation Confirmation",
-          html: `<h2>Ticket Cancelled</h2><p>Hello ${holderName},</p><p>Your ticket for <strong>${eventDetails.title}</strong> has been cancelled.</p>${refundSummary}<p>Thank you for using Velora Events.</p>`,
+          html: `<h2>Ticket Cancelled</h2><p>Hello ${holderName},</p><p>Your ticket for <strong>${eventDetails.title}</strong> has been cancelled.</p>${refundSummary}<p>Thank you for using Happitwin events.</p>`,
         });
       }
 

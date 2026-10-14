@@ -5,9 +5,9 @@ useHead({
     {
       name: "description",
       content:
-        "Velora Events is a modern platform for discovering, booking, and managing events with ease.",
+        "Happitwin events is a modern platform for discovering, booking, and managing events with ease.",
     },
-    { property: "og:title", content: "Velora Events - Home" },
+    { property: "og:title", content: "Happitwin events - Home" },
     {
       property: "og:description",
       content: "Discover, book, and manage amazing events all in one place.",
@@ -21,7 +21,7 @@ useHead({
   <div>
     <!-- Hero Section -->
     <header
-      class="relative w-full min-h-[500px] sm:min-h-[600px] md:min-h-[700px] bg-cover bg-center flex items-center justify-center overflow-hidden"
+      class="relative w-full min-h-125 sm:min-h-150 md:min-h-175 bg-cover bg-center flex items-center justify-center overflow-hidden"
       style="background-image: url(&quot;/images/dj.jpg&quot;)"
     >
       <!-- Gradient Overlay -->
@@ -38,8 +38,8 @@ useHead({
               <h1
                 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
               >
-                Velora
-                <span class="text-[#9c4e8b] block md:inline">Events</span>
+                HappiTwin
+                <span class="text-amber-300 block md:inline">Events</span>
               </h1>
               <p
                 class="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed max-w-md mx-auto md:mx-0"
@@ -55,7 +55,7 @@ useHead({
             >
               <NuxtLink
                 to="/eventPage"
-                class="px-8 py-3 bg-[#9c4e8b] text-white font-semibold rounded-lg hover:bg-[#7c3a6d] transform hover:scale-105 transition duration-200 text-center shadow-lg"
+                class="px-8 py-3 bg-amber-300 text-[#101d3a] font-semibold rounded-lg hover:bg-amber-200 transform hover:scale-105 transition duration-200 text-center shadow-lg shadow-black/20"
               >
                 Explore Events
               </NuxtLink>
@@ -70,19 +70,19 @@ useHead({
             <!-- Stats -->
             <div class="grid grid-cols-3 gap-4 pt-8 md:pt-0">
               <div class="text-center">
-                <p class="text-2xl sm:text-3xl font-bold text-[#9c4e8b]">
+                <p class="text-2xl sm:text-3xl font-bold text-amber-300">
                   1000+
                 </p>
                 <p class="text-xs sm:text-sm text-gray-300">Events</p>
               </div>
               <div class="text-center">
-                <p class="text-2xl sm:text-3xl font-bold text-[#9c4e8b]">
+                <p class="text-2xl sm:text-3xl font-bold text-amber-300">
                   50K+
                 </p>
                 <p class="text-xs sm:text-sm text-gray-300">Users</p>
               </div>
               <div class="text-center">
-                <p class="text-2xl sm:text-3xl font-bold text-[#9c4e8b]">
+                <p class="text-2xl sm:text-3xl font-bold text-amber-300">
                   100%
                 </p>
                 <p class="text-xs sm:text-sm text-gray-300">Satisfaction</p>
@@ -93,14 +93,14 @@ useHead({
           <!-- Right Visual Element -->
           <div class="hidden md:flex justify-center">
             <div
-              class="relative w-80 h-96 bg-gradient-to-br from-[#9c4e8b]/20 to-purple-600/20 rounded-3xl flex items-center justify-center border border-[#9c4e8b]/30 backdrop-blur-sm"
+              class="relative flex h-96 w-80 items-center justify-center rounded-3xl border border-amber-300/30 bg-linear-to-br from-[#13284b]/60 to-amber-500/20 backdrop-blur-sm"
             >
               <div
-                class="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#9c4e8b]/10 to-transparent"
+                class="absolute inset-0 rounded-3xl bg-linear-to-br from-amber-300/10 to-transparent"
               ></div>
               <Icon
                 name="mdi:ticket-percent"
-                class="text-8xl text-[#9c4e8b]/40 relative z-10"
+                class="relative z-10 text-8xl text-amber-300/80"
               />
             </div>
           </div>
@@ -115,7 +115,7 @@ useHead({
 
       <!-- Newsletter Section -->
       <section
-        class="bg-gradient-to-r from-[#020f31] via-[#1a1f3a] to-[#2d1b4e]"
+        class="bg-linear-to-r from-[#101d3a] via-[#172b50] to-[#213c35]"
       >
         <subscribe />
       </section>

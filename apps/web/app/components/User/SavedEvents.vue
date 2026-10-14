@@ -13,7 +13,7 @@
       </div>
       <NuxtLink
         to="/eventPage"
-        class="inline-flex items-center gap-2 text-sm font-semibold text-[#9d4e8a] hover:underline"
+        class="inline-flex items-center gap-2 text-sm font-semibold text-[#13284b] hover:underline"
       >
         <Icon name="mdi:compass-outline" /> Discover events
       </NuxtLink>
@@ -72,7 +72,7 @@
           </p>
           <NuxtLink
             :to="`/events/${event._id}`"
-            class="block rounded-xl bg-[#9d4e8a] px-4 py-2 text-center text-sm font-semibold text-white"
+            class="block rounded-xl bg-[#13284b] px-4 py-2 text-center text-sm font-semibold text-white"
             >View event</NuxtLink
           >
         </div>

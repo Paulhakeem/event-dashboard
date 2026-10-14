@@ -26,7 +26,7 @@
           aria-hidden="true"
         />
         <div
-          class="absolute -bottom-32 left-1/2 h-64 w-64 rounded-full bg-[#9c4e8b]/20 blur-3xl"
+          class="absolute -bottom-32 left-1/2 h-64 w-64 rounded-full bg-[#13284b]/20 blur-3xl"
           aria-hidden="true"
         />
         <div class="relative max-w-2xl">
@@ -79,7 +79,7 @@
               class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#d6a2c9] hover:shadow-md"
             >
               <span
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f2e5ef] text-xl text-[#9c4e8b] transition group-hover:bg-[#9c4e8b] group-hover:text-white"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fff5dc] text-xl text-[#13284b] transition group-hover:bg-[#13284b] group-hover:text-white"
               >
                 <Icon :name="item.icon" />
               </span>
@@ -112,7 +112,7 @@
                 </p>
               </div>
               <span
-                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f2e5ef] text-[#9c4e8b] sm:flex"
+                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fff5dc] text-[#13284b] sm:flex"
               >
                 <Icon name="material-symbols:forum-outline" class="text-xl" />
               </span>
@@ -162,7 +162,7 @@
               <button
                 type="submit"
                 :disabled="sending"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#9c4e8b] px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-[#9c4e8b]/20 transition hover:bg-[#7c3a6d] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#13284b] px-5 py-3.5 text-sm font-bold text-white shadow-md shadow-[#13284b]/20 transition hover:bg-[#0b1730] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 <Icon v-if="sending" name="svg-spinners:ring-resize" />
                 <Icon v-else name="material-symbols:send-rounded" />
@@ -189,7 +189,7 @@
             </p>
             <button
               type="button"
-              class="mt-6 text-sm font-bold text-[#9c4e8b] hover:underline"
+              class="mt-6 text-sm font-bold text-[#13284b] hover:underline"
               @click="resetForm"
             >
               Send another message
@@ -199,7 +199,7 @@
       </section>
 
       <p class="pb-4 text-center text-xs text-slate-400">
-        © {{ new Date().getFullYear() }} Velora Events. All rights reserved.
+        © {{ new Date().getFullYear() }} Happitwin events. All rights reserved.
       </p>
     </div>
   </main>
@@ -275,7 +275,7 @@ const resetForm = () => {
 }
 
 .contact-input:focus {
-  border-color: #9c4e8b;
+  border-color: #13284b;
   background: white;
   box-shadow: 0 0 0 3px rgb(156 78 139 / 15%);
 }

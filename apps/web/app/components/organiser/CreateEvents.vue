@@ -6,7 +6,7 @@
       <!-- Form Column -->
       <div class="lg:col-span-2">
         <div class="mb-6">
-          <h1 class="text-3xl font-bold text-[#9d4e8a]">Create an Event</h1>
+          <h1 class="text-3xl font-bold text-[#13284b]">Create an Event</h1>
           <p class="mt-2 text-gray-600">
             Quickly create and publish events with a beautiful preview.
           </p>
@@ -19,7 +19,7 @@
             >
             <label
               for="dropzone-file"
-              class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-purple-400 transition"
+              class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-amber-400 transition"
             >
               <template v-if="previewImage">
                 <img :src="previewImage" class="object-cover w-full h-full" />
@@ -60,7 +60,7 @@
                 v-model="form.title"
                 required
                 placeholder="Summer Music Festival"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
               />
             </div>
 
@@ -73,7 +73,7 @@
                 rows="4"
                 required
                 placeholder="Describe your event"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none resize-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none resize-none"
               ></textarea>
             </div>
 
@@ -86,7 +86,7 @@
                   v-model="form.location"
                   required
                   placeholder="Nairobi, Kenya"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
                 />
               </div>
               <div>
@@ -97,7 +97,7 @@
                   v-model="form.date"
                   required
                   type="date"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
                 />
               </div>
             </div>
@@ -108,7 +108,7 @@
               >
               <select
                 v-model="form.eventType"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
               >
                 <option value="other">Select type</option>
                 <option value="Entertainment">Entertainment</option>
@@ -127,7 +127,7 @@
                   type="checkbox"
                   :checked="freeEntry"
                   @change="toggleFreeEntry"
-                  class="w-5 h-5 accent-purple-600"
+                  class="w-5 h-5 accent-amber-500"
                 />
               </label>
             </div>
@@ -168,7 +168,7 @@
                 type="button"
                 @click="addTicketType"
                 :disabled="freeEntry"
-                class="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                class="text-sm text-amber-500 hover:text-amber-800 font-medium"
               >
                 + Add ticket type
               </button>
@@ -203,7 +203,7 @@
               <button
                 type="submit"
                 :disabled="isLoading"
-                class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60"
+                class="flex-1 bg-gradient-to-r from-amber-500 to-pink-600 text-white font-semibold py-3 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition disabled:opacity-60"
               >
                 <Icon
                   v-if="isLoading"

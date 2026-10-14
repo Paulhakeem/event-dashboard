@@ -53,7 +53,7 @@
           <div class="flex items-center gap-2 mb-6 px-2">
             <Icon
               name="material-symbols:dashboard"
-              class="text-2xl text-[#9c4e8b]"
+              class="text-2xl text-[#13284b]"
             />
             <span class="text-lg font-semibold">Organiser</span>
           </div>
@@ -100,7 +100,7 @@
         <div class="flex items-center gap-2 mb-6 px-2">
           <Icon
             name="material-symbols:dashboard"
-            class="text-2xl text-[#9c4e8b]"
+            class="text-2xl text-[#13284b]"
           />
           <span class="text-lg font-semibold">Organiser</span>
         </div>

@@ -6,7 +6,7 @@
         <div class="flex items-center gap-3 mb-2">
           <Icon
             name="material-symbols:notifications-active"
-            class="text-3xl text-[#9d4e8a]"
+            class="text-3xl text-[#13284b]"
           />
           <h1 class="text-3xl font-bold text-gray-900">Notifications</h1>
         </div>
@@ -21,7 +21,7 @@
       <div v-if="loading" class="text-center py-16">
         <div class="inline-block">
           <div
-            class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#9d4e8a]"
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13284b]"
           ></div>
         </div>
         <p class="mt-4 text-gray-600 font-medium">Loading notifications...</p>
@@ -95,7 +95,7 @@
                 }}</span>
                 <span
                   v-if="notification.sender"
-                  class="text-xs text-[#9d4e8a] font-medium"
+                  class="text-xs text-[#13284b] font-medium"
                   >from {{ notification.sender.name }}</span
                 >
               </div>
@@ -105,7 +105,7 @@
           <!-- Close Button -->
           <button
             @click="deleteNotification(notification._id)"
-            class="relative ml-4 shrink-0 p-2 rounded-full text-gray-400 hover:text-[#9d4e8a] hover:bg-gray-100 transition"
+            class="relative ml-4 shrink-0 p-2 rounded-full text-gray-400 hover:text-[#13284b] hover:bg-gray-100 transition"
           >
             <Icon name="material-symbols:close" class="text-xl" />
           </button>

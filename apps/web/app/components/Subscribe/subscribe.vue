@@ -3,8 +3,8 @@
   <div class="relative py-16 sm:py-20 lg:py-24 overflow-hidden">
     <!-- Background Decorations -->
     <div class="absolute inset-0 opacity-10">
-      <div class="absolute top-0 right-0 w-72 h-72 bg-[#9c4e8b] rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-96 h-96 bg-purple-600 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 right-0 w-72 h-72 bg-[#13284b] rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-96 h-96 bg-amber-500 rounded-full blur-3xl"></div>
     </div>
 
     <!-- Content -->
@@ -13,7 +13,7 @@
         <!-- Left Section -->
         <div class="space-y-6">
           <div class="space-y-3">
-            <span class="inline-block px-4 py-2 bg-[#9c4e8b]/20 text-[#9c4e8b] rounded-full text-sm font-semibold">
+            <span class="inline-block px-4 py-2 bg-[#13284b]/20 text-[#13284b] rounded-full text-sm font-semibold">
               Stay Connected
             </span>
             <h2 class="text-4xl sm:text-5xl font-bold text-white leading-tight">
@@ -27,15 +27,15 @@
           <!-- Features -->
           <div class="space-y-3 pt-4">
             <div class="flex items-center gap-3">
-              <Icon name="mdi:check-circle" class="text-[#9c4e8b] text-xl flex-shrink-0" />
+              <Icon name="mdi:check-circle" class="text-[#13284b] text-xl flex-shrink-0" />
               <span class="text-gray-300">Exclusive event updates</span>
             </div>
             <div class="flex items-center gap-3">
-              <Icon name="mdi:check-circle" class="text-[#9c4e8b] text-xl flex-shrink-0" />
+              <Icon name="mdi:check-circle" class="text-[#13284b] text-xl flex-shrink-0" />
               <span class="text-gray-300">Early access to bookings</span>
             </div>
             <div class="flex items-center gap-3">
-              <Icon name="mdi:check-circle" class="text-[#9c4e8b] text-xl flex-shrink-0" />
+              <Icon name="mdi:check-circle" class="text-[#13284b] text-xl flex-shrink-0" />
               <span class="text-gray-300">Special discounts & offers</span>
             </div>
           </div>
@@ -53,14 +53,14 @@
                 type="email"
                 v-model="email"
                 placeholder="your@email.com"
-                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#9c4e8b] focus:border-transparent transition"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#13284b] focus:border-transparent transition"
               />
             </div>
 
             <!-- Subscribe Button -->
             <button
               type="submit"
-              class="w-full px-6 py-3 bg-gradient-to-r from-[#9c4e8b] to-[#7c3a6d] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#9c4e8b]/50 transform hover:scale-105 transition duration-200"
+              class="w-full px-6 py-3 bg-gradient-to-r from-[#13284b] to-[#0b1730] text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-[#13284b]/50 transform hover:scale-105 transition duration-200"
             >
               Subscribe Now
             </button>

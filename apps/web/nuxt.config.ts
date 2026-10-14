@@ -7,16 +7,16 @@ export default defineNuxtConfig({
     head: {
       title:
         "Digital Online Events Booking Platform, Discover, Book, and Manage Events",
-      titleTemplate: "%s | Velora Events",
+      titleTemplate: "%s | Happitwin events",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         {
           name: "description",
           content:
-            "Velora Events Dashboard helps organisers and attendees discover, manage, and book events in one place.",
+            "Happitwin events Dashboard helps organisers and attendees discover, manage, and book events in one place.",
         },
-        { property: "og:title", content: "Velora Events Dashboard" },
+        { property: "og:title", content: "Happitwin events Dashboard" },
         {
           property: "og:description",
           content:

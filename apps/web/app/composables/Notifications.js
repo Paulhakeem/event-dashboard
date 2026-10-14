@@ -18,7 +18,7 @@ export default function useNotifications() {
       case "error":
         return "border-red-500";
       default:
-        return "border-[#9d4e8a]";
+        return "border-[#13284b]";
     }
   };
 
@@ -31,7 +31,7 @@ export default function useNotifications() {
       case "error":
         return "bg-gradient-to-br from-red-400 to-red-600";
       default:
-        return "bg-gradient-to-br from-[#9d4e8a] to-[#7a3968]";
+        return "bg-gradient-to-br from-[#13284b] to-[#0b1730]";
     }
   };
 
@@ -44,7 +44,7 @@ export default function useNotifications() {
       case "error":
         return "from-red-400";
       default:
-        return "from-[#9d4e8a]";
+        return "from-[#13284b]";
     }
   };
 

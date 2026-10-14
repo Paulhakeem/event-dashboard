@@ -60,14 +60,14 @@ export const orgNotifications = () => {
     if (notif.title.includes("Approved")) return "bg-green-100";
     if (notif.title.includes("Submitted")) return "bg-blue-100";
     if (notif.title.includes("Cancelled")) return "bg-red-100";
-    return "bg-purple-100";
+    return "bg-amber-100";
   };
 
   const getIconColor = (notif) => {
     if (notif.title.includes("Approved")) return "text-green-600";
     if (notif.title.includes("Submitted")) return "text-blue-600";
     if (notif.title.includes("Cancelled")) return "text-red-600";
-    return "text-purple-600";
+    return "text-amber-500";
   };
 
   const getTypeBadge = (notif) => {
