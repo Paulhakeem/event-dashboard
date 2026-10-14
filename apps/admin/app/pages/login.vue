@@ -1,11 +1,15 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900">
+  <div
+    class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-neutral-900"
+  >
     <div
       class="w-full max-w-md bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded-xl p-6 sm:p-8 shadow"
     >
       <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-[#9c4e8b]">Velora Admin</h1>
-        <p class="text-sm text-gray-500 mt-1">Restricted access — admins only</p>
+        <h1 class="text-2xl font-bold text-[#9c4e8b]">HappiTwin Admin</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Restricted access — admins only
+        </p>
       </div>
 
       <form class="space-y-5" @submit.prevent="login">
@@ -14,7 +18,9 @@
         </p>
 
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
             Email
           </label>
           <input
@@ -29,7 +35,9 @@
         </div>
 
         <div>
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
             Password
           </label>
           <input
@@ -44,7 +52,9 @@
         </div>
 
         <div v-if="mfaRequired">
-          <label class="block mb-2 text-sm font-medium text-gray-700 dark:text-white">
+          <label
+            class="block mb-2 text-sm font-medium text-gray-700 dark:text-white"
+          >
             Two-Factor Code
           </label>
           <input
@@ -115,12 +125,16 @@ const login = async () => {
     navigateTo(`/admin/${data.user.id}`);
   } catch (error) {
     console.log(error);
-    if (error?.data?.statusCode === 403 && error?.data?.statusMessage?.includes("Two-factor")) {
+    if (
+      error?.data?.statusCode === 403 &&
+      error?.data?.statusMessage?.includes("Two-factor")
+    ) {
       mfaRequired.value = true;
       errorMessage.value = error.data.statusMessage;
     } else {
       errorMessage.value =
-        error?.data?.statusMessage || "Login failed. Please check your credentials.";
+        error?.data?.statusMessage ||
+        "Login failed. Please check your credentials.";
     }
   } finally {
     isLoading.value = false;
