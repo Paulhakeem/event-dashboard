@@ -4,6 +4,7 @@ import Graph from "@/components/Dashboard/Graph.vue";
 import Notifications from "@/components/Dashboard/Notifications.vue";
 import Reports from "@/components/Dashboard/Reports.vue";
 import BookingManagement from "@/components/Dashboard/BookingManagement.vue";
+import Tickets from "@/components/Dashboard/Tickets.vue";
 
 export const dashboardSidebar = () => {
   const sidebarMenu = [
@@ -14,6 +15,11 @@ export const dashboardSidebar = () => {
     },
     { name: "Users", icon: "majesticons:users", component: Users },
     { name: "Events", icon: "material-symbols:event", component: Events },
+    {
+      name: "Tickets",
+      icon: "material-symbols:confirmation-number-outline",
+      component: Tickets,
+    },
     {
       name: "Notifications",
       icon: "material-symbols:notifications",

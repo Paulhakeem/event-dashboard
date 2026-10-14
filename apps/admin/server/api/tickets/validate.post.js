@@ -1,5 +1,6 @@
 import connectDB from "../../utils/mongoose.js";
 import { Ticket } from "../../models/Ticket.js";
+import { Event } from "../../models/Events.js";
 import { requireAuth } from "../../utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {
@@ -21,22 +22,46 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const existingTicket = await Ticket.findOne({ ticketCode });
+  if (!existingTicket) {
+    throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
+  }
+
+  const ticketEvent = await Event.findById(existingTicket.eventId)
+    .select("date")
+    .lean();
+  if (!ticketEvent || new Date(ticketEvent.date) < new Date()) {
+    await Ticket.updateOne(
+      { _id: existingTicket._id, status: "active" },
+      { $set: { status: "inactive" } },
+    );
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Event has expired; ticket is inactive",
+    });
+  }
+
   const ticket = await Ticket.findOneAndUpdate(
     { ticketCode, used: false, status: "active" },
-    { $set: { used: true, usedAt: new Date() } },
+    { $set: { used: true, usedAt: new Date(), status: "inactive" } },
     { new: true },
   ).populate("userId", "firstName lastName");
 
   if (!ticket) {
-    const existingTicket = await Ticket.findOne({ ticketCode });
-    if (!existingTicket) {
-      throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
+    const currentTicket = await Ticket.findById(existingTicket._id);
+    if (currentTicket?.used) {
+      await Ticket.updateOne(
+        { _id: existingTicket._id, status: "active" },
+        { $set: { status: "inactive" } },
+      );
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Ticket already used; ticket is inactive",
+      });
     }
     throw createError({
       statusCode: 400,
-      statusMessage: existingTicket.used
-        ? "Ticket already used"
-        : "Ticket is not active",
+      statusMessage: "Ticket is not active",
     });
   }
 

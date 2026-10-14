@@ -24,7 +24,11 @@ const TicketSchema = new mongoose.Schema(
     used: { type: Boolean, default: false },
     usedAt: { type: Date, default: null },
     cancelledAt: { type: Date, default: null },
-    status: { type: String, default: "active" },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "cancelled"],
+      default: "active",
+    },
   },
 
   { timestamps: true },

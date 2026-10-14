@@ -4,11 +4,13 @@ import { Ticket } from "~~/server/models/Ticket.js";
 import { Event } from "~~/server/models/Events.js";
 import { TotalBooking } from "~~/server/models/totalBooking.js";
 import mongoose from "mongoose";
+import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 
 export default defineEventHandler(async (event) => {
   try {
     await connectDB();
     const user = await requireAuth(event);
+    await syncTicketStatuses();
 
     if (!user) {
       throw createError({ statusCode: 401, statusMessage: "Unauthorized" });

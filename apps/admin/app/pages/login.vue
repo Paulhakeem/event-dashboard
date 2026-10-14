@@ -9,7 +9,7 @@
       </div>
 
       <form class="space-y-5" @submit.prevent="login">
-        <p v-if="errorMessage" class="text-red-500 text-sm italic">
+        <p v-if="errorMessage" role="alert" class="text-red-500 text-sm italic">
           {{ errorMessage }}
         </p>
 
@@ -22,6 +22,8 @@
             type="email"
             autocomplete="email"
             placeholder="admin@example.com"
+            :disabled="isLoading"
+            required
             class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300"
           />
         </div>
@@ -35,6 +37,8 @@
             type="password"
             autocomplete="current-password"
             placeholder="Your password"
+            :disabled="isLoading"
+            required
             class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300"
           />
         </div>
@@ -50,6 +54,7 @@
             autocomplete="one-time-code"
             maxlength="6"
             placeholder="123456 (from your authenticator app)"
+            :disabled="isLoading"
             class="w-full px-4 py-3 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm focus:ring-[#9c4e8b] focus:border-[#9c4e8b] dark:bg-neutral-900 dark:text-neutral-300"
           />
           <p class="mt-2 text-sm text-gray-500 dark:text-neutral-400">
@@ -60,9 +65,16 @@
         <button
           type="submit"
           :disabled="isLoading"
+          :aria-busy="isLoading"
           class="w-full py-3 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition disabled:opacity-50"
         >
-          {{ isLoading ? "Logging In..." : "Log In" }}
+          <Icon
+            v-if="isLoading"
+            name="mdi:loading"
+            class="mr-2 animate-spin text-lg"
+            aria-hidden="true"
+          />
+          <span>{{ isLoading ? "Verifying credentials..." : "Log In" }}</span>
         </button>
       </form>
     </div>
@@ -79,6 +91,7 @@ const isLoading = ref(false);
 const { setAuth } = useAuth();
 
 const login = async () => {
+  if (isLoading.value) return;
   errorMessage.value = "";
   isLoading.value = true;
 

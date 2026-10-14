@@ -145,7 +145,7 @@
               class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium cursor-not-allowed"
               disabled
             >
-              Cancelled
+              {{ ticket.status === "cancelled" ? "Cancelled" : "Inactive" }}
             </button>
           </div>
         </div>

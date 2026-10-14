@@ -37,6 +37,15 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, message: "Event not found" });
     }
 
+    if (ticket.status === "active" && new Date(eventDetails.date) < new Date()) {
+      ticket.status = "inactive";
+      await ticket.save();
+      throw createError({
+        statusCode: 400,
+        message: "This event has expired; the ticket is inactive",
+      });
+    }
+
     // change status from active to cancelled
     if (ticket.status !== "active") {
       throw createError({

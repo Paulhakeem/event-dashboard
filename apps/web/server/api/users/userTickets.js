@@ -1,12 +1,14 @@
 import connectDB from "~~/server/utils/mongoose.js";
 import { Ticket } from "../../models/Ticket.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
+import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
 
   // 🔐 Protect this route only
   const user = await requireAuth(event);
+  await syncTicketStatuses();
   if (!user?.email) {
     return { success: false, message: "Unauthorized" };
   }
