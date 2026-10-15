@@ -101,6 +101,11 @@
           :disabled="isLoading || !recaptchaToken"
           class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition disabled:opacity-50"
         >
+          <Icon
+            v-if="isLoading"
+            name="svg-spinners:90-ring-with-bg"
+            class="mr-2 text-base"
+          />
           {{ isLoading ? "Logging In..." : "Log In" }}
         </button>
       </form>
@@ -135,19 +140,17 @@ const login = async () => {
     setAuth(data);
 
     if (data.user.role === "admin") {
-      errorMessage.value =
-        "Admins must log in through the admin portal.";
+      errorMessage.value = "Admins must log in through the admin portal.";
       setAuth(null);
       return;
     }
 
-    if (data.user.role === "organiser") {
-      navigateTo(`/organiser/${data.user.id}`);
-    } else {
-      navigateTo(`/user/${data.user.id}`);
-    }
+    const destination =
+      data.user.role === "organiser"
+        ? `/organiser/${data.user.id}`
+        : `/user/${data.user.id}`;
+    await navigateTo(destination);
   } catch (error) {
-    console.log(error);
     if (error?.data?.statusCode === 403 && error?.data?.statusMessage?.includes("Two-factor")) {
       mfaRequired.value = true;
       errorMessage.value = error.data.statusMessage;

@@ -101,10 +101,8 @@
           {{ isLoading ? "Sending veryfication code..." : "Verify email" }}
         </button>
       </div>
+      <GoogleAuth />
     </div>
-
-    <!--  -->
-    <GoogleAuth />
   </div>
 </template>
 <script setup>

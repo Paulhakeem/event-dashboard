@@ -81,8 +81,10 @@ export default defineNuxtConfig({
   },
 
   googleAuth: {
-    clientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
-    autoLoadScript: true,
+    clientId:
+      process.env.NUXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID ||
+      process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    autoLoadScript: false,
     promptOneTap: true,
     enableServerVerify: true,
   },
@@ -123,7 +125,9 @@ export default defineNuxtConfig({
     deepseekApiKey: process.env.DEEPSEEK_API,
     recaptchaSecretKey: process.env.RECAPTCHA_SECRET_KEY,
     mailgunApiKey: process.env.MAILGUN_API_KEY,
-    googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
+    googleClientId:
+      process.env.NUXT_PUBLIC_GOOGLE_AUTH_CLIENT_ID ||
+      process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
 
     public: {
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,

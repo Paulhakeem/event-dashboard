@@ -13,8 +13,6 @@ const DUMMY_PASSWORD_HASH =
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  await connectDB();
-
   const { email, password, recaptchaToken, mfaCode } = await readBody(event);
 
   if (
@@ -29,8 +27,11 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // reCAPTCHA verification
-  const recaptchaResult = await verifyRecaptcha(recaptchaToken, config);
+  // Database setup and the remote reCAPTCHA check are independent.
+  const [recaptchaResult] = await Promise.all([
+    verifyRecaptcha(recaptchaToken, config),
+    connectDB(),
+  ]);
   if (!recaptchaResult?.success && !recaptchaResult?.skipped) {
     throw createError({
       statusCode: 400,

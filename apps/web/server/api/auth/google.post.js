@@ -41,7 +41,16 @@ async function verifyGoogleIdToken(credential, config) {
     });
   }
 
-  if (config.googleClientId && payload.aud !== config.googleClientId) {
+  const clientId =
+    config.public?.googleAuth?.clientId || config.googleClientId;
+  if (!clientId) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Google sign-in is not configured",
+    });
+  }
+
+  if (payload.aud !== clientId) {
     throw createError({
       statusCode: 401,
       statusMessage: "Google token audience mismatch",
