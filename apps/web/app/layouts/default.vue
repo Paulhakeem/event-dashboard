@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-center justify-center ml-10 z-50">
+    <div class="relative z-50 w-full">
       <ClientOnly>
         <Sidebar v-if="!isUserDashboard" />
       </ClientOnly>

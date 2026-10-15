@@ -1,60 +1,78 @@
 <template>
   <section>
-    <!-- Mobile Navigation -->
-    <div class="md:hidden">
+    <!-- Mobile and tablet navigation -->
+    <div class="lg:hidden">
       <div
-        class="border-b border-amber-300/25 bg-[#101d3a] px-4 py-3 text-white shadow-lg shadow-slate-950/10 backdrop-blur-xl"
+        class="sticky top-0 z-40 border-b border-amber-300/25 bg-[#101d3a]/95 px-3 py-2.5 text-white shadow-lg shadow-slate-950/10 backdrop-blur-xl sm:px-5"
       >
-        <div class="flex min-h-12 items-center justify-between gap-3">
-          <!-- Menu Toggle -->
-          <button
-            @click="toggleMenu"
-            class="rounded-xl p-2 text-amber-300 transition hover:bg-white/10 hover:text-amber-200"
-            aria-label="Open navigation menu"
-            :aria-expanded="openMenu"
-          >
-            <Icon class="text-xl" name="material-symbols:menu" />
-          </button>
+        <div
+          class="mx-auto flex min-h-12 w-full max-w-7xl items-center justify-between gap-2 sm:gap-4"
+        >
+          <div class="flex min-w-0 items-center gap-1 sm:gap-2">
+            <button
+              type="button"
+              @click="toggleMenu"
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-amber-300 transition hover:bg-white/10 hover:text-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              :aria-label="
+                openMenu ? 'Close navigation menu' : 'Open navigation menu'
+              "
+              :aria-expanded="openMenu"
+            >
+              <Icon
+                class="text-2xl"
+                :name="openMenu ? 'material-symbols:close' : 'material-symbols:menu'"
+              />
+            </button>
 
-          <!-- Logo -->
-          <NuxtLink to="/" class="flex items-center" aria-label="Happitwin home">
-            <span
-              class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 ring-1 ring-amber-300/50"
-            >
-              <img :src="logo" alt="Happitwin" class="h-full w-full object-contain" />
-            </span>
-          </NuxtLink>
-
-          <!-- Auth Buttons -->
-          <div v-if="!user" class="flex gap-2">
             <NuxtLink
-              to="/login"
-              class="rounded-full border border-white/25 px-3 py-2 text-xs font-bold text-white transition hover:border-amber-300/70 hover:bg-white/10"
+              to="/"
+              class="flex min-w-0 items-center gap-2"
+              aria-label="Happitwin home"
             >
-              Login
-            </NuxtLink>
-            <NuxtLink
-              to="/signup"
-              class="hidden rounded-full bg-amber-300 px-3 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200 xs:block"
-            >
-              Sign Up
+              <span
+                class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 ring-1 ring-amber-300/50 sm:h-10 sm:w-10"
+              >
+                <img :src="logo" alt="" class="h-full w-full object-contain" />
+              </span>
+              <span class="hidden min-w-0 sm:block">
+                <span class="block truncate text-xs font-black tracking-[0.14em]">
+                  HAPPITWIN
+                </span>
+                <span
+                  class="block truncate text-[9px] font-medium text-amber-300"
+                >
+                  EVENTS · FROM ROOTS TO REACH
+                </span>
+              </span>
             </NuxtLink>
           </div>
 
-          <div v-else class="flex gap-2">
+          <div v-if="!user" class="flex shrink-0 items-center gap-2">
             <NuxtLink
-              :to="
-                user && user.role === 'admin'
-                  ? '/admin/dashboard'
-                  : '/user/dashboard'
-              "
-              class="rounded-full bg-amber-300 px-3 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200"
+              to="/signup"
+              class="hidden min-h-10 items-center justify-center rounded-full bg-amber-300 px-4 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200 sm:inline-flex"
+            >
+              Sign Up
+            </NuxtLink>
+            <NuxtLink
+              to="/login"
+              class="inline-flex min-h-10 items-center justify-center rounded-full border border-white/25 px-4 py-2 text-xs font-bold text-white transition hover:border-amber-300/70 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            >
+              Login
+            </NuxtLink>
+          </div>
+
+          <div v-else class="flex shrink-0 items-center gap-2">
+            <NuxtLink
+              :to="dashboardPath"
+              class="inline-flex min-h-10 items-center justify-center rounded-full bg-amber-300 px-3 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200"
             >
               Dashboard
             </NuxtLink>
             <button
-              @click="useAuth().logout()"
-              class="hidden rounded-full bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition hover:bg-red-100 xs:block"
+              type="button"
+              @click="logout"
+              class="hidden min-h-10 items-center rounded-full border border-red-300/40 px-3 py-2 text-xs font-bold text-red-100 transition hover:bg-red-500/15 sm:inline-flex"
             >
               Logout
             </button>
@@ -73,7 +91,7 @@
       >
         <div
           v-if="openMenu"
-          class="fixed inset-y-0 left-0 z-50 flex w-[min(86vw,22rem)] flex-col overflow-y-auto bg-[#101d3a] p-5 text-white shadow-2xl shadow-slate-950/40 sm:p-6"
+          class="fixed inset-y-0 left-0 z-50 flex w-[min(88vw,22rem)] flex-col overflow-y-auto bg-[#101d3a] p-5 text-white shadow-2xl shadow-slate-950/40 sm:w-[min(80vw,24rem)] sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label="Main navigation"
@@ -148,7 +166,7 @@
     </div>
 
     <!-- Desktop Navigation -->
-    <div class="hidden md:block lg:block">
+    <div class="hidden lg:block">
       <SidebarMain />
     </div>
   </section>
@@ -159,5 +177,12 @@ import logo from "~/assets/logo/happitwin.png";
 
 const { menu, openMenu, toggleMenu } = Header();
 
-const { user } = useAuth();
+const { user, logout } = useAuth();
+const dashboardPath = computed(() =>
+  user.value?.role === "admin"
+    ? "/admin/dashboard"
+    : user.value?.role === "organiser"
+      ? `/organiser/${user.value.id}`
+      : `/user/${user.value?.id}`,
+);
 </script>
