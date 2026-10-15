@@ -26,7 +26,7 @@
             {{
               selectedEvent
                 ? "All ticket holders and ticket details for this event."
-                : "Select an event to view its tickets and attendee details."
+                : "Select an event to view its tickets and amounts."
             }}
           </p>
           <p
@@ -153,9 +153,9 @@
             </div>
             <div class="text-right">
               <p class="text-sm font-semibold text-gray-700">
-                {{ eventItem.userCount }}
-                {{ eventItem.userCount === 1 ? "attendee" : "attendees" }}
+                {{ formatAmount(eventItem.totalAmount) }}
               </p>
+              <p class="mt-1 text-xs text-gray-400">Total amount</p>
               <p class="mt-1 text-xs text-gray-400">
                 {{ formatDate(eventItem.eventDate) }}
               </p>
@@ -253,11 +253,10 @@
         <div
           class="flex flex-col gap-1 border-b border-gray-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
         >
-          <h2 class="font-semibold text-gray-900">Ticket holders</h2>
+          <h2 class="font-semibold text-gray-900">Event tickets</h2>
           <p class="text-xs text-gray-500">
             {{ tickets.length }}
-            {{ tickets.length === 1 ? "ticket" : "tickets" }} · names and email
-            addresses
+            {{ tickets.length === 1 ? "ticket" : "tickets" }}
           </p>
         </div>
 
@@ -268,20 +267,13 @@
             class="space-y-3 p-4"
           >
             <div class="flex items-start justify-between gap-3">
-              <div class="flex min-w-0 items-center gap-3">
-                <span
-                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#9c4e8b]/10 text-sm font-bold text-[#9c4e8b]"
-                >
-                  {{ initials(ticket.holderName, ticket.holderEmail) }}
-                </span>
-                <div class="min-w-0">
-                  <p class="truncate text-sm font-semibold text-gray-900">
-                    {{ ticket.holderName || "Name unavailable" }}
-                  </p>
-                  <p class="truncate text-xs text-gray-500">
-                    {{ ticket.holderEmail }}
-                  </p>
-                </div>
+              <div class="min-w-0">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Total amount
+                </p>
+                <p class="mt-1 text-lg font-bold text-gray-900">
+                  {{ formatAmount(ticket.amount) }}
+                </p>
               </div>
               <div class="flex shrink-0 flex-col items-end gap-2">
                 <span
@@ -317,18 +309,6 @@
                 Code:
                 <span class="font-mono font-medium text-gray-800">{{
                   ticket.ticketCode
-                }}</span>
-              </p>
-              <p>
-                Amount:
-                <span class="font-medium text-gray-800">{{
-                  formatAmount(ticket.amount)
-                }}</span>
-              </p>
-              <p>
-                Email:
-                <span class="font-medium text-gray-800">{{
-                  ticket.userEmail
                 }}</span>
               </p>
               <p class="col-span-2 break-all">
@@ -370,10 +350,9 @@
           <table class="min-w-full divide-y divide-gray-100 text-left text-sm">
             <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
               <tr>
-                <th scope="col" class="px-5 py-3 font-semibold">Attendee</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Total amount</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Ticket</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Booking</th>
-                <th scope="col" class="px-5 py-3 font-semibold">Amount</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Used</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Status</th>
               </tr>
@@ -384,28 +363,8 @@
                 :key="ticket._id"
                 class="transition hover:bg-gray-50/70"
               >
-                <td class="px-5 py-3.5">
-                  <div class="flex items-center gap-3">
-                    <span
-                      class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#9c4e8b]/10 text-xs font-bold text-[#9c4e8b]"
-                    >
-                      {{ initials(ticket.holderName, ticket.holderEmail) }}
-                    </span>
-                    <div class="min-w-0">
-                      <p class="font-semibold text-gray-900">
-                        {{ ticket.holderName || "Name unavailable" }}
-                      </p>
-                      <p class="text-xs text-gray-500">
-                        {{ ticket.holderEmail }}
-                      </p>
-                      <p class="text-[10px] text-gray-400">
-                        Booking email: {{ ticket.userEmail }}
-                      </p>
-                      <p class="mt-0.5 font-mono text-[10px] text-gray-400">
-                        User: {{ ticket.userId?._id || ticket.userId }}
-                      </p>
-                    </div>
-                  </div>
+                <td class="whitespace-nowrap px-5 py-3.5 font-semibold text-gray-900">
+                  {{ formatAmount(ticket.amount) }}
                 </td>
                 <td class="px-5 py-3.5">
                   <p class="font-medium text-gray-800">{{ ticket.ticketType }}</p>
@@ -422,9 +381,6 @@
                   <p class="mt-1">Created: {{ formatDateTime(ticket.createdAt) }}</p>
                   <p class="mt-1">Updated: {{ formatDateTime(ticket.updatedAt) }}</p>
                   <p class="mt-1">Event ID: <span class="break-all font-mono">{{ ticket.eventId }}</span></p>
-                </td>
-                <td class="whitespace-nowrap px-5 py-3.5 font-medium text-gray-800">
-                  {{ formatAmount(ticket.amount) }}
                 </td>
                 <td class="px-5 py-3.5">
                   <label

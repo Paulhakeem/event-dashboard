@@ -55,6 +55,7 @@ export default defineEventHandler(async (event) => {
         _id: "$eventId",
         eventName: { $first: "$eventName" },
         totalTickets: { $sum: 1 },
+        totalAmount: { $sum: "$amount" },
         activeTickets: {
           $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
         },
@@ -67,7 +68,6 @@ export default defineEventHandler(async (event) => {
         usedTickets: {
           $sum: { $cond: ["$used", 1, 0] },
         },
-        users: { $addToSet: "$userId" },
       },
     },
     {
@@ -76,11 +76,11 @@ export default defineEventHandler(async (event) => {
         eventId: "$_id",
         eventName: 1,
         totalTickets: 1,
+        totalAmount: 1,
         activeTickets: 1,
         cancelledTickets: 1,
         inactiveTickets: 1,
         usedTickets: 1,
-        userCount: { $size: "$users" },
       },
     },
     { $sort: { totalTickets: -1, eventName: 1 } },
