@@ -1,85 +1,120 @@
 <template>
   <main
-    class="relative min-h-screen overflow-hidden bg-[#17131c] px-4 py-8 text-slate-900 sm:px-8 sm:py-12 lg:px-12"
-    style="
-      background-image: url(&quot;/images/contacts.jpg&quot;);
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    "
+    class="relative min-h-screen overflow-hidden bg-[#f8f7f3] px-4 py-8 text-slate-900 sm:px-6 sm:py-10 lg:px-8 lg:py-14"
   >
     <div
-      class="pointer-events-none absolute inset-0 bg-[#0d0a12]/75"
+      class="pointer-events-none absolute -right-28 top-40 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl"
       aria-hidden="true"
     />
     <div
-      class="pointer-events-none absolute inset-0 bg-linear-to-b from-[#211a2d]/35 via-[#0d0a12]/20 to-[#0d0a12]/85"
+      class="pointer-events-none absolute -left-32 bottom-20 h-96 w-96 rounded-full bg-[#13284b]/10 blur-3xl"
       aria-hidden="true"
     />
 
     <div class="relative mx-auto max-w-6xl">
       <section
-        class="relative overflow-hidden rounded-4xl bg-[#211a2d] px-6 py-10 text-white shadow-xl shadow-slate-900/10 sm:px-10 sm:py-14 lg:px-16"
+        class="relative isolate overflow-hidden rounded-3xl bg-[#101d3a] text-white shadow-2xl shadow-slate-900/20 sm:rounded-4xl"
+        style="
+          background-image: url(&quot;/images/contacts.jpg&quot;);
+          background-size: cover;
+          background-position: center;
+        "
       >
         <div
-          class="absolute -right-20 -top-24 h-72 w-72 rounded-full border-40 border-[#d6a2c9]/20"
+          class="absolute inset-0 -z-10 bg-linear-to-r from-[#081226]/95 via-[#101d3a]/85 to-[#101d3a]/35"
           aria-hidden="true"
         />
         <div
-          class="absolute -bottom-32 left-1/2 h-64 w-64 rounded-full bg-[#13284b]/20 blur-3xl"
+          class="absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full border-[32px] border-amber-300/15"
           aria-hidden="true"
         />
-        <div class="relative max-w-2xl">
-          <p
-            class="mb-4 text-xs font-bold uppercase tracking-[0.28em] text-[#e8b8da]"
-          >
-            We are here to help
-          </p>
-          <h1
-            class="max-w-xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-          >
-            Let’s make your next event unforgettable.
-          </h1>
-          <p class="mt-5 max-w-xl text-base leading-7 text-white/70 sm:text-lg">
-            Whether you have a question, need assistance, you want to be a
-            partner, or want to share your feedback, we’re here to listen and
-            provide the support you need.
-          </p>
+        <div
+          class="relative grid min-h-[23rem] items-center gap-8 px-6 py-10 sm:min-h-[27rem] sm:px-10 sm:py-14 md:grid-cols-[1.2fr_0.8fr] md:px-14 lg:px-16"
+        >
+          <div class="max-w-2xl">
+            <p
+              class="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-amber-300 backdrop-blur"
+            >
+              <Icon name="mdi:message-text-outline" class="text-base" />
+              We are here to help
+            </p>
+            <h1
+              class="max-w-xl text-4xl font-black leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
+            >
+              Let’s make your next event
+              <span class="text-amber-300">unforgettable.</span>
+            </h1>
+            <p
+              class="mt-5 max-w-xl text-sm leading-7 text-white/75 sm:text-base"
+            >
+              Questions, feedback, or planning a partnership? Reach out and the
+              Happitwin team will help you find the right next step.
+            </p>
+            <a
+              href="mailto:paulnyamawi18@gmail.com"
+              class="mt-7 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-[#101d3a] shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#101d3a]"
+            >
+              <Icon name="material-symbols:mail-outline" class="text-lg" />
+              Get in touch
+            </a>
+          </div>
+
+          <div class="hidden justify-center md:flex">
+            <div
+              class="relative flex h-56 w-56 items-center justify-center rounded-3xl border border-amber-300/30 bg-white/5 shadow-2xl backdrop-blur-sm lg:h-64 lg:w-64"
+              aria-hidden="true"
+            >
+              <div
+                class="absolute inset-3 rounded-2xl border border-white/10"
+              />
+              <Icon
+                name="mdi:ticket-confirmation-outline"
+                class="text-8xl text-amber-300 drop-shadow-lg lg:text-9xl"
+              />
+              <span
+                class="absolute -bottom-4 -right-5 rounded-xl border border-white/10 bg-[#101d3a]/90 px-4 py-3 text-xs font-semibold text-white shadow-xl"
+              >
+                Here for every moment
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
       <section
-        class="grid gap-6 py-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10 lg:py-12"
+        class="grid gap-6 py-8 sm:py-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-8 lg:py-12"
       >
         <div>
           <div class="mb-6">
             <p
-              class="text-sm font-bold uppercase tracking-[0.2em] text-gray-200"
+              class="text-xs font-bold uppercase tracking-[0.2em] text-amber-700"
             >
               Contact details
             </p>
             <h2
-              class="mt-2 text-2xl font-bold text-gray-200 tracking-tight sm:text-3xl"
+              class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] sm:text-3xl"
             >
               Start a conversation
             </h2>
-            <p class="mt-3 max-w-md leading-7 text-slate-100">
+            <p
+              class="mt-3 max-w-md text-sm leading-7 text-slate-600 sm:text-base"
+            >
               Reach us through any of the channels below. We usually respond
               within one business day.
             </p>
           </div>
 
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <div class="grid gap-3 sm:grid-cols-2">
             <a
               v-for="item in contactItems"
               :key="item.title"
               :href="item.href || undefined"
               :target="item.external ? '_blank' : undefined"
               :rel="item.external ? 'noreferrer' : undefined"
-              class="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#d6a2c9] hover:shadow-md"
+              class="group flex min-w-0 items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-lg hover:shadow-slate-900/5"
             >
               <span
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#fff5dc] text-xl text-[#13284b] transition group-hover:bg-[#13284b] group-hover:text-white"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-xl text-[#13284b] transition group-hover:bg-amber-300"
               >
                 <Icon :name="item.icon" />
               </span>
@@ -98,7 +133,7 @@
         </div>
 
         <div
-          class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-900/5 sm:p-8"
+          class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-900/5 sm:p-8"
         >
           <template v-if="!submitted">
             <div class="mb-6 flex items-start justify-between gap-4">
@@ -106,20 +141,20 @@
                 <h2 class="text-2xl font-bold tracking-tight">
                   Send us a message
                 </h2>
-                <p class="mt-2 text-sm leading-6 text-slate-100">
+                <p class="mt-2 text-sm leading-6 text-slate-600">
                   Tell us a little about what you need and we’ll take it from
                   there.
                 </p>
               </div>
               <span
-                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#fff5dc] text-[#13284b] sm:flex"
+                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[#13284b] sm:flex"
               >
                 <Icon name="material-symbols:forum-outline" class="text-xl" />
               </span>
             </div>
 
             <form class="space-y-5" @submit.prevent="handleSubmit">
-              <div class="grid gap-5 sm:grid-cols-2">
+              <div class="grid gap-4 sm:grid-cols-2 sm:gap-5">
                 <label class="block">
                   <span class="mb-2 block text-sm font-semibold text-slate-700"
                     >Your name</span
@@ -154,7 +189,7 @@
                 <textarea
                   v-model="form.message"
                   required
-                  rows="6"
+                  rows="5"
                   placeholder="Tell us about your question or event..."
                   class="contact-input resize-none"
                 />
@@ -184,8 +219,8 @@
               Message received
             </h2>
             <p class="mt-2 max-w-sm leading-7 text-slate-600">
-              Thanks for reaching out. A member of the Velora team will get back
-              to you shortly.
+              Thanks for reaching out. A member of the Happitwin team will get
+              back to you shortly.
             </p>
             <button
               type="button"
@@ -206,11 +241,22 @@
 </template>
 
 <script setup>
+useHead({
+  title: "Contact Happitwin Events",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Get in touch with the Happitwin Events team for booking support, event partnerships, or general enquiries.",
+    },
+  ],
+});
+
 const contactItems = [
   {
     title: "Email us",
-    label: "support@velorabookingapp.com",
-    href: "mailto:support@velorabookingapp.com",
+    label: "support@happitwineventsltd.co.ke",
+    href: "mailto:support@happitwineventsltd.co.ke",
     icon: "material-symbols:mail-outline",
   },
   {
@@ -228,8 +274,8 @@ const contactItems = [
   },
   {
     title: "Follow along",
-    label: "@velorabookingapp",
-    href: "https://instagram.com/velorabookingapp",
+    label: "@happitwineventsltd",
+    href: "https://instagram.com/happitwineventsltd",
     external: true,
     icon: "mdi:instagram",
   },
