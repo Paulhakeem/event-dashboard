@@ -4,6 +4,8 @@ import { Event } from "~~/server/models/Events";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { Notification } from "~~/server/models/Notification";
 import { Ticket } from "~~/server/models/Ticket";
+import { CancelledTicket } from "~~/server/models/CancelledTickets";
+import { PendingPayment } from "~~/server/models/PendingPayment";
 
 const requireAdmin = (event) => {
   const header = getHeader(event, "authorization");
@@ -66,7 +68,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
 
   if (event.node.req.method === "DELETE") {
-    await Event.deleteOne({ _id: current._id });
+    await Promise.all([
+      Event.deleteOne({ _id: current._id }),
+      TotalBooking.deleteMany({ eventName: current.title }),
+      Ticket.deleteMany({
+        $or: [{ eventId: current._id }, { eventName: current.title }],
+      }),
+      CancelledTicket.deleteMany({ event: current._id }),
+      PendingPayment.deleteMany({
+        $or: [{ eventId: current._id }, { eventName: current.title }],
+      }),
+    ]);
     return { success: true };
   }
 

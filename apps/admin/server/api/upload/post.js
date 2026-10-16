@@ -111,8 +111,19 @@ export default defineEventHandler(async (event) => {
 
   await newEvent.save();
 
+  let shareUrl = null;
+  try {
+    const config = useRuntimeConfig();
+    const baseUrl =
+      config.public?.appUrl || process.env.APP_URL || "http://localhost:3000";
+    shareUrl = `${baseUrl.replace(/\/$/, "")}/events/${newEvent._id}`;
+  } catch (e) {
+    shareUrl = null;
+  }
+
   return {
     message: "Event created successfully",
     event: newEvent,
+    shareUrl,
   };
 });

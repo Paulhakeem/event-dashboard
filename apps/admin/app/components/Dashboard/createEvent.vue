@@ -398,6 +398,10 @@ const submitEvent = async () => {
     });
 
     alert("✅ Event created successfully!");
+    if (res?.shareUrl) {
+      navigator.clipboard?.writeText(res.shareUrl);
+      alert(`Shareable event link copied: ${res.shareUrl}`);
+    }
     clearForm();
   } catch (err) {
     const message =
