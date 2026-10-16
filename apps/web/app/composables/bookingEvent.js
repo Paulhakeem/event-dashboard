@@ -1,3 +1,5 @@
+import { navigateTo } from "#imports";
+
 export default function useEventBooking() {
   const config = useRuntimeConfig();
   const { user } = useAuth();
@@ -70,6 +72,7 @@ export default function useEventBooking() {
   const bookAndPay = async (phone, tickets = []) => {
     if (!user.value) {
       alert("Please login first");
+      await navigateTo("/login");
       return;
     }
 

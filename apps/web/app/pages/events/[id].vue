@@ -296,6 +296,7 @@
             <button
               @click="handleBooking"
               :disabled="
+                event?.freeEntry ||
                 !isBookable ||
                 (paymentStatus !== 'idle' && paymentStatus !== 'failed')
               "
@@ -454,6 +455,7 @@ const isBookable = computed(() => {
 });
 
 const handleBooking = () => {
+  if (event.value?.freeEntry) return;
   bookAndPay(phone.value, selectedTickets.value);
 };
 </script>
