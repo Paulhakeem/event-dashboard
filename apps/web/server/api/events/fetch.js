@@ -8,7 +8,13 @@ export default defineEventHandler(async (event) => {
   // update event statuses based on current date
   await markPastEventsCompleted();
   try {
-    const events = await Event.find().sort({date:1});
+    const query = getQuery(event);
+    const limit = parseInt(query.limit) || 10;
+    const skip = parseInt(query.skip) || 0;
+    const events = await Event.find({ status: { $ne: "pending" } })
+      .sort({ date: 1 })
+      .skip(skip)
+      .limit(limit);
 
     // attach ticket booking counts per event
     const bookings = await TotalBooking.aggregate([
@@ -31,7 +37,8 @@ export default defineEventHandler(async (event) => {
       return obj;
     });
 
-    return { success: true, events: enriched };
+    const total = await Event.countDocuments({ status: { $ne: "pending" } });
+    return { success: true, events: enriched, total };
   } catch (error) {
     return { success: false, message: error.message };
   }

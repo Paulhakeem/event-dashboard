@@ -50,6 +50,15 @@
           {{ status }}
         </option>
       </select>
+      <select
+        v-model="typeFilter"
+        class="rounded-lg border border-gray-200 px-3 py-2 text-sm sm:w-48 focus:ring-2 focus:ring-[#9c4e8b]/20 focus:border-[#9c4e8b] outline-none transition-all"
+      >
+        <option value="all">All types</option>
+        <option v-for="type in eventTypes" :key="type" :value="type">
+          {{ type }}
+        </option>
+      </select>
     </div>
     <!-- ── MOBILE CARDS ──────────────────────────────── -->
     <div class="block lg:hidden space-y-3">
@@ -606,6 +615,7 @@ const loading = ref(true);
 const searchQuery = ref("");
 const organiserFilter = ref("all");
 const statusFilter = ref("all");
+const typeFilter = ref("all");
 const eventStatuses = [
   "upcoming",
   "ongoing",
@@ -635,6 +645,10 @@ onMounted(loadEvents);
 const { editingEvent, editForm, openEdit, closeEdit, addTicket, removeTicket } =
   updateEvent(events);
 
+const eventTypes = computed(() => [
+  ...new Set(events.value.map((event) => event.eventType).filter(Boolean)),
+]);
+
 const filteredEvents = computed(() =>
   events.value.filter((event) => {
     const query = searchQuery.value.trim().toLowerCase();
@@ -644,7 +658,8 @@ const filteredEvents = computed(() =>
       (!query || event.title?.toLowerCase().includes(query)) &&
       (organiserFilter.value === "all" ||
         organiser === organiserFilter.value) &&
-      (statusFilter.value === "all" || event.status === statusFilter.value)
+      (statusFilter.value === "all" || event.status === statusFilter.value) &&
+      (typeFilter.value === "all" || event.eventType === typeFilter.value)
     );
   }),
 );

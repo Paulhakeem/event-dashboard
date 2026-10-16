@@ -12,6 +12,51 @@
         </p>
       </div>
 
+      <!-- Filters -->
+      <div class="mb-8">
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+          <button
+            v-for="tab in statusTabs"
+            :key="tab.key"
+            @click="activeTab = tab.key"
+            :class="[
+              'px-4 py-2 rounded-full text-sm font-semibold transition duration-200',
+              activeTab === tab.key
+                ? 'bg-[#13284b] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button
+            @click="selectedType = 'all'"
+            :class="[
+              'px-4 py-2 rounded-full text-xs font-semibold transition duration-200',
+              selectedType === 'all'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            All Types
+          </button>
+          <button
+            v-for="type in eventTypes.slice(1)"
+            :key="type"
+            @click="selectedType = type"
+            :class="[
+              'px-4 py-2 rounded-full text-xs font-semibold transition duration-200 capitalize',
+              selectedType === type
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            {{ type }}
+          </button>
+        </div>
+      </div>
+
       <!-- Skeleton Loading State -->
       <div
         v-if="pendings"
@@ -284,10 +329,39 @@
 <script setup>
 const { eventPosters, pendings, errorMessage, fetchEvents } = EventFunctions();
 
-onMounted(() => fetchEvents());
+onMounted(() => fetchEvents(false));
 
-// Filter out pending events
-const filteredEventPosters = computed(() =>
-  eventPosters.value.filter((event) => event.status !== "pending"),
-);
+const activeTab = ref("all");
+const selectedType = ref("all");
+
+const eventTypes = computed(() => {
+  const types = new Set(
+    eventPosters.value.map((event) => event.eventType).filter(Boolean),
+  );
+  return ["all", ...Array.from(types)];
+});
+
+const statusTabs = [
+  { key: "all", label: "All" },
+  { key: "upcoming", label: "Upcoming" },
+  { key: "live", label: "Live" },
+  { key: "ongoing", label: "Ongoing" },
+  { key: "completed", label: "Completed" },
+  { key: "cancelled", label: "Cancelled" },
+];
+
+// Filter out pending events and apply tab/type filters
+const filteredEventPosters = computed(() => {
+  let filtered = eventPosters.value.filter((event) => event.status !== "pending");
+
+  if (activeTab.value !== "all") {
+    filtered = filtered.filter((event) => (event.status || "upcoming") === activeTab.value);
+  }
+
+  if (selectedType.value !== "all") {
+    filtered = filtered.filter((event) => event.eventType === selectedType.value);
+  }
+
+  return filtered;
+});
 </script>

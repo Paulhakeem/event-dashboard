@@ -11,6 +11,51 @@
         </p>
       </div>
 
+      <!-- Filters -->
+      <div class="mb-8">
+        <div class="flex flex-wrap justify-center gap-2 mb-4">
+          <button
+            v-for="tab in statusTabs"
+            :key="tab.key"
+            @click="activeTab = tab.key"
+            :class="[
+              'px-4 py-2 rounded-full text-sm font-semibold transition duration-200',
+              activeTab === tab.key
+                ? 'bg-[#13284b] text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            {{ tab.label }}
+          </button>
+        </div>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button
+            @click="selectedType = 'all'"
+            :class="[
+              'px-4 py-2 rounded-full text-xs font-semibold transition duration-200',
+              selectedType === 'all'
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            All Types
+          </button>
+          <button
+            v-for="type in eventTypes.slice(1)"
+            :key="type"
+            @click="selectedType = type"
+            :class="[
+              'px-4 py-2 rounded-full text-xs font-semibold transition duration-200 capitalize',
+              selectedType === type
+                ? 'bg-amber-500 text-white shadow-md'
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+            ]"
+          >
+            {{ type }}
+          </button>
+        </div>
+      </div>
+
       <!-- 1. SKELETON LOADING STATE -->
       <div
         v-if="loading"
@@ -221,6 +266,17 @@
             </div>
           </div>
         </div>
+        <div class="mt-10 flex justify-center">
+          <button
+            v-if="totalEvents > events.length"
+            @click="loadMore"
+            :disabled="loadingMore"
+            class="inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#13284b] to-[#0b1730] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            <span v-if="loadingMore">Loading...</span>
+            <span v-else>Load More Events</span>
+          </button>
+        </div>
       </template>
 
       <!-- 3. EMPTY STATE (done loading, no events) -->
@@ -261,7 +317,7 @@
 
           <!-- Retry Button -->
           <button
-            @click="fetchEvents"
+            @click="fetchEvents(false)"
             class="mt-6 inline-flex items-center gap-2 px-6 py-2.5 bg-linear-to-r from-[#13284b] to-[#0b1730] text-white font-semibold rounded-lg hover:shadow-lg transform hover:scale-105 transition duration-200"
           >
             <svg
@@ -288,39 +344,104 @@
 <script setup>
 const events = ref([]);
 const loading = ref(true);
+const loadingMore = ref(false);
 const errorMessage = ref("");
+const totalEvents = ref(0);
+const limit = 10;
+const skip = ref(0);
 const { user } = useAuth();
 const { isFavorite, toggleFavorite } = useFavorites();
 const canFavorite = computed(() => user.value?.role === "user");
 
-// Filter out pending events
-const filteredEvents = computed(() =>
-  events.value.filter((event) => event.status !== "pending"),
-);
+  const activeTab = ref("all");
+  const selectedType = ref("all");
+
+  const eventTypes = computed(() => {
+    const types = new Set(events.value.map((event) => event.eventType).filter(Boolean));
+    return ["all", ...Array.from(types)];
+  });
+
+  const statusTabs = [
+    { key: "all", label: "All" },
+    { key: "upcoming", label: "Upcoming" },
+    { key: "live", label: "Live" },
+    { key: "ongoing", label: "Ongoing" },
+    { key: "completed", label: "Completed" },
+    { key: "cancelled", label: "Cancelled" },
+  ];
+
+  // Filter out pending events and apply tab/type filters
+  const filteredEvents = computed(() => {
+    let filtered = events.value.filter((event) => event.status !== "pending");
+
+    if (activeTab.value !== "all") {
+      filtered = filtered.filter((event) => (event.status || "upcoming") === activeTab.value);
+    }
+
+    if (selectedType.value !== "all") {
+      filtered = filtered.filter((event) => event.eventType === selectedType.value);
+    }
+
+    return filtered;
+  });
 
 // Extracted into a named function so the retry button can call it
-const fetchEvents = async () => {
-  loading.value = true;
+const fetchEvents = async (append = false) => {
+  if (append) {
+    loadingMore.value = true;
+  } else {
+    loading.value = true;
+    events.value = [];
+    skip.value = 0;
+  }
   errorMessage.value = "";
   try {
-    const res = await $fetch("/api/events/fetch");
+    const res = await $fetch("/api/events/fetch", {
+      query: { limit, skip: skip.value },
+    });
     if (Array.isArray(res)) {
-      events.value = res;
+      if (append) {
+        events.value = [...events.value, ...res];
+      } else {
+        events.value = res;
+      }
+      totalEvents.value = events.value.length;
     } else if (res?.success) {
-      events.value = res.events || [];
+      if (append) {
+        events.value = [...events.value, ...(res.events || [])];
+      } else {
+        events.value = res.events || [];
+      }
+      totalEvents.value = res.total || events.value.length;
+      if (append) {
+        skip.value = events.value.length;
+      } else {
+        skip.value = events.value.length;
+      }
     } else if (res?.events) {
-      events.value = res.events || [];
+      if (append) {
+        events.value = [...events.value, ...res.events];
+      } else {
+        events.value = res.events || [];
+      }
+      totalEvents.value = res.total || events.value.length;
     } else {
-      events.value = [];
+      if (!append) events.value = [];
     }
   } catch (error) {
-    events.value = [];
+    if (!append) events.value = [];
     errorMessage.value =
       error?.data?.message || error.message || "Failed to load events.";
   } finally {
     loading.value = false;
+    loadingMore.value = false;
   }
 };
 
-onMounted(fetchEvents);
+const loadMore = async () => {
+  skip.value = events.value.length;
+  await fetchEvents(true);
+};
+
+onMounted(() => fetchEvents(false));
 </script>

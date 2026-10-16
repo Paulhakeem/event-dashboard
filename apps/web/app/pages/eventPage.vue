@@ -1,3 +1,5 @@
 <template>
- <events-all-event/>
+  <div>
+    <events-all-event />
+  </div>
 </template>
