@@ -15,8 +15,6 @@ const RULES = [
   { path: "/api/cloudinary", limit: 30 },
   { path: "/api/upload", limit: 10 },
   { path: "/api/organiser/addevent", limit: 10 },
-  { path: "/api/booking/stkpush", limit: 10 },
-  { path: "/api/booking/payhero-callback", limit: 600 },
   { path: "/api/subscribe/mail", limit: 5 },
 ];
 
