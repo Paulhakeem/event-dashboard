@@ -4,7 +4,6 @@ import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
 import { PendingPayment } from "~~/server/models/PendingPayment";
 import nodemailer from "nodemailer";
-import axios from "axios";
 import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
@@ -69,7 +68,8 @@ export default defineEventHandler(async (event) => {
       message =
         "Payment not successful. You do not have enough M-Pesa balance to complete this payment. Top up and try again.";
     } else if (pending.resultCode === 1037) {
-      message = "Payment failed due to an incorrect M-Pesa PIN. Please try again.";
+      message =
+        "Payment failed due to an incorrect M-Pesa PIN. Please try again.";
     }
 
     throw createError({
@@ -134,125 +134,78 @@ export default defineEventHandler(async (event) => {
     )
     .join(", ");
 
-  /* ── VERIFY DARAJA M-PESA ─────────────────────────────────── */
-  const consumerKey = config.darajaConsumerKey;
-  const consumerSecret = config.darajaConsumerSecret;
-  const darajaUrl = config.darajaUrl || "https://sandbox.safaricom.co.ke";
-  const passkey = config.darajaPasskey;
+  /* ── VERIFY PAYHERO PAYMENT CALLBACK ───────────────────────── */
 
-  if (!consumerKey || !consumerSecret || !passkey) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Daraja API credentials not configured",
-    });
-  }
+  // A queued or pending request is not a completed payment.
+  // Only the PayHero callback can mark the payment as confirmed.
+  if (pending.status !== "confirmed") {
+    if (pending.status === "pending") {
+      throw createError({
+        statusCode: 409,
+        statusMessage:
+          "Payment is still being processed. Please wait and try again.",
+      });
+    }
 
-  let accessToken;
-  try {
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString(
-      "base64",
-    );
-    const tokenRes = await axios.get(
-      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
-      { headers: { Authorization: `Basic ${auth}` } },
-    );
-    accessToken = tokenRes.data.access_token;
-  } catch {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to get Daraja access token",
-    });
-  }
-
-  let darajaData;
-  try {
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-:TZ.]/g, "")
-      .slice(0, 14);
-    const password = Buffer.from(
-      `${config.mpesaShortCode}${passkey}${timestamp}`,
-    ).toString("base64");
-
-    const checkRes = await axios.post(
-      `${darajaUrl}/mpesa/stkpushquery/v1/query`,
-      {
-        BusinessShortCode: config.mpesaShortCode,
-        Password: password,
-        Timestamp: timestamp,
-        CheckoutRequestID: reference,
-      },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
-
-    if (checkRes.data.ResultCode !== 0 && checkRes.data.ResultCode !== "0") {
-      const queryResultCode = Number(checkRes.data.ResultCode);
-      const knownErrors = {
-        1: {
-          statusMessage:
-            "Payment not successful. You do not have enough M-Pesa balance to complete this payment.",
-          final: true,
-        },
-        1032: {
-          statusMessage: "Payment was cancelled. Please try again.",
-          final: true,
-        },
-        1037: {
-          statusMessage:
-            "Payment failed due to an incorrect M-Pesa PIN. Please try again.",
-          final: true,
-        },
-      };
-      const mapped = knownErrors[queryResultCode];
-
+    if (pending.status === "failed") {
       throw createError({
         statusCode: 400,
         statusMessage:
-          mapped?.statusMessage || "M-Pesa STK push verification failed",
-        data: mapped?.final ? { final: true } : undefined,
+          pending.resultDesc || "Payment was unsuccessful. Please try again.",
+        data: { final: true },
       });
     }
-    darajaData = checkRes.data;
-  } catch (err) {
-    if (err?.statusCode) throw err;
+
+    if (pending.status === "mismatch") {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Payment amount mismatch. Please contact support.",
+        data: { final: true },
+      });
+    }
 
     throw createError({
       statusCode: 400,
-      statusMessage:
-        err.response?.data?.errorMessage ||
-        "Payment not successful. Please try again.",
+      statusMessage: "Payment has not been confirmed by PayHero.",
+      data: { final: true },
     });
   }
 
-  /* ── AMOUNT VALIDATION ────────────────────────────────────── */
-  // Prefer the amount relayed by the M-Pesa callback (verified against the
-  // expected amount when it was received). Otherwise, if the query response
-  // includes an amount, validate it. If neither is available, fall back to the
-  // amount bound server-side when this user initiated the STK push — it was
-  // fixed at initiation time and cannot be changed by a client-supplied
-  // event/ticket.
-  let paidAmount;
-  if (pending.status === "confirmed" && Number.isFinite(pending.callbackAmount)) {
-    paidAmount = pending.callbackAmount;
-  } else {
-    const amountParam = darajaData.ResultParameters?.ResultParameter?.find(
-      (p) => p.Key === "Amount",
-    )?.Value;
-    const parsedAmount = amountParam !== undefined ? parseInt(amountParam, 10) : NaN;
-    paidAmount = Number.isNaN(parsedAmount) ? expectedAmount : parsedAmount;
-  }
+  /* ── VALIDATE THE CONFIRMED AMOUNT ─────────────────────────── */
 
-  if (paidAmount !== expectedAmount) {
+  const paidAmount = Number(pending.callbackAmount);
+
+  if (
+    !Number.isFinite(expectedAmount) ||
+    !Number.isFinite(paidAmount) ||
+    expectedAmount <= 0 ||
+    paidAmount !== expectedAmount
+  ) {
+    await PendingPayment.updateOne(
+      {
+        _id: pending._id,
+        status: "confirmed",
+      },
+      {
+        $set: {
+          status: "mismatch",
+          resultDesc:
+            "PayHero payment amount does not match the expected booking amount.",
+        },
+      },
+    );
+
     throw createError({
       statusCode: 400,
-      statusMessage: "Payment amount mismatch",
+      statusMessage: "Payment amount mismatch. Please contact support.",
+      data: { final: true },
     });
   }
+
+  /* ── TRANSACTION REFERENCE ─────────────────────────────────── */
 
   const transactionId =
-    darajaData.ResultParameters?.ResultParameter?.find(
-      (p) => p.Key === "MpesaReceiptNumber",
-    )?.Value || reference;
+    pending.mpesaReceiptNumber || pending.transactionId || reference.trim();
 
   /* ── PREVENT DUPLICATE BOOKINGS ───────────────────────────── */
   const existingBooking = await TotalBooking.findOne({ reference });
@@ -260,16 +213,29 @@ export default defineEventHandler(async (event) => {
     return { message: "Booking already confirmed", booking: existingBooking };
   }
 
-  /* ── CLAIM THIS PAYMENT ONCE (atomic, race-safe) ──────────── */
+  /* ── CLAIM THIS CONFIRMED PAYMENT ONCE ────────────────────── */
+
   const claimed = await PendingPayment.findOneAndUpdate(
-    { _id: pending._id, status: { $in: ["pending", "confirmed"] } },
-    { $set: { status: "claimed", claimedAt: new Date() } },
-    { new: true },
+    {
+      _id: pending._id,
+      status: "confirmed",
+    },
+    {
+      $set: {
+        status: "claimed",
+        claimedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+    },
   );
+
   if (!claimed) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Payment already processed",
+      statusCode: 409,
+      statusMessage:
+        "This payment has already been processed or is being processed.",
     });
   }
 
@@ -293,11 +259,12 @@ export default defineEventHandler(async (event) => {
     userEmail: userData.email,
     reference,
     status: "success",
-    ticketType: ticketLines
-      .map((line) => line.ticketType)
-      .join(", "),
+    ticketType: ticketLines.map((line) => line.ticketType).join(", "),
     quantity: ticketCount,
     amount: expectedAmount,
+    transactionId,
+    mpesaReceiptNumber: pending.mpesaReceiptNumber,
+    verifiedAt: pending.verifiedAt || new Date(),
     bookedAt: new Date(),
     createdBy: userData._id,
     organiserId: eventData.createdBy,

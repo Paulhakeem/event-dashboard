@@ -1,209 +1,180 @@
-import connectDB from "../../utils/mongoose.js";
-import { Event } from "~~/server/models/Events";
-import { PendingPayment } from "~~/server/models/PendingPayment";
-import { requireAuth } from "../../utils/requireAuth.js";
 import axios from "axios";
+import { randomBytes } from "node:crypto";
 
-const sanitizeForMpesa = (str) => {
-  return str
-    .replace(/&/g, "and") // & breaks XML
-    .replace(/'/g, "") // apostrophes can break SOAP
-    .replace(/"/g, "") // quotes too
-    .replace(/[<>]/g, "") // XML tags
-    .replace(/[^\w\s\-\.]/g, "") // any other special chars
-    .trim()
-    .slice(0, 12); // Safaricom recommends max 12 chars
-};
+import connectDB from "../../utils/mongoose.js";
+import { Event } from "../../models/Events";
+import { PendingPayment } from "../../models/PendingPayment";
+import { requireAuth } from "../../utils/requireAuth.js";
+
+function normalizePhone(phone) {
+  let value = String(phone || "").replace(/[\s+\-()]/g, "");
+
+  if (value.startsWith("0")) {
+    value = `254${value.slice(1)}`;
+  } else if (value.startsWith("7") || value.startsWith("1")) {
+    value = `254${value}`;
+  }
+
+  if (!/^254[17]\d{8}$/.test(value)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Enter a valid Kenyan phone number.",
+    });
+  }
+
+  return value;
+}
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const authUser = await requireAuth(event);
   const body = await readBody(event);
-
   const { phone, eventId, ticketType } = body;
+  const userId = authUser.id || authUser._id;
   const userEmail = authUser.email;
 
-  if (!phone || !eventId || !userEmail || !ticketType) {
+  if (!eventId || !ticketType || !phone) {
     throw createError({
       statusCode: 400,
-      statusMessage: "phone, eventId, userEmail and ticketType are required",
+      statusMessage: "Phone, eventId and ticketType are required.",
+    });
+  }
+  if (!userId || !userEmail) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Your login session is missing user details.",
     });
   }
 
+  const username = config.payheroUsername;
+  const password = config.payheroPassword;
+  const channelId = config.payheroChannelId;
+  const appUrl = String(config.appUrl || "").replace(/\/+$/, "");
+  if (!username || !password || !channelId || !appUrl) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "PayHero is not fully configured.",
+    });
+  }
+
+  const normalizedPhone = normalizePhone(phone);
   await connectDB();
 
-  // Normalize phone
-  let formattedPhone = phone.replace(/\D/g, "");
-
-  if (formattedPhone.startsWith("0")) {
-    formattedPhone = "254" + formattedPhone.slice(1);
-  }
-
-  if (!/^2547\d{8}$/.test(formattedPhone)) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid phone number format",
-    });
-  }
-
-  // Find event
   const eventData = await Event.findById(eventId);
-
   if (!eventData) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: "Event not found",
-    });
+    throw createError({ statusCode: 404, statusMessage: "Event not found." });
   }
-
   if (["cancelled", "completed"].includes(eventData.status)) {
     throw createError({
       statusCode: 400,
-      statusMessage: "Event not available for booking",
+      statusMessage: "This event is no longer available for booking.",
     });
   }
-
-  if (!eventData.TicketQuantity || eventData.TicketQuantity <= 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Tickets sold out",
-    });
+  if (
+    !Number.isFinite(Number(eventData.TicketQuantity)) ||
+    eventData.TicketQuantity < 1
+  ) {
+    throw createError({ statusCode: 400, statusMessage: "Tickets sold out." });
   }
 
-  // Verify ticket type
-  const matchedTicket = eventData.customTickets?.find(
-    (t) => t.name === ticketType,
+  const normalizedType = String(ticketType).trim().toLowerCase();
+  const matchedTicket = eventData.customTickets?.find((ticket) =>
+    [ticket.name, ticket.ticketType, ticket.type]
+      .filter(Boolean)
+      .some((name) => String(name).trim().toLowerCase() === normalizedType),
   );
-
-  if (!matchedTicket || !matchedTicket.price) {
+  const amount = Number(matchedTicket?.price);
+  if (!Number.isFinite(amount) || amount <= 0) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Ticket type not found",
+      statusMessage: "Ticket type not found.",
     });
   }
 
-  const amount = matchedTicket.price;
-
-  // Daraja credentials
-  const {
-    darajaConsumerKey,
-    darajaConsumerSecret,
-    darajaPasskey,
-    darajaUrl,
-    mpesaShortCode,
-    appUrl,
-  } = config;
-
-  if (!darajaConsumerKey || !darajaConsumerSecret || !darajaPasskey) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Daraja credentials missing",
-    });
-  }
-
-  // Get access token
-  let accessToken;
+  const reference = `EVT-${Date.now()}-${randomBytes(4).toString("hex")}`;
+  await PendingPayment.create({
+    CheckoutRequestID: reference,
+    userId,
+    userEmail,
+    phone: normalizedPhone,
+    eventId: eventData._id,
+    eventName: eventData.title,
+    ticketType: String(ticketType).trim(),
+    amount,
+    status: "pending",
+    resultDesc: "Waiting for PayHero payment confirmation",
+  });
 
   try {
-    const auth = Buffer.from(
-      `${darajaConsumerKey}:${darajaConsumerSecret}`,
-    ).toString("base64");
-
-    const tokenRes = await axios.get(
-      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
+    await axios.post(
+      "https://backend.payhero.co.ke/api/v2/payments",
+      {
+        amount,
+        phone_number: `0${normalizedPhone.slice(3)}`,
+        channel_id: Number(channelId),
+        provider: "m-pesa",
+        external_reference: reference,
+        callback_url: `${appUrl}/api/booking/payhero-callback`,
+      },
       {
         headers: {
-          Authorization: `Basic ${auth}`,
+          Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString("base64")}`,
+          "Content-Type": "application/json",
         },
+        timeout: 30000,
       },
     );
-
-    accessToken = tokenRes.data.access_token;
-  } catch (err) {
-    console.error("Token error", err.response?.data);
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to get Daraja token",
-    });
-  }
-
-  // Timestamp
-  const date = new Date();
-
-  const timestamp =
-    date.getFullYear() +
-    ("0" + (date.getMonth() + 1)).slice(-2) +
-    ("0" + date.getDate()).slice(-2) +
-    ("0" + date.getHours()).slice(-2) +
-    ("0" + date.getMinutes()).slice(-2) +
-    ("0" + date.getSeconds()).slice(-2);
-
-  const password = Buffer.from(
-    `${mpesaShortCode}${darajaPasskey}${timestamp}`,
-  ).toString("base64");
-
-  const transactionId = `MPESA-${Date.now()}`;
-
-  const callbackUrl = `${appUrl}/api/booking/mpesa-callback`;
-
-  const payload = {
-    BusinessShortCode: mpesaShortCode,
-    Password: password,
-    Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline",
-    Amount: amount,
-    PartyA: formattedPhone,
-    PartyB: mpesaShortCode,
-    PhoneNumber: formattedPhone,
-    CallBackURL: callbackUrl,
-    AccountReference: sanitizeForMpesa(eventData.title),
-    TransactionDesc: `Booking ${sanitizeForMpesa(eventData.title)}`,
-  };
-
-  try {
-    const response = await axios.post(
-      `${darajaUrl}/mpesa/stkpush/v1/processrequest`,
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    );
-
-    const checkoutRequestID = String(response.data?.CheckoutRequestID || "");
-
-    if (!checkoutRequestID) {
-      throw createError({
-        statusCode: 502,
-        statusMessage: "Safaricom did not return a CheckoutRequestID",
-      });
-    }
-
-    // Persist the intent so verification is bound to this user/event/amount
-    await PendingPayment.create({
-      CheckoutRequestID: checkoutRequestID,
-      userId: authUser.id,
-      userEmail,
-      phone: formattedPhone,
-      eventId: eventData._id,
-      eventName: eventData.title,
-      ticketType,
-      amount,
-    });
 
     return {
       success: true,
-      checkoutRequestID,
-      transactionId,
-      message: "STK push sent successfully",
+      reference,
+      checkoutRequestID: reference,
+      CheckoutRequestID: reference,
+      message: "Payment request submitted. Complete the payment on your phone.",
     };
-  } catch (err) {
-    console.error("STK push failed", err.response?.status || err.message);
+  } catch (error) {
+    const responseData = error.response?.data;
+    const providerMessage =
+      responseData && typeof responseData === "object"
+        ? [
+            responseData.message,
+            responseData.error_message,
+            responseData.error,
+            responseData.detail,
+            responseData.status_message,
+          ].find((message) => typeof message === "string" && message.trim()) ||
+          JSON.stringify(responseData)
+        : typeof responseData === "string"
+          ? responseData
+          : null;
+    const errorMessage =
+      providerMessage || error.message || "Unknown PayHero error.";
+    const responseStatus = error.response?.status;
+
+    console.error("PayHero payment initiation failed:", {
+      status: responseStatus || null,
+      message: errorMessage,
+    });
+
+    if (responseStatus >= 400 && responseStatus < 500) {
+      await PendingPayment.updateOne(
+        { CheckoutRequestID: reference, status: "pending" },
+        {
+          $set: {
+            status: "failed",
+            resultCode: responseStatus,
+            resultDesc: errorMessage,
+            verifiedAt: new Date(),
+          },
+        },
+      );
+    }
 
     throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to initiate STK push",
+      statusCode: 502,
+      statusMessage: responseStatus
+        ? `PayHero rejected the payment request (HTTP ${responseStatus}): ${errorMessage}`
+        : `No response from PayHero: ${errorMessage}`,
     });
   }
 });

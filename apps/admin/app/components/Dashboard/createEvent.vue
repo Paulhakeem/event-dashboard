@@ -296,6 +296,50 @@
         </div>
       </aside>
     </div>
+
+    <!-- Share Modal -->
+    <div
+      v-if="showShareModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      @click.self="closeShareModal"
+    >
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-900">Share Event Link</h3>
+          <button
+            @click="closeShareModal"
+            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+          >
+            <Icon name="mdi:close" />
+          </button>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">
+          Your event has been created. Share this link so people can view it.
+          They will need to login or sign up to book.
+        </p>
+        <div class="flex items-center gap-2 border rounded-lg p-2 bg-gray-50">
+          <input
+            :value="shareUrl"
+            readonly
+            class="flex-1 bg-transparent text-sm text-gray-700 outline-none truncate"
+          />
+          <button
+            @click="copyShareUrl"
+            class="px-3 py-2 text-sm font-semibold bg-[#9d4e8a] text-white rounded-lg hover:bg-[#7c3a6d] transition"
+          >
+            Copy
+          </button>
+        </div>
+        <div class="flex justify-end mt-6">
+          <button
+            @click="closeShareModal"
+            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -341,23 +385,21 @@ const toggleFreeEntry = () => {
   }
 };
 
-const clearForm = () => {
-  Object.assign(form, {
-    title: "",
-    description: "",
-    date: "",
-    location: "",
-    eventType: "other",
-    regular: "",
-    vip: "",
-    vvip: "",
-    TicketQuantity: 0,
-    status: "upcoming",
-  });
-  freeEntry.value = false;
-  customTickets.value = [];
-  previewImage.value = null;
-  file.value = null;
+const shareUrl = ref("");
+const showShareModal = ref(false);
+
+const closeShareModal = () => {
+  showShareModal.value = false;
+  clearForm();
+};
+
+const copyShareUrl = async () => {
+  try {
+    await navigator.clipboard?.writeText(shareUrl.value);
+    alert("Link copied to clipboard");
+  } catch (err) {
+    alert("Unable to copy link");
+  }
 };
 
 // ✅ When admin selects an image
@@ -399,10 +441,11 @@ const submitEvent = async () => {
 
     alert("✅ Event created successfully!");
     if (res?.shareUrl) {
-      navigator.clipboard?.writeText(res.shareUrl);
-      alert(`Shareable event link copied: ${res.shareUrl}`);
+      shareUrl.value = res.shareUrl;
+      showShareModal.value = true;
+    } else {
+      clearForm();
     }
-    clearForm();
   } catch (err) {
     const message =
       err.res?.statusMessage ||

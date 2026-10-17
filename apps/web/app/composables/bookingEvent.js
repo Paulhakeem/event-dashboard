@@ -116,26 +116,12 @@ export default function useEventBooking() {
       error.value = null;
       successMessage.value = null;
 
-      console.log("[booking] stkpush payload:", {
-        phone,
-        eventId: id.value,
-        userEmail: user.value.email,
-        tickets: selectedTickets,
-      });
-
       const res = await $fetch(config.public.stkpushApi, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        query: {
-          phone,
-          eventId: id.value,
-          userEmail: user.value.email,
-          tickets: JSON.stringify(selectedTickets),
-        },
         body: {
           phone,
           eventId: id.value,
-          userEmail: user.value.email,
           tickets: selectedTickets,
         },
       });
@@ -185,7 +171,13 @@ export default function useEventBooking() {
         }
       };
 
-      await tryVerify(res.checkoutRequestID);
+      const paymentReference =
+        res.reference || res.checkoutRequestID || res.CheckoutRequestID;
+      if (!paymentReference) {
+        throw new Error("Payment provider did not return a payment reference.");
+      }
+
+      await tryVerify(paymentReference);
     } catch (err) {
       paymentStatus.value = "failed";
       error.value = err?.data?.statusMessage || "Payment initiation failed";

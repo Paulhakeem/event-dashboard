@@ -15,7 +15,7 @@ export default defineEventHandler((event) => {
   const method = (event.node.req.method || "GET").toUpperCase();
   if (!STATE_CHANGING_METHODS.has(method)) return;
 
-  // Non-browser clients (M-Pesa callbacks, server-to-server, CLI tools)
+  // Non-browser clients (PayHero callbacks, server-to-server, CLI tools)
   // typically omit Origin/Referer entirely — allow those.
   const origin = getHeader(event, "origin");
   const referer = getHeader(event, "referer");

@@ -272,7 +272,9 @@
 
             <!-- PHONE INPUT -->
             <div class="mb-6">
-              <label class="text-sm text-gray-600"> M-Pesa Phone Number </label>
+              <label class="text-sm text-gray-600">
+                M-Pesa Phone Number (PayHero)
+              </label>
 
               <input
                 v-model="phone"

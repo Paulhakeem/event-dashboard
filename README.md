@@ -29,6 +29,10 @@ pnpm install
 
 Create a `.env` file inside `apps/web/` (and `apps/admin/`) with the environment variables referenced in each app's `nuxt.config.ts`. See the root `.gitignore` — env files are not committed.
 
+## PayHero payments
+
+Set `PAYHERO_USERNAME`, `PAYHERO_PASSWORD`, and `PAYHERO_CHANNEL_ID` in the environment for each app that serves the booking payment API. `APP_URL` defaults to `http://localhost:3000` for web and `http://localhost:3001` for admin development; in production, set it to that app's public HTTPS base URL. PayHero sends payment callbacks to `/api/booking/payhero-callback`. PayHero cannot reach a localhost callback from its servers, so use a public HTTPS tunnel (such as a development tunnel) for end-to-end callback testing. The web booking page defaults to the local `/api/booking/stkpush` and `/api/booking/verify` routes, with `STKPUSH_API` and `VERIFY_API` available as overrides.
+
 ## Development
 
 Run both apps in parallel:

@@ -4,18 +4,21 @@ import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
 import { PendingPayment } from "~~/server/models/PendingPayment";
 import nodemailer from "nodemailer";
-import axios from "axios";
 import { Ticket } from "~~/server/models/Ticket";
 import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode"; // npm install qrcode
 import { Notification } from "../../models/Notification";
 import { requireAuth } from "../../utils/requireAuth.js";
+import { parseBody } from "../../utils/parseBody.js";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const authUser = await requireAuth(event);
-  const body = await readBody(event);
+
+  // Replaces readBody(): proxies/intermediaries that strip or rewrite the
+  // Content-Type header make readBody() return {} and every field looks missing.
+  const body = await parseBody(event);
 
   const { reference } = body;
   const userEmail = authUser.email;
@@ -65,7 +68,8 @@ export default defineEventHandler(async (event) => {
       message =
         "Payment not successful. You do not have enough M-Pesa balance to complete this payment. Top up and try again.";
     } else if (pending.resultCode === 1037) {
-      message = "Payment failed due to an incorrect M-Pesa PIN. Please try again.";
+      message =
+        "Payment failed due to an incorrect M-Pesa PIN. Please try again.";
     }
 
     throw createError({
@@ -102,131 +106,106 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "User not found" });
   }
 
-  /* ── TICKET TYPE & PRICE FROM THE PENDING PAYMENT ─────────── */
+  /* ── TICKET LINES & PRICE FROM THE PENDING PAYMENT ─────────*/
   // Never derived from client-supplied ticketType/eventName — the amount was
   // fixed server-side when the STK push was initiated by this user.
-  const ticketType = pending.ticketType;
   const expectedAmount = pending.amount;
 
-  /* ── VERIFY DARAJA M-PESA ─────────────────────────────────── */
-  const consumerKey = config.darajaConsumerKey;
-  const consumerSecret = config.darajaConsumerSecret;
-  const darajaUrl = config.darajaUrl || "https://sandbox.safaricom.co.ke";
-  const passkey = config.darajaPasskey;
+  const ticketLines =
+    Array.isArray(pending.tickets) && pending.tickets.length > 0
+      ? pending.tickets
+      : [
+          {
+            ticketType: pending.ticketType,
+            quantity: pending.quantity,
+            amount: pending.amount,
+          },
+        ];
 
-  if (!consumerKey || !consumerSecret || !passkey) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Daraja API credentials not configured",
-    });
-  }
+  const ticketCount = ticketLines.reduce(
+    (sum, line) => sum + Math.floor(Number(line.quantity) || 0),
+    0,
+  );
 
-  let accessToken;
-  try {
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString(
-      "base64",
-    );
-    const tokenRes = await axios.get(
-      `${darajaUrl}/oauth/v1/generate?grant_type=client_credentials`,
-      { headers: { Authorization: `Basic ${auth}` } },
-    );
-    accessToken = tokenRes.data.access_token;
-  } catch {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to get Daraja access token",
-    });
-  }
+  const ticketSummary = ticketLines
+    .map(
+      (line) =>
+        `${Math.floor(Number(line.quantity) || 0)} × ${line.ticketType}`,
+    )
+    .join(", ");
 
-  let darajaData;
-  try {
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-:TZ.]/g, "")
-      .slice(0, 14);
-    const password = Buffer.from(
-      `${config.mpesaShortCode}${passkey}${timestamp}`,
-    ).toString("base64");
+  /* ── VERIFY PAYHERO PAYMENT CALLBACK ───────────────────────── */
 
-    const checkRes = await axios.post(
-      `${darajaUrl}/mpesa/stkpushquery/v1/query`,
-      {
-        BusinessShortCode: config.mpesaShortCode,
-        Password: password,
-        Timestamp: timestamp,
-        CheckoutRequestID: reference,
-      },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-    );
+  // A queued or pending request is not a completed payment.
+  // Only the PayHero callback can mark the payment as confirmed.
+  if (pending.status !== "confirmed") {
+    if (pending.status === "pending") {
+      throw createError({
+        statusCode: 409,
+        statusMessage:
+          "Payment is still being processed. Please wait and try again.",
+      });
+    }
 
-    if (checkRes.data.ResultCode !== 0 && checkRes.data.ResultCode !== "0") {
-      const queryResultCode = Number(checkRes.data.ResultCode);
-      const knownErrors = {
-        1: {
-          statusMessage:
-            "Payment not successful. You do not have enough M-Pesa balance to complete this payment.",
-          final: true,
-        },
-        1032: {
-          statusMessage: "Payment was cancelled. Please try again.",
-          final: true,
-        },
-        1037: {
-          statusMessage:
-            "Payment failed due to an incorrect M-Pesa PIN. Please try again.",
-          final: true,
-        },
-      };
-      const mapped = knownErrors[queryResultCode];
-
+    if (pending.status === "failed") {
       throw createError({
         statusCode: 400,
         statusMessage:
-          mapped?.statusMessage || "M-Pesa STK push verification failed",
-        data: mapped?.final ? { final: true } : undefined,
+          pending.resultDesc || "Payment was unsuccessful. Please try again.",
+        data: { final: true },
       });
     }
-    darajaData = checkRes.data;
-  } catch (err) {
-    if (err?.statusCode) throw err;
+
+    if (pending.status === "mismatch") {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "Payment amount mismatch. Please contact support.",
+        data: { final: true },
+      });
+    }
 
     throw createError({
       statusCode: 400,
-      statusMessage:
-        err.response?.data?.errorMessage ||
-        "Payment not successful. Please try again.",
+      statusMessage: "Payment has not been confirmed by PayHero.",
+      data: { final: true },
     });
   }
 
-  /* ── AMOUNT VALIDATION ────────────────────────────────────── */
-  // Prefer the amount relayed by the M-Pesa callback (verified against the
-  // expected amount when it was received). Otherwise, if the query response
-  // includes an amount, validate it. If neither is available, fall back to the
-  // amount bound server-side when this user initiated the STK push — it was
-  // fixed at initiation time and cannot be changed by a client-supplied
-  // event/ticket.
-  let paidAmount;
-  if (pending.status === "confirmed" && Number.isFinite(pending.callbackAmount)) {
-    paidAmount = pending.callbackAmount;
-  } else {
-    const amountParam = darajaData.ResultParameters?.ResultParameter?.find(
-      (p) => p.Key === "Amount",
-    )?.Value;
-    const parsedAmount = amountParam !== undefined ? parseInt(amountParam, 10) : NaN;
-    paidAmount = Number.isNaN(parsedAmount) ? expectedAmount : parsedAmount;
-  }
+  /* ── VALIDATE THE CONFIRMED AMOUNT ─────────────────────────── */
 
-  if (paidAmount !== expectedAmount) {
+  const paidAmount = Number(pending.callbackAmount);
+
+  if (
+    !Number.isFinite(expectedAmount) ||
+    !Number.isFinite(paidAmount) ||
+    expectedAmount <= 0 ||
+    paidAmount !== expectedAmount
+  ) {
+    await PendingPayment.updateOne(
+      {
+        _id: pending._id,
+        status: "confirmed",
+      },
+      {
+        $set: {
+          status: "mismatch",
+          resultDesc:
+            "PayHero payment amount does not match the expected booking amount.",
+        },
+      },
+    );
+
     throw createError({
       statusCode: 400,
-      statusMessage: "Payment amount mismatch",
+      statusMessage: "Payment amount mismatch. Please contact support.",
+      data: { final: true },
     });
   }
+
+  /* ── TRANSACTION REFERENCE ─────────────────────────────────── */
 
   const transactionId =
-    darajaData.ResultParameters?.ResultParameter?.find(
-      (p) => p.Key === "MpesaReceiptNumber",
-    )?.Value || reference;
+    pending.mpesaReceiptNumber || pending.transactionId || reference.trim();
 
   /* ── PREVENT DUPLICATE BOOKINGS ───────────────────────────── */
   const existingBooking = await TotalBooking.findOne({ reference });
@@ -234,16 +213,29 @@ export default defineEventHandler(async (event) => {
     return { message: "Booking already confirmed", booking: existingBooking };
   }
 
-  /* ── CLAIM THIS PAYMENT ONCE (atomic, race-safe) ──────────── */
+  /* ── CLAIM THIS CONFIRMED PAYMENT ONCE ────────────────────── */
+
   const claimed = await PendingPayment.findOneAndUpdate(
-    { _id: pending._id, status: { $in: ["pending", "confirmed"] } },
-    { $set: { status: "claimed", claimedAt: new Date() } },
-    { new: true },
+    {
+      _id: pending._id,
+      status: "confirmed",
+    },
+    {
+      $set: {
+        status: "claimed",
+        claimedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+    },
   );
+
   if (!claimed) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Payment already processed",
+      statusCode: 409,
+      statusMessage:
+        "This payment has already been processed or is being processed.",
     });
   }
 
@@ -251,10 +243,10 @@ export default defineEventHandler(async (event) => {
   const updatedEvent = await Event.findOneAndUpdate(
     {
       _id: eventData._id,
-      TicketQuantity: { $gt: 0 },
+      TicketQuantity: { $gte: ticketCount },
       status: { $nin: ["cancelled", "completed"] },
     },
-    { $inc: { TicketQuantity: -1 } },
+    { $inc: { TicketQuantity: -ticketCount } },
     { new: true },
   );
   if (!updatedEvent) {
@@ -267,39 +259,89 @@ export default defineEventHandler(async (event) => {
     userEmail: userData.email,
     reference,
     status: "success",
-    ticketType,
+    ticketType: ticketLines.map((line) => line.ticketType).join(", "),
+    quantity: ticketCount,
     amount: expectedAmount,
+    transactionId,
+    mpesaReceiptNumber: pending.mpesaReceiptNumber,
+    verifiedAt: pending.verifiedAt || new Date(),
     bookedAt: new Date(),
     createdBy: userData._id,
     organiserId: eventData.createdBy,
   });
 
-  /* ── GENERATE UNIQUE TICKET CODE ──────────────────────────── */
-  let ticketCode;
-  let retries = 3;
-  while (retries > 0) {
-    ticketCode = generateTicketCode();
-    const exists = await Ticket.findOne({ ticketCode });
-    if (!exists) break;
-    retries--;
-  }
-  if (retries === 0) {
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Failed to generate unique ticket code",
-    });
-  }
+  /* ── GENERATE TICKETS (one per person, per ticket line) ─── */
+  const tickets = [];
 
-  await Ticket.create({
-    ticketCode,
-    eventName: eventData.title,
-    eventId: eventData._id,
-    userEmail: userData.email,
-    userId: userData._id,
-    bookingId: booking._id,
-    ticketType,
-    amount: expectedAmount,
-  });
+  for (const line of ticketLines) {
+    const lineCount = Math.floor(Number(line.quantity) || 0);
+    const unitAmount = Math.round((Number(line.amount) || 0) / lineCount);
+
+    for (let i = 0; i < lineCount; i++) {
+      /* ── Generate unique ticket code ─────────────────────────── */
+      let ticketCode;
+      let created = false;
+
+      for (let retries = 3; retries > 0; retries--) {
+        ticketCode = generateTicketCode();
+        const exists = await Ticket.findOne({ ticketCode });
+        if (!exists) {
+          created = true;
+          break;
+        }
+      }
+
+      if (!created) {
+        throw createError({
+          statusCode: 500,
+          statusMessage: "Failed to generate unique ticket code",
+        });
+      }
+
+      const ticket = await Ticket.create({
+        ticketCode,
+        eventName: eventData.title,
+        eventId: eventData._id,
+        userEmail: userData.email,
+        userId: userData._id,
+        bookingId: booking._id,
+        ticketType: line.ticketType,
+        amount: unitAmount,
+      });
+
+      /* ── Generate this ticket's QR + PDF ─────────────────────── */
+      const qrPayload = [
+        `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
+        `Event: ${eventData.title}`,
+        `Ticket type: ${line.ticketType}`,
+        `Ticket code: ${ticketCode}`,
+      ].join("\n");
+
+      // Pure black on white = maximum contrast = easiest to scan
+      const qrBuffer = await QRCode.toBuffer(qrPayload, {
+        type: "png",
+        width: 200,
+        margin: 2,
+        errorCorrectionLevel: "L",
+        color: { dark: "#000000", light: "#ffffff" },
+      });
+
+      const pdfBuffer = await generateTicketPdf({
+        eventTitle: eventData.title,
+        eventDate: new Date(eventData.date).toDateString(),
+        location: eventData.location,
+        ticketCode,
+        ticketType: line.ticketType,
+        amount: unitAmount,
+        reference: transactionId,
+        name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
+        email: userData.email,
+        qrBuffer,
+      });
+
+      tickets.push({ ticketCode, pdfBuffer });
+    }
+  }
 
   try {
     const bookerName =
@@ -309,22 +351,26 @@ export default defineEventHandler(async (event) => {
     await Notification.insertMany([
       {
         title: "Booking confirmed",
-        message: `Your booking for "${eventData.title}" (${ticketType}) was confirmed successfully.`,
+        message: `Your booking for "${eventData.title}" (${ticketSummary}) was confirmed successfully.`,
         recipientUser: userData._id,
         event: eventData._id,
-        meta: { type: "booking_confirmed" },
+        meta: { type: "booking_confirmed", quantity: ticketCount },
         read: false,
       },
       {
         title: "New event booking",
-        message: `${bookerName} booked "${eventData.title}" (${ticketType}).`,
+        message: `${bookerName} booked ${ticketSummary} for "${eventData.title}".`,
         recipientRole: "admin",
         event: eventData._id,
         meta: {
           type: "booking_created",
           bookerId: userData._id,
           bookerName,
-          ticketType,
+          tickets: ticketLines.map((line) => ({
+            ticketType: line.ticketType,
+            quantity: Math.floor(Number(line.quantity) || 0),
+          })),
+          quantity: ticketCount,
           amount: expectedAmount,
         },
         read: false,
@@ -333,23 +379,6 @@ export default defineEventHandler(async (event) => {
   } catch (notificationError) {
     console.error("Failed to create booking notification:", notificationError);
   }
-
-  /* ── GENERATE TICKET PDF ──────────────────────────────────── */
-  const qrPayload = [
-    `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
-    `Event: ${eventData.title}`,
-    `Ticket type: ${ticketType}`,
-    `Ticket code: ${ticketCode}`,
-  ].join("\n");
-
-  // Pure black on white = maximum contrast = easiest to scan
-  const qrBuffer = await QRCode.toBuffer(qrPayload, {
-    type: "png",
-    width: 200,
-    margin: 2,
-    errorCorrectionLevel: "L",
-    color: { dark: "#000000", light: "#ffffff" },
-  });
 
   async function generateTicketPdf(details) {
     return new Promise((resolve, reject) => {
@@ -468,18 +497,14 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const pdfBuffer = await generateTicketPdf({
-    eventTitle: eventData.title,
-    eventDate: new Date(eventData.date).toDateString(),
-    location: eventData.location,
-    ticketCode,
-    ticketType,
-    amount: expectedAmount,
-    reference: transactionId,
-    name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
-    email: userData.email,
-    qrBuffer, // pass QR image buffer directly to pdfkit
-  });
+  /* ── BUILD ATTACHMENTS FROM GENERATED TICKETS ─────────────── */
+  const attachments = tickets.map((t, i) => ({
+    filename: `ticket-${t.ticketCode}.pdf`,
+    content: t.pdfBuffer,
+    contentType: "application/pdf",
+  }));
+
+  const ticketCodeList = tickets.map((t) => t.ticketCode).join(", ");
 
   /* ── SEND EMAILS ──────────────────────────────────────────── */
   if (
@@ -511,31 +536,25 @@ export default defineEventHandler(async (event) => {
             </div>
             <div style="padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
               <p>Hi <strong>${holderName}</strong>,</p>
-              <p>Your ticket for <strong>${eventData.title}</strong> is confirmed.</p>
+              <p>Your <strong>${ticketCount}</strong> ${ticketCount === 1 ? "ticket" : "tickets"} for <strong>${eventData.title}</strong> ${ticketCount === 1 ? "is" : "are"} confirmed.</p>
               <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
                 <tr><td style="padding:8px 0;color:#6b7280">Event</td><td style="padding:8px 0"><strong>${eventData.title}</strong></td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280">Date</td><td style="padding:8px 0">${new Date(eventData.date).toDateString()}</td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280">Location</td><td style="padding:8px 0">${eventData.location}</td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Ticket Type</td><td style="padding:8px 0">${ticketType.toUpperCase()}</td></tr>
+                <tr><td style="padding:8px 0;color:#6b7280">Tickets</td><td style="padding:8px 0">${ticketSummary}</td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280">Amount Paid</td><td style="padding:8px 0">KES ${expectedAmount}</td></tr>
                 <tr><td style="padding:8px 0;color:#6b7280">Reference</td><td style="padding:8px 0"><code>${transactionId}</code></td></tr>
               </table>
               <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;margin:16px 0">
-                <p style="margin:0 0 6px;color:#6b7280;font-size:12px">YOUR TICKET CODE</p>
-                <p style="font-family:monospace;font-size:22px;font-weight:bold;color:#9c4e8b;margin:0">${ticketCode}</p>
+                <p style="margin:0 0 6px;color:#6b7280;font-size:12px">YOUR TICKET ${ticketCount === 1 ? "CODE" : "CODES"}</p>
+                <p style="font-family:monospace;font-size:16px;font-weight:bold;color:#9c4e8b;margin:0;word-break:break-word">${ticketCodeList}</p>
               </div>
-              <p style="font-size:13px;color:#6b7280">Your ticket PDF is attached. Present it (printed or on your phone) at the entrance.</p>
+              <p style="font-size:13px;color:#6b7280">Your ticket PDF${ticketCount === 1 ? "" : "s"} ${ticketCount === 1 ? "is" : "are"} attached. Present ${ticketCount === 1 ? "it" : "them"} (printed or on your phone) at the entrance.</p>
               <p>Thank you for booking with Volora Events 🙏</p>
             </div>
           </div>
         `,
-        attachments: [
-          {
-            filename: `ticket-${ticketCode}.pdf`,
-            content: pdfBuffer,
-            contentType: "application/pdf",
-          },
-        ],
+        attachments,
       });
     } catch (err) {
       console.error("Error sending email to user:", err);
@@ -555,19 +574,13 @@ export default defineEventHandler(async (event) => {
               <p><strong>Event:</strong> ${eventData.title}</p>
               <p><strong>User:</strong> ${holderName}</p>
               <p><strong>Email:</strong> ${userData.email}</p>
-              <p><strong>Ticket:</strong> ${ticketType.toUpperCase()}</p>
+              <p><strong>Tickets:</strong> ${ticketSummary}</p>
               <p><strong>Amount:</strong> KES ${expectedAmount}</p>
               <p><strong>Reference:</strong> ${transactionId}</p>
-              <p><strong>Ticket Code:</strong> <code>${ticketCode}</code></p>
+              <p><strong>Ticket Codes:</strong> <code>${ticketCodeList}</code></p>
             </div>
           `,
-          attachments: [
-            {
-              filename: `ticket-${ticketCode}.pdf`,
-              content: pdfBuffer,
-              contentType: "application/pdf",
-            },
-          ],
+          attachments,
         });
       } catch (err) {
         console.error("Error sending email to admin:", err);
@@ -581,6 +594,7 @@ export default defineEventHandler(async (event) => {
   return {
     message: "Booking verified and saved successfully",
     booking,
-    ticketPdfBase64: pdfBuffer.toString("base64"),
+    ticketCount,
+    ticketPdfBase64: tickets[0]?.pdfBuffer.toString("base64"),
   };
 });

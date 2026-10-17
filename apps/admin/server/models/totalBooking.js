@@ -46,6 +46,10 @@ const totalBookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
     amount: {
       type: Number,
       default: 0,
