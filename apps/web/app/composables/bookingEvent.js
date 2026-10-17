@@ -11,6 +11,7 @@ export default function useEventBooking() {
 
   const loading = ref(false);
   const paymentStatus = ref("idle");
+  const currentPaymentReference = ref(null);
   const error = ref(null);
   const successMessage = ref(null);
 
@@ -48,7 +49,11 @@ export default function useEventBooking() {
         },
       });
 
-      successMessage.value = verifyResponse.message;
+      const emailDelivery = verifyResponse.emailDelivery;
+      successMessage.value =
+        emailDelivery?.attendee === false
+          ? `${verifyResponse.message} Your ticket email could not be sent yet; check your email settings or retry payment verification shortly.`
+          : verifyResponse.message;
       paymentStatus.value = "success";
 
       if (verifyResponse.ticketPdfBase64) {
@@ -68,6 +73,39 @@ export default function useEventBooking() {
   };
 
   /* ---------------- BOOK EVENT ---------------- */
+
+  const checkPaymentStatus = async () => {
+    const paymentReference = currentPaymentReference.value;
+    if (!paymentReference) return;
+
+    paymentStatus.value = "verifying";
+    error.value = null;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        await verifyPayment(paymentReference);
+        paymentStatus.value = "success";
+        return;
+      } catch (err) {
+        if (err?.data?.final === true) {
+          paymentStatus.value = "failed";
+          error.value =
+            err?.data?.statusMessage ||
+            "Payment not successful. Please try again.";
+          return;
+        }
+
+        if (attempt < 2) {
+          paymentStatus.value = "waiting";
+          await new Promise((resolve) => setTimeout(resolve, 15000));
+        }
+      }
+    }
+
+    paymentStatus.value = "pending";
+    error.value =
+      "Payment confirmation is taking longer than expected. Do not pay again; check this payment's status again shortly.";
+  };
 
   const bookAndPay = async (phone, tickets = []) => {
     if (!user.value) {
@@ -127,57 +165,14 @@ export default function useEventBooking() {
       });
       paymentStatus.value = "waiting";
 
-      // wait before verifying
-      const tryVerify = async (id, retries = 3) => {
-        paymentStatus.value = "verifying";
-
-        for (let i = 0; i < retries; i++) {
-          try {
-            console.log(`Verification attempt ${i + 1}`);
-
-            await verifyPayment(id);
-
-            // ✅ SUCCESS
-            paymentStatus.value = "success";
-            return;
-          } catch (err) {
-            console.log("Retrying verification...", i + 1);
-
-            // Payment was definitively rejected by M-Pesa (insufficient
-            // balance, cancelled, wrong PIN) — stop retrying right away.
-            if (err?.data?.final === true) {
-              paymentStatus.value = "failed";
-              error.value =
-                err?.data?.statusMessage ||
-                "Payment not successful. Please try again.";
-              return;
-            }
-
-            // If it's last attempt → fail
-            if (i === retries - 1) {
-              paymentStatus.value = "failed";
-              error.value =
-                err?.data?.statusMessage ||
-                "Payment not successful. Please try again.";
-              return;
-            }
-
-            // ⏳ Still waiting for user payment
-            paymentStatus.value = "waiting";
-
-            await new Promise((res) => setTimeout(res, 15000));
-            paymentStatus.value = "verifying";
-          }
-        }
-      };
-
       const paymentReference =
         res.reference || res.checkoutRequestID || res.CheckoutRequestID;
       if (!paymentReference) {
         throw new Error("Payment provider did not return a payment reference.");
       }
 
-      await tryVerify(paymentReference);
+      currentPaymentReference.value = paymentReference;
+      await checkPaymentStatus();
     } catch (err) {
       paymentStatus.value = "failed";
       error.value = err?.data?.statusMessage || "Payment initiation failed";
@@ -206,6 +201,7 @@ export default function useEventBooking() {
     successMessage,
     ticketPdfUrl,
     bookAndPay,
+    checkPaymentStatus,
     downloadTicket,
   };
 }

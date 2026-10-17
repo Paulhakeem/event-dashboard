@@ -296,22 +296,30 @@
 
             <!-- PAYMENT BUTTON -->
             <button
-              @click="handleBooking"
+              @click="
+                paymentStatus === 'pending'
+                  ? checkPaymentStatus()
+                  : handleBooking()
+              "
               :disabled="
                 event?.freeEntry ||
                 !isBookable ||
-                (paymentStatus !== 'idle' && paymentStatus !== 'failed')
+                !['idle', 'failed', 'pending'].includes(paymentStatus)
               "
               class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
               :class="{
                 'bg-green-500 hover:bg-green-600': paymentStatus === 'idle',
                 'bg-yellow-500': paymentStatus === 'waiting',
+                'bg-yellow-600': paymentStatus === 'pending',
                 'bg-blue-500':
                   paymentStatus === 'verifying' || paymentStatus === 'sending',
                 'bg-green-600': paymentStatus === 'success',
                 'bg-red-500': paymentStatus === 'failed',
-                'bg-gray-400 cursor-not-allowed':
-                  paymentStatus !== 'idle' && paymentStatus !== 'success',
+                'bg-gray-400 cursor-not-allowed': [
+                  'sending',
+                  'waiting',
+                  'verifying',
+                ].includes(paymentStatus),
               }"
             >
               <!-- Spinner -->
@@ -348,6 +356,9 @@
               <span v-else-if="paymentStatus === 'waiting'"
                 >Waiting for payment...</span
               >
+              <span v-else-if="paymentStatus === 'pending'"
+                >Check payment status</span
+              >
               <span v-else-if="paymentStatus === 'verifying'"
                 >Verifying payment...</span
               >
@@ -377,7 +388,14 @@
 import useEventBooking from "~/composables/bookingEvent";
 import { computed, ref } from "vue";
 
-const { event, paymentStatus, error, successMessage, bookAndPay } =
+const {
+  event,
+  paymentStatus,
+  error,
+  successMessage,
+  bookAndPay,
+  checkPaymentStatus,
+} =
   useEventBooking();
 
 const { user } = useAuth();

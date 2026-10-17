@@ -31,6 +31,7 @@ const pendingPaymentSchema = new mongoose.Schema(
       },
     ],
     amount: { type: Number, required: true },
+    payheroReference: { type: String },
     status: {
       type: String,
       enum: ["pending", "confirmed", "claimed", "failed", "mismatch"],

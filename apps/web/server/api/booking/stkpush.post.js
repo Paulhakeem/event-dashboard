@@ -232,7 +232,7 @@ export default defineEventHandler(async (event) => {
       "base64",
     );
 
-    await axios.post(
+    const payheroResponse = await axios.post(
       "https://backend.payhero.co.ke/api/v2/payments",
       {
         amount,
@@ -250,6 +250,21 @@ export default defineEventHandler(async (event) => {
         timeout: 30000,
       },
     );
+
+    const payheroReference =
+      payheroResponse.data?.reference ||
+      payheroResponse.data?.CheckoutRequestID;
+    if (typeof payheroReference === "string" && payheroReference.trim()) {
+      await PendingPayment.updateOne(
+        { CheckoutRequestID: reference },
+        { $set: { payheroReference: payheroReference.trim() } },
+      );
+    } else {
+      console.warn(
+        "PayHero accepted payment request without returning a transaction reference:",
+        reference,
+      );
+    }
 
   } catch (error) {
     const responseData = error.response?.data;

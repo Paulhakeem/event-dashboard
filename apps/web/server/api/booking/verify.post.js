@@ -1,4 +1,5 @@
 import connectDB from "../../utils/mongoose.js";
+import axios from "axios";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { User } from "~~/server/models/User";
 import { Event } from "~~/server/models/Events";
@@ -11,6 +12,134 @@ import QRCode from "qrcode"; // npm install qrcode
 import { Notification } from "../../models/Notification";
 import { requireAuth } from "../../utils/requireAuth.js";
 import { parseBody } from "../../utils/parseBody.js";
+
+async function sendBookingEmails({
+  config,
+  booking,
+  eventData,
+  userData,
+  ticketCount,
+  ticketSummary,
+  expectedAmount,
+  transactionId,
+  ticketCodeList,
+  attachments,
+}) {
+  const delivery = { attendee: false, admins: false };
+
+  if (
+    !config.smtpHost ||
+    !config.smtpPort ||
+    !config.emailUsername ||
+    !config.emailPass
+  ) {
+    console.warn("SMTP is not fully configured; booking emails were not sent.");
+    return delivery;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: config.smtpHost,
+    port: Number(config.smtpPort),
+    secure: Number(config.smtpPort) === 465,
+    auth: { user: config.emailUsername, pass: config.emailPass },
+  });
+  const from = `"Happitwin events" <${config.emailUsername}>`;
+  const holderName =
+    `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
+    userData.email;
+
+  if (booking.attendeeEmailSentAt) {
+    delivery.attendee = true;
+  } else {
+    try {
+      await transporter.sendMail({
+        from,
+        to: userData.email,
+        subject: `Booking Confirmed – ${eventData.title}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:auto">
+            <h2>Booking Confirmed!</h2>
+            <p>Hi <strong>${holderName}</strong>,</p>
+            <p>Your <strong>${ticketCount}</strong> ${ticketCount === 1 ? "ticket" : "tickets"} for <strong>${eventData.title}</strong> ${ticketCount === 1 ? "is" : "are"} confirmed.</p>
+            <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
+            <p><strong>Location:</strong> ${eventData.location}</p>
+            <p><strong>Tickets:</strong> ${ticketSummary}</p>
+            <p><strong>Amount paid:</strong> KES ${expectedAmount}</p>
+            <p><strong>Payment reference:</strong> ${transactionId}</p>
+            <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
+            <p>Your ticket PDF${ticketCount === 1 ? " is" : "s are"} attached. Present ${ticketCount === 1 ? "it" : "them"} at the entrance.</p>
+          </div>
+        `,
+        attachments,
+      });
+      const sentAt = new Date();
+      await TotalBooking.updateOne(
+        { _id: booking._id },
+        { $set: { attendeeEmailSentAt: sentAt } },
+      );
+      booking.attendeeEmailSentAt = sentAt;
+      delivery.attendee = true;
+    } catch (emailError) {
+      console.error("Failed to send booking confirmation to attendee:", {
+        bookingId: booking._id,
+        message: emailError.message,
+      });
+    }
+  }
+
+  if (booking.adminEmailSentAt) {
+    delivery.admins = true;
+  } else {
+    try {
+      const admins = await User.find({
+        role: "admin",
+        email: { $type: "string", $ne: "" },
+      })
+        .select("email")
+        .lean();
+      const adminEmails = admins.map((admin) => admin.email).filter(Boolean);
+
+      if (!adminEmails.length) {
+        console.error("No admin email recipients are configured for booking notifications.", {
+          bookingId: booking._id,
+        });
+      } else {
+        await transporter.sendMail({
+          from,
+          to: adminEmails,
+          subject: `New Booking – ${eventData.title}`,
+          html: `
+            <div style="font-family:sans-serif;max-width:520px;margin:auto">
+              <h2>New Booking Alert</h2>
+              <p><strong>Event:</strong> ${eventData.title}</p>
+              <p><strong>User:</strong> ${holderName}</p>
+              <p><strong>Email:</strong> ${userData.email}</p>
+              <p><strong>Tickets:</strong> ${ticketSummary}</p>
+              <p><strong>Amount:</strong> KES ${expectedAmount}</p>
+              <p><strong>Payment reference:</strong> ${transactionId}</p>
+              <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
+            </div>
+          `,
+          attachments,
+        });
+        const sentAt = new Date();
+        await TotalBooking.updateOne(
+          { _id: booking._id },
+          { $set: { adminEmailSentAt: sentAt } },
+        );
+        booking.adminEmailSentAt = sentAt;
+        delivery.admins = true;
+      }
+    } catch (emailError) {
+      console.error("Failed to send booking notification to admins:", {
+        bookingId: booking._id,
+        message: emailError.message,
+      });
+    }
+  }
+
+  return delivery;
+}
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
@@ -34,7 +163,7 @@ export default defineEventHandler(async (event) => {
   await connectDB();
 
   /* ── RESOLVE SERVER-BOUND PENDING PAYMENT ─────────────────── */
-  const pending = await PendingPayment.findOne({
+  let pending = await PendingPayment.findOne({
     CheckoutRequestID: reference.trim(),
     userId: authUser.id,
   });
@@ -45,11 +174,101 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  if (pending.status === "claimed") {
+  if (pending.status === "pending" && pending.payheroReference) {
+    const username = config.payheroUsername;
+    const password = config.payheroPassword;
+
+    if (username && password) {
+      try {
+        const authHeader = Buffer.from(`${username}:${password}`).toString(
+          "base64",
+        );
+        const { data: transaction } = await axios.get(
+          "https://backend.payhero.co.ke/api/v2/transaction-status",
+          {
+            params: { reference: pending.payheroReference },
+            headers: { Authorization: `Basic ${authHeader}` },
+            timeout: 10000,
+          },
+        );
+        const providerStatus = String(transaction?.status || "").toUpperCase();
+
+        if (providerStatus === "SUCCESS") {
+          const receivedAmount = Number(
+            transaction.amount ?? transaction.Amount ?? pending.amount,
+          );
+          const isAmountValid =
+            Number.isFinite(receivedAmount) &&
+            receivedAmount === Number(pending.amount);
+
+          pending = await PendingPayment.findOneAndUpdate(
+            { _id: pending._id, status: "pending" },
+            {
+              $set: {
+                status: isAmountValid ? "confirmed" : "mismatch",
+                resultCode: isAmountValid ? 0 : -1,
+                resultDesc: isAmountValid
+                  ? "Payment confirmed by PayHero."
+                  : "PayHero payment amount does not match the expected amount.",
+                callbackAmount: receivedAmount,
+                transactionId:
+                  transaction.provider_reference ||
+                  transaction.third_party_reference ||
+                  transaction.CheckoutRequestID ||
+                  "",
+                verifiedAt: new Date(),
+              },
+            },
+            { new: true },
+          );
+
+          if (!pending) {
+            pending = await PendingPayment.findOne({
+              CheckoutRequestID: reference.trim(),
+              userId: authUser.id,
+            });
+          }
+        } else if (providerStatus === "FAILED") {
+          pending = await PendingPayment.findOneAndUpdate(
+            { _id: pending._id, status: "pending" },
+            {
+              $set: {
+                status: "failed",
+                resultCode: -1,
+                resultDesc:
+                  transaction.message ||
+                  transaction.result_description ||
+                  "PayHero payment failed.",
+                verifiedAt: new Date(),
+              },
+            },
+            { new: true },
+          );
+
+          if (!pending) {
+            pending = await PendingPayment.findOne({
+              CheckoutRequestID: reference.trim(),
+              userId: authUser.id,
+            });
+          }
+        }
+      } catch (statusError) {
+        console.error("PayHero transaction status lookup failed:", {
+          reference: pending.CheckoutRequestID,
+          status: statusError.response?.status || null,
+          message:
+            statusError.response?.data?.error_message ||
+            statusError.message ||
+            "Unknown PayHero status error.",
+        });
+      }
+    }
+  }
+
+  if (!pending) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Payment already processed",
-      data: { final: true },
+      statusCode: 404,
+      statusMessage: "Payment record is no longer available.",
     });
   }
 
@@ -93,7 +312,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Event not found" });
   }
 
-  if (eventData.status === "cancelled" || eventData.status === "completed") {
+  if (
+    pending.status !== "claimed" &&
+    (eventData.status === "cancelled" || eventData.status === "completed")
+  ) {
     throw createError({
       statusCode: 400,
       statusMessage: "This event is no longer available for booking",
@@ -138,7 +360,7 @@ export default defineEventHandler(async (event) => {
 
   // A queued or pending request is not a completed payment.
   // Only the PayHero callback can mark the payment as confirmed.
-  if (pending.status !== "confirmed") {
+  if (!["confirmed", "claimed"].includes(pending.status)) {
     if (pending.status === "pending") {
       throw createError({
         statusCode: 409,
@@ -210,7 +432,74 @@ export default defineEventHandler(async (event) => {
   /* ── PREVENT DUPLICATE BOOKINGS ───────────────────────────── */
   const existingBooking = await TotalBooking.findOne({ reference });
   if (existingBooking) {
-    return { message: "Booking already confirmed", booking: existingBooking };
+    const savedTickets = await Ticket.find({
+      bookingId: existingBooking._id,
+    }).sort({ createdAt: 1 });
+    const emailTickets = [];
+
+    for (const ticket of savedTickets) {
+      const qrPayload = [
+        `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
+        `Event: ${eventData.title}`,
+        `Ticket type: ${ticket.ticketType}`,
+        `Ticket code: ${ticket.ticketCode}`,
+      ].join("\n");
+      const qrBuffer = await QRCode.toBuffer(qrPayload, {
+        type: "png",
+        width: 200,
+        margin: 2,
+        errorCorrectionLevel: "L",
+        color: { dark: "#000000", light: "#ffffff" },
+      });
+      const pdfBuffer = await generateTicketPdf({
+        eventTitle: eventData.title,
+        eventDate: new Date(eventData.date).toDateString(),
+        location: eventData.location,
+        ticketCode: ticket.ticketCode,
+        ticketType: ticket.ticketType,
+        amount: ticket.amount,
+        reference: existingBooking.transactionId || transactionId,
+        name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
+        email: userData.email,
+        qrBuffer,
+      });
+      emailTickets.push({ ticketCode: ticket.ticketCode, pdfBuffer });
+    }
+
+    const attachments = emailTickets.map((ticket) => ({
+      filename: `ticket-${ticket.ticketCode}.pdf`,
+      content: ticket.pdfBuffer,
+      contentType: "application/pdf",
+    }));
+    const emailDelivery = await sendBookingEmails({
+      config,
+      booking: existingBooking,
+      eventData,
+      userData,
+      ticketCount: existingBooking.quantity,
+      ticketSummary,
+      expectedAmount: existingBooking.amount,
+      transactionId: existingBooking.transactionId || transactionId,
+      ticketCodeList: emailTickets
+        .map((ticket) => ticket.ticketCode)
+        .join(", "),
+      attachments,
+    });
+
+    return {
+      message: "Booking already confirmed",
+      booking: existingBooking,
+      emailDelivery,
+      ticketPdfBase64: emailTickets[0]?.pdfBuffer.toString("base64"),
+    };
+  }
+
+  if (pending.status === "claimed") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Payment was claimed but its booking could not be found.",
+      data: { final: true },
+    });
   }
 
   /* ── CLAIM THIS CONFIRMED PAYMENT ONCE ────────────────────── */
@@ -498,97 +787,25 @@ export default defineEventHandler(async (event) => {
   }
 
   /* ── BUILD ATTACHMENTS FROM GENERATED TICKETS ─────────────── */
-  const attachments = tickets.map((t, i) => ({
+  const attachments = tickets.map((t) => ({
     filename: `ticket-${t.ticketCode}.pdf`,
     content: t.pdfBuffer,
     contentType: "application/pdf",
   }));
 
   const ticketCodeList = tickets.map((t) => t.ticketCode).join(", ");
-
-  /* ── SEND EMAILS ──────────────────────────────────────────── */
-  if (
-    config.smtpHost &&
-    config.smtpPort &&
-    config.emailUsername &&
-    config.emailPass
-  ) {
-    const transporter = nodemailer.createTransport({
-      host: config.smtpHost,
-      port: Number(config.smtpPort),
-      secure: Number(config.smtpPort) === 465,
-      auth: { user: config.emailUsername, pass: config.emailPass },
-    });
-
-    const holderName =
-      `${userData.firstName || ""} ${userData.lastName || ""}`.trim();
-
-    // Email to user
-    try {
-      await transporter.sendMail({
-        from: `"Volora Events" <${config.emailUsername}>`,
-        to: userData.email,
-        subject: `Booking Confirmed – ${eventData.title} 🎉`,
-        html: `
-          <div style="font-family:sans-serif;max-width:520px;margin:auto">
-            <div style="background:#9c4e8b;padding:24px;border-radius:12px 12px 0 0">
-              <h2 style="color:#fff;margin:0">Booking Confirmed! 🎉</h2>
-            </div>
-            <div style="padding:24px;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px">
-              <p>Hi <strong>${holderName}</strong>,</p>
-              <p>Your <strong>${ticketCount}</strong> ${ticketCount === 1 ? "ticket" : "tickets"} for <strong>${eventData.title}</strong> ${ticketCount === 1 ? "is" : "are"} confirmed.</p>
-              <table style="width:100%;border-collapse:collapse;font-size:14px;margin:16px 0">
-                <tr><td style="padding:8px 0;color:#6b7280">Event</td><td style="padding:8px 0"><strong>${eventData.title}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Date</td><td style="padding:8px 0">${new Date(eventData.date).toDateString()}</td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Location</td><td style="padding:8px 0">${eventData.location}</td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Tickets</td><td style="padding:8px 0">${ticketSummary}</td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Amount Paid</td><td style="padding:8px 0">KES ${expectedAmount}</td></tr>
-                <tr><td style="padding:8px 0;color:#6b7280">Reference</td><td style="padding:8px 0"><code>${transactionId}</code></td></tr>
-              </table>
-              <div style="background:#f8fafc;border-radius:8px;padding:16px;text-align:center;margin:16px 0">
-                <p style="margin:0 0 6px;color:#6b7280;font-size:12px">YOUR TICKET ${ticketCount === 1 ? "CODE" : "CODES"}</p>
-                <p style="font-family:monospace;font-size:16px;font-weight:bold;color:#9c4e8b;margin:0;word-break:break-word">${ticketCodeList}</p>
-              </div>
-              <p style="font-size:13px;color:#6b7280">Your ticket PDF${ticketCount === 1 ? "" : "s"} ${ticketCount === 1 ? "is" : "are"} attached. Present ${ticketCount === 1 ? "it" : "them"} (printed or on your phone) at the entrance.</p>
-              <p>Thank you for booking with Volora Events 🙏</p>
-            </div>
-          </div>
-        `,
-        attachments,
-      });
-    } catch (err) {
-      console.error("Error sending email to user:", err);
-    }
-
-    // Email to admin
-    const admin = await User.findOne({ role: "admin" });
-    if (admin) {
-      try {
-        await transporter.sendMail({
-          from: `"Volora Events" <${config.emailUsername}>`,
-          to: admin.email,
-          subject: `New Booking – ${eventData.title}`,
-          html: `
-            <div style="font-family:sans-serif;max-width:520px;margin:auto">
-              <h2>New Booking Alert 📢</h2>
-              <p><strong>Event:</strong> ${eventData.title}</p>
-              <p><strong>User:</strong> ${holderName}</p>
-              <p><strong>Email:</strong> ${userData.email}</p>
-              <p><strong>Tickets:</strong> ${ticketSummary}</p>
-              <p><strong>Amount:</strong> KES ${expectedAmount}</p>
-              <p><strong>Reference:</strong> ${transactionId}</p>
-              <p><strong>Ticket Codes:</strong> <code>${ticketCodeList}</code></p>
-            </div>
-          `,
-          attachments,
-        });
-      } catch (err) {
-        console.error("Error sending email to admin:", err);
-      }
-    }
-  } else {
-    console.warn("SMTP not configured; skipping booking notification emails.");
-  }
+  const emailDelivery = await sendBookingEmails({
+    config,
+    booking,
+    eventData,
+    userData,
+    ticketCount,
+    ticketSummary,
+    expectedAmount,
+    transactionId,
+    ticketCodeList,
+    attachments,
+  });
 
   /* ── RESPONSE ─────────────────────────────────────────────── */
   return {
@@ -596,5 +813,6 @@ export default defineEventHandler(async (event) => {
     booking,
     ticketCount,
     ticketPdfBase64: tickets[0]?.pdfBuffer.toString("base64"),
+    emailDelivery,
   };
 });
