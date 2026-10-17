@@ -59,9 +59,7 @@ export default defineEventHandler(async (event) => {
         activeTickets: {
           $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
         },
-        cancelledTickets: {
-          $sum: { $cond: [{ $eq: ["$status", "cancelled"] }, 1, 0] },
-        },
+
         inactiveTickets: {
           $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
         },
@@ -78,7 +76,7 @@ export default defineEventHandler(async (event) => {
         totalTickets: 1,
         totalAmount: 1,
         activeTickets: 1,
-        cancelledTickets: 1,
+
         inactiveTickets: 1,
         usedTickets: 1,
       },

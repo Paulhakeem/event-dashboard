@@ -83,9 +83,7 @@ export default defineEventHandler(async (event) => {
       filter.used = used === "true";
     }
 
-    if (filterValue === "cancelledTickets") {
-      filter.status = "cancelled";
-    }
+
 
     const tickets = await Ticket.find(filter).sort({ createdAt: -1 }).lean();
 

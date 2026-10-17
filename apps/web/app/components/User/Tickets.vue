@@ -136,18 +136,10 @@
                 :class="
                   ticket.status === 'active'
                     ? 'bg-emerald-100 text-emerald-800'
-                    : ticket.status === 'cancelled'
-                      ? 'bg-rose-100 text-rose-800'
-                      : 'bg-slate-100 text-slate-600'
+                    : 'bg-slate-100 text-slate-600'
                 "
               >
-                {{
-                  ticket.status === "active"
-                    ? "Active"
-                    : ticket.status === "cancelled"
-                      ? "Cancelled"
-                      : "Inactive"
-                }}
+                {{ ticket.status === "active" ? "Active" : "Inactive" }}
               </span>
             </div>
 
@@ -212,16 +204,7 @@
             <div
               class="mt-4 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 min-[420px]:flex-row min-[420px]:items-center"
             >
-              <button
-                v-if="ticket.status === 'active'"
-                type="button"
-                :disabled="cancellationLoading"
-                class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:cursor-wait disabled:opacity-60"
-                @click="handleCancel(ticket)"
-              >
-                <Icon name="mdi:close-circle-outline" class="text-lg" />
-                {{ cancellationLoading ? "Cancelling..." : "Cancel ticket" }}
-              </button>
+
               <span
                 v-else
                 class="hidden flex-1 text-xs text-slate-400 min-[420px]:block"
@@ -322,9 +305,9 @@
 <script setup>
 import { ref } from "vue";
 import QRCode from "qrcode";
-import useTicketCancellation from "~/composables/ticketCancellation";
 
-const { cancelTicket, cancellationLoading } = useTicketCancellation();
+
+
 const {
   tickets,
   filterOptions,
@@ -364,10 +347,7 @@ const downloadQr = () => {
   link.click();
 };
 
-const handleCancel = async (ticket) => {
-  await cancelTicket(ticket._id);
-  ticket.status = "cancelled";
-};
+
 </script>
 
 <style>

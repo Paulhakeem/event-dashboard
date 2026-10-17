@@ -9,9 +9,9 @@ export default function useTickets() {
   const { token } = useAuth();
   const tickets = ref([]);
   const totalTicketCount = ref(0);
-  const cancelledTicketCount = ref(0);
+
   const ticketsLoading = ref(true);
-  const cancelledLoading = ref(true);
+
   const ticketsError = ref("");
 
   const ticketChartData = computed(() => {
@@ -20,7 +20,7 @@ export default function useTickets() {
         .toLocaleString("en-US", { month: "short" })
         .toLowerCase(),
       tickets: 0,
-      cancelled: 0,
+
     }));
 
     const currentYear = new Date().getFullYear();
@@ -33,36 +33,16 @@ export default function useTickets() {
 
       const monthIndex = createdAt.getMonth();
 
-      if (ticket?.status === "cancelled") {
-        months[monthIndex].cancelled += 1;
-      } else {
-        months[monthIndex].tickets += 1;
-      }
+      months[monthIndex].tickets += 1;
     });
 
     return months;
   });
 
   const totalTickets = computed(() => totalTicketCount.value);
-  const totalCancelled = computed(() => cancelledTicketCount.value);
 
-  const cancelledTrend = computed(() => {
-    const currentMonth = new Date().getMonth();
-    const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
 
-    const currentMonthCount =
-      ticketChartData.value?.[currentMonth]?.cancelled ?? 0;
-    const previousMonthCount =
-      ticketChartData.value?.[previousMonth]?.cancelled ?? 0;
 
-    if (previousMonthCount === 0) {
-      return currentMonthCount > 0 ? "+100%" : "0%";
-    }
-
-    const change =
-      ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100;
-    return `${change >= 0 ? "+" : ""}${change.toFixed(0)}%`;
-  });
 
   const ticketTrend = computed(() => {
     const currentMonth = new Date().getMonth();
@@ -82,11 +62,7 @@ export default function useTickets() {
     return `${change >= 0 ? "+" : ""}${change.toFixed(0)}%`;
   });
 
-  const cancellationRate = computed(() =>
-    totalTicketCount.value > 0
-      ? ((cancelledTicketCount.value / totalTicketCount.value) * 100).toFixed(1)
-      : "0.0",
-  );
+
 
   onMounted(async () => {
     ticketsError.value = "";
@@ -121,21 +97,7 @@ export default function useTickets() {
       ticketsLoading.value = false;
     }
 
-    // checking tickets status for cancelled tickets
-    try {
-      const res = await $fetch("/api/tickets/ticket-filter", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token.value}` },
-        body: { filter: "cancelledTickets" },
-      });
-      cancelledTicketCount.value = Array.isArray(res?.tickets)
-        ? res.tickets.filter((ticket) => ticket.status === "cancelled").length
-        : 0;
-    } catch (err) {
-      console.error("Error fetching cancelled tickets:", err);
-    } finally {
-      cancelledLoading.value = false;
-    }
+
   });
 
   const filterOptions = [
