@@ -100,9 +100,12 @@ async function sendBookingEmails({
       const adminEmails = admins.map((admin) => admin.email).filter(Boolean);
 
       if (!adminEmails.length) {
-        console.error("No admin email recipients are configured for booking notifications.", {
-          bookingId: booking._id,
-        });
+        console.error(
+          "No admin email recipients are configured for booking notifications.",
+          {
+            bookingId: booking._id,
+          },
+        );
       } else {
         await transporter.sendMail({
           from,
@@ -208,8 +211,8 @@ export default defineEventHandler(async (event) => {
                 status: isAmountValid ? "confirmed" : "mismatch",
                 resultCode: isAmountValid ? 0 : -1,
                 resultDesc: isAmountValid
-                  ? "Payment confirmed by PayHero."
-                  : "PayHero payment amount does not match the expected amount.",
+                  ? "Payment confirmed."
+                  : "Payment amount does not match the expected amount.",
                 callbackAmount: receivedAmount,
                 transactionId:
                   transaction.provider_reference ||
@@ -253,7 +256,7 @@ export default defineEventHandler(async (event) => {
           }
         }
       } catch (statusError) {
-        console.error("PayHero transaction status lookup failed:", {
+        console.error("Transaction status lookup failed:", {
           reference: pending.CheckoutRequestID,
           status: statusError.response?.status || null,
           message:
