@@ -313,7 +313,6 @@ export default defineEventHandler(async (event) => {
 
     console.error("PayHero payment initiation failed:", {
       status: responseStatus || null,
-      message: errorMessage,
     });
 
     // The request may have reached PayHero even if the response timed out.
@@ -335,7 +334,9 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 502,
       statusMessage: responseStatus
-        ? `PayHero rejected the payment request (HTTP ${responseStatus}): ${errorMessage}`
+        ? (typeof errorMessage === 'string' && /insufficient balance|merchant.*balance|insufficient funds|not enough funds/i.test(errorMessage)
+            ? "Payment failed: the event organizer's PayHero account does not have enough funds to complete this transaction. Please contact the event organizer for assistance."
+            : `PayHero rejected the payment request (HTTP ${responseStatus}): ${errorMessage}`)
         : `No response from PayHero: ${errorMessage}`,
     });
   }

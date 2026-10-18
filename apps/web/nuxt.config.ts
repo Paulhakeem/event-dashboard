@@ -115,6 +115,7 @@ export default defineNuxtConfig({
     payheroUsername: process.env.PAYHERO_USERNAME,
     payheroPassword: process.env.PAYHERO_PASSWORD,
     payheroChannelId: process.env.PAYHERO_CHANNEL_ID,
+    payheroTopupSecret: process.env.PAYHERO_TOPUP_SECRET,
     appUrl: process.env.APP_URL || "http://localhost:3000",
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     deepseekApiKey: process.env.DEEPSEEK_API,
