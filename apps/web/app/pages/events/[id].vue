@@ -301,10 +301,7 @@
 
               <div class="space-y-3">
                 <div>
-                  <label
-                    for="booking-first-name"
-                    class="text-sm text-gray-600"
-                  >
+                  <label for="booking-first-name" class="text-sm text-gray-600">
                     First name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -371,9 +368,7 @@
 
             <!-- PHONE INPUT -->
             <div class="mb-6">
-              <label class="text-sm text-gray-600">
-                M-Pesa Phone Number (PayHero)
-              </label>
+              <label class="text-sm text-gray-600"> M-Pesa Phone Number </label>
 
               <input
                 v-model="phone"
@@ -485,8 +480,7 @@ const {
   successMessage,
   bookAndPay,
   checkPaymentStatus,
-} =
-  useEventBooking();
+} = useEventBooking();
 
 const { user } = useAuth();
 
@@ -509,7 +503,8 @@ watch(
   { immediate: true },
 );
 
-const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
+const isEmail = (value) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
 
 const priceOf = (name) =>
   event.value?.customTickets?.find((t) => t.name === name)?.price ?? 0;
@@ -587,7 +582,9 @@ const isBookable = computed(() => {
 
 const copyShareLink = async () => {
   if (process.client) {
-    const url = event.value?.shareUrl || `${window.location.origin}/events/${route.params.id}`;
+    const url =
+      event.value?.shareUrl ||
+      `${window.location.origin}/events/${route.params.id}`;
     try {
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(url);

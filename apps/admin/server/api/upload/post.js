@@ -115,7 +115,6 @@ export default defineEventHandler(async (event) => {
     eventType,
     image: uploadResult.secure_url,
     createdBy: authUser.id,
-    shareUrl: `${baseUrl}/events/${null}`,
   });
 
   const shareUrl = `${baseUrl}/events/${newEvent._id}`;

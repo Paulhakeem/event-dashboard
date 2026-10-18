@@ -721,6 +721,19 @@ const removeEvent = async (id) => {
     window.alert(error?.data?.statusMessage || "Unable to delete event");
   }
 };
+const shareEvent = (event) => {
+  const url =
+    event.shareUrl ||
+    `https://happitwineventslimited.co.ke/events/${event._id}`;
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => window.alert("Share link copied to clipboard"))
+      .catch(() => window.prompt("Copy this link:", url));
+  } else {
+    window.prompt("Copy this link:", url);
+  }
+};
 const moderateEvent = (event, action) => mutateEvent(event, action);
 const setStatus = (event, status) => mutateEvent(event, "status", { status });
 const submitUpdate = async () => {
