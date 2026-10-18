@@ -270,6 +270,96 @@
               <span>🎟️ {{ event?.TicketQuantity || 0 }} tickets available</span>
             </div>
 
+            <!-- CONTACT DETAILS -->
+            <div class="mb-6 pb-6 border-b border-gray-200">
+              <div class="flex items-center justify-between mb-3">
+                <p class="text-sm font-semibold text-gray-700">
+                  {{ user ? "Booking as" : "Your details" }}
+                </p>
+                <span
+                  v-if="user"
+                  class="text-[11px] font-semibold text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5"
+                >
+                  Account
+                </span>
+                <span
+                  v-else
+                  class="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5"
+                >
+                  Guest
+                </span>
+              </div>
+
+              <div class="space-y-3">
+                <div>
+                  <label
+                    for="booking-first-name"
+                    class="text-sm text-gray-600"
+                  >
+                    First name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="booking-first-name"
+                    v-model="firstName"
+                    type="text"
+                    autocomplete="given-name"
+                    placeholder="e.g. Amina"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label for="booking-last-name" class="text-sm text-gray-600">
+                    Last name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="booking-last-name"
+                    v-model="lastName"
+                    type="text"
+                    autocomplete="family-name"
+                    placeholder="e.g. Wanjiku"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label for="booking-email" class="text-sm text-gray-600">
+                    Email address <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="booking-email"
+                    v-model="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                  />
+                </div>
+              </div>
+
+              <p v-if="!user" class="mt-3 text-xs text-gray-500">
+                Your ticket and payment confirmation are sent to this email.
+              </p>
+
+              <p v-if="!user" class="mt-3 text-sm text-gray-600">
+                Have an account?
+                <NuxtLink
+                  to="/login"
+                  class="font-semibold text-[#13284b] underline hover:text-[#0b1730]"
+                >
+                  Log in
+                </NuxtLink>
+                or
+                <NuxtLink
+                  to="/signup"
+                  class="font-semibold text-[#13284b] underline hover:text-[#0b1730]"
+                >
+                  Sign up
+                </NuxtLink>
+                to track your bookings.
+              </p>
+            </div>
+
             <!-- PHONE INPUT -->
             <div class="mb-6">
               <label class="text-sm text-gray-600">
@@ -281,17 +371,6 @@
                 placeholder="+2547XXXXXXXX"
                 class="w-full border rounded-lg p-3 mt-2"
               />
-            </div>
-
-            <!-- USER INFO -->
-            <div class="mb-6 pb-6 border-b border-gray-200">
-              <p class="text-sm text-gray-500">
-                {{ user?.firstName }} {{ user?.lastName }}
-              </p>
-
-              <p class="text-sm text-gray-500">
-                {{ user?.email }}
-              </p>
             </div>
 
             <!-- PAYMENT BUTTON -->
@@ -386,7 +465,7 @@
 
 <script setup>
 import useEventBooking from "~/composables/bookingEvent";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 const {
   event,
@@ -401,7 +480,25 @@ const {
 const { user } = useAuth();
 
 const phone = ref("");
+const firstName = ref("");
+const lastName = ref("");
+const email = ref("");
 const ticketLines = ref([{ ticketType: "", quantity: 1 }]);
+
+// Logged-in users book with their account details by default; guests type
+// their own. The fields stay editable either way.
+watch(
+  user,
+  (u) => {
+    if (!u) return;
+    if (!firstName.value) firstName.value = u.firstName || "";
+    if (!lastName.value) lastName.value = u.lastName || "";
+    if (!email.value) email.value = u.email || "";
+  },
+  { immediate: true },
+);
+
+const isEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
 
 const priceOf = (name) =>
   event.value?.customTickets?.find((t) => t.name === name)?.price ?? 0;
@@ -463,6 +560,9 @@ const isBookable = computed(() => {
   return (
     selectedTickets.value.length > 0 &&
     phone.value &&
+    firstName.value.trim() &&
+    lastName.value.trim() &&
+    isEmail(email.value) &&
     ev.status !== "cancelled" &&
     ev.status !== "completed" &&
     ev.TicketQuantity > 0 &&
@@ -476,6 +576,10 @@ const isBookable = computed(() => {
 
 const handleBooking = () => {
   if (event.value?.freeEntry) return;
-  bookAndPay(phone.value, selectedTickets.value);
+  bookAndPay(phone.value, selectedTickets.value, {
+    firstName: firstName.value,
+    lastName: lastName.value,
+    email: email.value,
+  });
 };
 </script>

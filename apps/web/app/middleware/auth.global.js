@@ -21,14 +21,18 @@ export default defineNuxtRouteMiddleware((to) => {
   const publicPages = [
     "/",
     "/events",
+    "/eventPage",
     "/about",
     "/login",
     "/signup",
     "/verifyEmail",
   ];
 
+  const isPublicPage =
+    publicPages.includes(to.path) || to.path.startsWith("/events/");
+
   // Guest → block private pages
-  if (!user.value && !publicPages.includes(to.path)) {
+  if (!user.value && !isPublicPage) {
     return navigateTo("/login");
   }
 

@@ -70,7 +70,8 @@ export default defineEventHandler(async (event) => {
     ticket: {
       ticketCode: ticket.ticketCode,
       userName:
-        `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim(),
+        `${ticket.userId?.firstName || ticket.firstName || ""} ${ticket.userId?.lastName || ticket.lastName || ""}`.trim() ||
+        ticket.userEmail,
       eventName: ticket.eventName,
       ticketType: ticket.ticketType,
       usedAt: ticket.usedAt,

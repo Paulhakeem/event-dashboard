@@ -169,12 +169,6 @@
               {{ eventItem.activeTickets }} active
             </span>
             <span
-              v-if="eventItem.cancelledTickets"
-              class="rounded-full bg-red-50 px-2.5 py-1 text-red-700"
-            >
-              {{ eventItem.cancelledTickets }} cancelled
-            </span>
-            <span
               v-if="eventItem.inactiveTickets"
               class="rounded-full bg-gray-100 px-2.5 py-1 text-gray-600"
             >
@@ -323,7 +317,7 @@
               <p class="col-span-2 break-all">
                 User ID:
                 <span class="font-mono text-gray-700">{{
-                  ticket.userId?._id || ticket.userId
+                  ticket.userId?._id || ticket.userId || `Guest (${ticket.userEmail})`
                 }}</span>
               </p>
               <p class="col-span-2 break-all">
@@ -338,9 +332,6 @@
               </p>
               <p class="col-span-2">
                 Used at: <span class="font-medium text-gray-800">{{ formatDateTime(ticket.usedAt) }}</span>
-              </p>
-              <p class="col-span-2">
-                Cancelled at: <span class="font-medium text-gray-800">{{ formatDateTime(ticket.cancelledAt) }}</span>
               </p>
             </div>
           </article>
@@ -410,9 +401,6 @@
                   >
                     {{ ticketStatus(ticket) }}
                   </span>
-                  <p class="mt-1 text-[10px] text-gray-400">
-                    Cancelled: {{ formatDateTime(ticket.cancelledAt) }}
-                  </p>
                 </td>
               </tr>
             </tbody>
@@ -463,11 +451,6 @@ const ticketSummary = computed(() => [
   {
     label: "Inactive",
     value: tickets.value.filter((ticket) => ticketStatus(ticket) === "inactive")
-      .length,
-  },
-  {
-    label: "Cancelled",
-    value: tickets.value.filter((ticket) => ticket.status === "cancelled")
       .length,
   },
   {
@@ -568,7 +551,6 @@ function formatAmount(value) {
 
 function ticketStatus(ticket) {
   if (ticket.used) return "inactive";
-  if (ticket.status === "cancelled") return "cancelled";
   if (
     selectedEvent.value?.eventExpired ||
     (selectedEvent.value?.eventDate &&
@@ -581,7 +563,6 @@ function ticketStatus(ticket) {
 
 function statusClasses(status) {
   if (status === "active") return "bg-emerald-50 text-emerald-700";
-  if (status === "cancelled") return "bg-red-50 text-red-700";
   if (status === "inactive") return "bg-gray-100 text-gray-600";
   return "bg-amber-50 text-amber-700";
 }

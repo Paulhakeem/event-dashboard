@@ -1,8 +1,5 @@
-import { navigateTo } from "#imports";
-
 export default function useEventBooking() {
   const config = useRuntimeConfig();
-  const { user } = useAuth();
   const route = useRoute();
 
   const id = computed(() => route.params.id);
@@ -17,6 +14,11 @@ export default function useEventBooking() {
 
   const ticketPdfBase64 = ref(null);
   const ticketPdfUrl = ref(null);
+
+  // Contact details for the booking (account details when logged in,
+  // otherwise the guest details typed into the booking form). Verification
+  // needs the email so guests can claim a payment without an account.
+  const bookingContact = ref({ firstName: "", lastName: "", email: "" });
 
   /* ---------------- LOAD EVENT ---------------- */
 
@@ -46,6 +48,7 @@ export default function useEventBooking() {
         headers: { "Content-Type": "application/json" },
         body: {
           reference: checkoutRequestID,
+          email: bookingContact.value.email,
         },
       });
 
@@ -107,12 +110,27 @@ export default function useEventBooking() {
       "Payment confirmation is taking longer than expected. Do not pay again; check this payment's status again shortly.";
   };
 
-  const bookAndPay = async (phone, tickets = []) => {
-    if (!user.value) {
-      alert("Please login first");
-      await navigateTo("/login");
+  const bookAndPay = async (phone, tickets = [], contact = {}) => {
+    const firstName = String(contact.firstName || "").trim();
+    const lastName = String(contact.lastName || "").trim();
+    const email = String(contact.email || "").trim().toLowerCase();
+
+    if (!firstName) {
+      alert("Please enter your first name");
       return;
     }
+
+    if (!lastName) {
+      alert("Please enter your last name");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
+
+    bookingContact.value = { firstName, lastName, email };
 
     const selectedTickets = (Array.isArray(tickets) ? tickets : [])
       .filter((t) => t?.ticketType && Math.floor(Number(t?.quantity) || 0) > 0)
@@ -161,6 +179,9 @@ export default function useEventBooking() {
           phone,
           eventId: id.value,
           tickets: selectedTickets,
+          firstName: bookingContact.value.firstName,
+          lastName: bookingContact.value.lastName,
+          email: bookingContact.value.email,
         },
       });
       paymentStatus.value = "waiting";

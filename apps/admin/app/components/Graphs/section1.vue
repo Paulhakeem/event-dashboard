@@ -65,12 +65,7 @@ const { users } = totalUsers();
 const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
 const { eventsBooked, loading, fetchBookedEvents } = eventsBooking();
-const {
-  totalTicketCount,
-  cancelledTicketCount,
-  ticketsLoading,
-  cancelledLoading,
-} = useTickets();
+const { totalTicketCount, ticketsLoading } = useTickets();
 
 onMounted(async () => {
   await fetchBookedEvents();
@@ -157,16 +152,6 @@ const cards = computed(() => [
     to: "#67e8f9",
     trend: "Now live",
     trendIcon: "material-symbols:live-tv",
-  },
-  {
-    label: "Cancelled Tickets",
-    value: cancelledTicketCount.value,
-    loading: cancelledLoading.value,
-    icon: "solar:ticket-bold",
-    from: "#64748b",
-    to: "#94a3b8",
-    trend: "Refunded",
-    trendIcon: "material-symbols:cancel",
   },
 ]);
 </script>

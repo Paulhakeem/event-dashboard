@@ -56,3 +56,41 @@ export async function requireAuth(event) {
   event.context.user = { ...decoded, email: user.email };
   return event.context.user;
 }
+
+// Returns the authenticated user when a valid session exists, otherwise null.
+// Booking endpoints use this so guests can book without an account while
+// logged-in users keep their account-linked bookings.
+export async function getOptionalAuth(event) {
+  const config = useRuntimeConfig();
+  const token = getAuthToken(event);
+
+  if (!token) return null;
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, config.secretStr, {
+      algorithms: ["HS256"],
+    });
+  } catch {
+    return null;
+  }
+
+  await connectDB();
+
+  const user = await User.findById(decoded.id).select(
+    "accountStatus isEmailVerified email",
+  );
+  if (!user) return null;
+
+  if (user.accountStatus === "suspended") {
+    throw createError({
+      statusCode: 403,
+      statusMessage: "This account has been suspended",
+    });
+  }
+
+  if (!user.isEmailVerified) return null;
+
+  event.context.user = { ...decoded, email: user.email };
+  return event.context.user;
+}

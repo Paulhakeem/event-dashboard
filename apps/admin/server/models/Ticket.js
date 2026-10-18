@@ -12,8 +12,10 @@ const TicketSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
+    firstName: { type: String },
+    lastName: { type: String },
     bookingId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "TotalBooking",

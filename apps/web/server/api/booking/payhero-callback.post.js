@@ -88,20 +88,23 @@ export default defineEventHandler(async (event) => {
       },
     );
 
-    try {
-      await Notification.create({
-        title: "Payment failed",
-        message: `${callback.ResultDesc || callback.Status || "Your payment was unsuccessful."} (${pending.eventName})`,
-        recipientUser: pending.userId,
-        event: pending.eventId,
-        meta: { type: "payment_failed" },
-        read: false,
-      });
-    } catch (notificationError) {
-      console.error(
-        "Failed to create payment failure notification:",
-        notificationError,
-      );
+    // Guest payments have no linked account to notify.
+    if (pending.userId) {
+      try {
+        await Notification.create({
+          title: "Payment failed",
+          message: `${callback.ResultDesc || callback.Status || "Your payment was unsuccessful."} (${pending.eventName})`,
+          recipientUser: pending.userId,
+          event: pending.eventId,
+          meta: { type: "payment_failed" },
+          read: false,
+        });
+      } catch (notificationError) {
+        console.error(
+          "Failed to create payment failure notification:",
+          notificationError,
+        );
+      }
     }
 
     return {

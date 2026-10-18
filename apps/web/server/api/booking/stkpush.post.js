@@ -4,7 +4,8 @@ import { randomBytes } from "node:crypto";
 import connectDB from "../../utils/mongoose.js";
 import { Event } from "../../models/Events";
 import { PendingPayment } from "../../models/PendingPayment";
-import { requireAuth } from "../../utils/requireAuth.js";
+import { User } from "../../models/User";
+import { getOptionalAuth } from "../../utils/requireAuth.js";
 import { parseBody } from "../../utils/parseBody.js";
 
 function normalizePhone(phone) {
@@ -82,7 +83,7 @@ function getTicketPrice(eventData, ticketType) {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const authUser = await requireAuth(event);
+  const authUser = await getOptionalAuth(event);
   const body = await parseBody(event);
 
   const { phone, eventId } = body;
@@ -101,16 +102,41 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const userId = authUser.id || authUser._id;
-  const userEmail = authUser.email;
+  await connectDB();
 
-  if (!userId || !userEmail) {
+  let firstName = String(body.firstName || "").trim();
+  let lastName = String(body.lastName || "").trim();
+
+  // Logged-in bookings may omit the name fields; fall back to the account.
+  if (authUser && (!firstName || !lastName)) {
+    const account = await User.findById(authUser.id || authUser._id).select(
+      "firstName lastName",
+    );
+    firstName = firstName || String(account?.firstName || "").trim();
+    lastName = lastName || String(account?.lastName || "").trim();
+  }
+
+  if (!firstName || !lastName) {
     throw createError({
-      statusCode: 401,
-      statusMessage:
-        "Your login session is missing user details. Please sign in again.",
+      statusCode: 400,
+      statusMessage: "First name and last name are required.",
     });
   }
+
+  let userEmail;
+  if (authUser) {
+    userEmail = authUser.email;
+  } else {
+    userEmail = String(body.email || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: "A valid email address is required.",
+      });
+    }
+  }
+
+  const userId = authUser ? authUser.id || authUser._id : null;
 
   const username = config.payheroUsername;
   const password = config.payheroPassword;
@@ -124,8 +150,6 @@ export default defineEventHandler(async (event) => {
         "PayHero is not fully configured. Check your server runtime configuration.",
     });
   }
-
-  await connectDB();
 
   const eventData = await Event.findById(eventId);
 
@@ -214,6 +238,8 @@ export default defineEventHandler(async (event) => {
   await PendingPayment.create({
     CheckoutRequestID: reference,
     userId,
+    firstName,
+    lastName,
     userEmail,
     phone: normalizedPhone,
     eventId: eventData._id,

@@ -9,11 +9,11 @@ const totalBookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // user who made the booking
+    // user who made the booking (optional for guest bookings)
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     // organiser (event creator) - stored for easy querying
     organiserId: {

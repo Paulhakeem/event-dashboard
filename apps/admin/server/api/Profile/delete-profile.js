@@ -4,7 +4,6 @@ import connectDB from "~~/server/utils/mongoose.js";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { Event } from "~~/server/models/Events.js";
 import { Ticket } from "~~/server/models/Ticket";
-import { CancelledTicket } from "~~/server/models/CancelledTickets";
 import { Notification } from "~~/server/models/Notification";
 
 export default defineEventHandler(async (event) => {
@@ -27,9 +26,6 @@ export default defineEventHandler(async (event) => {
 
     // Delete tickets owned by the user
     await Ticket.deleteMany({ userId });
-
-    // Delete cancelled ticket records linked to the user
-    await CancelledTicket.deleteMany({ user: userId });
 
     // Delete notifications addressed to the user
     await Notification.deleteMany({ recipientUser: userId });

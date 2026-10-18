@@ -66,8 +66,6 @@ const { totalTickets } = getTickets();
 const cancelledEvents = ref([]);
 const totalBookedEvents = ref(0);
 const totalIncome = ref(0);
-const cancelledTickets = ref(0);
-const refundedTickets = ref(0);
 const dashboardLoading = ref(true);
 
 const loadDashboard = async () => {
@@ -173,26 +171,6 @@ const cards = computed(() => [
     to: "#22d3ee",
     trend: "Now live",
     trendIcon: "material-symbols:live-tv",
-  },
-  {
-    label: "Cancelled Tickets",
-    value: cancelledTickets.value,
-    loading: dashboardLoading.value,
-    icon: "solar:ticket-bold",
-    from: "#64748b",
-    to: "#94a3b8",
-    trend: "Cancelled",
-    trendIcon: "material-symbols:cancel",
-  },
-  {
-    label: "Refunded Tickets",
-    value: refundedTickets.value,
-    loading: dashboardLoading.value,
-    icon: "solar:refresh-bold",
-    from: "#f59e0b",
-    to: "#fbbf24",
-    trend: "Pending",
-    trendIcon: "material-symbols:refresh",
   },
 ]);
 

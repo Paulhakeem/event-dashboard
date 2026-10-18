@@ -158,8 +158,6 @@ export default defineNuxtConfig({
       organiserTotalAmount: process.env.ORGANISER_TOTAL_AMOUNT_API,
       profileUpdateApi: process.env.PROFILE_UPDATE_API,
       profileDeleteApi: process.env.PROFILE_DELETE_API,
-      ticketCancelApi: process.env.TICKET_CANCEL_API,
-      cancelledSummaryApi: process.env.CANCELLED_SUMMARY_API,
       recaptchaSiteKey: process.env.NUXT_PUBLIC_RECAPTCHA_SITE_KEY,
     },
   },

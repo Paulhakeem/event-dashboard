@@ -4,7 +4,6 @@ import { Event } from "~~/server/models/Events";
 import { TotalBooking } from "~~/server/models/totalBooking";
 import { Notification } from "~~/server/models/Notification";
 import { Ticket } from "~~/server/models/Ticket";
-import { CancelledTicket } from "~~/server/models/CancelledTickets";
 import { PendingPayment } from "~~/server/models/PendingPayment";
 
 const requireAdmin = (event) => {
@@ -74,7 +73,7 @@ export default defineEventHandler(async (event) => {
       Ticket.deleteMany({
         $or: [{ eventId: current._id }, { eventName: current.title }],
       }),
-      CancelledTicket.deleteMany({ event: current._id }),
+
       PendingPayment.deleteMany({
         $or: [{ eventId: current._id }, { eventName: current.title }],
       }),

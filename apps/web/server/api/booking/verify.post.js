@@ -10,7 +10,7 @@ import { generateTicketCode } from "~~/server/utils/generateTicketCode";
 import PDFDocument from "pdfkit";
 import QRCode from "qrcode"; // npm install qrcode
 import { Notification } from "../../models/Notification";
-import { requireAuth } from "../../utils/requireAuth.js";
+import { getOptionalAuth } from "../../utils/requireAuth.js";
 import { parseBody } from "../../utils/parseBody.js";
 
 async function sendBookingEmails({
@@ -146,14 +146,13 @@ async function sendBookingEmails({
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const authUser = await requireAuth(event);
+  const authUser = await getOptionalAuth(event);
 
   // Replaces readBody(): proxies/intermediaries that strip or rewrite the
   // Content-Type header make readBody() return {} and every field looks missing.
   const body = await parseBody(event);
 
   const { reference } = body;
-  const userEmail = authUser.email;
 
   /* ── BASIC VALIDATION ─────────────────────────────────────── */
   if (typeof reference !== "string" || !reference.trim()) {
@@ -168,14 +167,38 @@ export default defineEventHandler(async (event) => {
   /* ── RESOLVE SERVER-BOUND PENDING PAYMENT ─────────────────── */
   let pending = await PendingPayment.findOne({
     CheckoutRequestID: reference.trim(),
-    userId: authUser.id,
   });
+
   if (!pending) {
     throw createError({
       statusCode: 400,
       statusMessage: "No matching payment found for this account",
     });
   }
+
+  // Logged-in callers must own the payment; guests prove ownership with the
+  // email address the STK push was initiated for.
+  const requesterEmail = String(
+    authUser?.email || body.email || "",
+  )
+    .trim()
+    .toLowerCase();
+  const pendingEmail = String(pending.userEmail || "").toLowerCase();
+
+  const ownsPending = authUser
+    ? pending.userId
+      ? String(pending.userId) === String(authUser.id || authUser._id)
+      : pendingEmail === requesterEmail
+    : !!requesterEmail && requesterEmail === pendingEmail;
+
+  if (!ownsPending) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "No matching payment found for this account",
+    });
+  }
+
+  const pendingId = pending._id;
 
   if (pending.status === "pending" && pending.payheroReference) {
     const username = config.payheroUsername;
@@ -226,10 +249,7 @@ export default defineEventHandler(async (event) => {
           );
 
           if (!pending) {
-            pending = await PendingPayment.findOne({
-              CheckoutRequestID: reference.trim(),
-              userId: authUser.id,
-            });
+            pending = await PendingPayment.findOne({ _id: pendingId });
           }
         } else if (providerStatus === "FAILED") {
           pending = await PendingPayment.findOneAndUpdate(
@@ -249,10 +269,7 @@ export default defineEventHandler(async (event) => {
           );
 
           if (!pending) {
-            pending = await PendingPayment.findOne({
-              CheckoutRequestID: reference.trim(),
-              userId: authUser.id,
-            });
+            pending = await PendingPayment.findOne({ _id: pendingId });
           }
         }
       } catch (statusError) {
@@ -325,11 +342,20 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  /* ── FIND USER ────────────────────────────────────────────── */
-  const userData = await User.findOne({ email: userEmail });
-  if (!userData) {
-    throw createError({ statusCode: 404, statusMessage: "User not found" });
-  }
+  /* ── RESOLVE THE TICKET HOLDER ────────────────────────────── */
+  // Registered accounts keep their account link; guests book with the name
+  // and email captured when the STK push was initiated.
+  const holderEmail = pending.userEmail;
+  const registeredUser = pending.userId
+    ? await User.findById(pending.userId)
+    : await User.findOne({ email: holderEmail });
+
+  const userData = registeredUser || {
+    firstName: pending.firstName || "",
+    lastName: pending.lastName || "",
+    email: holderEmail,
+    _id: null,
+  };
 
   /* ── TICKET LINES & PRICE FROM THE PENDING PAYMENT ─────────*/
   // Never derived from client-supplied ticketType/eventName — the amount was
@@ -558,7 +584,7 @@ export default defineEventHandler(async (event) => {
     mpesaReceiptNumber: pending.mpesaReceiptNumber,
     verifiedAt: pending.verifiedAt || new Date(),
     bookedAt: new Date(),
-    createdBy: userData._id,
+    createdBy: userData._id || null,
     organiserId: eventData.createdBy,
   });
 
@@ -595,7 +621,9 @@ export default defineEventHandler(async (event) => {
         eventName: eventData.title,
         eventId: eventData._id,
         userEmail: userData.email,
-        userId: userData._id,
+        userId: userData._id || null,
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
         bookingId: booking._id,
         ticketType: line.ticketType,
         amount: unitAmount,
@@ -640,34 +668,40 @@ export default defineEventHandler(async (event) => {
       `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
       userData.email;
 
-    await Notification.insertMany([
-      {
+    const notifications = [];
+
+    // Guests have no account to notify; they get their confirmation by email.
+    if (userData._id) {
+      notifications.push({
         title: "Booking confirmed",
         message: `Your booking for "${eventData.title}" (${ticketSummary}) was confirmed successfully.`,
         recipientUser: userData._id,
         event: eventData._id,
         meta: { type: "booking_confirmed", quantity: ticketCount },
         read: false,
+      });
+    }
+
+    notifications.push({
+      title: "New event booking",
+      message: `${bookerName} booked ${ticketSummary} for "${eventData.title}".`,
+      recipientRole: "admin",
+      event: eventData._id,
+      meta: {
+        type: "booking_created",
+        bookerId: userData._id || null,
+        bookerName,
+        tickets: ticketLines.map((line) => ({
+          ticketType: line.ticketType,
+          quantity: Math.floor(Number(line.quantity) || 0),
+        })),
+        quantity: ticketCount,
+        amount: expectedAmount,
       },
-      {
-        title: "New event booking",
-        message: `${bookerName} booked ${ticketSummary} for "${eventData.title}".`,
-        recipientRole: "admin",
-        event: eventData._id,
-        meta: {
-          type: "booking_created",
-          bookerId: userData._id,
-          bookerName,
-          tickets: ticketLines.map((line) => ({
-            ticketType: line.ticketType,
-            quantity: Math.floor(Number(line.quantity) || 0),
-          })),
-          quantity: ticketCount,
-          amount: expectedAmount,
-        },
-        read: false,
-      },
-    ]);
+      read: false,
+    });
+
+    await Notification.insertMany(notifications);
   } catch (notificationError) {
     console.error("Failed to create booking notification:", notificationError);
   }

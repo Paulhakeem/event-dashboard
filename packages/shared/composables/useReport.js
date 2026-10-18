@@ -19,7 +19,6 @@ export default function useReport() {
     const rawDate =
       value.date ||
       value.bookedAt ||
-      value.cancelledAt ||
       value.updatedAt ||
       value.createdAt;
     if (!rawDate) return null;
@@ -134,31 +133,6 @@ export default function useReport() {
       }
     } catch (error) {
       console.error("Error fetching total revenue:", error);
-    }
-
-    try {
-      const res = await $fetch("/api/tickets/ticket-filter", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token.value}` },
-        body: { filter: "cancelledTickets" },
-      });
-      if (Array.isArray(res?.tickets)) {
-        totalRefund.value = res.tickets.reduce(
-          (sum, ticket) => sum + (ticket.amount || 0),
-          0,
-        );
-        refundSeries.value = res.tickets
-          .filter((ticket) => ticket.status === "cancelled")
-          .map((ticket) => ({
-            date: ticket.cancelledAt || ticket.updatedAt || ticket.createdAt,
-            totalRefund: ticket.amount || 0,
-          }));
-      } else {
-        totalRefund.value = 0;
-        refundSeries.value = [];
-      }
-    } catch (err) {
-      console.error("Error fetching cancelled tickets:", err);
     } finally {
       loading.value = false;
     }

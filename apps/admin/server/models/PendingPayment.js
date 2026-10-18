@@ -10,8 +10,10 @@ const pendingPaymentSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
+    firstName: { type: String },
+    lastName: { type: String },
     userEmail: { type: String, required: true },
     phone: { type: String, required: true },
     eventId: {

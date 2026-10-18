@@ -204,13 +204,6 @@
             <div
               class="mt-4 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 min-[420px]:flex-row min-[420px]:items-center"
             >
-
-              <span
-                v-else
-                class="hidden flex-1 text-xs text-slate-400 min-[420px]:block"
-              >
-                This ticket is {{ ticket.status }}.
-              </span>
               <button
                 type="button"
                 class="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl bg-[#13284b] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1d3763] focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
@@ -324,7 +317,7 @@ const openTicket = async (ticket) => {
   const userName =
     ticket.userName ||
     ticket.name ||
-    `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim() ||
+    `${ticket.firstName || ticket.userId?.firstName || ""} ${ticket.lastName || ticket.userId?.lastName || ""}`.trim() ||
     "Ticket holder";
   const qrPayload = [
     `Name: ${userName}`,

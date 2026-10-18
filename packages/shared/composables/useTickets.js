@@ -142,15 +142,10 @@ export default function useTickets() {
     activeFilter,
     filteredTickets,
     totalTicketCount,
-    cancelledTicketCount,
     totalTickets,
-    totalCancelled,
-    cancellationRate,
-    cancelledTrend,
     ticketTrend,
     ticketChartData,
     ticketsLoading,
-    cancelledLoading,
     ticketsError,
   };
 }

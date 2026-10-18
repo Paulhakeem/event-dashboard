@@ -157,9 +157,11 @@ export default defineEventHandler(async (event) => {
           const ticketHolders = await Ticket.find({
             eventId: updatedEvent._id,
           }).distinct("userId");
-          if (ticketHolders.length) {
+          // Guest bookings have no linked account to notify.
+          const notifiedHolders = ticketHolders.filter(Boolean);
+          if (notifiedHolders.length) {
             await Notification.insertMany(
-              ticketHolders.map((recipientUser) => ({
+              notifiedHolders.map((recipientUser) => ({
                 title: "Event cancelled",
                 message: `The event "${updatedEvent.title}" has been cancelled.`,
                 recipientUser,
