@@ -78,13 +78,14 @@ export default defineNuxtConfig({
     emailPass: process.env.EMAIL_PASSWORD,
     smtpHost: process.env.SMTP_HOST,
     smtpPort: process.env.SMTP_PORT,
-    appUrl: process.env.APP_URL || "http://localhost:3001",
+    appUrl: process.env.APP_URL || "https://happitwineventslimited.co.ke",
     paystackSecretKey: process.env.PAYSTACK_SECRET_KEY,
     deepseekApiKey: process.env.DEEPSEEK_API,
     mailgunApiKey: process.env.MAILGUN_API_KEY,
     googleClientId: process.env.NUXT_PUBLIC_GOOGLE_CLIENT_ID,
 
     public: {
+      appUrl: process.env.APP_URL || "https://happitwineventslimited.co.ke",
       cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
       pendingEventApi: "/api/events/fetch",
       approvedEvent: "/api/events",

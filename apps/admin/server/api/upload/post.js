@@ -114,8 +114,7 @@ export default defineEventHandler(async (event) => {
   let shareUrl = null;
   try {
     const config = useRuntimeConfig();
-    const baseUrl =
-      config.public?.appUrl || process.env.APP_URL || "http://localhost:3000";
+    const baseUrl = config.appUrl || config.public?.appUrl || process.env.APP_URL || "https://happitwineventslimited.co.ke";
     shareUrl = `${baseUrl.replace(/\/$/, "")}/events/${newEvent._id}`;
   } catch (e) {
     shareUrl = null;
