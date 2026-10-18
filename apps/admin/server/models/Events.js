@@ -39,6 +39,7 @@ const eventSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: { type: Date, default: Date.now },
+  shareUrl: { type: String },
 });
 
 // whenever events are queried, ensure statuses are updated based on dates

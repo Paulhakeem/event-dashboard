@@ -22,7 +22,11 @@ export default defineEventHandler(async (event) => {
           statusMessage: "Event not found",
         });
       }
-      return { success: true, eventData };
+      const config = useRuntimeConfig();
+      const baseUrl = (config.appUrl || config.public?.appUrl || process.env.APP_URL || "https://happitwineventslimited.co.ke").replace(/\/$/, "");
+      const obj = eventData.toObject ? eventData.toObject() : eventData;
+      obj.shareUrl = obj.shareUrl || `${baseUrl}/events/${obj._id}`;
+      return { success: true, eventData: obj };
     }
 
     if (method === "DELETE") {

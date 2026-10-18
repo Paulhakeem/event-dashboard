@@ -30,10 +30,13 @@ export default defineEventHandler(async (event) => {
       bookingMap[b._id] = b.ticketsSold;
     }
 
+    const config = useRuntimeConfig();
+    const baseUrl = (config.appUrl || config.public?.appUrl || process.env.APP_URL || "https://happitwineventslimited.co.ke").replace(/\/$/, "");
     const enriched = events.map((e) => {
       const obj = e.toObject();
       obj.ticketsSold = bookingMap[e.title] || 0;
       obj.ticketsRemaining = Math.max(0, (e.TicketQuantity || 0) - obj.ticketsSold);
+      obj.shareUrl = obj.shareUrl || `${baseUrl}/events/${obj._id}`;
       return obj;
     });
 

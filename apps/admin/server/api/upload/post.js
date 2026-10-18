@@ -92,6 +92,14 @@ export default defineEventHandler(async (event) => {
   fs.unlink(imageFile.filepath, () => {});
 
   // Save event in MongoDB
+  let baseUrl = "https://happitwineventslimited.co.ke";
+  try {
+    const config = useRuntimeConfig();
+    baseUrl = (config.appUrl || config.public?.appUrl || process.env.APP_URL || baseUrl).replace(/\/$/, "");
+  } catch (e) {
+    baseUrl = baseUrl.replace(/\/$/, "");
+  }
+
   const newEvent = new Event({
     title,
     description,
@@ -107,18 +115,12 @@ export default defineEventHandler(async (event) => {
     eventType,
     image: uploadResult.secure_url,
     createdBy: authUser.id,
+    shareUrl: `${baseUrl}/events/${null}`,
   });
 
+  const shareUrl = `${baseUrl}/events/${newEvent._id}`;
+  newEvent.shareUrl = shareUrl;
   await newEvent.save();
-
-  let shareUrl = null;
-  try {
-    const config = useRuntimeConfig();
-    const baseUrl = config.appUrl || config.public?.appUrl || process.env.APP_URL || "https://happitwineventslimited.co.ke";
-    shareUrl = `${baseUrl.replace(/\/$/, "")}/events/${newEvent._id}`;
-  } catch (e) {
-    shareUrl = null;
-  }
 
   return {
     message: "Event created successfully",

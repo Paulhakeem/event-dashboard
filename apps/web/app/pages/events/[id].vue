@@ -13,9 +13,18 @@
           Back to Events
         </NuxtLink>
 
-        <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
-          {{ event?.title }}
-        </h1>
+        <div class="flex flex-wrap items-center gap-3">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+            {{ event?.title }}
+          </h1>
+          <button
+            @click="copyShareLink"
+            class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg bg-amber-300 text-[#101d3a] hover:bg-amber-200 transition active:scale-95"
+          >
+            <Icon name="mdi:share-variant" />
+            Share
+          </button>
+        </div>
 
         <p class="text-gray-600 mt-2 text-lg">
           Book your tickets for an unforgettable experience
@@ -467,6 +476,8 @@
 import useEventBooking from "~/composables/bookingEvent";
 import { computed, ref, watch } from "vue";
 
+const route = useRoute();
+
 const {
   event,
   paymentStatus,
@@ -573,6 +584,22 @@ const isBookable = computed(() => {
     })
   );
 });
+
+const copyShareLink = async () => {
+  if (process.client) {
+    const url = event.value?.shareUrl || `${window.location.origin}/events/${route.params.id}`;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+        alert("Link copied to clipboard");
+      } else {
+        window.prompt("Copy this link:", url);
+      }
+    } catch (err) {
+      window.prompt("Copy this link:", url);
+    }
+  }
+};
 
 const handleBooking = () => {
   if (event.value?.freeEntry) return;

@@ -170,7 +170,7 @@
           <!-- Actions -->
           <div
             class="grid gap-2 pt-1"
-            :class="event.status === 'pending' ? 'grid-cols-2' : 'grid-cols-2'"
+            :class="event.status === 'pending' ? 'grid-cols-3' : 'grid-cols-3'"
           >
             <button
               @click="openEdit(event)"
@@ -184,6 +184,13 @@
             >
               <Icon name="solar:pen-bold" class="text-sm" />
               Edit
+            </button>
+            <button
+              @click="shareEvent(event)"
+              class="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] active:scale-95 transition-all duration-200 shadow-sm"
+            >
+              <Icon name="vaadin:share" class="text-sm" />
+              Share
             </button>
             <button
               @click="removeEvent(event._id)"
