@@ -110,6 +110,9 @@ useHead({
 
     <!-- Main Content -->
     <main class="min-h-screen">
+      <!-- Highlights -->
+      <home-highlights />
+
       <!-- Events Display -->
       <events-event-page />
 

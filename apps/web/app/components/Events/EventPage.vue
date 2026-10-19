@@ -335,7 +335,10 @@ const { eventPosters, pendings, errorMessage, fetchEvents } = EventFunctions();
 onMounted(() => fetchEvents(false));
 
 const activeTab = ref("all");
-const selectedType = ref("all");
+const route = useRoute();
+const selectedType = ref(
+  typeof route.query.type === "string" ? route.query.type : "all",
+);
 
 const eventTypes = computed(() => {
   const types = new Set(

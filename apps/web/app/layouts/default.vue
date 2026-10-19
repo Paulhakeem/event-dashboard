@@ -7,6 +7,7 @@
     </div>
 
     <slot />
+    <Footer v-if="!isUserDashboard" />
     <ChatBotChat/>
   </div>
 </template>
