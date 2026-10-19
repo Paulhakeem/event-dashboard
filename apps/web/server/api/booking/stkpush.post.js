@@ -209,6 +209,16 @@ export default defineEventHandler(async (event) => {
     0,
   );
 
+  const maxPerUser = eventData.maxTicketsPerUser;
+  if (Number.isFinite(Number(maxPerUser)) && Number(maxPerUser) > 0) {
+    if (ticketCount > Number(maxPerUser)) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `You can only purchase up to ${maxPerUser} ticket${Number(maxPerUser) === 1 ? "" : "s"} for this event.`,
+      });
+    }
+  }
+
   const amount = tickets.reduce((total, ticket) => total + ticket.amount, 0);
 
   if (!Number.isInteger(amount) || amount <= 0) {
@@ -219,14 +229,35 @@ export default defineEventHandler(async (event) => {
   }
 
   // Avoid selling more tickets than the event has available.
-  if (
-    Number.isFinite(Number(eventData.TicketQuantity)) &&
-    Number(eventData.TicketQuantity) < ticketCount
-  ) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Not enough tickets are available.",
+  const customTicketsAvail = Array.isArray(eventData.customTickets)
+    ? eventData.customTickets
+    : [];
+  for (const ticket of tickets) {
+    const tname = String(ticket.ticketType || "").trim().toLowerCase();
+    const ct = customTicketsAvail.find((c) => {
+      const cname = String(c.ticketType || c.name || c.type || "").trim().toLowerCase();
+      return cname === tname;
     });
+    if (ct) {
+      const avail = Number(ct.availableQuantity ?? ct.quantity ?? 0);
+      if (Number.isFinite(avail) && ticket.quantity > avail) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Not enough "${ticket.ticketType}" tickets available.`,
+        });
+      }
+    } else if (
+      Number.isFinite(Number(eventData.TicketQuantity)) &&
+      eventData.TicketQuantity >= 0
+    ) {
+      // fallback
+      if (Number(eventData.TicketQuantity) < ticketCount) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Not enough tickets are available.",
+        });
+      }
+    }
   }
 
   const normalizedPhone = normalizePhone(phone);

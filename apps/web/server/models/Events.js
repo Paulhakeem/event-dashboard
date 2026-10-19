@@ -7,11 +7,14 @@ const eventSchema = new mongoose.Schema({
   freeEntry: { type: Boolean, default: false },
   date: { type: Date, required: true },
   location: { type: String, required: true },
-  TicketQuantity: { type: Number, required: true, default: 0 },
+  TicketQuantity: { type: Number, default: 0 },
+  maxTicketsPerUser: { type: Number, default: null },
   customTickets: [
     {
       name: { type: String, required: true },
       price: { type: Number, required: true },
+      quantity: { type: Number, default: 0 },
+      availableQuantity: { type: Number, default: 0 },
     },
   ],
   status: {

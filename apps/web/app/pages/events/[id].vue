@@ -276,7 +276,7 @@
             <div
               class="flex items-center justify-between text-sm text-gray-600 mb-6"
             >
-              <span>🎟️ {{ event?.TicketQuantity || 0 }} tickets available</span>
+              <span>🎟️ {{ (Array.isArray(event?.customTickets) ? event.customTickets.reduce((s,t)=>s+(Number(t.availableQuantity??t.quantity)||0),0) : (event?.TicketQuantity||0)) }} tickets available</span>
             </div>
 
             <!-- CONTACT DETAILS -->
@@ -540,10 +540,26 @@ const removeTicketLine = (index) => {
   ticketLines.value.splice(index, 1);
 };
 
+const getTypeAvailability = (typeName) => {
+  if (!typeName) return Infinity;
+  const t = event.value?.customTickets?.find(
+    (c) => String(c.name || c.ticketType || c.type).toLowerCase() === String(typeName).toLowerCase(),
+  );
+  if (t) {
+    const avail = Number(t.availableQuantity ?? t.quantity ?? 0);
+    if (Number.isFinite(avail) && avail >= 0) return avail;
+  }
+  return maxQuantity.value;
+};
+
 const remainingForLine = (index) => {
   const line = ticketLines.value[index];
-  const other = totalQuantity.value - (line?.quantity || 0);
-  return Math.max(0, maxQuantity.value - other);
+  const avail = getTypeAvailability(line?.ticketType);
+  if (!Number.isFinite(avail)) {
+    const other = totalQuantity.value - (line?.quantity || 0);
+    return Math.max(0, maxQuantity.value - other);
+  }
+  return Math.max(0, avail);
 };
 
 const increaseLineQuantity = (index) => {

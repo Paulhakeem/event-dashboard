@@ -138,7 +138,7 @@
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
-                class="flex flex-col sm:flex-row items-center gap-3 p-3 border rounded-lg"
+                class="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 border rounded-lg"
               >
                 <input
                   v-model="ticket.name"
@@ -151,9 +151,17 @@
                   v-model.number="ticket.price"
                   type="number"
                   min="0"
-                  placeholder="Price"
+                  placeholder="Price (KES)"
                   :disabled="freeEntry"
-                  class="w-full sm:w-32 p-2 border rounded outline-none"
+                  class="w-full sm:w-28 p-2 border rounded outline-none"
+                />
+                <input
+                  v-model.number="ticket.quantity"
+                  type="number"
+                  min="0"
+                  placeholder="Available"
+                  :disabled="freeEntry"
+                  class="w-full sm:w-28 p-2 border rounded outline-none"
                 />
                 <button
                   type="button"
@@ -176,13 +184,13 @@
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Total Tickets</label
+                  >Max tickets per user (optional)</label
                 >
                 <input
-                  v-model.number="form.TicketQuantity"
-                  required
+                  v-model.number="form.maxTicketsPerUser"
                   type="number"
                   min="0"
+                  placeholder="e.g. 2"
                   class="w-full p-3 border rounded-lg"
                 />
               </div>
@@ -356,6 +364,7 @@ const form = reactive({
   vip: "",
   vvip: "",
   TicketQuantity: 0,
+  maxTicketsPerUser: null,
   status: "upcoming",
   image: null,
 });
@@ -367,7 +376,7 @@ const freeEntry = ref(false);
 const customTickets = ref([]);
 
 const addTicketType = () => {
-  customTickets.value.push({ name: "", price: 0 });
+  customTickets.value.push({ name: "", price: 0, quantity: 0 });
 };
 
 const removeTicketType = (index) => {
@@ -381,7 +390,9 @@ const canSubmit = computed(
 const toggleFreeEntry = () => {
   freeEntry.value = !freeEntry.value;
   if (freeEntry.value) {
-    customTickets.value.forEach((t) => (t.price = 0));
+    customTickets.value.forEach((t) => {
+      t.price = 0;
+    });
   }
 };
 
@@ -427,7 +438,10 @@ const submitEvent = async () => {
     formData.append("vvip", form.vvip ?? 0);
     formData.append("customTickets", JSON.stringify(customTickets.value));
     formData.append("freeEntry", String(freeEntry.value));
-    formData.append("TicketQuantity", form.TicketQuantity);
+    formData.append("TicketQuantity", form.TicketQuantity || 0);
+    if (form.maxTicketsPerUser != null && form.maxTicketsPerUser !== "") {
+      formData.append("maxTicketsPerUser", form.maxTicketsPerUser);
+    }
     formData.append("status", form.status);
     formData.append("image", file.value);
 
