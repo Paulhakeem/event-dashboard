@@ -184,7 +184,10 @@
                         :key="ticket.name"
                         :value="ticket.name"
                       >
-                        {{ ticket.name }} — Ksh {{ ticket.price }}
+                        {{ ticket.name }} — Ksh {{ ticket.price }} ({{
+                          ticket.availableQuantity ?? ticket.quantity ?? 0
+                        }}
+                        tickets)
                       </option>
                     </select>
                   </div>
