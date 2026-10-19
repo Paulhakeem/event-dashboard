@@ -566,30 +566,54 @@
                 :key="i"
                 class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2"
               >
-                <input
-                  v-model="ticket.name"
-                  placeholder="Ticket name"
-                  class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
-                />
+                <div class="flex-1 flex flex-col gap-1">
+                  <label
+                    class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide"
+                    :for="`edit-ticket-name-${i}`"
+                    >Ticket Type</label
+                  >
+                  <input
+                    :id="`edit-ticket-name-${i}`"
+                    v-model="ticket.name"
+                    placeholder="Ticket type e.g. Gold"
+                    class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
+                  />
+                </div>
                 <div class="flex items-center gap-2">
-                  <input
-                    v-model.number="ticket.price"
-                    type="number"
-                    min="0"
-                    placeholder="Price"
-                    class="flex-1 sm:w-28 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
-                  />
-                  <input
-                    v-model.number="ticket.quantity"
-                    type="number"
-                    min="0"
-                    placeholder="Available"
-                    class="flex-1 sm:w-28 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
-                  />
+                  <div class="flex-1 sm:w-28 flex flex-col gap-1">
+                    <label
+                      class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide"
+                      :for="`edit-ticket-price-${i}`"
+                      >Price (KES)</label
+                    >
+                    <input
+                      :id="`edit-ticket-price-${i}`"
+                      v-model.number="ticket.price"
+                      type="number"
+                      min="0"
+                      placeholder="Price (KES)"
+                      class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
+                    />
+                  </div>
+                  <div class="flex-1 sm:w-28 flex flex-col gap-1">
+                    <label
+                      class="text-[10px] font-semibold text-gray-500 uppercase tracking-wide"
+                      :for="`edit-ticket-quantity-${i}`"
+                      >Total Tickets</label
+                    >
+                    <input
+                      :id="`edit-ticket-quantity-${i}`"
+                      v-model.number="ticket.quantity"
+                      type="number"
+                      min="0"
+                      placeholder="Total tickets"
+                      class="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
+                    />
+                  </div>
                   <button
                     @click="removeTicket(i)"
                     type="button"
-                    class="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all text-lg leading-none flex-shrink-0"
+                    class="w-9 h-9 self-end sm:self-auto flex items-center justify-center rounded-xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-all text-lg leading-none flex-shrink-0"
                     aria-label="Remove ticket type"
                   >
                     &times;
