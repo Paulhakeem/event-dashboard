@@ -138,35 +138,60 @@
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
-                class="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 border rounded-lg"
+                class="flex flex-col sm:flex-row items-start gap-3 p-3 border rounded-lg"
               >
-                <input
-                  v-model="ticket.name"
-                  type="text"
-                  placeholder="Ticket name e.g. Gold"
-                  :disabled="freeEntry"
-                  class="flex-1 w-full min-w-0 p-2 border rounded outline-none"
-                />
-                <input
-                  v-model.number="ticket.price"
-                  type="number"
-                  min="0"
-                  placeholder="Price (KES)"
-                  :disabled="freeEntry"
-                  class="w-full sm:w-28 p-2 border rounded outline-none"
-                />
-                <input
-                  v-model.number="ticket.quantity"
-                  type="number"
-                  min="0"
-                  placeholder="Available"
-                  :disabled="freeEntry"
-                  class="w-full sm:w-28 p-2 border rounded outline-none"
-                />
+                <div class="flex-1 w-full min-w-0">
+                  <label
+                    class="block text-xs font-semibold text-gray-600 mb-1"
+                    :for="`ticket-name-${index}`"
+                    >Ticket Type</label
+                  >
+                  <input
+                    :id="`ticket-name-${index}`"
+                    v-model="ticket.name"
+                    type="text"
+                    placeholder="e.g. Gold"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none"
+                  />
+                </div>
+                <div class="w-full sm:w-28">
+                  <label
+                    class="block text-xs font-semibold text-gray-600 mb-1"
+                    :for="`ticket-price-${index}`"
+                    >Price (KES)</label
+                  >
+                  <input
+                    :id="`ticket-price-${index}`"
+                    v-model.number="ticket.price"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none"
+                  />
+                </div>
+                <div class="w-full sm:w-32">
+                  <label
+                    class="block text-xs font-semibold text-gray-600 mb-1"
+                    :for="`ticket-quantity-${index}`"
+                    >Total Tickets</label
+                  >
+                  <input
+                    :id="`ticket-quantity-${index}`"
+                    v-model.number="ticket.quantity"
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 100"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none"
+                  />
+                </div>
                 <button
                   type="button"
                   @click="removeTicketType(index)"
-                  class="self-end sm:self-auto text-red-500 hover:text-red-700 text-lg px-2"
+                  class="self-end text-red-500 hover:text-red-700 text-lg px-2 sm:mb-1"
+                  title="Remove ticket type"
                 >
                   ✕
                 </button>
@@ -292,13 +317,12 @@
                   class="flex justify-between text-sm"
                 >
                   <span>{{ t.name || "Unnamed" }}</span
-                  ><span>{{ t.price ? "KES " + t.price : "Free" }}</span>
+                  ><span
+                    >{{ t.price ? "KES " + t.price : "Free" }} ·
+                    {{ t.quantity || 0 }} left</span
+                  >
                 </div>
               </template>
-              <div class="flex justify-between text-sm pt-2 border-t mt-2">
-                <span>Available</span
-                ><span>{{ form.TicketQuantity || 0 }}</span>
-              </div>
             </div>
           </div>
         </div>

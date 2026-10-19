@@ -579,6 +579,13 @@
                     placeholder="Price"
                     class="flex-1 sm:w-28 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
                   />
+                  <input
+                    v-model.number="ticket.quantity"
+                    type="number"
+                    min="0"
+                    placeholder="Available"
+                    class="flex-1 sm:w-28 border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/30 focus:border-[#9c4e8b] outline-none transition-all"
+                  />
                   <button
                     @click="removeTicket(i)"
                     type="button"

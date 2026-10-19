@@ -202,6 +202,9 @@
                   <p class="text-sm font-bold text-gray-900">
                     Ksh {{ ticket.price }}
                   </p>
+                  <p class="text-[11px] text-gray-500">
+                    {{ ticket.availableQuantity ?? ticket.quantity ?? 0 }} tickets
+                  </p>
                 </div>
               </div>
 

@@ -31,7 +31,7 @@ export default function updateEvent(eventsRef = null) {
   };
 
   const addTicket = () => {
-    editForm.value.customTickets.push({ name: "", price: 0 });
+    editForm.value.customTickets.push({ name: "", price: 0, quantity: 0 });
   };
 
   const removeTicket = (index) => {
@@ -48,7 +48,11 @@ export default function updateEvent(eventsRef = null) {
       location: ev.location || "",
       TicketQuantity: ev.TicketQuantity || 0,
       customTickets: ev.customTickets
-        ? ev.customTickets.map((t) => ({ name: t.name, price: t.price }))
+        ? ev.customTickets.map((t) => ({
+            name: t.name,
+            price: t.price,
+            quantity: t.quantity ?? 0,
+          }))
         : [],
       status: ev.status || "upcoming",
       eventType: ev.eventType || "other",
