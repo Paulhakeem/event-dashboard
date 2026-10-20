@@ -1,7 +1,6 @@
 import connectDB from "~~/server/utils/mongoose";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
 import { Ticket } from "~~/server/models/Ticket.js";
-import { Event } from "~~/server/models/Events.js";
 import { TotalBooking } from "~~/server/models/totalBooking.js";
 import mongoose from "mongoose";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
@@ -29,7 +28,6 @@ export default defineEventHandler(async (event) => {
       eventName,
       ticketType,
       used,
-      filter: filterValue,
     } = {
       ...query,
       ...body,

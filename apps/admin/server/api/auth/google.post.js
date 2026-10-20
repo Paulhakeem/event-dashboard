@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { User } from "../../models/User.js";
 import connectDB from "../../utils/mongoose.js";
-import { v2 as cloudinary } from "cloudinary";
 import { setAuthCookie } from "../../utils/authCookie.js";
 
 const GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo";

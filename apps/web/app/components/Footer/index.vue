@@ -19,13 +19,13 @@
       aria-hidden="true"
     />
 
-    <div class="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+    <div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
       <!-- Newsletter strip -->
       <div
-        class="mb-12 flex flex-col items-start gap-6 rounded-3xl border border-amber-300/20 bg-white/5 p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:p-8"
+        class="mb-10 flex flex-col items-start gap-5 rounded-3xl border border-amber-300/20 bg-white/5 p-5 backdrop-blur-sm sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-8"
       >
         <div class="max-w-xl">
-          <h3 class="text-xl font-bold tracking-tight sm:text-2xl">
+          <h3 class="text-lg font-bold tracking-tight sm:text-2xl">
             Never miss an event
           </h3>
           <p class="mt-2 text-sm leading-6 text-white/70">
@@ -34,7 +34,7 @@
           </p>
         </div>
         <form
-          class="flex w-full max-w-md flex-col gap-3 sm:flex-row"
+          class="flex w-full min-w-0 flex-col gap-3 sm:max-w-md sm:flex-row"
           @submit.prevent="handleSubscribe"
         >
           <label class="sr-only" for="footer-email">Email address</label>
@@ -43,11 +43,11 @@
             v-model="email"
             type="email"
             placeholder="your@email.com"
-            class="w-full flex-1 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/50 outline-none transition focus:border-amber-300 focus:ring-2 focus:ring-amber-300/40"
+            class="w-full min-w-0 flex-1 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/50 outline-none transition focus:border-amber-300 focus:ring-2 focus:ring-amber-300/40"
           />
           <button
             type="submit"
-            class="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-[#101d3a] shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#081226]"
+            class="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-[#101d3a] shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#081226] sm:w-auto"
           >
             <Icon name="material-symbols:send-rounded" class="text-lg" />
             Subscribe
@@ -56,16 +56,22 @@
       </div>
 
       <!-- Main grid -->
-      <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div
+        class="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10"
+      >
         <!-- Brand -->
-        <div>
-          <NuxtLink to="/" class="flex items-center gap-3" aria-label="Happitwin home">
+        <div class="col-span-2 lg:col-span-1">
+          <NuxtLink
+            to="/"
+            class="flex items-center gap-3"
+            aria-label="Happitwin home"
+          >
             <span
               class="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-0.5 ring-1 ring-amber-300/50"
             >
               <img :src="logo" alt="" class="h-full w-full object-contain" />
             </span>
-            <span>
+            <span class="min-w-0">
               <span class="block text-sm font-black tracking-[0.14em]">
                 HAPPITWIN
               </span>
@@ -79,7 +85,7 @@
             organisers and guests together in one seamless platform.
           </p>
 
-          <div class="mt-6 flex items-center gap-3">
+          <div class="mt-6 flex flex-wrap items-center gap-3">
             <a
               v-for="social in socials"
               :key="social.name"
@@ -119,10 +125,12 @@
 
       <!-- Bottom bar -->
       <div
-        class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-white/50 sm:flex-row"
+        class="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-6 text-center text-xs text-white/50 sm:mt-12 sm:flex-row sm:text-left"
       >
         <p>© {{ year }} Happitwin events. All rights reserved.</p>
-        <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <div
+          class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 sm:justify-end"
+        >
           <NuxtLink
             v-for="item in legal"
             :key="item.name"

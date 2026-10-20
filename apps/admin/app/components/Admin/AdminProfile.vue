@@ -308,17 +308,12 @@ onMounted(async () => {
   }
 });
 
-const editProfile = () => {
-  // handle profile edit
-};
-
 // ---- Two-Factor Authentication ----
 const mfaEnabled = ref(false);
 const mfaSetup = ref(null);
 const mfaVerifyCode = ref("");
 const mfaLoading = ref(false);
 const disableModal = ref(false);
-const mfaMessage = ref("");
 
 const headers = computed(() => ({
   Authorization: `Bearer ${token.value}`,
@@ -345,8 +340,6 @@ const startMfaSetup = async () => {
     });
     mfaSetup.value = res;
   } catch (error) {
-    mfaMessage.value =
-      error?.data?.statusMessage || "Failed to start setup";
     console.error(error);
   } finally {
     mfaLoading.value = false;
@@ -364,10 +357,8 @@ const confirmMfaEnable = async () => {
     mfaEnabled.value = true;
     mfaSetup.value = null;
     mfaVerifyCode.value = "";
-    mfaMessage.value = "Two-factor authentication enabled.";
   } catch (error) {
-    mfaMessage.value =
-      error?.data?.statusMessage || "Invalid code. Try again.";
+    console.error(error);
   } finally {
     mfaLoading.value = false;
   }
@@ -389,10 +380,8 @@ const confirmMfaDisable = async () => {
     mfaEnabled.value = false;
     disableModal.value = false;
     mfaVerifyCode.value = "";
-    mfaMessage.value = "Two-factor authentication disabled.";
   } catch (error) {
-    mfaMessage.value =
-      error?.data?.statusMessage || "Invalid code. Try again.";
+    console.error(error);
   } finally {
     mfaLoading.value = false;
   }

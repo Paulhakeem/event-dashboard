@@ -102,17 +102,7 @@ export default function getTotalTickets() {
   );
 
   // Tooltip
-  const chartWrap = ref(null);
   const tip = ref({ visible: false, x: 0, y: 0, idx: 0 });
-  const showTip = (e, idx) => {
-    const rect = chartWrap.value?.getBoundingClientRect();
-    tip.value = {
-      visible: true,
-      x: e.clientX - rect.left + 14,
-      y: e.clientY - rect.top - 70,
-      idx,
-    };
-  };
   const hideTip = () => {
     tip.value.visible = false;
   };
@@ -148,7 +138,6 @@ export default function getTotalTickets() {
     revenueAreaPath,
     gridYs,
     tip,
-    showTip,
     hideTip,
     W,
     H,

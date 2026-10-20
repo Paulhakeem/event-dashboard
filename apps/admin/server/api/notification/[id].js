@@ -1,6 +1,5 @@
 import { Notification } from "~~/server/models/Notification.js";
 import connectDB from "~~/server/utils/mongoose.js";
-import { User } from "~~/server/models/User.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
 
 export default defineEventHandler(async (event) => {

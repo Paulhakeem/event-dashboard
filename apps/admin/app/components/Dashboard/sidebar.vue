@@ -116,7 +116,7 @@
 
 <script setup>
 import AdminProfile from "~/components/Admin/AdminProfile.vue";
-const props = defineProps({
+defineProps({
   modelValue: Object,
 });
 const emit = defineEmits(["update:modelValue"]);

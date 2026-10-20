@@ -601,14 +601,5 @@ async function markTicketUsed(ticket, checked) {
   }
 }
 
-function initials(name, email) {
-  const parts = String(name || "")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  if (parts.length) return parts.map((part) => part[0]).join("").slice(0, 2);
-  return String(email || "?").slice(0, 1).toUpperCase();
-}
-
 onMounted(loadEvents);
 </script>

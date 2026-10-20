@@ -39,14 +39,15 @@ export default defineNuxtConfig({
           "form-action 'self'",
           "frame-ancestors 'self'",
           "object-src 'none'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-          "script-src-elem 'self' 'unsafe-inline'",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://static.cloudflareinsights.com",
+          "script-src-elem 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://static.cloudflareinsights.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "font-src 'self' https://fonts.gstatic.com data:",
           "img-src 'self' data: https: blob:",
-          "connect-src 'self' https:",
-          "frame-src 'self'",
+          "connect-src 'self' https: wss:",
+          "frame-src 'self' https://www.google.com https://www.gstatic.com",
+          "worker-src 'self' blob:",
           "upgrade-insecure-requests",
         ].join("; "),
         "X-Content-Type-Options": "nosniff",
@@ -57,7 +58,6 @@ export default defineNuxtConfig({
       },
     },
   },
-
   vite: {
     plugins: [tailwindcss()],
     resolve: {

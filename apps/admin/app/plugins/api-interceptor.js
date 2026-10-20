@@ -1,15 +1,5 @@
-import { $fetch as ofetch } from "ofetch";
-
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(() => {
   const { logout } = useAuth();
-
-  const api = ofetch.create({
-    onResponseError({ response }) {
-      if (response.status === 401) {
-        logout();
-      }
-    },
-  });
 
   if (process.client && typeof window !== "undefined") {
     const originalFetch = window.fetch.bind(window);
@@ -28,10 +18,4 @@ export default defineNuxtPlugin((nuxtApp) => {
       return response;
     };
   }
-
-  return {
-    provide: {
-      api,
-    },
-  };
 });

@@ -1,4 +1,4 @@
-import { deleteCookie, getCookie, setCookie } from "h3";
+import { getCookie, setCookie } from "h3";
 
 const AUTH_COOKIE_NAME = "auth_token";
 
@@ -22,11 +22,5 @@ export function setAuthCookie(event, token, config) {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24,
-  });
-}
-
-export function clearAuthCookie(event) {
-  deleteCookie(event, AUTH_COOKIE_NAME, {
-    path: "/",
   });
 }

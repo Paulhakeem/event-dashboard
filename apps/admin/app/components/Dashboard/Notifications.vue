@@ -120,7 +120,6 @@ const {
   notifications,
   loading,
   error,
-  removeNotification,
   borderColor,
   iconBg,
   bgGradient,

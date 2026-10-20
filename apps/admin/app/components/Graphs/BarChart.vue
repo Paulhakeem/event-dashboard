@@ -1,4 +1,3 @@
-```vue
 <template>
   <div
     class="relative overflow-hidden rounded-3xl border border-white/20 bg-gradient-to-br from-white via-green-50 to-emerald-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 backdrop-blur-xl shadow-xl p-6"
@@ -108,14 +107,6 @@ const RevenueCategoriesMultple = {
 const xFormatter = (i) => `${RevenueData.value[i]?.month || ""}`;
 
 const yFormatter = (tick) => tick.toString();
-
-const totalEvents = computed(() =>
-  RevenueData.value.reduce((sum, item) => sum + (item.events || 0), 0),
-);
-
-const totalUsers = computed(() =>
-  RevenueData.value.reduce((sum, item) => sum + (item.users || 0), 0),
-);
 
 onMounted(async () => {
   loading.value = true;
