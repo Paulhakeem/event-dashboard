@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
+  <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:bg-zinc-950 dark:from-zinc-950 dark:to-zinc-950 p-8">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex items-center gap-3 mb-2">
           <Icon
             name="material-symbols:notifications-active"
-            class="text-3xl text-[#13284b]"
+            class="text-3xl text-[#13284b] dark:text-white"
           />
-          <h1 class="text-3xl font-bold text-gray-900">Notifications</h1>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
         </div>
-        <p class="text-gray-600">
+        <p class="text-gray-600 dark:text-neutral-400">
           You have {{ notifications.length }} notification{{
             notifications.length !== 1 ? "s" : ""
           }}
@@ -21,10 +21,10 @@
       <div v-if="loading" class="text-center py-16">
         <div class="inline-block">
           <div
-            class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13284b]"
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13284b] dark:border-white"
           ></div>
         </div>
-        <p class="mt-4 text-gray-600 font-medium">Loading notifications...</p>
+        <p class="mt-4 text-gray-600 dark:text-neutral-400 font-medium">Loading notifications...</p>
       </div>
 
       <!-- Error -->
@@ -47,13 +47,13 @@
       <!-- Empty -->
       <div
         v-if="!loading && notifications.length === 0"
-        class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-gray-300"
+        class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-gray-300 dark:bg-neutral-900 dark:border-neutral-700"
       >
         <Icon
           name="material-symbols:inbox"
           class="text-6xl text-gray-300 mx-auto mb-4"
         />
-        <p class="text-xl text-gray-500 font-medium">All caught up!</p>
+        <p class="text-xl text-gray-500 dark:text-neutral-400 font-medium">All caught up!</p>
         <p class="text-gray-400 mt-2">No new notifications at this time</p>
       </div>
 
@@ -62,7 +62,7 @@
         <div
           v-for="notification in notifications"
           :key="notification._id"
-          class="group relative flex items-start justify-between p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border-l-4 overflow-hidden"
+          class="group relative flex items-start justify-between p-6 bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border-l-4 overflow-hidden dark:bg-neutral-900 dark:shadow-none"
           :class="borderColor(notification.type)"
         >
           <!-- Background gradient on hover -->
@@ -83,10 +83,10 @@
 
             <!-- Text -->
             <div class="flex-1 min-w-0">
-              <h4 class="font-semibold text-gray-800 truncate">
+              <h4 class="font-semibold text-gray-800 dark:text-white truncate">
                 {{ notification.title }}
               </h4>
-              <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+              <p class="text-sm text-gray-600 dark:text-neutral-400 mt-1 line-clamp-2">
                 {{ notification.message }}
               </p>
               <div class="flex items-center gap-4 mt-3">
@@ -95,7 +95,7 @@
                 }}</span>
                 <span
                   v-if="notification.sender"
-                  class="text-xs text-[#13284b] font-medium"
+                  class="text-xs text-[#13284b] dark:text-white font-medium"
                   >from {{ notification.sender.name }}</span
                 >
               </div>
@@ -105,7 +105,7 @@
           <!-- Close Button -->
           <button
             @click="deleteNotification(notification._id)"
-            class="relative ml-4 shrink-0 p-2 rounded-full text-gray-400 hover:text-[#13284b] hover:bg-gray-100 transition"
+            class="relative ml-4 shrink-0 p-2 rounded-full text-gray-400 hover:text-[#13284b] hover:bg-gray-100 dark:hover:text-white dark:hover:bg-neutral-800 transition"
           >
             <Icon name="material-symbols:close" class="text-xl" />
           </button>

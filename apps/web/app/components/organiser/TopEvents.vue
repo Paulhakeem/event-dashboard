@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-white p-6 rounded-lg shadow">
+  <div class="bg-white p-6 rounded-lg shadow dark:bg-neutral-900 dark:shadow-none">
     <h2 class="text-lg font-semibold mb-4">Top Booked Events</h2>
 
     <div v-if="loading" class="py-8 flex items-center justify-center">
       <div
-        class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-[#13284b]"
+        class="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 dark:border-neutral-700 border-t-[#13284b]"
       ></div>
-      <p class="ml-4 text-sm text-gray-500">Loading booked events...</p>
+      <p class="ml-4 text-sm text-gray-500 dark:text-neutral-400">Loading booked events...</p>
     </div>
 
     <div
@@ -25,7 +25,7 @@
 
     <div
       v-else-if="bookedEvents.length === 0"
-      class="py-6 text-center text-gray-500"
+      class="py-6 text-center text-gray-500 dark:text-neutral-400"
     >
       No booked events yet. Once you receive bookings, the top events will
       appear here.
@@ -34,20 +34,20 @@
     <div v-else class="space-y-4">
       <!-- Top event highlight -->
       <div
-        class="rounded-lg p-4 bg-gradient-to-r from-amber-50 to-white border border-gray-100 flex items-center justify-between"
+        class="rounded-lg p-4 bg-gradient-to-r from-amber-50 to-white border border-gray-100 dark:from-amber-950/40 dark:to-neutral-900 dark:border-neutral-800 flex items-center justify-between"
       >
         <div>
-          <p class="text-sm text-gray-500">Top Event</p>
-          <h3 class="text-lg font-bold text-gray-900">
+          <p class="text-sm text-gray-500 dark:text-neutral-400">Top Event</p>
+          <h3 class="text-lg font-bold text-gray-900 dark:text-white">
             {{ bookedEvents[0]?.eventName || bookedEvents[0]?.name || "—" }}
           </h3>
-          <p class="text-sm text-gray-500 mt-1">
+          <p class="text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Booked {{ bookedEvents[0]?.totalBookings ?? 0 }} times
           </p>
         </div>
         <div class="text-right">
-          <p class="text-sm text-gray-500">Total income</p>
-          <p class="text-lg font-semibold text-gray-900">
+          <p class="text-sm text-gray-500 dark:text-neutral-400">Total income</p>
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">
             Ksh {{ bookedEvents[0]?.totalIncome ?? 0 }}
           </p>
         </div>
@@ -61,15 +61,15 @@
           class="py-3 flex items-center justify-between"
         >
           <div>
-            <p class="font-medium text-gray-900">
+            <p class="font-medium text-gray-900 dark:text-white">
               {{ event.eventName || event.name }}
             </p>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-gray-500 dark:text-neutral-400 mt-1">
               Booked {{ event.totalBookings }} times
             </p>
           </div>
           <div class="text-right">
-            <p class="text-sm text-gray-500">Income</p>
+            <p class="text-sm text-gray-500 dark:text-neutral-400">Income</p>
             <p class="font-semibold">Ksh {{ event.totalIncome ?? 0 }}</p>
           </div>
         </li>

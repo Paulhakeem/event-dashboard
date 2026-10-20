@@ -1,5 +1,5 @@
 <template>
-  <div class="relative bg-white px-4 py-8 sm:px-6 lg:px-8">
+  <div class="relative bg-white dark:bg-neutral-900 px-4 py-8 sm:px-6 lg:px-8">
     <!-- Card -->
     <div
       class="flex flex-col border border-gray-200 rounded-xl p-4 sm:p-6 lg:p-10 max-w-xl mx-auto w-full dark:border-neutral-700"
@@ -7,7 +7,7 @@
       <p class="text-center sm:text-left">
         <NuxtLink
           to="/login"
-          class="text-sm text-[#13284b] underline cursor-pointer"
+          class="text-sm text-[#13284b] dark:text-white underline cursor-pointer"
           >Have an account? Login</NuxtLink
         >
       </p>
@@ -65,7 +65,7 @@
               aria-label="Email address"
               autocomplete="email"
               required
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
 
@@ -81,7 +81,7 @@
               aria-label="Password"
               required
               minlength="6"
-              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
+              class="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg outline-none sm:text-sm focus:border-[#13284b] focus:ring-[#13284b] dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
             />
           </div>
         </div>

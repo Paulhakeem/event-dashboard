@@ -1,20 +1,20 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100"
+    class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-zinc-950 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950"
   >
     <!-- HEADER -->
-    <div class="bg-white border-b border-gray-200">
+    <div class="bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
       <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
         <NuxtLink
           to="/eventPage"
-          class="inline-flex items-center text-[#13284b] hover:text-[#0b1730] mb-4 transition"
+          class="inline-flex items-center text-[#13284b] dark:text-white hover:text-[#0b1730] dark:hover:text-white mb-4 transition"
         >
           <Icon name="gg:arrow-left" class="mr-2" />
           Back to Events
         </NuxtLink>
 
         <div class="flex flex-wrap items-center gap-3">
-          <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
             {{ event?.title }}
           </h1>
           <button
@@ -26,7 +26,7 @@
           </button>
         </div>
 
-        <p class="text-gray-600 mt-2 text-lg">
+        <p class="text-gray-600 dark:text-neutral-400 mt-2 text-lg">
           Book your tickets for an unforgettable experience
         </p>
       </div>
@@ -48,19 +48,19 @@
 
           <!-- INFO CARDS -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-lg shadow-md">
-              <p class="text-xs text-gray-500 uppercase">Location</p>
-              <p class="text-sm font-semibold text-gray-900">
+            <div class="bg-white dark:bg-neutral-900 p-4 rounded-lg shadow-md dark:shadow-none">
+              <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase">Location</p>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
                 📍 {{ event?.location }}
               </p>
             </div>
 
-            <div class="bg-white p-4 rounded-lg shadow-md">
-              <p class="text-xs text-gray-500 uppercase">Date</p>
-              <p class="text-sm font-semibold text-gray-900">
+            <div class="bg-white dark:bg-neutral-900 p-4 rounded-lg shadow-md dark:shadow-none">
+              <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase">Date</p>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
                 <Icon
                   name="mdi:calendar-month"
-                  class="inline mr-1 text-[#13284b]"
+                  class="inline mr-1 text-[#13284b] dark:text-white"
                 />
                 {{
                   new Date(event?.date).toLocaleDateString("en-US", {
@@ -72,20 +72,21 @@
               </p>
             </div>
 
-            <div class="bg-white p-4 rounded-lg shadow-md">
-              <p class="text-xs text-gray-500 uppercase">Type</p>
-              <p class="text-sm font-semibold text-gray-900">
+            <div class="bg-white dark:bg-neutral-900 p-4 rounded-lg shadow-md dark:shadow-none">
+              <p class="text-xs text-gray-500 dark:text-neutral-400 uppercase">Type</p>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
                 🎭 {{ event?.eventType || "Event" }}
               </p>
             </div>
 
-            <div class="bg-white p-4 rounded-lg shadow-md">
+            <div class="bg-white dark:bg-neutral-900 p-4 rounded-lg shadow-md dark:shadow-none">
               <p
                 class="text-sm font-semibold capitalize"
                 :class="{
                   'text-green-600': event?.status === 'upcoming',
                   'text-blue-600': event?.status === 'ongoing',
                   'text-gray-600': event?.status === 'completed',
+                  'dark:text-neutral-400': event?.status === 'completed',
                   'text-red-600': event?.status === 'cancelled',
                 }"
               >
@@ -95,12 +96,12 @@
           </div>
 
           <!-- DESCRIPTION -->
-          <div class="bg-white p-8 rounded-2xl shadow-md mb-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+          <div class="bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-md dark:shadow-none mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
               About This Event
             </h2>
 
-            <p class="text-gray-700 leading-relaxed text-lg">
+            <p class="text-gray-700 dark:text-neutral-300 leading-relaxed text-lg">
               {{ event?.description }}
             </p>
           </div>
@@ -108,8 +109,8 @@
 
         <!-- BOOKING SIDEBAR -->
         <div class="lg:col-span-1">
-          <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-4">
-            <h3 class="text-2xl font-bold text-gray-900 mb-6">
+          <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg dark:shadow-none p-8 sticky top-4">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
               Book Your Tickets
             </h3>
 
@@ -121,7 +122,7 @@
                 name="mdi:calendar-month"
                 class="text-[#13284b] text-xl flex-shrink-0"
               />
-              <p class="text-sm font-semibold text-gray-900">
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
                 {{
                   new Date(event?.date).toLocaleDateString("en-US", {
                     weekday: "short",
@@ -135,7 +136,7 @@
 
             <!-- COUNTDOWN -->
             <div v-if="event?.date" class="mb-6">
-              <p class="text-sm text-gray-500 mb-2">Time until event starts</p>
+              <p class="text-sm text-gray-500 dark:text-neutral-400 mb-2">Time until event starts</p>
               <CountdownTimer
                 :date="event.date"
                 expired-label="Event is live"
@@ -161,13 +162,13 @@
                 :class="
                   line.ticketType
                     ? 'border-[#13284b] bg-amber-50'
-                    : 'border-gray-200'
+                    : 'border-gray-200 dark:border-neutral-700'
                 "
               >
                 <div class="flex items-start justify-between gap-3">
                   <div class="flex-1">
                     <label
-                      class="block text-xs font-semibold text-gray-500 mb-1"
+                      class="block text-xs font-semibold text-gray-500 dark:text-neutral-400 mb-1"
                     >
                       Ticket Type{{
                         ticketLines.length > 1 ? " " + (index + 1) : ""
@@ -176,7 +177,7 @@
                     <select
                       :value="line.ticketType"
                       @change="line.ticketType = $event.target.value"
-                      class="w-full p-2.5 border rounded-lg text-sm font-semibold text-gray-900 shadow-sm outline-none focus:ring-2 focus:ring-[#13284b] bg-white"
+                      class="w-full p-2.5 border rounded-lg text-sm font-semibold text-gray-900 dark:text-white shadow-sm dark:shadow-none outline-none focus:ring-2 focus:ring-[#13284b] bg-white dark:bg-neutral-900 dark:border-neutral-700"
                     >
                       <option value="" disabled>Select ticket type</option>
                       <option
@@ -205,20 +206,20 @@
                 </div>
 
                 <div class="flex items-center justify-between mt-3">
-                  <span class="text-sm text-gray-600">Quantity</span>
+                  <span class="text-sm text-gray-600 dark:text-neutral-400">Quantity</span>
                   <div class="flex items-center gap-3">
                     <button
                       type="button"
                       @click="decreaseLineQuantity(index)"
                       :disabled="line.quantity <= 0"
                       aria-label="Decrease quantity"
-                      class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-lg font-bold text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                      class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 text-lg font-bold text-gray-700 dark:text-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
                     >
                       −
                     </button>
 
                     <span
-                      class="w-6 text-center text-xl font-bold text-gray-900 tabular-nums"
+                      class="w-6 text-center text-xl font-bold text-gray-900 dark:text-white tabular-nums"
                     >
                       {{ line.quantity }}
                     </span>
@@ -240,12 +241,12 @@
 
                 <div
                   v-if="line.ticketType"
-                  class="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 text-sm"
+                  class="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-neutral-700 text-sm"
                 >
-                  <span class="text-gray-600">
+                  <span class="text-gray-600 dark:text-neutral-400">
                     {{ line.quantity }} × Ksh {{ priceOf(line.ticketType) }}
                   </span>
-                  <span class="font-bold text-[#13284b]">
+                  <span class="font-bold text-[#13284b] dark:text-white">
                     Ksh {{ lineTotal(line).toLocaleString() }}
                   </span>
                 </div>
@@ -255,7 +256,7 @@
               <button
                 type="button"
                 @click="addTicketLine"
-                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-[#13284b]/40 text-[#13284b] font-semibold hover:bg-amber-50 transition"
+                class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg border-2 border-dashed border-[#13284b]/40 text-[#13284b] dark:text-white font-semibold hover:bg-amber-50 transition"
               >
                 <span class="text-lg leading-none">+</span>
                 Add more tickets
@@ -264,28 +265,28 @@
               <!-- SUMMARY -->
               <div
                 v-if="totalQuantity > 0"
-                class="flex items-center justify-between mt-4 p-3 bg-gray-50 rounded-lg text-sm"
+                class="flex items-center justify-between mt-4 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg text-sm"
               >
-                <span class="text-gray-600">
+                <span class="text-gray-600 dark:text-neutral-400">
                   🎟️ {{ totalQuantity }}
                   {{ totalQuantity === 1 ? "ticket" : "tickets" }} selected
                 </span>
-                <span class="font-bold text-[#13284b] text-base">
+                <span class="font-bold text-[#13284b] dark:text-white text-base">
                   Total: Ksh {{ totalPrice.toLocaleString() }}
                 </span>
               </div>
             </div>
 
             <div
-              class="flex items-center justify-between text-sm text-gray-600 mb-6"
+              class="flex items-center justify-between text-sm text-gray-600 dark:text-neutral-400 mb-6"
             >
               <span>🎟️ {{ (Array.isArray(event?.customTickets) ? event.customTickets.reduce((s,t)=>s+(Number(t.availableQuantity??t.quantity)||0),0) : (event?.TicketQuantity||0)) }} tickets available</span>
             </div>
 
             <!-- CONTACT DETAILS -->
-            <div class="mb-6 pb-6 border-b border-gray-200">
+            <div class="mb-6 pb-6 border-b border-gray-200 dark:border-neutral-700">
               <div class="flex items-center justify-between mb-3">
-                <p class="text-sm font-semibold text-gray-700">
+                <p class="text-sm font-semibold text-gray-700 dark:text-neutral-300">
                   {{ user ? "Booking as" : "Your details" }}
                 </p>
                 <span
@@ -304,7 +305,7 @@
 
               <div class="space-y-3">
                 <div>
-                  <label for="booking-first-name" class="text-sm text-gray-600">
+                  <label for="booking-first-name" class="text-sm text-gray-600 dark:text-neutral-400">
                     First name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -313,12 +314,12 @@
                     type="text"
                     autocomplete="given-name"
                     placeholder="e.g. Amina"
-                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
                   />
                 </div>
 
                 <div>
-                  <label for="booking-last-name" class="text-sm text-gray-600">
+                  <label for="booking-last-name" class="text-sm text-gray-600 dark:text-neutral-400">
                     Last name <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -327,12 +328,12 @@
                     type="text"
                     autocomplete="family-name"
                     placeholder="e.g. Wanjiku"
-                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
                   />
                 </div>
 
                 <div>
-                  <label for="booking-email" class="text-sm text-gray-600">
+                  <label for="booking-email" class="text-sm text-gray-600 dark:text-neutral-400">
                     Email address <span class="text-red-500">*</span>
                   </label>
                   <input
@@ -341,27 +342,27 @@
                     type="email"
                     autocomplete="email"
                     placeholder="you@example.com"
-                    class="w-full border rounded-lg p-3 mt-1 text-sm"
+                    class="w-full border rounded-lg p-3 mt-1 text-sm dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
                   />
                 </div>
               </div>
 
-              <p v-if="!user" class="mt-3 text-xs text-gray-500">
+              <p v-if="!user" class="mt-3 text-xs text-gray-500 dark:text-neutral-400">
                 Your ticket and payment confirmation are sent to this email.
               </p>
 
-              <p v-if="!user" class="mt-3 text-sm text-gray-600">
+              <p v-if="!user" class="mt-3 text-sm text-gray-600 dark:text-neutral-400">
                 Have an account?
                 <NuxtLink
                   to="/login"
-                  class="font-semibold text-[#13284b] underline hover:text-[#0b1730]"
+                  class="font-semibold text-[#13284b] dark:text-white underline hover:text-[#0b1730] dark:hover:text-white"
                 >
                   Log in
                 </NuxtLink>
                 or
                 <NuxtLink
                   to="/signup"
-                  class="font-semibold text-[#13284b] underline hover:text-[#0b1730]"
+                  class="font-semibold text-[#13284b] dark:text-white underline hover:text-[#0b1730] dark:hover:text-white"
                 >
                   Sign up
                 </NuxtLink>
@@ -371,12 +372,12 @@
 
             <!-- PHONE INPUT -->
             <div class="mb-6">
-              <label class="text-sm text-gray-600"> M-Pesa Phone Number </label>
+              <label class="text-sm text-gray-600 dark:text-neutral-400"> M-Pesa Phone Number </label>
 
               <input
                 v-model="phone"
                 placeholder="+2547XXXXXXXX"
-                class="w-full border rounded-lg p-3 mt-2"
+                class="w-full border rounded-lg p-3 mt-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
               />
             </div>
 

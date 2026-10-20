@@ -1,41 +1,41 @@
 <template>
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-    <div class="w-full max-w-2xl rounded bg-white p-6">
+    <div class="w-full max-w-2xl rounded bg-white dark:bg-neutral-900 p-6">
       <h3 class="mb-4 text-lg font-medium">Edit Event</h3>
       <div class="grid gap-3 md:grid-cols-2">
         <input
           v-model="editForm.title"
           placeholder="Title"
-          class="border p-2"
+          class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
-        <input v-model="editForm.date" type="date" class="border p-2" />
+        <input v-model="editForm.date" type="date" class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400" />
         <input
           v-model="editForm.location"
           placeholder="Location"
-          class="border p-2"
+          class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
         <input
           v-model.number="editForm.regular"
           placeholder="Regular price"
-          class="border p-2"
+          class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
         <input
           v-model.number="editForm.vip"
           placeholder="VIP price"
-          class="border p-2"
+          class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
         <input
           v-model.number="editForm.vvip"
           placeholder="VVIP price"
-          class="border p-2"
+          class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         />
-        <select v-model="editForm.status" class="border p-2">
+        <select v-model="editForm.status" class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
           <option value="upcoming">📅 Upcoming</option>
           <option value="ongoing">🔴 Ongoing</option>
           <option value="completed">✅ Completed</option>
           <option value="cancelled">❌ Cancelled</option>
         </select>
-        <select v-model="editForm.eventType" class="border p-2">
+        <select v-model="editForm.eventType" class="border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
           <option value="other">Select Event Type</option>
           <option value="Entertainment">🎵 Entertainment</option>
           <option value="Arts & Culture">🛠️ Arts & Culture</option>
@@ -45,7 +45,7 @@
         <textarea
           v-model="editForm.description"
           placeholder="Description"
-          class="col-span-2 border p-2"
+          class="col-span-2 border p-2 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         ></textarea>
       </div>
       <div class="mt-4 flex justify-end gap-2">

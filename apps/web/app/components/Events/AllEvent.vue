@@ -1,12 +1,12 @@
 <template>
   <div
-    class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
+    class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:bg-zinc-950 dark:from-zinc-950 dark:to-zinc-950 px-4 py-10 sm:px-6 lg:px-8 lg:py-14"
   >
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="mb-12 text-center">
-        <h2 class="text-4xl font-bold text-gray-900 mb-3">Upcoming Events</h2>
-        <p class="text-gray-600 text-lg">
+        <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-3">Upcoming Events</h2>
+        <p class="text-gray-600 dark:text-neutral-300 text-lg">
           Discover and book amazing events happening near you
         </p>
       </div>
@@ -22,7 +22,7 @@
               'px-4 py-2 rounded-full text-sm font-semibold transition duration-200',
               activeTab === tab.key
                 ? 'bg-[#13284b] text-white shadow-md'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:border-neutral-700',
             ]"
           >
             {{ tab.label }}
@@ -35,7 +35,7 @@
               'px-4 py-2 rounded-full text-xs font-semibold transition duration-200',
               selectedType === 'all'
                 ? 'bg-amber-500 text-white shadow-md'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:border-neutral-700',
             ]"
           >
             All Types
@@ -48,7 +48,7 @@
               'px-4 py-2 rounded-full text-xs font-semibold transition duration-200 capitalize',
               selectedType === type
                 ? 'bg-amber-500 text-white shadow-md'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200',
+                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:border-neutral-700',
             ]"
           >
             {{ type }}
@@ -64,25 +64,25 @@
         <div
           v-for="n in 6"
           :key="n"
-          class="rounded-2xl overflow-hidden shadow-lg bg-white animate-pulse"
+          class="rounded-2xl overflow-hidden shadow-lg bg-white animate-pulse dark:bg-neutral-900 dark:shadow-none"
         >
           <!-- Image Skeleton -->
-          <div class="h-64 bg-gray-200"></div>
+          <div class="h-64 bg-gray-200 dark:bg-neutral-800"></div>
           <!-- Content Skeleton -->
           <div class="p-6 space-y-4">
-            <div class="h-5 bg-gray-200 rounded-full w-3/4"></div>
-            <div class="h-4 bg-gray-200 rounded-full w-1/2"></div>
-            <div class="h-4 bg-gray-200 rounded-full w-2/5"></div>
+            <div class="h-5 bg-gray-200 dark:bg-neutral-800 rounded-full w-3/4"></div>
+            <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded-full w-1/2"></div>
+            <div class="h-4 bg-gray-200 dark:bg-neutral-800 rounded-full w-2/5"></div>
             <div class="space-y-2">
-              <div class="h-3 bg-gray-200 rounded-full w-full"></div>
-              <div class="h-3 bg-gray-200 rounded-full w-4/5"></div>
+              <div class="h-3 bg-gray-200 dark:bg-neutral-800 rounded-full w-full"></div>
+              <div class="h-3 bg-gray-200 dark:bg-neutral-800 rounded-full w-4/5"></div>
             </div>
             <div class="grid grid-cols-3 gap-2">
-              <div class="h-10 bg-gray-200 rounded-lg"></div>
-              <div class="h-10 bg-gray-200 rounded-lg"></div>
-              <div class="h-10 bg-gray-200 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 dark:bg-neutral-800 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 dark:bg-neutral-800 rounded-lg"></div>
+              <div class="h-10 bg-gray-200 dark:bg-neutral-800 rounded-lg"></div>
             </div>
-            <div class="h-10 bg-gray-200 rounded-lg w-full"></div>
+            <div class="h-10 bg-gray-200 dark:bg-neutral-800 rounded-lg w-full"></div>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@
           <div
             v-for="event in filteredEvents"
             :key="event._id"
-            class="group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 bg-white"
+            class="group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 bg-white dark:bg-neutral-900 dark:shadow-none"
           >
             <!-- Image Container -->
             <div class="relative h-64 overflow-hidden">
@@ -153,20 +153,20 @@
             <!-- Content -->
             <div class="p-6">
               <h3
-                class="text-xl font-bold text-gray-900 group-hover:text-[#13284b] transition mb-2 line-clamp-2"
+                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-[#13284b] dark:group-hover:text-white transition mb-2 line-clamp-2"
               >
                 {{ event.title }}
               </h3>
 
               <div class="space-y-2 mb-4">
-                <div class="flex items-center text-gray-600 text-sm">
+                <div class="flex items-center text-gray-600 dark:text-neutral-300 text-sm">
                   <span class="mr-2">📍</span>
                   <p class="truncate">{{ event.location }}</p>
                 </div>
-                <div class="flex items-center text-gray-600 text-sm">
+                <div class="flex items-center text-gray-600 dark:text-neutral-300 text-sm">
                   <Icon
                     name="mdi:calendar-month"
-                    class="mr-2 text-base text-[#13284b]"
+                    class="mr-2 text-base text-[#13284b] dark:text-white"
                   />
                   <p>
                     {{
@@ -187,7 +187,7 @@
                 </div>
               </div>
 
-              <p class="text-gray-600 text-sm mb-4 line-clamp-2 min-h-10">
+              <p class="text-gray-600 dark:text-neutral-300 text-sm mb-4 line-clamp-2 min-h-10">
                 {{ event.description }}
               </p>
 
@@ -213,7 +213,7 @@
               </div>
 
               <div
-                class="flex items-center justify-between text-xs text-gray-600 mb-4"
+                class="flex items-center justify-between text-xs text-gray-600 dark:text-neutral-300 mb-4"
               >
                 <span
                   >🎟️ {{ event.TicketQuantity || 0 }} tickets available</span
@@ -304,8 +304,8 @@
               />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">No Events Found</h3>
-          <p class="text-gray-500 text-lg max-w-md">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Events Found</h3>
+          <p class="text-gray-500 dark:text-neutral-300 text-lg max-w-md">
             There are no events available at the moment. Check back later for
             new and exciting events.
           </p>

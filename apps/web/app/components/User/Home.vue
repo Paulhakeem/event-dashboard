@@ -17,7 +17,7 @@
   >
     <!-- Tickets Purchased -->
     <div
-      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
         <h2
@@ -43,7 +43,7 @@
 
     <!-- Free Registrations -->
     <div
-      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
         <h2
@@ -69,7 +69,7 @@
 
     <!-- Attended Events -->
     <div
-      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
         <h2
@@ -95,7 +95,7 @@
 
     <!-- Total Spent -->
     <div
-      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105"
+      class="bg-white dark:bg-neutral-800 rounded-lg md:rounded-xl p-4 md:p-6 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 transform hover:scale-105"
     >
       <div class="flex items-center justify-between mb-4">
         <h2

@@ -1,25 +1,25 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-950 py-12 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Form Column -->
       <div class="lg:col-span-2">
         <div class="mb-6">
-          <h1 class="text-3xl font-bold text-[#13284b]">Create an Event</h1>
-          <p class="mt-2 text-gray-600">
+          <h1 class="text-3xl font-bold text-[#13284b] dark:text-white">Create an Event</h1>
+          <p class="mt-2 text-gray-600 dark:text-neutral-400">
             Quickly create and publish events with a beautiful preview.
           </p>
         </div>
 
         <form @submit.prevent="submitEvent" class="space-y-6">
-          <div class="bg-white rounded-2xl shadow p-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-2"
+          <div class="bg-white rounded-2xl shadow p-6 dark:bg-neutral-900 dark:shadow-none">
+            <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
               >Event Image</label
             >
             <label
               for="dropzone-file"
-              class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-amber-400 transition"
+              class="relative flex items-center justify-center h-48 w-full border-2 border-dashed border-gray-200 dark:border-neutral-700 rounded-lg overflow-hidden cursor-pointer hover:border-amber-400 transition"
             >
               <template v-if="previewImage">
                 <img :src="previewImage" class="object-cover w-full h-full" />
@@ -35,9 +35,9 @@
                 <div class="flex flex-col items-center justify-center">
                   <Icon
                     name="mdi:cloud-upload"
-                    class="text-4xl text-gray-400"
+                    class="text-4xl text-gray-400 dark:text-neutral-400"
                   />
-                  <p class="text-sm text-gray-500 mt-2">
+                  <p class="text-sm text-gray-500 dark:text-neutral-400 mt-2">
                     Click to upload or drag & drop
                   </p>
                 </div>
@@ -51,21 +51,21 @@
             </label>
           </div>
 
-          <div class="bg-white rounded-2xl shadow p-6 space-y-4">
+          <div class="bg-white rounded-2xl shadow p-6 space-y-4 dark:bg-neutral-900 dark:shadow-none">
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
+              <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                 >Event Title *</label
               >
               <input
                 v-model="form.title"
                 required
                 placeholder="Summer Music Festival"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
               />
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
+              <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                 >Description *</label
               >
               <textarea
@@ -73,42 +73,42 @@
                 rows="4"
                 required
                 placeholder="Describe your event"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none resize-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none resize-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
               ></textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >Location *</label
                 >
                 <input
                   v-model="form.location"
                   required
                   placeholder="Nairobi, Kenya"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >Date *</label
                 >
                 <input
                   v-model="form.date"
                   required
                   type="date"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-2"
+              <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                 >Event Type</label
               >
               <select
                 v-model="form.eventType"
-                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
               >
                 <option value="other">Select type</option>
                 <option value="Entertainment">Entertainment</option>
@@ -118,11 +118,11 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-2xl shadow p-6">
+          <div class="bg-white rounded-2xl shadow p-6 dark:bg-neutral-900 dark:shadow-none">
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-semibold">Pricing & Tickets</h3>
               <label class="flex items-center gap-2 cursor-pointer">
-                <span class="text-sm text-gray-600">Free Entry</span>
+                <span class="text-sm text-gray-600 dark:text-neutral-400">Free Entry</span>
                 <input
                   type="checkbox"
                   :checked="freeEntry"
@@ -139,14 +139,14 @@
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
-                class="flex flex-col sm:flex-row items-center gap-3 p-3 border rounded-lg"
+                class="flex flex-col sm:flex-row items-center gap-3 p-3 border rounded-lg dark:border-neutral-700"
               >
                 <input
                   v-model="ticket.name"
                   type="text"
                   placeholder="Ticket name e.g. Gold"
                   :disabled="freeEntry"
-                  class="flex-1 w-full min-w-0 p-2 border rounded outline-none"
+                  class="flex-1 w-full min-w-0 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
                 <input
                   v-model.number="ticket.price"
@@ -154,7 +154,7 @@
                   min="0"
                   placeholder="Price"
                   :disabled="freeEntry"
-                  class="w-full sm:w-32 p-2 border rounded outline-none"
+                  class="w-full sm:w-32 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
                 <input
                   v-model.number="ticket.quantity"
@@ -162,7 +162,7 @@
                   min="1"
                   placeholder="Tickets"
                   :disabled="freeEntry"
-                  class="w-full sm:w-32 p-2 border rounded outline-none"
+                  class="w-full sm:w-32 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
                 <button
                   type="button"
@@ -184,7 +184,7 @@
 
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >Total Tickets</label
                 >
                 <input
@@ -192,17 +192,17 @@
                   required
                   type="number"
                   min="0"
-                  class="w-full p-3 border rounded-lg"
+                  class="w-full p-3 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >Approval status</label
                 >
                 <input
                   value="Pending admin approval"
                   readonly
-                  class="w-full p-3 border rounded-lg bg-gray-50 text-gray-600"
+                  class="w-full p-3 border rounded-lg bg-gray-50 text-gray-600 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
               </div>
             </div>
@@ -223,7 +223,7 @@
               <button
                 type="reset"
                 @click="clearForm"
-                class="px-6 py-3 border rounded-lg"
+                class="px-6 py-3 border rounded-lg dark:border-neutral-700"
               >
                 Clear
               </button>
@@ -235,8 +235,8 @@
       <!-- Preview Column -->
       <aside class="lg:col-span-1">
         <div class="sticky top-20 space-y-4">
-          <div class="bg-white rounded-2xl shadow p-6">
-            <div class="h-40 rounded-lg overflow-hidden bg-gray-100">
+          <div class="bg-white rounded-2xl shadow p-6 dark:bg-neutral-900 dark:shadow-none">
+            <div class="h-40 rounded-lg overflow-hidden bg-gray-100 dark:bg-neutral-800">
               <img
                 v-if="previewImage"
                 :src="previewImage"
@@ -244,7 +244,7 @@
               />
               <div
                 v-else
-                class="w-full h-full flex items-center justify-center text-gray-400"
+                class="w-full h-full flex items-center justify-center text-gray-400 dark:text-neutral-400"
               >
                 Preview
               </div>
@@ -252,12 +252,12 @@
             <h3 class="mt-4 text-lg font-bold">
               {{ form.title || "Untitled Event" }}
             </h3>
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-sm text-gray-500 dark:text-neutral-400 mt-2">
               {{
                 form.date ? new Date(form.date).toDateString() : "Date not set"
               }}
             </p>
-            <p class="mt-3 text-gray-700 text-sm">
+            <p class="mt-3 text-gray-700 dark:text-neutral-300 text-sm">
               {{
                 form.description
                   ? form.description.slice(0, 120) +
@@ -267,8 +267,8 @@
             </p>
           </div>
 
-          <div class="bg-white rounded-2xl shadow p-4">
-            <h4 class="text-sm font-semibold text-gray-700">Tickets</h4>
+          <div class="bg-white rounded-2xl shadow p-4 dark:bg-neutral-900 dark:shadow-none">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-neutral-300">Tickets</h4>
             <div class="mt-3 space-y-2">
               <template v-if="freeEntry">
                 <div

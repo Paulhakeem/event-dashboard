@@ -18,9 +18,9 @@
     <!-- LOADING -->
     <div v-if="loading" class="flex flex-col items-center justify-center py-16">
       <div
-        class="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-amber-500"
+        class="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 dark:border-neutral-700 border-t-amber-500"
       ></div>
-      <p class="mt-4 text-sm text-gray-500">Loading ongoing events...</p>
+      <p class="mt-4 text-sm text-gray-500 dark:text-neutral-400">Loading ongoing events...</p>
     </div>
 
     <!-- ERROR -->
@@ -52,14 +52,14 @@
       class="flex flex-col items-center justify-center py-16 text-center"
     >
       <div
-        class="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 text-xl"
+        class="w-14 h-14 flex items-center justify-center rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-400 dark:text-neutral-400 text-xl"
       >
         🎭
       </div>
 
-      <p class="mt-4 text-gray-700 font-medium">No ongoing events</p>
+      <p class="mt-4 text-gray-700 dark:text-neutral-300 font-medium">No ongoing events</p>
 
-      <p class="text-sm text-gray-500">
+      <p class="text-sm text-gray-500 dark:text-neutral-400">
         Your active events will appear here once they start.
       </p>
     </div>
@@ -78,13 +78,13 @@
               {{ event.title }}
             </h3>
 
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-gray-500 dark:text-neutral-400 mt-1">
               {{ new Date(event.date).toLocaleString() }}
             </p>
 
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-gray-500 dark:text-neutral-400 mt-1">
               Tickets Left:
-              <span class="font-medium text-gray-700 dark:text-gray-300">
+              <span class="font-medium text-gray-700 dark:text-neutral-300">
                 {{ event.TicketQuantity }}
               </span>
             </p>
@@ -132,7 +132,7 @@ const getStatusClass = (status) => {
     case "ongoing":
       return "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-400";
   }
 };
 

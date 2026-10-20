@@ -53,7 +53,7 @@
                 type="email"
                 v-model="email"
                 placeholder="your@email.com"
-                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#13284b] focus:border-transparent transition"
+                class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-[#13284b] focus:border-transparent transition"
               />
             </div>
 

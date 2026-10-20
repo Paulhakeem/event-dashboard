@@ -1,9 +1,9 @@
 <template>
-  <section class="mt-6 border-t border-slate-200 pt-5">
+  <section class="mt-6 border-t border-slate-200 dark:border-neutral-700 pt-5">
     <div class="mb-4 flex items-center gap-3" aria-hidden="true">
       <span class="h-px flex-1 bg-slate-200"></span>
       <span
-        class="text-xs font-medium uppercase tracking-[0.14em] text-slate-500"
+        class="text-xs font-medium uppercase tracking-[0.14em] text-slate-500 dark:text-neutral-400"
       >
         Or continue with
       </span>
@@ -36,7 +36,7 @@
         />
         <div
           v-if="isLoading"
-          class="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-white/90 text-sm font-medium text-[#13284b]"
+          class="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-white/90 dark:bg-neutral-900/90 text-sm font-medium text-[#13284b] dark:text-white"
           role="status"
           aria-live="polite"
         >
@@ -46,7 +46,7 @@
       </div>
       <template #fallback>
         <div
-          class="flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-sm text-slate-500"
+          class="flex min-h-11 items-center justify-center rounded-lg border border-slate-200 dark:border-neutral-700 bg-slate-50 dark:bg-neutral-800 text-sm text-slate-500 dark:text-neutral-400"
           role="status"
           aria-live="polite"
         >

@@ -49,22 +49,22 @@ const resend = async () => {
 
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-50">
-    <div class="bg-white rounded-xl shadow-md p-8 w-full max-w-md">
+  <div class="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-zinc-950">
+    <div class="bg-white dark:bg-neutral-900 rounded-xl shadow-md dark:shadow-none p-8 w-full max-w-md">
       <!-- Title -->
-      <h2 class="text-2xl font-bold text-gray-800 mb-2">Verify Your Email</h2>
-      <p class="text-gray-500 text-sm mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Verify Your Email</h2>
+      <p class="text-gray-500 dark:text-neutral-400 text-sm mb-6">
         Enter the verification code we sent to your email address.
       </p>
 
       <!-- Input -->
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Verification Code</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">Verification Code</label>
         <input
           v-model="code"
           type="text"
           placeholder="Enter code"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#13284b] focus:outline-none"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#13284b] focus:outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500"
         />
       </div>
 
@@ -80,7 +80,7 @@ const resend = async () => {
 
       <button
         @click="resend"
-        class="w-full mt-3 text-sm text-[#13284b] hover:text-[#13284b] cursor-pointer transition"
+        class="w-full mt-3 text-sm text-[#13284b] dark:text-white hover:text-[#13284b] dark:hover:text-white cursor-pointer transition"
       >
         Resend Code
       </button>

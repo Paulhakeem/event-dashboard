@@ -7,7 +7,7 @@
       <div class="flex flex-col lg:flex-row gap-4 md:gap-6 lg:gap-8">
         <!-- Recent Activity Card -->
         <div
-          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col"
         >
           <!-- Header -->
           <div class="flex items-center justify-between mb-4 md:mb-6">
@@ -64,7 +64,7 @@
 
         <!-- Upcoming Events Card -->
         <div
-          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col justify-between"
+          class="flex-1 bg-white dark:bg-neutral-800 rounded-lg md:rounded-2xl p-4 md:p-6 lg:p-8 shadow-md hover:shadow-lg dark:shadow-none transition-all duration-200 min-h-62.5 md:min-h-87.5 flex flex-col justify-between"
         >
           <div class="flex items-center justify-between mb-4 md:mb-6">
             <h2

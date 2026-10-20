@@ -47,35 +47,39 @@
             </NuxtLink>
           </div>
 
-          <div v-if="!user" class="flex shrink-0 items-center gap-2">
-            <NuxtLink
-              to="/signup"
-              class="hidden min-h-10 items-center justify-center rounded-full bg-amber-300 px-4 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200 sm:inline-flex"
-            >
-              Sign Up
-            </NuxtLink>
-            <NuxtLink
-              to="/login"
-              class="inline-flex min-h-10 items-center justify-center rounded-full border border-white/25 px-4 py-2 text-xs font-bold text-white transition hover:border-amber-300/70 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300"
-            >
-              Login
-            </NuxtLink>
-          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
 
-          <div v-else class="flex shrink-0 items-center gap-2">
-            <NuxtLink
-              :to="dashboardPath"
-              class="inline-flex min-h-10 items-center justify-center rounded-full bg-amber-300 px-3 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200"
-            >
-              Dashboard
-            </NuxtLink>
-            <button
-              type="button"
-              @click="logout"
-              class="hidden min-h-10 items-center rounded-full border border-red-300/40 px-3 py-2 text-xs font-bold text-red-100 transition hover:bg-red-500/15 sm:inline-flex"
-            >
-              Logout
-            </button>
+            <template v-if="!user">
+              <NuxtLink
+                to="/signup"
+                class="hidden min-h-10 items-center justify-center rounded-full bg-amber-300 px-4 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200 sm:inline-flex"
+              >
+                Sign Up
+              </NuxtLink>
+              <NuxtLink
+                to="/login"
+                class="inline-flex min-h-10 items-center justify-center rounded-full border border-white/25 px-4 py-2 text-xs font-bold text-white transition hover:border-amber-300/70 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-300"
+              >
+                Login
+              </NuxtLink>
+            </template>
+
+            <template v-else>
+              <NuxtLink
+                :to="dashboardPath"
+                class="inline-flex min-h-10 items-center justify-center rounded-full bg-amber-300 px-3 py-2 text-xs font-bold text-[#101d3a] transition hover:bg-amber-200"
+              >
+                Dashboard
+              </NuxtLink>
+              <button
+                type="button"
+                @click="logout"
+                class="hidden min-h-10 items-center rounded-full border border-red-300/40 px-3 py-2 text-xs font-bold text-red-100 transition hover:bg-red-500/15 sm:inline-flex"
+              >
+                Logout
+              </button>
+            </template>
           </div>
         </div>
       </div>

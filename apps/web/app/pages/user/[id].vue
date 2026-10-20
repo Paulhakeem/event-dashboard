@@ -107,20 +107,25 @@
         <section
           class="rounded-4xl border border-slate-200/80 bg-white/95 p-6 shadow-xl shadow-slate-200/40 dark:border-zinc-800/80 dark:bg-zinc-950/95 dark:shadow-none"
         >
-          <p
-            class="text-sm font-semibold uppercase tracking-[0.24em] text-amber-700 dark:text-amber-300"
-          >
-            User dashboard
-          </p>
-          <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            {{ currentMenuItem.name }}
-          </h1>
-          <p
-            class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-400"
-          >
-            Manage your {{ currentMenuItem.name.toLowerCase() }} with a cleaner,
-            more focused interface.
-          </p>
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <p
+                class="text-sm font-semibold uppercase tracking-[0.24em] text-amber-700 dark:text-amber-300"
+              >
+                User dashboard
+              </p>
+              <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+                {{ currentMenuItem.name }}
+              </h1>
+              <p
+                class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-400"
+              >
+                Manage your {{ currentMenuItem.name.toLowerCase() }} with a
+                cleaner, more focused interface.
+              </p>
+            </div>
+            <ThemeToggle class="mt-0.5" />
+          </div>
         </section>
 
         <section

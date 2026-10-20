@@ -1,6 +1,6 @@
 <template>
   <main
-    class="relative min-h-screen overflow-hidden bg-[#f8f7f3] px-4 py-8 text-slate-900 sm:px-6 sm:py-10 lg:px-8 lg:py-14"
+    class="relative min-h-screen overflow-hidden bg-[#f8f7f3] dark:bg-zinc-950 px-4 py-8 text-slate-900 dark:text-white sm:px-6 sm:py-10 lg:px-8 lg:py-14"
   >
     <div
       class="pointer-events-none absolute -right-28 top-40 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl"
@@ -94,11 +94,11 @@
             Our mission
           </p>
           <h2
-            class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] sm:text-3xl"
+            class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] dark:text-white sm:text-3xl"
           >
             Making every event effortless
           </h2>
-          <p class="mt-3 max-w-md text-sm leading-7 text-slate-600 sm:text-base">
+          <p class="mt-3 max-w-md text-sm leading-7 text-slate-600 dark:text-neutral-400 sm:text-base">
             We believe organising and attending events should feel exciting, not
             stressful. That is why we blend beautiful design with reliable
             tooling so organisers can focus on the experience and guests can
@@ -108,7 +108,7 @@
             <li
               v-for="point in missionPoints"
               :key="point"
-              class="flex items-start gap-3 text-sm text-slate-700"
+              class="flex items-start gap-3 text-sm text-slate-700 dark:text-neutral-300"
             >
               <Icon
                 name="material-symbols:check-circle"
@@ -123,17 +123,17 @@
           <div
             v-for="feature in features"
             :key="feature.title"
-            class="group flex flex-col rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-xl hover:shadow-slate-900/5"
+            class="group flex flex-col rounded-3xl border border-slate-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 shadow-sm dark:shadow-none transition duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-xl hover:shadow-slate-900/5"
           >
             <span
               class="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-100 text-xl text-[#13284b] transition group-hover:bg-amber-300"
             >
               <Icon :name="feature.icon" />
             </span>
-            <h3 class="mt-4 text-base font-bold text-[#101d3a]">
+            <h3 class="mt-4 text-base font-bold text-[#101d3a] dark:text-white">
               {{ feature.title }}
             </h3>
-            <p class="mt-2 text-sm leading-6 text-slate-600">
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-neutral-400">
               {{ feature.description }}
             </p>
           </div>
@@ -147,7 +147,7 @@
             How it works
           </p>
           <h2
-            class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] sm:text-3xl"
+            class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] dark:text-white sm:text-3xl"
           >
             Three steps to your next event
           </h2>
@@ -157,17 +157,17 @@
           <div
             v-for="(step, index) in steps"
             :key="step.title"
-            class="relative rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-900/5"
+            class="relative rounded-3xl border border-slate-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-6 shadow-sm dark:shadow-none transition duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-slate-900/5"
           >
             <span
               class="flex h-10 w-10 items-center justify-center rounded-full bg-[#13284b] text-sm font-black text-amber-300"
             >
               {{ index + 1 }}
             </span>
-            <h3 class="mt-4 text-base font-bold text-[#101d3a]">
+            <h3 class="mt-4 text-base font-bold text-[#101d3a] dark:text-white">
               {{ step.title }}
             </h3>
-            <p class="mt-2 text-sm leading-6 text-slate-600">
+            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-neutral-400">
               {{ step.description }}
             </p>
           </div>

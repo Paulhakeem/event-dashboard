@@ -1,5 +1,5 @@
 <template>
-  <section class="relative bg-[#f8f7f3] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+  <section class="relative bg-[#f8f7f3] dark:bg-zinc-950 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
     <div class="mx-auto max-w-7xl">
       <!-- Why choose us -->
       <div class="mb-14 text-center">
@@ -7,11 +7,11 @@
           Why Happitwin
         </p>
         <h2
-          class="mx-auto mt-2 max-w-2xl text-3xl font-black tracking-tight text-[#101d3a] sm:text-4xl"
+          class="mx-auto mt-2 max-w-2xl text-3xl font-black tracking-tight text-[#101d3a] dark:text-white sm:text-4xl"
         >
           Everything you need for a standout event
         </h2>
-        <p class="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+        <p class="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 dark:text-neutral-400 sm:text-base">
           From discovery to a sold-out show, Happitwin gives organisers and
           guests one seamless experience built on trust and great design.
         </p>
@@ -21,17 +21,17 @@
         <div
           v-for="feature in features"
           :key="feature.title"
-          class="group flex flex-col rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl hover:shadow-slate-900/5"
+          class="group flex flex-col rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl hover:shadow-slate-900/5 dark:border-neutral-700 dark:bg-neutral-900"
         >
           <span
             class="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-2xl text-[#13284b] transition group-hover:bg-amber-300"
           >
             <Icon :name="feature.icon" />
           </span>
-          <h3 class="mt-5 text-base font-bold text-[#101d3a]">
+          <h3 class="mt-5 text-base font-bold text-[#101d3a] dark:text-white">
             {{ feature.title }}
           </h3>
-          <p class="mt-2 text-sm leading-6 text-slate-600">
+          <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-neutral-400">
             {{ feature.description }}
           </p>
         </div>
@@ -44,13 +44,13 @@
             <p class="text-xs font-bold uppercase tracking-[0.2em] text-amber-700">
               Find your vibe
             </p>
-            <h2 class="mt-2 text-2xl font-black tracking-tight text-[#101d3a] sm:text-3xl">
+            <h2 class="mt-2 text-2xl font-black tracking-tight text-[#101d3a] dark:text-white sm:text-3xl">
               Browse by category
             </h2>
           </div>
           <NuxtLink
             to="/eventPage"
-            class="inline-flex items-center gap-2 self-center text-sm font-bold text-[#13284b] transition hover:text-[#9c4e8b] sm:self-auto"
+            class="inline-flex items-center gap-2 self-center text-sm font-bold text-[#13284b] dark:text-white transition hover:text-[#9c4e8b] sm:self-auto"
           >
             View all events
             <Icon name="material-symbols:arrow-forward-rounded" />
@@ -62,7 +62,7 @@
             v-for="category in categories"
             :key="category.name"
             :to="`/eventPage?type=${encodeURIComponent(category.name)}`"
-            class="group relative isolate flex min-h-32 flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10"
+            class="group relative isolate flex min-h-32 flex-col justify-between overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10 dark:border-neutral-700 dark:bg-neutral-900"
           >
             <div
               class="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-70 transition duration-300 group-hover:scale-125"
@@ -76,10 +76,10 @@
               <Icon :name="category.icon" />
             </span>
             <div class="relative">
-              <p class="text-base font-bold text-[#101d3a]">
+              <p class="text-base font-bold text-[#101d3a] dark:text-white">
                 {{ category.name }}
               </p>
-              <p class="mt-1 text-xs text-slate-500">{{ category.blurb }}</p>
+              <p class="mt-1 text-xs text-slate-500 dark:text-neutral-400">{{ category.blurb }}</p>
             </div>
           </NuxtLink>
         </div>

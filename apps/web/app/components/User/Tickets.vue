@@ -32,15 +32,15 @@
     </header>
 
     <section
-      class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-4 shadow-sm sm:p-6"
+      class="rounded-3xl border border-slate-200/80 bg-slate-50/80 p-4 shadow-sm dark:bg-neutral-950 dark:border-neutral-800 sm:p-6"
       aria-label="Your event tickets"
     >
       <div
         class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h3 class="text-lg font-bold text-slate-900">Your passes</h3>
-          <p class="mt-1 text-sm text-slate-500">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Your passes</h3>
+          <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
             {{ filteredTickets.length }}
             {{ filteredTickets.length === 1 ? "ticket" : "tickets" }}
           </p>
@@ -60,7 +60,7 @@
               'shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2',
               activeFilter === option.value
                 ? 'bg-[#13284b] text-white shadow-sm'
-                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-amber-50 hover:text-[#13284b]',
+                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-amber-50 hover:text-[#13284b] dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-700 dark:hover:bg-neutral-800 dark:hover:text-white',
             ]"
           >
             {{ option.label }}
@@ -70,7 +70,7 @@
 
       <div
         v-if="ticketsLoading"
-        class="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-12 text-slate-500"
+        class="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-12 text-slate-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400"
         role="status"
         aria-live="polite"
       >
@@ -91,15 +91,15 @@
 
       <div
         v-else-if="filteredTickets.length === 0"
-        class="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-12 text-center"
+        class="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-12 text-center dark:bg-neutral-900 dark:border-neutral-700"
       >
         <div
           class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-[#13284b]"
         >
           <Icon name="mdi:ticket-outline" class="text-3xl" />
         </div>
-        <h4 class="font-semibold text-slate-900">No tickets here yet</h4>
-        <p class="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">
+        <h4 class="font-semibold text-slate-900 dark:text-white">No tickets here yet</h4>
+        <p class="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-neutral-400">
           Browse upcoming events and book a pass. Your tickets will appear here
           with their TKT code and QR access.
         </p>
@@ -115,7 +115,7 @@
         <article
           v-for="ticket in filteredTickets"
           :key="ticket._id"
-          class="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md"
+          class="min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-md dark:bg-neutral-900 dark:border-neutral-700 dark:hover:border-amber-300/60 dark:shadow-none"
         >
           <div class="p-4 sm:p-5">
             <div class="flex items-start justify-between gap-3">
@@ -126,7 +126,7 @@
                   Event pass
                 </p>
                 <h4
-                  class="mt-1 break-words text-lg font-bold leading-snug text-slate-900"
+                  class="mt-1 break-words text-lg font-bold leading-snug text-slate-900 dark:text-white"
                 >
                   {{ ticket.eventName }}
                 </h4>
@@ -135,8 +135,8 @@
                 class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
                 :class="
                   ticket.status === 'active'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : 'bg-slate-100 text-slate-600'
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
+                    : 'bg-slate-100 text-slate-600 dark:bg-neutral-800 dark:text-neutral-400'
                 "
               >
                 {{ ticket.status === "active" ? "Active" : "Inactive" }}
@@ -144,22 +144,22 @@
             </div>
 
             <div
-              class="mt-4 flex min-w-0 items-center gap-3 rounded-xl border border-dashed border-amber-300 bg-amber-50/70 px-3 py-3 sm:px-4"
+              class="mt-4 flex min-w-0 items-center gap-3 rounded-xl border border-dashed border-amber-300 bg-amber-50/70 px-3 py-3 sm:px-4 dark:bg-amber-900/10 dark:border-amber-400/40"
             >
               <span
-                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#13284b] shadow-sm"
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[#13284b] shadow-sm dark:bg-neutral-800 dark:text-amber-300"
                 aria-hidden="true"
               >
                 <Icon name="mdi:barcode" class="text-xl" />
               </span>
               <div class="min-w-0">
                 <p
-                  class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500"
+                  class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-neutral-400"
                 >
                   TKT code
                 </p>
                 <p
-                  class="mt-0.5 break-all font-mono text-sm font-bold tracking-wide text-[#13284b]"
+                  class="mt-0.5 break-all font-mono text-sm font-bold tracking-wide text-[#13284b] dark:text-amber-300"
                 >
                   {{ ticket.ticketCode || "Ticket code unavailable" }}
                 </p>
@@ -167,42 +167,42 @@
             </div>
 
             <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5">
+              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-neutral-800">
                 <p
-                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400"
+                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
                 >
                   Booked
                 </p>
-                <p class="mt-1 truncate text-sm font-semibold text-slate-700">
+                <p class="mt-1 truncate text-sm font-semibold text-slate-700 dark:text-neutral-300">
                   {{ new Date(ticket.createdAt).toLocaleDateString() }}
                 </p>
               </div>
-              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5">
+              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-neutral-800">
                 <p
-                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400"
+                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
                 >
                   Ticket type
                 </p>
                 <p
-                  class="mt-1 truncate text-sm font-semibold capitalize text-slate-700"
+                  class="mt-1 truncate text-sm font-semibold capitalize text-slate-700 dark:text-neutral-300"
                 >
                   {{ ticket.ticketType }}
                 </p>
               </div>
-              <div class="col-span-2 min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 sm:col-span-1">
+              <div class="col-span-2 min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 sm:col-span-1 dark:bg-neutral-800">
                 <p
-                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400"
+                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
                 >
                   Amount
                 </p>
-                <p class="mt-1 truncate text-sm font-semibold text-slate-700">
+                <p class="mt-1 truncate text-sm font-semibold text-slate-700 dark:text-neutral-300">
                   KES {{ Number(ticket.amount || 0).toLocaleString() }}
                 </p>
               </div>
             </div>
 
             <div
-              class="mt-4 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 min-[420px]:flex-row min-[420px]:items-center"
+              class="mt-4 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 min-[420px]:flex-row min-[420px]:items-center dark:border-neutral-800"
             >
               <button
                 type="button"
@@ -228,7 +228,7 @@
       class="ticket-print w-[80mm] max-w-full rounded-xl bg-white p-4 text-gray-900 shadow-2xl"
     >
       <div
-        class="flex items-start justify-between gap-3 border-b border-dashed border-gray-300 pb-3"
+        class="flex items-start justify-between gap-3 border-b border-dashed border-gray-300 dark:border-neutral-600 pb-3"
       >
         <div>
           <p
@@ -285,7 +285,7 @@
         </button>
         <button
           type="button"
-          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold"
+          class="flex-1 rounded-lg border border-gray-300 dark:border-neutral-600 px-3 py-2 text-xs font-semibold"
           @click="downloadQr"
         >
           Download QR

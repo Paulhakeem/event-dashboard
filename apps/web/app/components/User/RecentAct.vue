@@ -5,7 +5,7 @@
         <!-- HEADER -->
         <thead>
           <tr
-            class="text-left text-xs uppercase tracking-wider text-gray-500 border-b border-gray-200"
+            class="text-left text-xs uppercase tracking-wider text-gray-500 dark:text-neutral-400 border-b border-gray-200 dark:border-neutral-700"
           >
             <th class="py-3 px-4">Event</th>
             <th class="py-3 px-4">Date</th>
@@ -15,24 +15,24 @@
         </thead>
 
         <!-- BODY -->
-        <tbody class="bg-white divide-y divide-gray-100">
+        <tbody class="bg-white dark:bg-neutral-900 divide-y divide-gray-100 dark:divide-neutral-800">
           <tr
             v-for="(item, index) in booking"
             :key="index"
-            class="hover:bg-gray-50 transition duration-200"
+            class="hover:bg-gray-50 dark:hover:bg-neutral-800 transition duration-200"
           >
             <!-- Event -->
-            <td class="py-4 px-4 text-sm font-medium text-gray-800">
+            <td class="py-4 px-4 text-sm font-medium text-gray-800 dark:text-white">
               {{ item.eventName }}
             </td>
 
             <!-- Date -->
-            <td class="py-4 px-4 text-sm text-gray-500">
+            <td class="py-4 px-4 text-sm text-gray-500 dark:text-neutral-400">
               {{ formatDate(item.bookedAt) }}
             </td>
 
             <!-- Ticket -->
-            <td class="py-4 px-4 text-sm text-gray-600">
+            <td class="py-4 px-4 text-sm text-gray-600 dark:text-neutral-400">
               {{ item.ticketType }}
             </td>
 
@@ -53,7 +53,7 @@
     <!-- Empty State -->
     <div
       v-if="booking.length === 0"
-      class="text-center py-10 text-gray-500"
+      class="text-center py-10 text-gray-500 dark:text-neutral-400"
     >
       No recent activity
     </div>
@@ -86,7 +86,7 @@ const statusClass = (status) => {
       return "bg-red-100 text-red-700";
 
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-400";
   }
 };
 </script>

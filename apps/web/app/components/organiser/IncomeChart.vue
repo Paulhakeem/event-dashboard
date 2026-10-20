@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-white p-6 rounded-lg shadow">
+  <div class="bg-white p-6 rounded-lg shadow dark:bg-neutral-900 dark:shadow-none">
     <h2 class="text-lg font-semibold mb-4">Monthly Income</h2>
 
-    <div v-if="loading" class="text-center py-10 text-gray-500">
+    <div v-if="loading" class="text-center py-10 text-gray-500 dark:text-neutral-400">
       Loading income data...
     </div>
 
-    <div v-else-if="IncomeData.length === 0" class="text-center py-10 text-gray-400">
+    <div v-else-if="IncomeData.length === 0" class="text-center py-10 text-gray-400 dark:text-neutral-400">
       No bookings found
     </div>
 

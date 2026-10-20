@@ -1,6 +1,6 @@
 <template>
   <main
-    class="relative min-h-screen overflow-hidden bg-[#f8f7f3] px-4 py-8 text-slate-900 sm:px-6 sm:py-10 lg:px-8 lg:py-14"
+    class="relative min-h-screen overflow-hidden bg-[#f8f7f3] dark:bg-zinc-950 px-4 py-8 text-slate-900 dark:text-white sm:px-6 sm:py-10 lg:px-8 lg:py-14"
   >
     <div
       class="pointer-events-none absolute -right-28 top-40 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl"
@@ -92,12 +92,12 @@
               Contact details
             </p>
             <h2
-              class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] sm:text-3xl"
+              class="mt-2 text-2xl font-bold tracking-tight text-[#101d3a] dark:text-white sm:text-3xl"
             >
               Start a conversation
             </h2>
             <p
-              class="mt-3 max-w-md text-sm leading-7 text-slate-600 sm:text-base"
+              class="mt-3 max-w-md text-sm leading-7 text-slate-600 dark:text-neutral-400 sm:text-base"
             >
               Reach us through any of the channels below. We usually respond
               within one business day.
@@ -111,7 +111,7 @@
               :href="item.href || undefined"
               :target="item.external ? '_blank' : undefined"
               :rel="item.external ? 'noreferrer' : undefined"
-              class="group flex min-w-0 items-center gap-4 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-lg hover:shadow-slate-900/5"
+              class="group flex min-w-0 items-center gap-4 rounded-2xl border border-slate-200/80 dark:border-neutral-700 bg-white/90 dark:bg-neutral-900/90 p-4 shadow-sm dark:shadow-none transition duration-200 hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-lg hover:shadow-slate-900/5"
             >
               <span
                 class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-xl text-[#13284b] transition group-hover:bg-amber-300"
@@ -124,7 +124,7 @@
                   >{{ item.title }}</span
                 >
                 <span
-                  class="mt-1 block wrap-break-word text-sm font-semibold text-slate-800"
+                  class="mt-1 block wrap-break-word text-sm font-semibold text-slate-800 dark:text-white"
                   >{{ item.label }}</span
                 >
               </span>
@@ -133,7 +133,7 @@
         </div>
 
         <div
-          class="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-xl shadow-slate-900/5 sm:p-8"
+          class="rounded-3xl border border-slate-200/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-5 shadow-xl dark:shadow-none shadow-slate-900/5 sm:p-8"
         >
           <template v-if="!submitted">
             <div class="mb-6 flex items-start justify-between gap-4">
@@ -141,7 +141,7 @@
                 <h2 class="text-2xl font-bold tracking-tight">
                   Send us a message
                 </h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600">
+                <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-neutral-400">
                   Tell us a little about what you need and we’ll take it from
                   there.
                 </p>
@@ -156,7 +156,7 @@
             <form class="space-y-5" @submit.prevent="handleSubmit">
               <div class="grid gap-4 sm:grid-cols-2 sm:gap-5">
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-700"
+                  <span class="mb-2 block text-sm font-semibold text-slate-700 dark:text-neutral-300"
                     >Your name</span
                   >
                   <input
@@ -169,7 +169,7 @@
                   />
                 </label>
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-700"
+                  <span class="mb-2 block text-sm font-semibold text-slate-700 dark:text-neutral-300"
                     >Email address</span
                   >
                   <input
@@ -183,7 +183,7 @@
                 </label>
               </div>
               <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-slate-700"
+                <span class="mb-2 block text-sm font-semibold text-slate-700 dark:text-neutral-300"
                   >How can we help?</span
                 >
                 <textarea
@@ -215,16 +215,16 @@
             >
               <Icon name="material-symbols:check-circle" class="text-4xl" />
             </div>
-            <h2 class="mt-5 text-2xl font-bold text-gray-700">
+            <h2 class="mt-5 text-2xl font-bold text-gray-700 dark:text-neutral-300">
               Message received
             </h2>
-            <p class="mt-2 max-w-sm leading-7 text-slate-600">
+            <p class="mt-2 max-w-sm leading-7 text-slate-600 dark:text-neutral-400">
               Thanks for reaching out. A member of the Happitwin team will get
               back to you shortly.
             </p>
             <button
               type="button"
-              class="mt-6 text-sm font-bold text-[#13284b] hover:underline"
+              class="mt-6 text-sm font-bold text-[#13284b] dark:text-white hover:underline"
               @click="resetForm"
             >
               Send another message
@@ -324,5 +324,20 @@ const resetForm = () => {
   border-color: #13284b;
   background: white;
   box-shadow: 0 0 0 3px rgb(156 78 139 / 15%);
+}
+
+.dark .contact-input {
+  border-color: rgb(63 63 70);
+  background: rgb(24 24 27);
+  color: rgb(228 228 231);
+}
+
+.dark .contact-input::placeholder {
+  color: rgb(113 113 122);
+}
+
+.dark .contact-input:focus {
+  border-color: rgb(251 191 36);
+  background: rgb(24 24 27);
 }
 </style>

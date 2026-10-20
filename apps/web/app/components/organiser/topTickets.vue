@@ -1,23 +1,23 @@
 <template>
   <div
-    class="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col gap-6"
+    class="bg-white border border-gray-100 rounded-2xl p-6 flex flex-col gap-6 dark:bg-neutral-900 dark:border-neutral-800"
   >
     <!-- Header -->
     <div class="flex items-start justify-between flex-wrap gap-3">
       <div>
-        <h2 class="text-base font-semibold text-gray-900">Tickets & Revenue</h2>
-        <p class="text-xs text-gray-400 mt-0.5">
+        <h2 class="text-base font-semibold text-gray-900 dark:text-white">Tickets & Revenue</h2>
+        <p class="text-xs text-gray-400 dark:text-neutral-400 mt-0.5">
           Monthly overview · {{ currentYear }}
         </p>
       </div>
       <div class="flex items-center gap-4">
-        <span class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-neutral-400">
           <span
             class="w-2.5 h-2.5 rounded-full bg-[#13284b] inline-block"
           ></span>
           Tickets
         </span>
-        <span class="flex items-center gap-1.5 text-xs text-gray-500">
+        <span class="flex items-center gap-1.5 text-xs text-gray-500 dark:text-neutral-400">
           <span
             class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"
           ></span>
@@ -29,28 +29,28 @@
     <!-- Summary pills -->
     <div class="grid grid-cols-3 gap-3">
       <div
-        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1"
+        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1 dark:bg-neutral-800 dark:border-neutral-800"
       >
-        <span class="text-lg font-bold text-gray-900 leading-none">{{
+        <span class="text-lg font-bold text-gray-900 dark:text-white leading-none">{{
           totalTickets.toLocaleString()
         }}</span>
-        <span class="text-xs text-gray-400">Total Tickets</span>
+        <span class="text-xs text-gray-400 dark:text-neutral-400">Total Tickets</span>
       </div>
       <div
-        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1"
+        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1 dark:bg-neutral-800 dark:border-neutral-800"
       >
         <span class="text-lg font-bold text-emerald-600 leading-none"
           >KES {{ totalRevenue.toLocaleString() }}</span
         >
-        <span class="text-xs text-gray-400">Total Revenue</span>
+        <span class="text-xs text-gray-400 dark:text-neutral-400">Total Revenue</span>
       </div>
       <div
-        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1"
+        class="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 flex flex-col gap-1 dark:bg-neutral-800 dark:border-neutral-800"
       >
-        <span class="text-lg font-bold text-gray-900 leading-none">{{
+        <span class="text-lg font-bold text-gray-900 dark:text-white leading-none">{{
           peakMonth
         }}</span>
-        <span class="text-xs text-gray-400">Peak Month</span>
+        <span class="text-xs text-gray-400 dark:text-neutral-400">Peak Month</span>
       </div>
     </div>
 
@@ -60,7 +60,7 @@
         <div
           v-for="n in 12"
           :key="n"
-          class="flex-1 bg-gray-100 rounded-t-md animate-pulse"
+          class="flex-1 bg-gray-100 dark:bg-neutral-800 rounded-t-md animate-pulse"
           :style="{ height: 30 + (Math.floor(n * 5.3) % 60) + '%' }"
         ></div>
       </div>
@@ -68,7 +68,7 @@
         <div
           v-for="n in 12"
           :key="n"
-          class="flex-1 h-2 bg-gray-100 rounded animate-pulse"
+          class="flex-1 h-2 bg-gray-100 dark:bg-neutral-800 rounded animate-pulse"
         ></div>
       </div>
     </div>

@@ -3,7 +3,7 @@
     <div
       v-for="card in cards"
       :key="card.label"
-      class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+      class="relative overflow-hidden rounded-2xl bg-white border border-gray-100 p-5 shadow-sm hover:-translate-y-1 hover:shadow-lg dark:bg-neutral-900 dark:border-neutral-800 dark:shadow-none dark:hover:shadow-none transition-all duration-200"
     >
       <!-- Top accent bar -->
       <div
@@ -25,19 +25,19 @@
       <div class="flex items-end justify-between gap-2">
         <div>
           <p
-            class="text-xs font-semibold text-gray-400 uppercase tracking-wide leading-none mb-1.5"
+            class="text-xs font-semibold text-gray-400 dark:text-neutral-400 uppercase tracking-wide leading-none mb-1.5"
           >
             {{ card.label }}
           </p>
           <!-- Skeleton while loading -->
           <div
             v-if="card.loading"
-            class="h-7 w-16 bg-gray-100 rounded-lg animate-pulse mt-1"
+            class="h-7 w-16 bg-gray-100 dark:bg-neutral-800 rounded-lg animate-pulse mt-1"
           ></div>
-          <p v-else class="text-2xl font-bold text-gray-900 leading-none">
+          <p v-else class="text-2xl font-bold text-gray-900 dark:text-white leading-none">
             <span
               v-if="card.prefix"
-              class="text-sm font-semibold text-gray-500 mr-0.5"
+              class="text-sm font-semibold text-gray-500 dark:text-neutral-400 mr-0.5"
               >{{ card.prefix }}</span
             >
             {{ card.value }}

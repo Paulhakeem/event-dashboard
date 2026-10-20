@@ -2,8 +2,8 @@
   <div class="flex flex-col gap-4 pt-10">
     <div class="flex justify-between items-center">
       <div>
-        <h2 class="text-2xl font-bold text-gray-900">Total Events</h2>
-        <p class="text-gray-600 mt-1">View and manage your events here.</p>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Total Events</h2>
+        <p class="text-gray-600 dark:text-neutral-400 mt-1">View and manage your events here.</p>
       </div>
     </div>
 
@@ -26,24 +26,24 @@
     <!-- Empty State -->
     <div
       v-if="!loading && events.length === 0 && !error"
-      class="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300"
+      class="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300 dark:bg-neutral-900 dark:border-neutral-700"
     >
-      <p class="text-gray-500 text-lg">No events created yet</p>
-      <p class="text-gray-400 text-sm">Start by creating your first event</p>
+      <p class="text-gray-500 dark:text-neutral-400 text-lg">No events created yet</p>
+      <p class="text-gray-400 dark:text-neutral-400 text-sm">Start by creating your first event</p>
     </div>
 
     <!-- Events Table -->
     <div
       v-if="events.length > 0"
-      class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto max-h-112"
+      class="bg-white rounded-xl shadow-sm border border-gray-200 dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-none overflow-y-auto max-h-112"
     >
       <!-- HEADER -->
       <div
-        class="flex items-center justify-between px-6 py-4 border-b bg-gray-50"
+        class="flex items-center justify-between px-6 py-4 border-b bg-gray-50 dark:bg-neutral-800"
       >
         <div>
-          <h3 class="text-lg font-semibold text-gray-800">Your Events</h3>
-          <p class="text-sm text-gray-500">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Your Events</h3>
+          <p class="text-sm text-gray-500 dark:text-neutral-400">
             Manage and track all created events
           </p>
         </div>
@@ -52,8 +52,8 @@
       <!-- TABLE -->
       <div class="overflow-x-auto max-h-104">
         <table class="w-full text-sm">
-          <thead class="sticky top-0 bg-white border-b z-10">
-            <tr class="text-gray-600">
+          <thead class="sticky top-0 bg-white border-b dark:bg-neutral-900 dark:border-neutral-700 z-10">
+            <tr class="text-gray-600 dark:text-neutral-400">
               <th class="px-6 py-3 text-left font-semibold">Event</th>
               <th class="px-6 py-3 text-left font-semibold">Location</th>
               <th class="px-6 py-3 text-left font-semibold">Date</th>
@@ -67,20 +67,20 @@
             <tr
               v-for="event in events"
               :key="event._id"
-              class="hover:bg-gray-50 transition"
+              class="hover:bg-gray-50 dark:hover:bg-neutral-800 transition"
             >
               <!-- EVENT -->
               <td class="px-6 py-4">
-                <p class="font-medium text-gray-900 truncate max-w-55">
+                <p class="font-medium text-gray-900 dark:text-white truncate max-w-55">
                   {{ event.title }}
                 </p>
               </td>
 
               <!-- LOCATION -->
-              <td class="px-6 py-4 text-gray-600">📍 {{ event.location }}</td>
+              <td class="px-6 py-4 text-gray-600 dark:text-neutral-400">📍 {{ event.location }}</td>
 
               <!-- DATE -->
-              <td class="px-6 py-4 text-gray-600">
+              <td class="px-6 py-4 text-gray-600 dark:text-neutral-400">
                 {{ formatDate(event.date) }}
               </td>
 
@@ -99,7 +99,7 @@
                   :class="{
                     'bg-green-100 text-green-700': event.status === 'upcoming',
                     'bg-blue-100 text-blue-700': event.status === 'ongoing',
-                    'bg-gray-100 text-gray-700': event.status === 'completed',
+                    'bg-gray-100 text-gray-700 dark:bg-neutral-800 dark:text-neutral-300': event.status === 'completed',
                     'bg-red-100 text-red-700': event.status === 'cancelled',
                     'bg-yellow-100 text-yellow-700': event.status === 'pending',
                   }"
@@ -120,7 +120,7 @@
                   </button>
                   <NuxtLink
                     :to="`/events/${event._id}`"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 transition"
                   >
                     View
                   </NuxtLink>

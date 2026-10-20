@@ -20,12 +20,12 @@
 
     <!-- Chat Popup -->
     <Transition name="chat">
-      <div
-        v-if="open"
-        class="fixed bottom-24 right-4 z-50 flex h-[min(70vh,32rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xl shadow-slate-900/25 sm:bottom-24 sm:right-6"
-        role="dialog"
-        aria-label="Happitwin Assistant chat"
-      >
+        <div
+          v-if="open"
+          class="fixed bottom-24 right-4 z-50 flex h-[min(70vh,32rem)] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white dark:bg-neutral-900 dark:border-neutral-700 shadow-2xl shadow-slate-900/25 dark:shadow-none sm:bottom-24 sm:right-6"
+          role="dialog"
+          aria-label="Happitwin Assistant chat"
+        >
         <!-- Header -->
         <div
           class="relative overflow-hidden bg-gradient-to-r from-[#101d3a] via-[#172b50] to-[#213c35] px-4 py-4 text-white"
@@ -67,7 +67,7 @@
         <!-- Messages -->
         <div
           ref="scrollArea"
-          class="flex-1 space-y-3 overflow-y-auto bg-[#f8f7f3] px-4 py-4"
+          class="flex-1 space-y-3 overflow-y-auto bg-[#f8f7f3] dark:bg-zinc-950 px-4 py-4"
         >
           <div
             v-for="(msg, i) in messages"
@@ -82,11 +82,11 @@
               <Icon name="material-symbols:support-agent" />
             </span>
             <div
-              class="max-w-[78%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm"
+              class="max-w-[78%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm dark:shadow-none"
               :class="
                 msg.from === 'user'
                   ? 'rounded-br-md bg-[#13284b] text-white'
-                  : 'rounded-bl-md border border-slate-200/80 bg-white text-slate-700'
+                  : 'rounded-bl-md border border-slate-200/80 bg-white text-slate-700 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300'
               "
             >
               {{ msg.text }}
@@ -101,7 +101,7 @@
               <Icon name="material-symbols:support-agent" />
             </span>
             <div
-              class="flex items-center gap-1 rounded-2xl rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 shadow-sm"
+              class="flex items-center gap-1 rounded-2xl rounded-bl-md border border-slate-200/80 bg-white px-4 py-3 shadow-sm dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-none"
             >
               <span
                 v-for="d in 3"
@@ -114,14 +114,14 @@
         </div>
 
         <!-- Input -->
-        <div class="border-t border-slate-100 bg-white p-3">
+        <div class="border-t border-slate-100 bg-white dark:bg-neutral-900 dark:border-neutral-800 p-3">
           <div class="flex items-end gap-2">
             <input
               v-model="message"
               @keyup.enter="sendMessage"
               type="text"
               placeholder="Ask about events, tickets…"
-              class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#13284b] focus:bg-white focus:ring-2 focus:ring-[#13284b]/15"
+              class="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[#13284b] focus:bg-white focus:ring-2 focus:ring-[#13284b]/15 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300 dark:placeholder:text-neutral-500 dark:focus:bg-neutral-900 dark:focus:ring-[#13284b]/30"
             />
             <button
               @click="sendMessage"
@@ -132,7 +132,7 @@
               <Icon name="material-symbols:send-rounded" class="text-xl" />
             </button>
           </div>
-          <p class="mt-2 text-center text-[10px] text-slate-400">
+          <p class="mt-2 text-center text-[10px] text-slate-400 dark:text-neutral-500">
             Powered by Happitwin Assistant
           </p>
         </div>

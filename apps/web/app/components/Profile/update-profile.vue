@@ -7,7 +7,7 @@
         <!-- Name -->
         <div>
           <label
-            class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
+            class="block text-sm font-medium mb-1 text-gray-700 dark:text-neutral-300"
           >
             Name
           </label>
@@ -23,7 +23,7 @@
         <!-- Last Name -->
         <div>
           <label
-            class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
+            class="block text-sm font-medium mb-1 text-gray-700 dark:text-neutral-300"
           >
             Last Name
           </label>

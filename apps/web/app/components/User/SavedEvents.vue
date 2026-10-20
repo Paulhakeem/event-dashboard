@@ -30,13 +30,13 @@
     </div>
     <div
       v-else-if="favorites.length === 0"
-      class="rounded-2xl border border-dashed border-gray-300 p-10 text-center"
+      class="rounded-2xl border border-dashed border-gray-300 dark:border-neutral-600 p-10 text-center"
     >
       <Icon
         name="mdi:heart-outline"
         class="mx-auto mb-3 text-4xl text-gray-300"
       />
-      <p class="font-semibold text-gray-700">No saved events yet</p>
+      <p class="font-semibold text-gray-700 dark:text-neutral-300">No saved events yet</p>
       <p class="mt-1 text-sm text-gray-500">
         Tap the heart on an event you want to revisit.
       </p>

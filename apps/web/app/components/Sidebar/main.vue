@@ -43,6 +43,8 @@
 
       <!-- Right Side Auth Buttons -->
       <div class="flex shrink-0 items-center justify-end gap-2 sm:gap-3">
+        <ThemeToggle />
+
         <!-- Not Logged In -->
         <template v-if="!user">
           <NuxtLink

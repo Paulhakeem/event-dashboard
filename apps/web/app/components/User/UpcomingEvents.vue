@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white dark:bg-neutral-900 w-full p-4 sm:p-6 rounded-3xl shadow-md border border-gray-100 dark:border-neutral-800 transition-all duration-200"
+    class="bg-white dark:bg-neutral-900 w-full p-4 sm:p-6 rounded-3xl shadow-md dark:shadow-none border border-gray-100 dark:border-neutral-800 transition-all duration-200"
   >
     <!-- Header -->
     <div

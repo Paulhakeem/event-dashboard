@@ -1,20 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-zinc-950">
     <!-- Mobile Header -->
     <header
-      class="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm lg:hidden"
+      class="sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm dark:bg-neutral-900 dark:border-neutral-700 dark:shadow-none lg:hidden"
     >
-      <h1 class="text-lg font-bold text-gray-900">Organiser Dashboard</h1>
+      <h1 class="text-lg font-bold text-gray-900 dark:text-white">Organiser Dashboard</h1>
 
       <button
         @click="toggleSidebar"
-        class="p-2 rounded-lg hover:bg-gray-100 transition"
+        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 transition"
       >
         <Icon
           :name="
             sidebarOpen ? 'material-symbols:close' : 'material-symbols:menu'
           "
-          class="text-2xl text-gray-700"
+          class="text-2xl text-gray-700 dark:text-neutral-300"
         />
       </button>
     </header>
@@ -46,14 +46,14 @@
     >
       <aside
         v-if="sidebarOpen"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 lg:hidden"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 dark:bg-neutral-900 dark:border-neutral-700 lg:hidden"
       >
         <div class="h-full px-3 py-4 overflow-y-auto">
           <!-- Logo -->
           <div class="flex items-center gap-2 mb-6 px-2">
             <Icon
               name="material-symbols:dashboard"
-              class="text-2xl text-[#13284b]"
+              class="text-2xl text-[#13284b] dark:text-white"
             />
             <span class="text-lg font-semibold">Organiser</span>
           </div>
@@ -93,14 +93,14 @@
 
     <!-- Sidebar (Desktop) -->
     <aside
-      class="hidden lg:block fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200"
+      class="hidden lg:block fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 dark:bg-neutral-900 dark:border-neutral-700"
     >
       <div class="h-full px-3 py-4 overflow-y-auto">
         <!-- Logo -->
         <div class="flex items-center gap-2 mb-6 px-2">
           <Icon
             name="material-symbols:dashboard"
-            class="text-2xl text-[#13284b]"
+            class="text-2xl text-[#13284b] dark:text-white"
           />
           <span class="text-lg font-semibold">Organiser</span>
         </div>
@@ -135,7 +135,7 @@
       </div>
 
       <div
-        class="sticky bottom-0 bg-white border-t border-gray-200 p-4 cursor-pointer"
+        class="sticky bottom-0 bg-white border-t border-gray-200 dark:bg-neutral-900 dark:border-neutral-700 p-4 cursor-pointer"
       >
         <ProfileInfo @click="openProfile" />
       </div>
@@ -148,18 +148,18 @@
             class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
           >
             <div
-             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50"
+             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50 dark:bg-neutral-900/90 dark:border-neutral-700/50"
             >
               <button
                 @click="open = false"
-                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 transition shadow-sm cursor-pointer"
+                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 dark:bg-neutral-800 dark:text-neutral-300 transition shadow-sm cursor-pointer"
               >
                 ✕
               </button>
 
               <!-- Optional drag handle (nice UX) -->
               <div
-                class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"
+                class="w-12 h-1.5 bg-gray-300 dark:bg-neutral-700 rounded-full mx-auto mb-4"
               ></div>
 
               <!-- Content -->
