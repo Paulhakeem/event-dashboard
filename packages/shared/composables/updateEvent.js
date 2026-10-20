@@ -52,6 +52,7 @@ export default function updateEvent(eventsRef = null) {
             name: t.name,
             price: t.price,
             quantity: t.quantity ?? 0,
+            availableQuantity: t.availableQuantity ?? t.quantity ?? 0,
           }))
         : [],
       status: ev.status || "upcoming",

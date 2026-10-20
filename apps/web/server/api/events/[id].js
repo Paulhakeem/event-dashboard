@@ -73,12 +73,6 @@ export default defineEventHandler(async (event) => {
           update[key] = body[key];
         }
       }
-      if (Object.keys(update).length === 0) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "No valid fields to update",
-        });
-      }
 
       // Get the current event to check if status is changing
       const currentEvent = await Event.findById(id);
@@ -94,6 +88,58 @@ export default defineEventHandler(async (event) => {
       ) {
         throw createError({ statusCode: 403, statusMessage: "Access denied" });
       }
+
+      // Preserve availableQuantity when tickets are edited so stock is
+      // never silently reset to 0.
+      if (Array.isArray(update.customTickets)) {
+        const currentTickets = Array.isArray(currentEvent?.customTickets)
+          ? currentEvent.customTickets
+          : [];
+        update.customTickets = update.customTickets
+          .filter((t) => t && t.name)
+          .map((t) => {
+            const name = String(t.name).trim();
+            const quantity = Math.max(0, Number(t.quantity) || 0);
+            const prev = currentTickets.find(
+              (p) =>
+                String(p.name || "").trim().toLowerCase() ===
+                name.toLowerCase(),
+            );
+            const prevAvail = Math.max(
+              0,
+              Number(prev?.availableQuantity ?? prev?.quantity) || 0,
+            );
+            const delta =
+              quantity - Math.max(0, Number(prev?.quantity) || 0);
+            return {
+              name,
+              price: Number(t.price) || 0,
+              quantity,
+              availableQuantity: Math.max(
+                0,
+                Math.min(quantity, prevAvail + delta),
+              ),
+            };
+          });
+        const effectiveFreeEntry =
+          "freeEntry" in update
+            ? Boolean(update.freeEntry)
+            : Boolean(currentEvent?.freeEntry);
+        if (!effectiveFreeEntry) {
+          update.TicketQuantity = update.customTickets.reduce(
+            (sum, t) => sum + (Number(t.quantity) || 0),
+            0,
+          );
+        }
+      }
+
+      if (Object.keys(update).length === 0) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "No valid fields to update",
+        });
+      }
+
       const eventTitle = body.title || currentEvent?.title || "Event";
       // treat transition from 'pending' -> 'upcoming' as approval
       const isApproved =

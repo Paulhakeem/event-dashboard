@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
           $group: {
             _id: "$eventName",
             bookings: { $sum: 1 },
+            ticketsSold: { $sum: { $ifNull: ["$quantity", 1] } },
             revenue: { $sum: "$amount" },
           },
         },
@@ -47,12 +48,18 @@ export default defineEventHandler(async (event) => {
       bookings.map((item) => [item._id, item]),
     );
     return {
-      events: events.map((item) => ({
-        ...item.toObject(),
-        organiser: item.createdBy,
-        bookings: metrics[item.title]?.bookings || 0,
-        revenue: metrics[item.title]?.revenue || 0,
-      })),
+      events: events.map((item) => {
+        const obj = item.toObject();
+        const sold = metrics[item.title]?.ticketsSold || 0;
+        return {
+          ...obj,
+          organiser: item.createdBy,
+          bookings: metrics[item.title]?.bookings || 0,
+          ticketsSold: sold,
+          ticketsRemaining: Math.max(0, (item.TicketQuantity || 0) - sold),
+          revenue: metrics[item.title]?.revenue || 0,
+        };
+      }),
     };
   }
 
@@ -134,6 +141,49 @@ export default defineEventHandler(async (event) => {
   const changes = Object.fromEntries(
     Object.entries(update).filter(([key]) => allowed.includes(key)),
   );
+
+  // Normalize ticket edits so availableQuantity is never reset to 0 and
+  // TicketQuantity stays in sync with the per-type quantities.
+  if (Array.isArray(changes.customTickets)) {
+    const prevTickets = Array.isArray(current.customTickets)
+      ? current.customTickets
+      : [];
+    changes.customTickets = changes.customTickets
+      .filter((t) => t && t.name)
+      .map((t) => {
+        const name = String(t.name).trim();
+        const quantity = Math.max(0, Number(t.quantity) || 0);
+        const prev = prevTickets.find(
+          (p) =>
+            String(p.name || "").trim().toLowerCase() === name.toLowerCase(),
+        );
+        const prevQty = Math.max(0, Number(prev?.quantity) || 0);
+        const prevAvail = Math.max(
+          0,
+          Number(prev?.availableQuantity ?? prevQty) || 0,
+        );
+        const delta = quantity - prevQty;
+        const availableQuantity = Math.max(
+          0,
+          Math.min(quantity, prevAvail + delta),
+        );
+        return {
+          name,
+          price: Number(t.price) || 0,
+          quantity,
+          availableQuantity,
+        };
+      });
+    const effectiveFreeEntry =
+      "freeEntry" in changes ? Boolean(changes.freeEntry) : Boolean(current.freeEntry);
+    if (!effectiveFreeEntry) {
+      changes.TicketQuantity = changes.customTickets.reduce(
+        (sum, t) => sum + (Number(t.quantity) || 0),
+        0,
+      );
+    }
+  }
+
   const updatedEvent = await Event.findByIdAndUpdate(current._id, changes, {
     new: true,
     runValidators: true,

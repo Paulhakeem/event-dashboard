@@ -156,6 +156,14 @@
                   :disabled="freeEntry"
                   class="w-full sm:w-32 p-2 border rounded outline-none"
                 />
+                <input
+                  v-model.number="ticket.quantity"
+                  type="number"
+                  min="1"
+                  placeholder="Tickets"
+                  :disabled="freeEntry"
+                  class="w-full sm:w-32 p-2 border rounded outline-none"
+                />
                 <button
                   type="button"
                   @click="removeTicketType(index)"

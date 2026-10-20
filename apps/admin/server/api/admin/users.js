@@ -54,9 +54,15 @@ export default defineEventHandler(async (event) => {
 
   const action = body?.action;
   if (
-    !["delete", "suspend", "activate", "role", "verify", "unverify"].includes(
-      action,
-    )
+    ![
+      "delete",
+      "suspend",
+      "activate",
+      "role",
+      "verify",
+      "unverify",
+      "permissions",
+    ].includes(action)
   ) {
     throw createError({
       statusCode: 400,

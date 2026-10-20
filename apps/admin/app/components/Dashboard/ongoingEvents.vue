@@ -162,6 +162,8 @@ const { eventPosters, errorMessage, pendings, fetchEvents } = EventFunctions();
 onMounted(() => fetchEvents());
 
 const ongoingEvents = computed(() =>
-  eventPosters.value.filter((event) => event.status === "ongoing"),
+  eventPosters.value.filter(
+    (event) => event.status === "ongoing" || event.status === "live",
+  ),
 );
 </script>

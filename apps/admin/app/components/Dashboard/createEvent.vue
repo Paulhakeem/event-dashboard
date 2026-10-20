@@ -469,6 +469,10 @@ const onFileChange = (event) => {
 
 // ✅ Submit event form
 const submitEvent = async () => {
+  if (!file.value) {
+    alert("Please select an event image");
+    return;
+  }
   try {
     isLoading.value = true;
 
@@ -488,7 +492,9 @@ const submitEvent = async () => {
       formData.append("maxTicketsPerUser", form.maxTicketsPerUser);
     }
     formData.append("status", form.status);
-    formData.append("image", file.value);
+    if (file.value) {
+      formData.append("image", file.value);
+    }
 
     const res = await $fetch(`${config.public.createEventApi}`, {
       method: "POST",

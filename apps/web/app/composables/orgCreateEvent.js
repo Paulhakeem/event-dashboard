@@ -22,7 +22,7 @@ export const orgCreateEvent = () => {
   const customTickets = ref([]);
 
   const addTicketType = () => {
-    customTickets.value.push({ name: "", price: 0 });
+    customTickets.value.push({ name: "", price: 0, quantity: 0 });
   };
 
   const removeTicketType = (index) => {
