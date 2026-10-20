@@ -189,7 +189,11 @@
               <!-- Tickets Info -->
               <div
                 v-if="event.customTickets?.length"
-                class="grid grid-cols-3 gap-2 mb-4"
+                :class="
+                  event.customTickets.length === 1
+                    ? 'flex justify-center mb-4'
+                    : 'grid grid-cols-3 gap-2 mb-4'
+                "
               >
                 <div
                   v-for="(ticket, i) in event.customTickets"
