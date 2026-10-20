@@ -522,7 +522,12 @@ const totalPrice = computed(() =>
   ticketLines.value.reduce((sum, line) => sum + lineTotal(line), 0),
 );
 
-const maxQuantity = computed(() => event.value?.TicketQuantity || 0);
+const maxQuantity = computed(() => {
+  const eventTotal = event.value?.TicketQuantity || 0;
+  const maxPerUser = Math.floor(Number(event.value?.maxTicketsPerUser) || 0);
+  if (maxPerUser > 0) return Math.min(eventTotal || maxPerUser, maxPerUser);
+  return eventTotal;
+});
 
 const selectedTickets = computed(() =>
   ticketLines.value
@@ -591,7 +596,7 @@ const isBookable = computed(() => {
     ev.status !== "cancelled" &&
     ev.status !== "completed" &&
     ev.TicketQuantity > 0 &&
-    totalQuantity.value <= ev.TicketQuantity &&
+    totalQuantity.value <= maxQuantity.value &&
     selectedTickets.value.every((t) => {
       const match = ev.customTickets?.find((c) => c.name === t.ticketType);
       return !!match && !!match.price;

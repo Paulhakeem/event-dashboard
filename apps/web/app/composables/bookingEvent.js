@@ -159,6 +159,20 @@ export default function useEventBooking() {
       return;
     }
 
+    const maxPerUser = Math.floor(Number(event.value?.maxTicketsPerUser) || 0);
+    if (maxPerUser > 0 && totalQuantity > maxPerUser) {
+      alert(
+        `You can only purchase up to ${maxPerUser} ticket${maxPerUser === 1 ? "" : "s"} for this event.`,
+      );
+      return;
+    }
+
+    const eventTotal = Math.floor(Number(event.value?.TicketQuantity) || 0);
+    if (eventTotal > 0 && totalQuantity > eventTotal) {
+      alert(`Only ${eventTotal} ticket${eventTotal === 1 ? "" : "s"} left for this event.`);
+      return;
+    }
+
     if (
       event.value.status === "cancelled" ||
       event.value.status === "completed"

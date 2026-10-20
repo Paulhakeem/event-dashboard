@@ -420,6 +420,27 @@ const toggleFreeEntry = () => {
   }
 };
 
+const clearForm = () => {
+  Object.assign(form, {
+    title: "",
+    description: "",
+    date: "",
+    location: "",
+    eventType: "other",
+    regular: "",
+    vip: "",
+    vvip: "",
+    TicketQuantity: 0,
+    maxTicketsPerUser: null,
+    status: "upcoming",
+    image: null,
+  });
+  freeEntry.value = false;
+  customTickets.value = [];
+  previewImage.value = null;
+  file.value = null;
+};
+
 const shareUrl = ref("");
 const showShareModal = ref(false);
 
