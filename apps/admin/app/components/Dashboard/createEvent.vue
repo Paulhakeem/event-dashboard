@@ -77,30 +77,64 @@
               ></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2"
+                >Location *</label
+              >
+              <input
+                v-model="form.location"
+                required
+                placeholder="Nairobi, Kenya"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Location *</label
+                  >Start Date</label
                 >
                 <input
-                  v-model="form.location"
-                  required
-                  placeholder="Nairobi, Kenya"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2"
-                  >Date *</label
-                >
-                <input
-                  v-model="form.date"
-                  required
+                  v-model="form.startDate"
                   type="date"
                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
                 />
               </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >End Date</label
+                >
+                <input
+                  v-model="form.endDate"
+                  type="date"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >Start Time</label
+                >
+                <input
+                  v-model="form.startTime"
+                  type="time"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2"
+                  >End Time</label
+                >
+                <input
+                  v-model="form.endTime"
+                  type="time"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                />
+              </div>
             </div>
+            <p class="text-xs text-gray-500">
+              Start and end dates and times are optional. Provide at least one
+              date so the event can be scheduled.
+            </p>
 
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2"
@@ -286,9 +320,7 @@
               {{ form.title || "Untitled Event" }}
             </h3>
             <p class="text-sm text-gray-500 mt-2">
-              {{
-                form.date ? new Date(form.date).toDateString() : "Date not set"
-              }}
+              {{ scheduleLabel }}
             </p>
             <p class="mt-3 text-gray-700 text-sm">
               {{
@@ -381,7 +413,10 @@ const config = useRuntimeConfig();
 const form = reactive({
   title: "",
   description: "",
-  date: "",
+  startDate: "",
+  endDate: "",
+  startTime: "",
+  endTime: "",
   location: "",
   eventType: "other",
   regular: "",
@@ -411,6 +446,32 @@ const canSubmit = computed(
   () => freeEntry.value || customTickets.value.length > 0,
 );
 
+const formatPreviewDate = (value) => {
+  if (!value) return "";
+  return new Date(`${value}T00:00:00`).toDateString();
+};
+
+const scheduleLabel = computed(() => {
+  const start = formatPreviewDate(form.startDate);
+  const end = formatPreviewDate(form.endDate);
+  let dateLabel = "Date not set";
+
+  if (start && end) {
+    dateLabel = start === end ? start : `${start} - ${end}`;
+  } else if (start) {
+    dateLabel = start;
+  } else if (end) {
+    dateLabel = end;
+  }
+
+  const timeLabel =
+    form.startTime && form.endTime
+      ? `${form.startTime} - ${form.endTime}`
+      : form.startTime || form.endTime || "";
+
+  return timeLabel ? `${dateLabel} · ${timeLabel}` : dateLabel;
+});
+
 const toggleFreeEntry = () => {
   freeEntry.value = !freeEntry.value;
   if (freeEntry.value) {
@@ -424,7 +485,10 @@ const clearForm = () => {
   Object.assign(form, {
     title: "",
     description: "",
-    date: "",
+    startDate: "",
+    endDate: "",
+    startTime: "",
+    endTime: "",
     location: "",
     eventType: "other",
     regular: "",
@@ -473,13 +537,25 @@ const submitEvent = async () => {
     alert("Please select an event image");
     return;
   }
+  if (!form.startDate && !form.endDate) {
+    alert("Please provide a start date or an end date");
+    return;
+  }
+  if (form.startDate && form.endDate && form.endDate < form.startDate) {
+    alert("End date cannot be before the start date");
+    return;
+  }
   try {
     isLoading.value = true;
 
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("description", form.description);
-    formData.append("date", form.date);
+    formData.append("date", form.startDate || form.endDate);
+    formData.append("startDate", form.startDate);
+    formData.append("endDate", form.endDate);
+    formData.append("startTime", form.startTime);
+    formData.append("endTime", form.endTime);
     formData.append("location", form.location);
     formData.append("eventType", form.eventType);
     formData.append("regular", form.regular ?? 0);

@@ -7,21 +7,26 @@ export const profileEditing = () => {
   const config = useRuntimeConfig();
   const firstName = ref("");
   const lastName = ref("");
+  const email = ref("");
   const loading = ref(false);
   const { token } = useAuth();
   const updateProfile = async () => {
     loading.value = true;
     try {
+      const body = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+      };
+      if (email.value !== undefined && email.value !== "") {
+        body.email = email.value;
+      }
       const response = await $fetch(`${config.public.profileUpdateApi}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token.value}`,
         },
-        body: {
-          firstName: firstName.value,
-          lastName: lastName.value,
-        },
+        body,
       });
 
       if (response && response.message) {
@@ -30,7 +35,9 @@ export const profileEditing = () => {
         alert("Profile updated successfully✅");
       }
     } catch (error) {
-      alert("Failed to update profile❌");
+      const message =
+        error?.data?.message || error?.statusMessage || "Failed to update profile❌";
+      alert(message);
     } finally {
       loading.value = false;
     }
@@ -39,6 +46,7 @@ export const profileEditing = () => {
   return {
     firstName,
     lastName,
+    email,
     updateProfile,
     loading,
   };

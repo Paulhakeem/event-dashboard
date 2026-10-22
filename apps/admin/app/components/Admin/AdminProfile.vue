@@ -49,6 +49,36 @@
           {{ user?.role || '' }}
         </span>
 
+        <!-- Quick Email Update -->
+        <div class="w-full mt-6 max-w-md">
+          <div
+            class="rounded-2xl border border-gray-200 dark:border-neutral-700 bg-white/70 dark:bg-neutral-900/70 p-4 text-left"
+          >
+            <p class="text-sm font-semibold text-gray-800 dark:text-white">
+              Update Email
+            </p>
+            <p class="text-xs text-gray-500 dark:text-neutral-400 mt-0.5">
+              Change the email on your profile
+            </p>
+            <form @submit.prevent="updateEmail" class="mt-3 flex flex-col sm:flex-row gap-2">
+              <input
+                v-model="emailForm"
+                type="email"
+                required
+                placeholder="Enter new email"
+                class="flex-1 px-3 py-2 border border-gray-200 dark:border-neutral-700 rounded-lg text-sm dark:bg-neutral-900 dark:text-neutral-300"
+              />
+              <button
+                type="submit"
+                :disabled="emailLoading"
+                class="px-4 py-2 rounded-lg text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow hover:scale-[1.02] transition disabled:opacity-50"
+              >
+                {{ emailLoading ? "Saving..." : "Save Email" }}
+              </button>
+            </form>
+          </div>
+        </div>
+
         <!-- Divider -->
         <div
           class="w-full border-t border-gray-200 dark:border-neutral-700 my-6"
@@ -267,7 +297,7 @@
   </div>
 </template>
 <script setup>
-const { user, token, logout } = useAuth();
+const { user, token, logout, setUser } = useAuth();
 const { users } = totalUsers();
 const { events } = totalEvents();
 const { cancelledEvents } = fetchCancelledEvents();
@@ -282,6 +312,38 @@ const total = ref({ total: 0 });
 const open = ref(false);
 const toggle = () => {
   open.value = !open.value;
+};
+
+const emailForm = ref(user?.value?.email || "");
+const emailLoading = ref(false);
+
+const updateEmail = async () => {
+  if (!emailForm.value) return;
+  emailLoading.value = true;
+  try {
+    const res = await $fetch(`${config.public.profileUpdateApi}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: {
+        firstName: user?.value?.firstName || "",
+        lastName: user?.value?.lastName || "",
+        email: emailForm.value,
+      },
+    });
+    if (setUser) {
+      setUser({ ...user.value, email: emailForm.value });
+    }
+    alert(res?.message || "Email updated successfully✅");
+  } catch (error) {
+    const message =
+      error?.data?.message || error?.statusMessage || "Failed to update email❌";
+    alert(message);
+  } finally {
+    emailLoading.value = false;
+  }
 };
 
 const getOrganisers = computed(() => {

@@ -202,7 +202,12 @@
                 <div
                   v-for="(ticket, i) in event.customTickets"
                   :key="ticket.name + i"
-                  class="text-center p-2 bg-amber-50 rounded-lg hover:bg-amber-100 transition duration-200 cursor-pointer"
+                  class="text-center p-2 rounded-lg transition duration-200"
+                  :class="
+                    isTicketTypeSoldOut(ticket)
+                      ? 'bg-gray-100 opacity-60 cursor-not-allowed'
+                      : 'bg-amber-50 hover:bg-amber-100 cursor-pointer'
+                  "
                 >
                   <p class="text-xs font-semibold text-[#13284b]">
                     {{ ticket.name }}
@@ -211,7 +216,11 @@
                     Ksh {{ ticket.price }}
                   </p>
                   <p class="text-[11px] text-gray-500">
-                    {{ ticket.availableQuantity ?? ticket.quantity ?? 0 }} tickets
+                    {{
+                      isTicketTypeSoldOut(ticket)
+                        ? "Sold out"
+                        : `${ticket.availableQuantity ?? ticket.quantity ?? 0} tickets`
+                    }}
                   </p>
                 </div>
               </div>
@@ -230,7 +239,7 @@
                 </span>
               </div>
 
-              <template v-if="!event.freeEntry">
+              <template v-if="!event.freeEntry && !isEventSoldOut(event)">
                 <NuxtLink :to="`/events/${event._id}`">
                   <button
                     :disabled="
@@ -250,6 +259,14 @@
                     }}
                   </button>
                 </NuxtLink>
+              </template>
+              <template v-else-if="!event.freeEntry">
+                <button
+                  disabled
+                  class="w-full bg-gray-400 text-white font-semibold py-2.5 rounded-lg cursor-not-allowed"
+                >
+                  Sold Out
+                </button>
               </template>
               <template v-else>
                 <button
@@ -367,6 +384,24 @@ const canFavorite = computed(() => user.value?.role === "user");
     const types = new Set(events.value.map((event) => event.eventType).filter(Boolean));
     return ["all", ...Array.from(types)];
   });
+
+  const ticketAvailable = (ticket) => {
+    const available = Number(ticket?.availableQuantity ?? ticket?.quantity ?? 0);
+    return Number.isFinite(available) ? available : 0;
+  };
+
+  const isTicketTypeSoldOut = (ticket) => ticketAvailable(ticket) <= 0;
+
+  const isEventSoldOut = (event) => {
+    if (!event || event.freeEntry) return false;
+    if (Math.floor(Number(event.TicketQuantity) || 0) <= 0) return true;
+
+    if (Array.isArray(event.customTickets) && event.customTickets.length > 0) {
+      return event.customTickets.every((ticket) => isTicketTypeSoldOut(ticket));
+    }
+
+    return false;
+  };
 
   const statusTabs = [
     { key: "all", label: "All" },

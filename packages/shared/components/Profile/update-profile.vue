@@ -36,6 +36,22 @@
           />
         </div>
 
+        <!-- Email -->
+        <div>
+          <label
+            class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300"
+          >
+            Email
+          </label>
+
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Enter your email"
+            class="w-full p-3 rounded-lg border border-gray-300 dark:border-neutral-600 bg-white dark:bg-neutral-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition"
+          />
+        </div>
+
         <!-- Button -->
         <button
           type="submit"
@@ -68,8 +84,15 @@
 <script setup>
 import { profileEditing } from "../../composables/profileEditing.js";
 import { useAuth } from "../../composables/useAuth.js";
-const { firstName, lastName, loading, updateProfile } = profileEditing();
-const { token, logout } = useAuth();
+const { firstName, lastName, email, loading, updateProfile } = profileEditing();
+const { token, logout, user } = useAuth();
+
+if (user?.value) {
+  firstName.value = user.value.firstName || "";
+  lastName.value = user.value.lastName || "";
+  email.value = user.value.email || "";
+}
+
 const config = useRuntimeConfig();
 // delete account logic
 const deleteAccount = async () => {

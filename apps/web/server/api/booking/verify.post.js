@@ -370,7 +370,11 @@ export default defineEventHandler(async (event) => {
   // fixed server-side when the STK push was initiated by this user.
   const expectedAmount = pending.amount;
 
-  const ticketLines =
+  const eventTicketTypes = Array.isArray(eventData.customTickets)
+    ? eventData.customTickets
+    : [];
+
+  const ticketLines = (
     Array.isArray(pending.tickets) && pending.tickets.length > 0
       ? pending.tickets
       : [
@@ -379,7 +383,25 @@ export default defineEventHandler(async (event) => {
             quantity: pending.quantity,
             amount: pending.amount,
           },
-        ];
+        ]
+  ).map((line) => {
+    const requestedType = String(line.ticketType || "").trim();
+    const matchedType = eventTicketTypes.find(
+      (ticket) =>
+        String(ticket.name || ticket.ticketType || ticket.type || "")
+          .trim()
+          .toLowerCase() === requestedType.toLowerCase(),
+    );
+
+    return {
+      ...line,
+      ticketType: matchedType
+        ? String(
+            matchedType.name || matchedType.ticketType || matchedType.type,
+          ).trim()
+        : requestedType,
+    };
+  });
 
   const ticketCount = ticketLines.reduce(
     (sum, line) => sum + Math.floor(Number(line.quantity) || 0),
@@ -567,13 +589,122 @@ export default defineEventHandler(async (event) => {
   }
 
   /* ── DECREMENT TICKET QUANTITY ATOMICALLY ─────────────────── */
+  const stockByType = new Map();
+
+  for (const line of ticketLines) {
+    const quantity = Math.floor(Number(line.quantity) || 0);
+    const ticketType = String(line.ticketType || "").trim();
+
+    if (!ticketType || quantity < 1) continue;
+
+    const key = ticketType.toLowerCase();
+    const existing = stockByType.get(key);
+
+    if (existing) existing.quantity += quantity;
+    else stockByType.set(key, { ticketType, quantity });
+  }
+
+  const perTypeStock = [...stockByType.values()].filter((line) =>
+    eventTicketTypes.some(
+      (ticket) =>
+        String(ticket.name || ticket.ticketType || ticket.type || "")
+          .trim()
+          .toLowerCase() === line.ticketType.toLowerCase(),
+    ),
+  );
+
+  const availabilityFilters = perTypeStock.map((line) => ({
+    customTickets: {
+      $elemMatch: {
+        name: line.ticketType,
+        $or: [
+          { availableQuantity: { $gte: line.quantity } },
+          { availableQuantity: null, quantity: { $gte: line.quantity } },
+        ],
+      },
+    },
+  }));
+
+  const stockUpdate =
+    perTypeStock.length > 0
+      ? [
+          {
+            $set: {
+              TicketQuantity: { $subtract: ["$TicketQuantity", ticketCount] },
+              customTickets: {
+                $cond: [
+                  { $isArray: "$customTickets" },
+                  {
+                    $map: {
+                      input: "$customTickets",
+                      as: "ticket",
+                      in: {
+                        $mergeObjects: [
+                          "$$ticket",
+                          {
+                            availableQuantity: {
+                              $subtract: [
+                                {
+                                  $ifNull: [
+                                    "$$ticket.availableQuantity",
+                                    "$$ticket.quantity",
+                                  ],
+                                },
+                                {
+                                  $sum: {
+                                    $map: {
+                                      input: {
+                                        $filter: {
+                                          input: {
+                                            $literal: perTypeStock,
+                                          },
+                                          as: "stock",
+                                          cond: {
+                                            $eq: [
+                                              {
+                                                $toLower: {
+                                                  $ifNull: [
+                                                    "$$ticket.name",
+                                                    "",
+                                                  ],
+                                                },
+                                              },
+                                              {
+                                                $toLower:
+                                                  "$$stock.ticketType",
+                                              },
+                                            ],
+                                          },
+                                        },
+                                      },
+                                      as: "stock",
+                                      in: "$$stock.quantity",
+                                    },
+                                  },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  },
+                  "$customTickets",
+                ],
+              },
+            },
+          },
+        ]
+      : { $inc: { TicketQuantity: -ticketCount } };
+
   const updatedEvent = await Event.findOneAndUpdate(
     {
       _id: eventData._id,
       TicketQuantity: { $gte: ticketCount },
       status: { $nin: ["cancelled", "completed"] },
+      ...(availabilityFilters.length ? { $and: availabilityFilters } : {}),
     },
-    { $inc: { TicketQuantity: -ticketCount } },
+    stockUpdate,
     { new: true },
   );
   if (!updatedEvent) {

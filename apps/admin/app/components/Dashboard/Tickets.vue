@@ -293,6 +293,22 @@
               </div>
             </div>
             <div class="grid grid-cols-2 gap-2 text-xs text-gray-500">
+              <p class="col-span-2">
+                Event:
+                <span class="font-medium text-gray-800">{{
+                  ticket.eventName || selectedEvent?.eventName
+                }}</span>
+              </p>
+              <p class="col-span-2">
+                Username:
+                <span class="font-medium text-gray-800">{{
+                  ticket.holderName ||
+                  ticket.userId?.firstName ||
+                  ticket.userId?.lastName
+                    ? `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim()
+                    : ticket.userEmail || "Guest"
+                }}</span>
+              </p>
               <p>
                 Type:
                 <span class="font-medium text-gray-800">{{
@@ -305,32 +321,13 @@
                   ticket.ticketCode
                 }}</span>
               </p>
-              <p class="col-span-2 break-all">
-                Ticket ID: <span class="font-mono text-gray-700">{{ ticket._id }}</span>
-              </p>
               <p class="col-span-2">
-                Event: <span class="font-medium text-gray-800">{{ ticket.eventName }}</span>
-              </p>
-              <p class="col-span-2 break-all">
-                Event ID: <span class="font-mono text-gray-700">{{ ticket.eventId }}</span>
-              </p>
-              <p class="col-span-2 break-all">
-                User ID:
-                <span class="font-mono text-gray-700">{{
-                  ticket.userId?._id || ticket.userId || `Guest (${ticket.userEmail})`
+                Email:
+                <span class="font-medium text-gray-800">{{
+                  ticket.holderEmail || ticket.userId?.email || ticket.userEmail || "—"
                 }}</span>
               </p>
-              <p class="col-span-2 break-all">
-                Booking ID:
-                <span class="font-mono text-gray-700">{{ ticket.bookingId }}</span>
-              </p>
-              <p class="col-span-2">
-                Created: <span class="font-medium text-gray-800">{{ formatDateTime(ticket.createdAt) }}</span>
-              </p>
-              <p class="col-span-2">
-                Updated: <span class="font-medium text-gray-800">{{ formatDateTime(ticket.updatedAt) }}</span>
-              </p>
-              <p class="col-span-2">
+              <p class="col-span-2" v-if="ticket.usedAt">
                 Used at: <span class="font-medium text-gray-800">{{ formatDateTime(ticket.usedAt) }}</span>
               </p>
             </div>
@@ -341,9 +338,10 @@
           <table class="min-w-full divide-y divide-gray-100 text-left text-sm">
             <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
               <tr>
-                <th scope="col" class="px-5 py-3 font-semibold">Total amount</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Event</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Username</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Ticket</th>
-                <th scope="col" class="px-5 py-3 font-semibold">Booking</th>
+                <th scope="col" class="px-5 py-3 font-semibold">Amount</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Used</th>
                 <th scope="col" class="px-5 py-3 font-semibold">Status</th>
               </tr>
@@ -354,24 +352,32 @@
                 :key="ticket._id"
                 class="transition hover:bg-gray-50/70"
               >
-                <td class="whitespace-nowrap px-5 py-3.5 font-semibold text-gray-900">
-                  {{ formatAmount(ticket.amount) }}
+                <td class="max-w-56 px-5 py-3.5">
+                  <p class="font-medium text-gray-800">
+                    {{ ticket.eventName || selectedEvent?.eventName }}
+                  </p>
+                </td>
+                <td class="px-5 py-3.5">
+                  <p class="font-medium text-gray-800">
+                    {{
+                      ticket.holderName ||
+                      (ticket.userId?.firstName || ticket.userId?.lastName
+                        ? `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim()
+                        : ticket.userEmail || "Guest")
+                    }}
+                  </p>
+                  <p class="mt-0.5 text-xs text-gray-400">
+                    {{ ticket.holderEmail || ticket.userId?.email || ticket.userEmail || "—" }}
+                  </p>
                 </td>
                 <td class="px-5 py-3.5">
                   <p class="font-medium text-gray-800">{{ ticket.ticketType }}</p>
                   <p class="mt-0.5 font-mono text-xs text-gray-400">
                     {{ ticket.ticketCode }}
                   </p>
-                  <p class="mt-0.5 font-mono text-[10px] text-gray-400">
-                    ID: {{ ticket._id }}
-                  </p>
                 </td>
-                <td class="max-w-64 px-5 py-3.5 text-xs text-gray-600">
-                  <p>Event: {{ ticket.eventName }}</p>
-                  <p>Booking: <span class="break-all font-mono">{{ ticket.bookingId }}</span></p>
-                  <p class="mt-1">Created: {{ formatDateTime(ticket.createdAt) }}</p>
-                  <p class="mt-1">Updated: {{ formatDateTime(ticket.updatedAt) }}</p>
-                  <p class="mt-1">Event ID: <span class="break-all font-mono">{{ ticket.eventId }}</span></p>
+                <td class="whitespace-nowrap px-5 py-3.5 font-semibold text-gray-900">
+                  {{ formatAmount(ticket.amount) }}
                 </td>
                 <td class="px-5 py-3.5">
                   <label
@@ -388,7 +394,7 @@
                     />
                     <span>
                       {{ ticket.used ? "Used" : "Mark used" }}
-                      <span class="block text-[10px] text-gray-400">
+                      <span class="block text-[10px] text-gray-400" v-if="ticket.usedAt">
                         {{ formatDateTime(ticket.usedAt) }}
                       </span>
                     </span>

@@ -39,13 +39,29 @@ export default defineEventHandler(async (event) => {
       eventExpired: Boolean(
         eventDetails?.date && new Date(eventDetails.date) < new Date(),
       ),
-      tickets: tickets.map((ticket) => ({
-        ...ticket,
-        holderName: ticket.userId
-          ? `${ticket.userId.firstName || ""} ${ticket.userId.lastName || ""}`.trim()
-          : "",
-        holderEmail: ticket.userId?.email || ticket.userEmail,
-      })),
+      tickets: tickets.map((ticket) => {
+        const base = ticket.toObject ? ticket.toObject() : ticket;
+        const user = base.userId || {};
+        const firstName = user.firstName || base.firstName || "";
+        const lastName = user.lastName || base.lastName || "";
+        const holderName = `${firstName} ${lastName}`.trim() || base.holderName || "";
+        const holderEmail = user.email || base.userEmail || base.email || base.holderEmail || "";
+        return {
+          _id: base._id,
+          ticketCode: base.ticketCode,
+          ticketType: base.ticketType,
+          amount: base.amount,
+          quantity: base.quantity,
+          status: base.status,
+          used: base.used,
+          usedAt: base.usedAt,
+          eventName: base.eventName || eventDetails?.title || "",
+          eventId: base.eventId,
+          userId: base.userId,
+          holderName,
+          holderEmail,
+        };
+      }),
     };
   }
 

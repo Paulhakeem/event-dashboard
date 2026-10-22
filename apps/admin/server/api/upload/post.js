@@ -36,6 +36,11 @@ export default defineEventHandler(async (event) => {
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
+  const startDateRaw = String(fields.startDate?.[0] || "");
+  const endDateRaw = String(fields.endDate?.[0] || "");
+  const startTime = String(fields.startTime?.[0] || "").trim();
+  const endTime = String(fields.endTime?.[0] || "").trim();
+  const primaryDateRaw = startDateRaw || endDateRaw || date;
   const regular =
     fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
   const vip =
@@ -60,14 +65,37 @@ export default defineEventHandler(async (event) => {
     !title ||
     !description ||
     !location ||
-    !date ||
+    !primaryDateRaw ||
     !eventType ||
     !status ||
     !files.image?.[0]
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: "All fields are required",
+      statusMessage:
+        "Title, description, location, event date, event type, status and image are required",
+    });
+  }
+
+  const startDate = startDateRaw ? new Date(startDateRaw) : null;
+  const endDate = endDateRaw ? new Date(endDateRaw) : null;
+  const eventDate = startDate || endDate || new Date(date);
+
+  if (
+    Number.isNaN(eventDate.getTime()) ||
+    (startDate && Number.isNaN(startDate.getTime())) ||
+    (endDate && Number.isNaN(endDate.getTime()))
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid event date",
+    });
+  }
+
+  if (startDate && endDate && endDate < startDate) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "End date cannot be before the start date",
     });
   }
 
@@ -130,7 +158,11 @@ export default defineEventHandler(async (event) => {
     description,
     freeEntry,
     location,
-    date: new Date(date),
+    date: eventDate,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
     regular,
     vip,
     vvip,

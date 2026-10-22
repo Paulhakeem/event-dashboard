@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const firstName = (body.firstName || "").trim();
   const lastName = (body.lastName || "").trim();
+  const email = body.email !== undefined ? String(body.email).trim().toLowerCase() : undefined;
 
   if (!firstName) throw createError({ statusCode: 400, message: "First name is required" });
   if (!lastName) throw createError({ statusCode: 400, message: "Last name is required" });
@@ -21,10 +22,26 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  if (email !== undefined && email !== "") {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw createError({ statusCode: 400, message: "Invalid email address" });
+    }
+    const existing = await User.findOne({ email, _id: { $ne: user.id } });
+    if (existing) {
+      throw createError({ statusCode: 409, message: "Email already in use" });
+    }
+  }
+
   try {
+    const update = { firstName, lastName };
+    if (email !== undefined && email !== "") {
+      update.email = email;
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       user.id,
-      { firstName, lastName },
+      update,
       { new: true, runValidators: true, context: "query" }
     );
 

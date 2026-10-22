@@ -6,6 +6,10 @@ const eventSchema = new mongoose.Schema({
   description: { type: String, required: true },
   freeEntry: { type: Boolean, default: false },
   date: { type: Date, required: true },
+  startDate: { type: Date, default: null },
+  endDate: { type: Date, default: null },
+  startTime: { type: String, default: "" },
+  endTime: { type: String, default: "" },
   location: { type: String, required: true },
   TicketQuantity: { type: Number, default: 0 },
   maxTicketsPerUser: { type: Number, default: null },
@@ -45,40 +49,74 @@ const eventSchema = new mongoose.Schema({
   shareUrl: { type: String },
 });
 
+const parseTime = (value, fallbackHour, fallbackMinute) => {
+  const match = /^(\d{1,2}):(\d{2})/.exec(String(value || ""));
+  if (!match) return [fallbackHour, fallbackMinute];
+  return [Number(match[1]), Number(match[2])];
+};
+
+export async function syncEventStatuses(model, now = new Date()) {
+  const events = await model.aggregate([
+    {
+      $match: {
+        status: {
+          $nin: ["pending", "completed", "cancelled", "inactive", "archived"],
+        },
+      },
+    },
+    {
+      $project: {
+        status: 1,
+        date: 1,
+        startDate: 1,
+        endDate: 1,
+        startTime: 1,
+        endTime: 1,
+      },
+    },
+  ]);
+
+  const operations = [];
+  for (const item of events) {
+    const startSource = item.startDate || item.date;
+    const endSource = item.endDate || item.startDate || item.date;
+    if (!startSource || !endSource) continue;
+
+    const start = new Date(startSource);
+    const end = new Date(endSource);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) continue;
+
+    const [startHour, startMinute] = parseTime(item.startTime, 0, 0);
+    const [endHour, endMinute] = parseTime(item.endTime, 23, 59);
+    start.setHours(startHour, startMinute, 0, 0);
+    end.setHours(endHour, endMinute, 59, 999);
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+
+    let status;
+    if (now < start) status = "upcoming";
+    else if (now > end) status = "completed";
+    else status = "live";
+
+    if (status !== item.status) {
+      operations.push({
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $set: { status } },
+        },
+      });
+    }
+  }
+
+  if (operations.length) await model.bulkWrite(operations);
+}
+
 // whenever events are queried, ensure statuses are updated based on dates
 eventSchema.pre(/^find/, async function (next) {
   try {
-    const now = new Date();
-
-    // Get today's date range (start and end of day)
-    const todayStart = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-    );
-    const todayEnd = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate() + 1,
-    );
-
-    // Mark today's events as live
-    await this.model.updateMany(
-      {
-        date: { $gte: todayStart, $lt: todayEnd },
-        status: { $nin: ["completed", "cancelled", "inactive", "archived"] },
-      },
-      { $set: { status: "live" } },
-    );
-
-    // Mark past events as completed
-    await this.model.updateMany(
-      {
-        date: { $lt: todayStart },
-        status: { $nin: ["completed", "cancelled", "inactive", "archived"] },
-      },
-      { $set: { status: "completed" } },
-    );
+    await syncEventStatuses(this.model);
   } catch (err) {
     console.error("Error auto-updating event statuses:", err);
   }

@@ -231,11 +231,12 @@
                         v-for="ticket in event.customTickets"
                         :key="ticket.name"
                         :value="ticket.name"
+                        :disabled="isTicketTypeSoldOut(ticket)"
                       >
                         {{ ticket.name }} — Ksh {{ ticket.price }} ({{
                           ticket.availableQuantity ?? ticket.quantity ?? 0
                         }}
-                        tickets)
+                        tickets){{ isTicketTypeSoldOut(ticket) ? " — Sold out" : "" }}
                       </option>
                     </select>
                   </div>
@@ -440,20 +441,22 @@
                 !isBookable ||
                 !['idle', 'failed', 'pending'].includes(paymentStatus)
               "
-              class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
+              class="w-full p-4 rounded-lg text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               :class="{
-                'bg-green-500 hover:bg-green-600': paymentStatus === 'idle',
+                'bg-green-500 hover:bg-green-600':
+                  paymentStatus === 'idle' &&
+                  !event?.freeEntry &&
+                  !isEventSoldOut,
                 'bg-yellow-500': paymentStatus === 'waiting',
                 'bg-yellow-600': paymentStatus === 'pending',
                 'bg-blue-500':
                   paymentStatus === 'verifying' || paymentStatus === 'sending',
                 'bg-green-600': paymentStatus === 'success',
                 'bg-red-500': paymentStatus === 'failed',
-                'bg-gray-400 cursor-not-allowed': [
-                  'sending',
-                  'waiting',
-                  'verifying',
-                ].includes(paymentStatus),
+                'bg-gray-400 cursor-not-allowed':
+                  event?.freeEntry ||
+                  isEventSoldOut ||
+                  ['sending', 'waiting', 'verifying'].includes(paymentStatus),
               }"
             >
               <!-- Spinner -->
@@ -483,6 +486,7 @@
 
               <!-- TEXT STATES -->
               <span v-if="event?.freeEntry">Free Event</span>
+              <span v-else-if="isEventSoldOut">Sold Out</span>
               <span v-else-if="paymentStatus === 'idle'">Pay with M-Pesa</span>
               <span v-else-if="paymentStatus === 'sending'"
                 >Sending STK...</span
@@ -561,6 +565,25 @@ const isEmail = (value) =>
 
 const priceOf = (name) =>
   event.value?.customTickets?.find((t) => t.name === name)?.price ?? 0;
+
+const ticketAvailable = (ticket) => {
+  const available = Number(ticket?.availableQuantity ?? ticket?.quantity ?? 0);
+  return Number.isFinite(available) ? available : 0;
+};
+
+const isTicketTypeSoldOut = (ticket) => ticketAvailable(ticket) <= 0;
+
+const isEventSoldOut = computed(() => {
+  const ev = event.value;
+  if (!ev || ev.freeEntry) return false;
+  if (Math.floor(Number(ev.TicketQuantity) || 0) <= 0) return true;
+
+  if (Array.isArray(ev.customTickets) && ev.customTickets.length > 0) {
+    return ev.customTickets.every((ticket) => isTicketTypeSoldOut(ticket));
+  }
+
+  return false;
+});
 
 const lineTotal = (line) => priceOf(line.ticketType) * (line.quantity || 0);
 
@@ -645,11 +668,16 @@ const isBookable = computed(() => {
     isEmail(email.value) &&
     ev.status !== "cancelled" &&
     ev.status !== "completed" &&
+    !isEventSoldOut.value &&
     ev.TicketQuantity > 0 &&
     totalQuantity.value <= maxQuantity.value &&
     selectedTickets.value.every((t) => {
       const match = ev.customTickets?.find((c) => c.name === t.ticketType);
-      return !!match && !!match.price;
+      return (
+        !!match &&
+        !!match.price &&
+        ticketAvailable(match) >= Number(t.quantity)
+      );
     })
   );
 });
