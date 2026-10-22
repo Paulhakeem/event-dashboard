@@ -252,15 +252,23 @@ export default defineEventHandler(async (event) => {
             pending = await PendingPayment.findOne({ _id: pendingId });
           }
         } else if (providerStatus === "FAILED") {
+          const resultCode =
+            transaction.result_code ??
+            transaction.resultCode ??
+            transaction.error_code ??
+            transaction.errorCode ??
+            (transaction.message?.includes("cancel") ? 1032 : undefined) ??
+            -1;
           pending = await PendingPayment.findOneAndUpdate(
             { _id: pending._id, status: "pending" },
             {
               $set: {
                 status: "failed",
-                resultCode: -1,
+                resultCode: resultCode,
                 resultDesc:
                   transaction.message ||
                   transaction.result_description ||
+                  transaction.error_message ||
                   "PayHero payment failed.",
                 verifiedAt: new Date(),
               },
@@ -302,7 +310,7 @@ export default defineEventHandler(async (event) => {
 
     let message = "Payment not successful. Please try again.";
     if (cancelled) {
-      message = "Payment was cancelled. Please try again.";
+      message = "STK has been cancelled";
     } else if (insufficient) {
       message =
         "Payment not successful. You do not have enough M-Pesa balance to complete this payment. Top up and try again.";
@@ -390,13 +398,14 @@ export default defineEventHandler(async (event) => {
   // A queued or pending request is not a completed payment.
   // Only the PayHero callback can mark the payment as confirmed.
   if (!["confirmed", "claimed"].includes(pending.status)) {
-    if (pending.status === "pending") {
-      throw createError({
-        statusCode: 409,
-        statusMessage:
-          "Payment is still being processed. Please wait and try again.",
-      });
-    }
+  if (pending.status === "pending") {
+    throw createError({
+      statusCode: 409,
+      statusMessage:
+        "Payment is still being processed. Please wait and try again.",
+      data: { final: true },
+    });
+  }
 
     if (pending.status === "failed") {
       throw createError({

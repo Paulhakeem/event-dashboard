@@ -26,12 +26,14 @@ export default function useEventBooking() {
     if (!id.value) return;
     try {
       loading.value = true;
+      error.value = null;
 
       const res = await $fetch(`${config.public.bookingEvent}/${id.value}`);
 
       event.value = res.eventData;
     } catch (err) {
-      error.value = err?.message || "Failed to load event";
+      error.value = err?.data?.statusMessage || err?.message || "Failed to load event";
+      // If it's a 404, keep error but ensure we can detect it
     } finally {
       loading.value = false;
     }
@@ -90,11 +92,13 @@ export default function useEventBooking() {
         paymentStatus.value = "success";
         return;
       } catch (err) {
-        if (err?.data?.final === true) {
+        const msg = String(err?.data?.statusMessage || err?.statusMessage || err?.message || "").toLowerCase();
+        if (err?.data?.final === true || msg.includes("cancel")) {
           paymentStatus.value = "failed";
           error.value =
             err?.data?.statusMessage ||
-            "Payment not successful. Please try again.";
+            err?.statusMessage ||
+            "STK has been cancelled";
           return;
         }
 
@@ -105,9 +109,8 @@ export default function useEventBooking() {
       }
     }
 
-    paymentStatus.value = "pending";
-    error.value =
-      "Payment confirmation is taking longer than expected. Do not pay again; check this payment's status again shortly.";
+    paymentStatus.value = "failed";
+    error.value = "STK has been cancelled";
   };
 
   const bookAndPay = async (phone, tickets = [], contact = {}) => {
@@ -210,7 +213,7 @@ export default function useEventBooking() {
       await checkPaymentStatus();
     } catch (err) {
       paymentStatus.value = "failed";
-      error.value = err?.data?.statusMessage || "Payment initiation failed";
+      error.value = err?.data?.statusMessage || err?.statusMessage || "Payment initiation failed";
     }
   };
 

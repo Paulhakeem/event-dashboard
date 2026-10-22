@@ -2,6 +2,53 @@
   <div
     class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-zinc-950 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950"
   >
+    <!-- LOADING SKELETON -->
+    <div v-if="loading && !event?._id">
+      <div class="bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
+        <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
+          <div class="h-6 w-32 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse mb-4"></div>
+          <div class="h-10 w-3/4 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse mb-2"></div>
+          <div class="h-5 w-1/2 bg-gray-200 dark:bg-neutral-800 rounded animate-pulse"></div>
+        </div>
+      </div>
+      <div class="max-w-6xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="lg:col-span-2 space-y-6">
+            <div class="w-full h-96 bg-gray-200 dark:bg-neutral-800 rounded-2xl animate-pulse"></div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div v-for="i in 4" :key="i" class="h-16 bg-gray-200 dark:bg-neutral-800 rounded-lg animate-pulse"></div>
+            </div>
+            <div class="h-48 bg-gray-200 dark:bg-neutral-800 rounded-2xl animate-pulse"></div>
+          </div>
+          <div class="lg:col-span-1">
+            <div class="h-[600px] bg-gray-200 dark:bg-neutral-800 rounded-2xl animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 404 / ERROR -->
+    <div v-else-if="!event?._id || (error && !event?._id)" class="min-h-screen flex items-center justify-center px-4">
+      <div class="text-center">
+        <h1 class="text-7xl md:text-9xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
+        <h2 class="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-neutral-200 mb-4">Event Not Found</h2>
+        <p class="text-gray-600 dark:text-neutral-400 mb-8 max-w-md">
+          {{ error || "The event you're looking for doesn't exist or has been removed." }}
+        </p>
+        <NuxtLink
+          to="/eventPage"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-[#13284b] hover:bg-[#0b1730] text-white font-semibold rounded-lg transition"
+        >
+          <Icon name="gg:arrow-left" />
+          Back to Events
+        </NuxtLink>
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:bg-zinc-950 dark:from-zinc-950 dark:via-zinc-950 dark:to-zinc-950"
+    >
     <!-- HEADER -->
     <div class="bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-700">
       <div class="max-w-6xl mx-auto px-4 py-8 lg:py-12">
@@ -469,6 +516,7 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
@@ -479,6 +527,7 @@ const route = useRoute();
 
 const {
   event,
+  loading,
   paymentStatus,
   error,
   successMessage,
