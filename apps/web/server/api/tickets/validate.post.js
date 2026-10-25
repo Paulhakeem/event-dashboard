@@ -1,7 +1,14 @@
 import connectDB from "../../utils/mongoose.js";
 import { Ticket } from "../../models/Ticket.js";
-import { Event } from "../../models/Events.js";
+import { Event, getEventStartEnd } from "../../models/Events.js";
 import { requireAuth } from "../../utils/requireAuth.js";
+
+const extractTicketCode = (value) => {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  const match = /TKT-[A-Z0-9]+/i.exec(text);
+  return match ? match[0].toUpperCase() : text;
+};
 
 export default defineEventHandler(async (event) => {
   const scanner = await requireAuth(event);
@@ -11,7 +18,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Staff access required",
     });
   }
-  const { ticketCode } = await readBody(event);
+  const body = await readBody(event);
+  const ticketCode = extractTicketCode(body?.ticketCode);
 
   await connectDB();
 
@@ -27,10 +35,20 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
   }
 
+  if (existingTicket.used || existingTicket.status !== "active") {
+    throw createError({
+      statusCode: 400,
+      statusMessage: existingTicket.used
+        ? "Ticket already used; ticket is inactive"
+        : "Ticket is not active",
+    });
+  }
+
   const ticketEvent = await Event.findById(existingTicket.eventId)
-    .select("date")
+    .select("date startDate endDate startTime endTime")
     .lean();
-  if (!ticketEvent || new Date(ticketEvent.date) < new Date()) {
+  const eventWindow = getEventStartEnd(ticketEvent || {});
+  if (!eventWindow || eventWindow.end < new Date()) {
     await Ticket.updateOne(
       { _id: existingTicket._id, status: "active" },
       { $set: { status: "inactive" } },
@@ -48,20 +66,9 @@ export default defineEventHandler(async (event) => {
   ).populate("userId", "firstName lastName");
 
   if (!ticket) {
-    const currentTicket = await Ticket.findById(existingTicket._id);
-    if (currentTicket?.used) {
-      await Ticket.updateOne(
-        { _id: existingTicket._id, status: "active" },
-        { $set: { status: "inactive" } },
-      );
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Ticket already used; ticket is inactive",
-      });
-    }
     throw createError({
       statusCode: 400,
-      statusMessage: "Ticket is not active",
+      statusMessage: "Ticket already used; ticket is inactive",
     });
   }
 

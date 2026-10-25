@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import connectDB from "~~/server/utils/mongoose.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
-import { Event } from "~~/server/models/Events.js";
+import { Event, getEventStartEnd } from "~~/server/models/Events.js";
 import { Ticket } from "~~/server/models/Ticket.js";
 
 export default defineEventHandler(async (event) => {
@@ -52,9 +52,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const eventDetails = await Event.findById(ticket.eventId)
-    .select("date")
+    .select("date startDate endDate startTime endTime")
     .lean();
-  if (!eventDetails || new Date(eventDetails.date) < new Date()) {
+  const eventWindow = getEventStartEnd(eventDetails || {});
+  if (!eventWindow || eventWindow.end < new Date()) {
     ticket.status = "inactive";
     await ticket.save();
     throw createError({

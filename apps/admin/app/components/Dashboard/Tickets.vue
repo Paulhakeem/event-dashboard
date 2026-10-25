@@ -557,13 +557,7 @@ function formatAmount(value) {
 
 function ticketStatus(ticket) {
   if (ticket.used) return "inactive";
-  if (
-    selectedEvent.value?.eventExpired ||
-    (selectedEvent.value?.eventDate &&
-      new Date(selectedEvent.value.eventDate) < new Date())
-  ) {
-    return "inactive";
-  }
+  if (selectedEvent.value?.eventExpired) return "inactive";
   return ticket.status || "unknown";
 }
 

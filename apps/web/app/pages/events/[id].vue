@@ -183,10 +183,14 @@
 
             <!-- COUNTDOWN -->
             <div v-if="event?.date" class="mb-6">
-              <p class="text-sm text-gray-500 dark:text-neutral-400 mb-2">Time until event starts</p>
+              <p class="text-sm text-gray-500 dark:text-neutral-400 mb-2">Event countdown</p>
               <CountdownTimer
                 :date="event.date"
+                :start-time="event.startTime"
+                :end-date="event.endDate"
+                :end-time="event.endTime"
                 expired-label="Event is live"
+                finished-label="Event ended"
               />
             </div>
 

@@ -55,6 +55,27 @@ const parseTime = (value, fallbackHour, fallbackMinute) => {
   return [Number(match[1]), Number(match[2])];
 };
 
+export function getEventStartEnd(item = {}) {
+  const startSource = item.startDate || item.date;
+  const endSource = item.endDate || item.startDate || item.date;
+  if (!startSource || !endSource) return null;
+
+  const start = new Date(startSource);
+  const end = new Date(endSource);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+
+  const [startHour, startMinute] = parseTime(item.startTime, 0, 0);
+  const [endHour, endMinute] = parseTime(item.endTime, 23, 59);
+  start.setHours(startHour, startMinute, 0, 0);
+  end.setHours(endHour, endMinute, 59, 999);
+
+  if (end <= start) {
+    end.setDate(end.getDate() + 1);
+  }
+
+  return { start, end };
+}
+
 export async function syncEventStatuses(model, now = new Date()) {
   const events = await model.aggregate([
     {
@@ -78,22 +99,9 @@ export async function syncEventStatuses(model, now = new Date()) {
 
   const operations = [];
   for (const item of events) {
-    const startSource = item.startDate || item.date;
-    const endSource = item.endDate || item.startDate || item.date;
-    if (!startSource || !endSource) continue;
-
-    const start = new Date(startSource);
-    const end = new Date(endSource);
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) continue;
-
-    const [startHour, startMinute] = parseTime(item.startTime, 0, 0);
-    const [endHour, endMinute] = parseTime(item.endTime, 23, 59);
-    start.setHours(startHour, startMinute, 0, 0);
-    end.setHours(endHour, endMinute, 59, 999);
-
-    if (end <= start) {
-      end.setDate(end.getDate() + 1);
-    }
+    const window = getEventStartEnd(item);
+    if (!window) continue;
+    const { start, end } = window;
 
     let status;
     if (now < start) status = "upcoming";

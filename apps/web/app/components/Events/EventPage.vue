@@ -175,8 +175,12 @@
                 <div class="pt-1">
                   <CountdownTimer
                     :date="event.date"
+                    :start-time="event.startTime"
+                    :end-date="event.endDate"
+                    :end-time="event.endTime"
                     compact
                     expired-label="Started"
+                    finished-label="Finished"
                   />
                 </div>
               </div>

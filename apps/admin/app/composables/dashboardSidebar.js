@@ -5,6 +5,7 @@ import Notifications from "@/components/Dashboard/Notifications.vue";
 import Reports from "@/components/Dashboard/Reports.vue";
 import BookingManagement from "@/components/Dashboard/BookingManagement.vue";
 import Tickets from "@/components/Dashboard/Tickets.vue";
+import Scanner from "@/components/Dashboard/Scanner.vue";
 
 export const dashboardSidebar = () => {
   const sidebarMenu = [
@@ -19,6 +20,11 @@ export const dashboardSidebar = () => {
       name: "Tickets",
       icon: "material-symbols:confirmation-number-outline",
       component: Tickets,
+    },
+    {
+      name: "Scan Tickets",
+      icon: "material-symbols:qr-code-scanner",
+      component: Scanner,
     },
     {
       name: "Notifications",

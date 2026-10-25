@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import connectDB from "~~/server/utils/mongoose.js";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
-import { Event } from "~~/server/models/Events.js";
+import { Event, getEventStartEnd } from "~~/server/models/Events.js";
 import { Ticket } from "~~/server/models/Ticket.js";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 
@@ -27,7 +27,9 @@ export default defineEventHandler(async (event) => {
     }
 
     const [eventDetails, tickets] = await Promise.all([
-      Event.findById(eventId).select("title date location").lean(),
+      Event.findById(eventId)
+        .select("title date startDate endDate startTime endTime location")
+        .lean(),
       Ticket.find({ eventId })
         .populate("userId", "firstName lastName email")
         .sort({ createdAt: -1 })
@@ -37,7 +39,10 @@ export default defineEventHandler(async (event) => {
     return {
       event: eventDetails,
       eventExpired: Boolean(
-        eventDetails?.date && new Date(eventDetails.date) < new Date(),
+        (() => {
+          const window = getEventStartEnd(eventDetails || {});
+          return window && window.end < new Date();
+        })(),
       ),
       tickets: tickets.map((ticket) => {
         const base = ticket.toObject ? ticket.toObject() : ticket;
