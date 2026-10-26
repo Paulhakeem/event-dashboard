@@ -385,6 +385,8 @@ export default defineEventHandler(async (event) => {
           },
         ]
   ).map((line) => {
+    // pending.tickets may contain Mongoose subdocuments; spreading one does
+    // not copy its schema fields, so read the values explicitly.
     const requestedType = String(line.ticketType || "").trim();
     const matchedType = eventTicketTypes.find(
       (ticket) =>
@@ -394,12 +396,13 @@ export default defineEventHandler(async (event) => {
     );
 
     return {
-      ...line,
       ticketType: matchedType
         ? String(
             matchedType.name || matchedType.ticketType || matchedType.type,
           ).trim()
         : requestedType,
+      quantity: Number(line.quantity) || 0,
+      amount: Number(line.amount) || 0,
     };
   });
 
@@ -414,6 +417,17 @@ export default defineEventHandler(async (event) => {
         `${Math.floor(Number(line.quantity) || 0)} × ${line.ticketType}`,
     )
     .join(", ");
+
+  // A confirmed payment must always produce at least one ticket; never save an
+  // empty booking or email a confirmation without passes.
+  if (ticketCount < 1) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        "No tickets were found for this payment. Please contact support.",
+      data: { final: true },
+    });
+  }
 
   /* ── VERIFY PAYHERO PAYMENT CALLBACK ───────────────────────── */
 
@@ -492,9 +506,82 @@ export default defineEventHandler(async (event) => {
   /* ── PREVENT DUPLICATE BOOKINGS ───────────────────────────── */
   const existingBooking = await TotalBooking.findOne({ reference });
   if (existingBooking) {
-    const savedTickets = await Ticket.find({
+    let savedTickets = await Ticket.find({
       bookingId: existingBooking._id,
     }).sort({ createdAt: 1 });
+
+    // Repair bookings that were saved without their tickets (older versions
+    // dropped the ticket line quantities, leaving quantity 0 and no passes).
+    // The conditional update also makes the repair safe against concurrent
+    // verification retries.
+    if (savedTickets.length === 0 && ticketCount > 0) {
+      const repairedBooking = await TotalBooking.findOneAndUpdate(
+        { _id: existingBooking._id, quantity: { $lt: 1 } },
+        {
+          $set: {
+            quantity: ticketCount,
+            ticketType: ticketLines.map((line) => line.ticketType).join(", "),
+          },
+        },
+        { new: true },
+      );
+
+      if (repairedBooking) {
+        for (const line of ticketLines) {
+          const lineCount = Math.floor(Number(line.quantity) || 0);
+          if (lineCount < 1) continue;
+          const unitAmount = Math.round(
+            (Number(line.amount) || 0) / lineCount,
+          );
+
+          for (let i = 0; i < lineCount; i++) {
+            let ticketCode;
+            let created = false;
+
+            for (let retries = 3; retries > 0; retries--) {
+              ticketCode = generateTicketCode();
+              const exists = await Ticket.findOne({ ticketCode });
+              if (!exists) {
+                created = true;
+                break;
+              }
+            }
+
+            if (!created) {
+              throw createError({
+                statusCode: 500,
+                statusMessage: "Failed to generate unique ticket code",
+              });
+            }
+
+            await Ticket.create({
+              ticketCode,
+              eventName: eventData.title,
+              eventId: eventData._id,
+              userEmail: userData.email,
+              userId: userData._id || null,
+              firstName: userData.firstName || "",
+              lastName: userData.lastName || "",
+              bookingId: existingBooking._id,
+              ticketType: line.ticketType,
+              amount: unitAmount,
+            });
+          }
+        }
+      }
+
+      savedTickets = await Ticket.find({
+        bookingId: existingBooking._id,
+      }).sort({ createdAt: 1 });
+
+      if (savedTickets.length > 0) {
+        existingBooking.quantity = ticketCount;
+        existingBooking.ticketType = ticketLines
+          .map((line) => line.ticketType)
+          .join(", ");
+      }
+    }
+
     const emailTickets = [];
 
     for (const ticket of savedTickets) {
@@ -536,7 +623,7 @@ export default defineEventHandler(async (event) => {
       booking: existingBooking,
       eventData,
       userData,
-      ticketCount: existingBooking.quantity,
+      ticketCount,
       ticketSummary,
       expectedAmount: existingBooking.amount,
       transactionId: existingBooking.transactionId || transactionId,
