@@ -140,28 +140,16 @@ export default defineEventHandler(async (event) => {
 
   await newEvent.save();
 
-  // Create an admin notification for this new pending event
   try {
-    const notification = new Notification({
-      title: "New event pending approval",
-      message: `${user.firstName || "An organiser"} ${user.lastName || ""} submitted the event "${title}" for approval."`,
-      recipientRole: "admin",
-      event: newEvent._id,
-      meta: { organiser: user._id },
-    });
-    await notification.save();
-
     return {
       message: "Event created successfully and pending admin approval",
       event: newEvent,
-      notification,
       eventType,
       image: uploadResult.secure_url,
     };
   } catch (err) {
-    // Return success for event creation even if notification fails
     return {
-      message: "Event created but failed to notify admins",
+      message: "Event created but failed",
       event: newEvent,
       error: err?.message || String(err),
       eventType,

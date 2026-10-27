@@ -903,6 +903,7 @@ export default defineEventHandler(async (event) => {
         title: "Booking confirmed",
         message: `Your booking for "${eventData.title}" (${ticketSummary}) was confirmed successfully.`,
         recipientUser: userData._id,
+        recipientRole: "user",
         event: eventData._id,
         meta: { type: "booking_confirmed", quantity: ticketCount },
         read: false,
