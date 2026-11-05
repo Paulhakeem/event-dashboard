@@ -45,6 +45,11 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
 :root {
   color-scheme: light;
   --background: oklch(1 0 0);
@@ -126,6 +131,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 .event-title {
   font-family: "Sacramento", sans-serif;
   letter-spacing: 2px;
