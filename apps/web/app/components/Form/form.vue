@@ -16,7 +16,7 @@
       <p class="text-center mb-4">
         <NuxtLink
           to="/signup"
-          class="text-sm text-[#13284b] underline hover:text-[#0b1730]"
+          class="text-sm text-[#13284b] underline hover:text-[#0b1730] dark:text-amber-300 dark:hover:text-amber-200"
         >
           Don't have an account? Sign up
         </NuxtLink>
@@ -99,7 +99,7 @@
         <button
           type="submit"
           :disabled="isLoading || !recaptchaToken"
-          class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition disabled:opacity-50"
+          class="w-full py-3 mb-10 px-4 flex justify-center items-center text-sm font-semibold rounded-lg bg-[#13284b] text-white hover:bg-[#0b1730] transition disabled:cursor-not-allowed disabled:bg-slate-500 disabled:opacity-100 dark:disabled:bg-neutral-600"
         >
           <Icon
             v-if="isLoading"

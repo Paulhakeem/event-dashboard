@@ -3,10 +3,6 @@
     class="relative min-h-screen overflow-hidden bg-[#f8f7f3] dark:bg-zinc-950 px-4 py-8 text-slate-900 dark:text-white sm:px-6 sm:py-10 lg:px-8 lg:py-14"
   >
     <div
-      class="pointer-events-none absolute -right-28 top-40 h-80 w-80 rounded-full bg-amber-200/40 blur-3xl"
-      aria-hidden="true"
-    />
-    <div
       class="pointer-events-none absolute -left-32 bottom-20 h-96 w-96 rounded-full bg-[#13284b]/10 blur-3xl"
       aria-hidden="true"
     />
@@ -18,10 +14,6 @@
       >
         <div
           class="absolute inset-0 -z-10 bg-linear-to-r from-[#081226]/95 via-[#101d3a]/85 to-[#101d3a]/40"
-          aria-hidden="true"
-        />
-        <div
-          class="absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full border-[32px] border-amber-300/15"
           aria-hidden="true"
         />
         <div
@@ -178,10 +170,6 @@
       <section
         class="relative isolate overflow-hidden rounded-3xl bg-linear-to-r from-[#101d3a] via-[#172b50] to-[#213c35] px-6 py-10 text-white shadow-2xl shadow-slate-900/20 sm:px-10 sm:py-12 sm:rounded-4xl"
       >
-        <div
-          class="absolute -right-16 -top-16 h-56 w-56 rounded-full border-[28px] border-amber-300/15"
-          aria-hidden="true"
-        />
         <div
           class="relative flex flex-col items-center gap-6 text-center md:flex-row md:justify-between md:text-left"
         >
