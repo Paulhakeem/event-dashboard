@@ -5,24 +5,10 @@
   >
     <h2 id="footer-heading" class="sr-only">Footer</h2>
 
-    <!-- Decorative background -->
-    <div
-      class="pointer-events-none absolute -left-32 -top-24 h-80 w-80 rounded-full bg-amber-300/10 blur-3xl"
-      aria-hidden="true"
-    />
-    <div
-      class="pointer-events-none absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-[#13284b]/40 blur-3xl"
-      aria-hidden="true"
-    />
-    <div
-      class="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-300/40 to-transparent"
-      aria-hidden="true"
-    />
-
     <div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
       <!-- Newsletter strip -->
       <div
-        class="mb-10 flex flex-col items-start gap-5 rounded-3xl border border-amber-300/20 bg-white/5 p-5 backdrop-blur-sm sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-8"
+        class="mb-10 flex flex-col items-start gap-5 rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:p-8"
       >
         <div class="max-w-xl">
           <h3 class="text-lg font-bold tracking-tight sm:text-2xl">

@@ -23,6 +23,7 @@ export default defineNuxtRouteMiddleware((to) => {
     "/events",
     "/eventPage",
     "/about",
+    "/contacts",
     "/login",
     "/signup",
     "/verifyEmail",
