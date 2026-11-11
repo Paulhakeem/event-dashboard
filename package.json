@@ -3,12 +3,14 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel --filter @velora/web --filter @velora/admin run dev",
+    "dev": "pnpm --parallel --filter @velora/web --filter @velora/admin --filter @velora/organiser run dev",
     "dev:web": "pnpm --filter @velora/web run dev",
     "dev:admin": "pnpm --filter @velora/admin run dev",
-    "build": "pnpm --filter @velora/web build && pnpm --filter @velora/admin build",
+    "dev:organiser": "pnpm --filter @velora/organiser run dev",
+    "build": "pnpm --filter @velora/web build && pnpm --filter @velora/admin build && pnpm --filter @velora/organiser build",
     "build:web": "pnpm --filter @velora/web run build",
-    "build:admin": "pnpm --filter @velora/admin run build"
+    "build:admin": "pnpm --filter @velora/admin run build",
+    "build:organiser": "pnpm --filter @velora/organiser run build"
   },
   "packageManager": "pnpm@11.24.0+sha512.bd27e345e976dcb0be0b7a1228217b049a817e21b1f355c90dbe7dc46671895a8bc1e6d06c24554505ea93ea0b45f489a27ec1bfbc8de6a9659fca0f16fa0000"
 }

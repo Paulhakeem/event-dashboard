@@ -95,13 +95,22 @@ const onGoogleSuccess = async (e) => {
 
     setAuth(data);
 
-    const destination =
-      data.user.role === "admin"
-        ? `/admin/${data.user.id}`
-        : data.user.role === "organiser"
-          ? `/organiser/${data.user.id}`
-          : `/user/${data.user.id}`;
-    await navigateTo(destination);
+    const organiserAppUrl =
+      config.public.organiserAppUrl || "http://localhost:3007";
+
+    if (data.user.role === "admin") {
+      await navigateTo(`/admin/${data.user.id}`);
+      return;
+    }
+
+    if (data.user.role === "organiser") {
+      await navigateTo(`${organiserAppUrl}/organiser/${data.user.id}`, {
+        external: true,
+      });
+      return;
+    }
+
+    await navigateTo(`/user/${data.user.id}`);
   } catch (error) {
     errorMessage.value =
       error?.data?.statusMessage ||

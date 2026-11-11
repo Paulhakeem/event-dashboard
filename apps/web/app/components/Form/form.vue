@@ -123,6 +123,9 @@ const mfaRequired = ref(false);
 const errorMessage = ref("");
 const isLoading = ref(false);
 const { setAuth } = useAuth();
+const config = useRuntimeConfig();
+const organiserAppUrl =
+  config.public.organiserAppUrl || "http://localhost:3007";
 const login = async () => {
   errorMessage.value = "";
   isLoading.value = true;
@@ -145,11 +148,14 @@ const login = async () => {
       return;
     }
 
-    const destination =
-      data.user.role === "organiser"
-        ? `/organiser/${data.user.id}`
-        : `/user/${data.user.id}`;
-    await navigateTo(destination);
+    if (data.user.role === "organiser") {
+      await navigateTo(`${organiserAppUrl}/organiser/${data.user.id}`, {
+        external: true,
+      });
+      return;
+    }
+
+    await navigateTo(`/user/${data.user.id}`);
   } catch (error) {
     if (error?.data?.statusCode === 403 && error?.data?.statusMessage?.includes("Two-factor")) {
       mfaRequired.value = true;

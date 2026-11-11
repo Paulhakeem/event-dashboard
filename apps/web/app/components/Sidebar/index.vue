@@ -182,11 +182,14 @@ import logo from "~/assets/logo/happitwin.png";
 const { menu, openMenu, toggleMenu } = Header();
 
 const { user, logout } = useAuth();
+const config = useRuntimeConfig();
+const organiserAppUrl =
+  config.public.organiserAppUrl || "http://localhost:3007";
 const dashboardPath = computed(() =>
   user.value?.role === "admin"
     ? "/admin/dashboard"
     : user.value?.role === "organiser"
-      ? `/organiser/${user.value.id}`
+      ? `${organiserAppUrl}/organiser/${user.value.id}`
       : `/user/${user.value?.id}`,
 );
 </script>

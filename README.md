@@ -1,20 +1,21 @@
 # Happitwin events — Monorepo
 
-Digital online events booking platform. Discover, book, and manage events with separate **web** and **admin** applications sharing a common package.
+Digital online events booking platform. Discover, book, and manage events with separate **web**, **admin**, and **organiser** applications sharing a common package.
 
 ## Structure
 
 ```
 ├── apps/
-│   ├── web/      # Public website — @velora/web (Nuxt)
-│   └── admin/    # Admin dashboard — @velora/admin (Nuxt)
+│   ├── web/        # Public website — @velora/web (Nuxt)
+│   ├── admin/      # Admin dashboard — @velora/admin (Nuxt)
+│   └── organiser/  # Organiser dashboard — @velora/organiser (Nuxt)
 ├── packages/
 │   └── shared/   # Shared composables & components — @velora/shared
-├── ecosystem.config.cjs  # PM2 production config (web app)
+├── ecosystem.config.cjs  # PM2 production config (web, admin & organiser apps)
 └── pnpm-workspace.yaml
 ```
 
-Each app is a self-contained Nuxt application with its own `app/` (pages, components, composables), `server/` (API routes, models, utils), and `public/`. The backend (MongoDB, authentication, payments, notifications) is deployed with the web app.
+Each app is a self-contained Nuxt application with its own `app/` (pages, components, composables), `server/` (API routes, models, utils), and `public/`. The backend (MongoDB, authentication, payments, notifications) is deployed with the web app. The organiser app has its own authentication, organiser dashboard, and organiser API routes.
 
 ## Requirements
 
@@ -27,7 +28,7 @@ Each app is a self-contained Nuxt application with its own `app/` (pages, compon
 pnpm install
 ```
 
-Create a `.env` file inside `apps/web/` (and `apps/admin/`) with the environment variables referenced in each app's `nuxt.config.ts`. See the root `.gitignore` — env files are not committed.
+Create a `.env` file inside `apps/web/`, `apps/admin/`, and `apps/organiser/` with the environment variables referenced in each app's `nuxt.config.ts`. See each app's `.env.example` where provided. The root `.gitignore` excludes env files from version control.
 
 ## PayHero payments
 
@@ -35,7 +36,7 @@ Set `PAYHERO_USERNAME`, `PAYHERO_PASSWORD`, and `PAYHERO_CHANNEL_ID` in the `app
 
 ## Development
 
-Run both apps in parallel:
+Run all apps in parallel:
 
 ```bash
 pnpm dev
@@ -44,16 +45,18 @@ pnpm dev
 Run a single app:
 
 ```bash
-pnpm dev:web     # public website  → http://localhost:3000
-pnpm dev:admin   # admin dashboard → http://localhost:3001
+pnpm dev:web        # public website      → http://localhost:3000
+pnpm dev:admin      # admin dashboard     → http://localhost:3001
+pnpm dev:organiser  # organiser dashboard → http://localhost:3007
 ```
 
 ## Build
 
 ```bash
-pnpm build            # build both apps
+pnpm build            # build all apps
 pnpm build:web        # build the public website
 pnpm build:admin      # build the admin dashboard
+pnpm build:organiser  # build the organiser dashboard
 ```
 
 ## Production (PM2)
