@@ -21,14 +21,15 @@
           class="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mx-auto mb-6"
         >
           <Icon
-            name="material-symbols:admin-panel-settings"
+            name="material-symbols:event-note"
             class="text-3xl text-white"
           />
         </div>
-        <h1 class="text-2xl font-bold mb-3 leading-tight">Create New Admin</h1>
+        <h1 class="text-2xl font-bold mb-3 leading-tight">
+          Create New Organiser
+        </h1>
         <p class="text-sm text-white/60 leading-relaxed max-w-xs mx-auto">
-          Grant administrative access to manage events, users, and platform
-          settings.
+          Grant organiser access to create and manage events on the platform.
         </p>
 
         <!-- Feature list -->
@@ -60,19 +61,21 @@
             class="w-12 h-12 rounded-xl bg-[#9c4e8b]/10 flex items-center justify-center mx-auto mb-3"
           >
             <Icon
-              name="material-symbols:admin-panel-settings"
+              name="material-symbols:event-note"
               class="text-xl text-[#9c4e8b]"
             />
           </div>
-          <h1 class="text-xl font-bold text-gray-900">Create New Admin</h1>
+          <h1 class="text-xl font-bold text-gray-900">
+            Create New Organiser
+          </h1>
           <p class="text-xs text-gray-400 mt-1">
-            Fill in the details to create an admin account.
+            Fill in the details to create an organiser account.
           </p>
         </div>
 
         <!-- Desktop heading -->
         <div class="hidden md:block mb-8">
-          <h2 class="text-xl font-bold text-gray-900">Admin Details</h2>
+          <h2 class="text-xl font-bold text-gray-900">Organiser Details</h2>
           <p class="text-xs text-gray-400 mt-1">All fields are required.</p>
         </div>
 
@@ -120,7 +123,7 @@
               <input
                 v-model="email"
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="organiser@example.com"
                 class="w-full pl-10 pr-4 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:ring-2 focus:ring-[#9c4e8b]/20 focus:border-[#9c4e8b] outline-none transition-all"
               />
             </div>
@@ -175,7 +178,7 @@
               </div>
             </div>
             <span class="text-xs text-gray-500 leading-relaxed">
-              I confirm this account has admin privileges and accept the
+              I confirm this account has organiser privileges and accept the
               <span
                 class="text-[#9c4e8b] font-medium cursor-pointer hover:underline"
                 >Terms & Conditions</span
@@ -211,10 +214,10 @@
             </svg>
             <Icon
               v-else
-              name="material-symbols:admin-panel-settings"
+              name="material-symbols:event-note"
               class="text-base"
             />
-            {{ isLoading ? "Creating account…" : "Create Admin Account" }}
+            {{ isLoading ? "Creating account…" : "Create Organiser Account" }}
           </button>
         </form>
       </div>
@@ -230,9 +233,9 @@ const showPassword = ref(false);
 const accepted = ref(false);
 
 const features = [
-  "Full platform management access",
-  "Manage events and attendees",
-  "View analytics and reports",
-  "Moderate users and content",
+  "Create and manage events",
+  "Manage attendees and bookings",
+  "View event analytics and reports",
+  "Publish event updates",
 ];
 </script>

@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
 
   const authUser = event.context.user;
 
-  // 🔒 Only admins can create other admins
+  // 🔒 Only admins can create organisers
   if (!authUser || authUser.role !== "admin") {
     throw createError({
       statusCode: 403,
@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // 🚫 Prevent duplicate admins
+  // 🚫 Prevent duplicate accounts
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw createError({
@@ -82,13 +82,13 @@ export default defineEventHandler(async (event) => {
     100000 + Math.random() * 900000,
   ).toString();
 
-  // 👤 Create admin
-  const admin = await User.create({
+  // 👤 Create organiser
+  const organiser = await User.create({
     firstName,
     lastName,
     email,
     password: hashedPassword,
-    role: "admin",
+    role: "organiser",
     isEmailVerified: false,
     emailVerificationCode: verificationCode,
     emailVerificationExpires: Date.now() + 10 * 60 * 1000, // 10 mins
@@ -120,14 +120,14 @@ export default defineEventHandler(async (event) => {
   /* ---------- RESPONSE (NO TOKEN YET) ---------- */
   return {
     success: true,
-    message: "Admin created successfully. Verify their email to continue.",
+    message: "Organiser created successfully. Verify their email to continue.",
     email,
-    admin: {
-      id: admin._id,
-      firstName: admin.firstName,
-      lastName: admin.lastName,
-      email: admin.email,
-      role: admin.role,
+    organiser: {
+      id: organiser._id,
+      firstName: organiser.firstName,
+      lastName: organiser.lastName,
+      email: organiser.email,
+      role: organiser.role,
     },
   };
 });

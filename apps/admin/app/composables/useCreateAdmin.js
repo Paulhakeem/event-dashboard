@@ -24,7 +24,7 @@ export default function useCreateAdmin() {
     }
   });
 
-  // create admin
+  // create organiser
   const createAdmin = async () => {
     errorMessage.value = "";
     isLoading.value = true;
@@ -62,7 +62,7 @@ export default function useCreateAdmin() {
       isLoading.value = false;
     } catch (error) {
       errorMessage.value =
-        error?.data?.statusMessage || "Failed to create admin.";
+        error?.data?.statusMessage || "Failed to create organiser.";
       isLoading.value = false;
     }
   };

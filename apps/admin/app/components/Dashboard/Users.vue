@@ -1,5 +1,5 @@
 <template>
-  <!-- Create admin modal -->
+  <!-- Create organiser modal -->
   <admin-create-modal
     :show="showModal"
     @close="showModal = false"
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <!-- Right: reset + add admin -->
+      <!-- Right: reset + add organiser -->
       <div class="flex items-center gap-2 flex-wrap lg:justify-end">
         <button
           v-if="selectedUsers.length"
@@ -78,7 +78,7 @@
           class="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl bg-[#9c4e8b] text-white hover:bg-[#7c3a6d] transition-colors shadow-sm"
         >
           <Icon name="tdesign:add" class="text-sm" />
-          Add Admin
+          Add Organiser
         </button>
       </div>
     </div>
