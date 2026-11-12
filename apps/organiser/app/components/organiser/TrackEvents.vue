@@ -118,12 +118,12 @@
                   >
                     Edit
                   </button>
-                  <NuxtLink
-                    :to="`/events/${event._id}`"
-                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700 transition"
+                  <button
+                    @click="removeEvent(event._id)"
+                    class="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-950/60 transition"
                   >
-                    View
-                  </NuxtLink>
+                    Delete
+                  </button>
                 </div>
               </td>
             </tr>
@@ -155,6 +155,12 @@
 
 <script setup>
 const { events, loading, error, formatDate } = organiserEvents();
-const { editingEvent, editForm, openEdit, closeEdit, submitUpdate } =
-  updateEvent(events);
+const {
+  editingEvent,
+  editForm,
+  openEdit,
+  closeEdit,
+  submitUpdate,
+  removeEvent,
+} = updateEvent(events);
 </script>

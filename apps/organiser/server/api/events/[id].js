@@ -60,8 +60,13 @@ export default defineEventHandler(async (event) => {
         "title",
         "description",
         "date",
+        "startDate",
+        "endDate",
+        "startTime",
+        "endTime",
         "location",
         "TicketQuantity",
+        "maxTicketsPerUser",
         "customTickets",
         "status",
         "eventType",
@@ -87,6 +92,58 @@ export default defineEventHandler(async (event) => {
         String(currentEvent.createdBy) !== String(authUser.id)
       ) {
         throw createError({ statusCode: 403, statusMessage: "Access denied" });
+      }
+
+      const hasScheduleEdit = [
+        "startDate",
+        "endDate",
+        "startTime",
+        "endTime",
+      ].some((key) =>
+        Object.prototype.hasOwnProperty.call(update, key),
+      );
+      if (hasScheduleEdit) {
+        const startRaw =
+          "startDate" in update ? update.startDate : currentEvent.startDate;
+        const endRaw =
+          "endDate" in update ? update.endDate : currentEvent.endDate;
+        const startDate = startRaw ? new Date(startRaw) : null;
+        const endDate = endRaw ? new Date(endRaw) : null;
+
+        if (
+          (startDate && Number.isNaN(startDate.getTime())) ||
+          (endDate && Number.isNaN(endDate.getTime()))
+        ) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: "Invalid event date",
+          });
+        }
+        if (startDate && endDate && endDate < startDate) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: "End date cannot be before the start date",
+          });
+        }
+
+        if ("startDate" in update) update.startDate = startDate;
+        if ("endDate" in update) update.endDate = endDate;
+        if ("startTime" in update) {
+          update.startTime = String(update.startTime || "").trim();
+        }
+        if ("endTime" in update) {
+          update.endTime = String(update.endTime || "").trim();
+        }
+        if (startDate || endDate) update.date = startDate || endDate;
+      }
+
+      if ("maxTicketsPerUser" in update) {
+        const raw = update.maxTicketsPerUser;
+        const parsed = Number(raw);
+        update.maxTicketsPerUser =
+          raw == null || raw === "" || !Number.isFinite(parsed) || parsed <= 0
+            ? null
+            : Math.floor(parsed);
       }
 
       // Preserve availableQuantity when tickets are edited so stock is

@@ -1,9 +1,11 @@
 import { ref } from "vue";
 import { useRuntimeConfig } from "#imports";
 import { $fetch } from "ofetch";
+import { useAuth } from "./useAuth.js";
 
 export default function updateEvent(eventsRef = null) {
   const config = useRuntimeConfig()
+  const { token } = useAuth();
   const editingEvent = ref(false);
   const events = eventsRef || ref([]);
   const editForm = ref({
@@ -11,22 +13,44 @@ export default function updateEvent(eventsRef = null) {
     title: "",
     description: "",
     date: "",
+    startDate: "",
+    endDate: "",
+    startTime: "",
+    endTime: "",
     location: "",
     TicketQuantity: 0,
+    maxTicketsPerUser: null,
     customTickets: [],
+    freeEntry: false,
     status: "upcoming",
     eventType: "other",
   });
 
+  const toDateInput = (value) => {
+    if (!value) return "";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return "";
+    return parsed.toISOString().slice(0, 10);
+  };
+
   const removeEvent = async (id) => {
-     if (!confirm("Are you sure you want to delete this event?")) return;
-    const res = await $fetch(`${config.public.deleteEvent}/${id}`, {
-      method: "DELETE",
-    });
-    if (res && res.success) {
-      events.value = events.value.filter((e) => e._id !== id);
-    } else {
-      window.alert(res.statusMessage || "Delete failed");
+    if (!confirm("Are you sure you want to delete this event?")) return;
+    try {
+      const res = await $fetch(`${config.public.deleteEvent}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+        },
+      });
+      if (res && res.success) {
+        events.value = events.value.filter((e) => e._id !== id);
+      } else {
+        window.alert(res?.statusMessage || "Delete failed");
+      }
+    } catch (err) {
+      window.alert(
+        err?.data?.statusMessage || err?.message || "Unable to delete event",
+      );
     }
   };
 
@@ -44,9 +68,14 @@ export default function updateEvent(eventsRef = null) {
       image: ev.image || "",
       title: ev.title || "",
       description: ev.description || "",
-      date: ev.date ? new Date(ev.date).toISOString().slice(0, 10) : "",
+      date: toDateInput(ev.date),
+      startDate: toDateInput(ev.startDate),
+      endDate: toDateInput(ev.endDate),
+      startTime: ev.startTime || "",
+      endTime: ev.endTime || "",
       location: ev.location || "",
       TicketQuantity: ev.TicketQuantity || 0,
+      maxTicketsPerUser: ev.maxTicketsPerUser ?? null,
       customTickets: ev.customTickets
         ? ev.customTickets.map((t) => ({
             name: t.name,
@@ -55,6 +84,7 @@ export default function updateEvent(eventsRef = null) {
             availableQuantity: t.availableQuantity ?? t.quantity ?? 0,
           }))
         : [],
+      freeEntry: Boolean(ev.freeEntry),
       status: ev.status || "upcoming",
       eventType: ev.eventType || "other",
     };
@@ -65,6 +95,14 @@ export default function updateEvent(eventsRef = null) {
   };
 
   const submitUpdate = async () => {
+    if (
+      editForm.value.startDate &&
+      editForm.value.endDate &&
+      editForm.value.endDate < editForm.value.startDate
+    ) {
+      window.alert("End date cannot be before the start date");
+      return;
+    }
     try {
       const res = await $fetch(`${config.public.updateEvent}/${editingEvent.value}`, {
         method: "PATCH",
