@@ -1,26 +1,29 @@
 <template>
   <div class="w-full flex justify-center px-4 py-6">
-    <!-- Glow Border -->
     <div
-      class="relative w-full max-w-2xl rounded-3xl p-[1px] bg-gradient-to-br from-pink-500 via-amber-500 to-indigo-500 shadow-2xl"
+      class="relative w-full max-w-2xl rounded-3xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-xl"
     >
-      <!-- Card -->
       <div
-        class="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl rounded-3xl p-8 flex flex-col items-center text-center"
+        class="rounded-3xl p-8 flex flex-col items-center text-center"
       >
         <!-- Profile -->
-        <div class="relative group">
-          <div
-            class="absolute inset-0 rounded-full bg-gradient-to-tr from-pink-500 to-indigo-500 blur-xl opacity-70 group-hover:opacity-100 transition"
-          ></div>
-
+        <div class="relative">
           <img
-            src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&w=300&q=80"
-            class="relative w-28 h-28 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-xl"
+            v-if="user?.profileImage"
+            :src="user.profileImage"
+            :alt="`${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Profile picture'"
+            class="relative w-28 h-28 rounded-full object-cover border-4 border-gray-100 dark:border-neutral-800"
           />
+          <div
+            v-else
+            class="flex w-28 h-28 items-center justify-center rounded-full border-4 border-gray-100 dark:border-neutral-800 bg-gray-100 dark:bg-neutral-800 text-2xl font-semibold text-gray-600 dark:text-neutral-300"
+            aria-label="Profile initials"
+          >
+            {{ initials }}
+          </div>
 
           <span
-            class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
+            class="absolute bottom-2 right-2 w-4 h-4 bg-green-500 border-2 border-white dark:border-neutral-900 rounded-full"
           ></span>
         </div>
 
@@ -37,7 +40,7 @@
 
         <!-- Role -->
         <span
-          class="mt-3 px-4 py-1 text-xs rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-md"
+          class="mt-3 px-4 py-1 text-xs rounded-full bg-gray-100 dark:bg-neutral-800 text-gray-700 dark:text-neutral-300"
         >
           {{ user.role }}
         </span>
@@ -110,7 +113,7 @@
         <div class="flex gap-3 mt-8 w-full">
           <button
             @click="toggle"
-            class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-600 to-amber-500 text-white text-sm font-semibold shadow-lg hover:scale-[1.03] hover:shadow-xl transition"
+            class="flex-1 py-3 rounded-xl bg-[#13284b] text-white text-sm font-semibold shadow-sm hover:bg-[#0b1730] transition"
           >
             Edit Profile
           </button>
@@ -132,6 +135,11 @@ const { user, logout, token } = useAuth();
 const { events } = organiserEvents();
 const { pendingEvents } = usePendingEvent();
 const cancelledEvents = ref([]);
+const initials = computed(() => {
+  const first = user.value?.firstName?.[0] || "";
+  const last = user.value?.lastName?.[0] || "";
+  return `${first}${last}`.toUpperCase() || "U";
+});
 
 // total income
 const config = useRuntimeConfig();
