@@ -1,8 +1,7 @@
 import connectDB from "~~/server/utils/mongoose";
 import { requireAuth } from "~~/server/utils/requireAuth.js";
 import { Ticket } from "~~/server/models/Ticket.js";
-import { TotalBooking } from "~~/server/models/totalBooking.js";
-import mongoose from "mongoose";
+import { Event } from "~~/server/models/Events.js";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 
 export default defineEventHandler(async (event) => {
@@ -24,13 +23,13 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event).catch(() => ({}));
     const query = getQuery(event);
-    const { eventName, ticketType, used } = { ...query, ...body };
+    const { eventId, eventName, ticketType, used } = { ...query, ...body };
+    const events = await Event.find({ createdBy: user.id })
+      .select("_id title")
+      .lean();
+    const eventIds = events.map((item) => item._id);
 
-    const eventTitles = await TotalBooking.distinct("eventName", {
-      organiserId: new mongoose.Types.ObjectId(user.id),
-    });
-
-    if (!eventTitles.length) {
+    if (!eventIds.length) {
       return {
         success: true,
         tickets: [],
@@ -39,16 +38,30 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    const filter = { eventName: { $in: eventTitles } };
+    const filter = { eventId: { $in: eventIds } };
 
-    if (eventName) {
-      if (!eventTitles.includes(eventName)) {
+    if (eventId) {
+      const ownedEvent = events.find(
+        (item) => String(item._id) === String(eventId),
+      );
+      if (!ownedEvent) {
         throw createError({
           statusCode: 403,
           statusMessage: "You do not have access to tickets for this event.",
         });
       }
-      filter.eventName = eventName;
+      filter.eventId = ownedEvent._id;
+    } else if (eventName) {
+      const ownedTitles = events
+        .filter((item) => item.title === eventName)
+        .map((item) => item.title);
+      if (!ownedTitles.length) {
+        throw createError({
+          statusCode: 403,
+          statusMessage: "You do not have access to tickets for this event.",
+        });
+      }
+      filter.eventName = { $in: ownedTitles };
     }
 
     if (ticketType) {

@@ -3,6 +3,8 @@ export default function useOrganiserSidebar() {
     { title: "Dashboard", icon: "material-symbols:dashboard-rounded", component: "OrganiserDashboard" },
     { title: "Create Events", icon: "mdi:event-add", component: "OrganiserCreateEvents" },
     { title: "Track Events", icon: "carbon:event", component: "OrganiserTrackEvents" },
+    { title: "Tickets", icon: "material-symbols:confirmation-number-outline", component: "OrganiserTickets" },
+    { title: "Scan Tickets", icon: "material-symbols:qr-code-scanner", component: "OrganiserTicketScanner" },
     { title: "Notifications", icon: "tdesign:notification-filled", component: "OrganiserNotifications" },
     { title: "Insights", icon: "gg:insights", component: "OrganiserInsights" },
   ]);

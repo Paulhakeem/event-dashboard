@@ -189,6 +189,8 @@ import ProfileInfo from "~/components/Profile/profileInfo.vue";
 import OrganiserDashboard from "~/components/organiser/Dashboard.vue";
 import OrganiserCreateEvents from "~/components/organiser/CreateEvents.vue";
 import OrganiserTrackEvents from "~/components/organiser/TrackEvents.vue";
+import OrganiserTickets from "~/components/organiser/Tickets.vue";
+import OrganiserTicketScanner from "~/components/organiser/TicketScanner.vue";
 import OrganiserNotifications from "~/components/organiser/Notifications.vue";
 import OrganiserInsights from "~/components/organiser/Insights.vue";
 const { notifications } = orgNotifications();
@@ -197,6 +199,8 @@ const componentsMap = {
   OrganiserDashboard,
   OrganiserCreateEvents,
   OrganiserTrackEvents,
+  OrganiserTickets,
+  OrganiserTicketScanner,
   OrganiserNotifications,
   OrganiserInsights,
 };
