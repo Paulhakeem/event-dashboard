@@ -25,8 +25,8 @@
           <p class="mt-1 text-sm text-gray-500">
             {{
               selectedEvent
-                ? "All ticket holders and ticket details for this event."
-                : "Select an event to view its tickets and amounts."
+                ? "Ticket holders, check-ins, and collected revenue for this event."
+                : "Review ticket activity and collected revenue across events."
             }}
           </p>
           <p
@@ -34,6 +34,12 @@
             class="mt-2 font-mono text-[11px] text-gray-400"
           >
             Event ID: {{ selectedEvent.eventId }}
+          </p>
+          <p v-if="selectedEvent?.organiserName" class="mt-1 text-xs text-gray-500">
+            Organiser: {{ selectedEvent.organiserName }}
+            <span v-if="selectedEvent.organiserEmail" class="text-gray-400">
+              · {{ selectedEvent.organiserEmail }}
+            </span>
           </p>
         </div>
       </div>
@@ -132,6 +138,9 @@
                 <p class="mt-1 truncate text-xs text-gray-500">
                   {{ eventItem.location || "Location not available" }}
                 </p>
+                <p class="mt-1 truncate text-xs text-gray-400">
+                  Organiser: {{ eventItem.organiserName }}
+                </p>
               </div>
             </div>
             <Icon
@@ -155,7 +164,7 @@
               <p class="text-sm font-semibold text-gray-700">
                 {{ formatAmount(eventItem.totalAmount) }}
               </p>
-              <p class="mt-1 text-xs text-gray-400">Total amount</p>
+              <p class="mt-1 text-xs text-gray-400">Revenue collected</p>
               <p class="mt-1 text-xs text-gray-400">
                 {{ formatDate(eventItem.eventDate) }}
               </p>
@@ -205,7 +214,7 @@
 
     <template v-else>
       <div
-        class="grid grid-cols-2 gap-3 sm:grid-cols-4"
+        class="grid grid-cols-2 gap-3 sm:grid-cols-5"
         aria-label="Event ticket summary"
       >
         <div
@@ -443,7 +452,9 @@ const filteredEvents = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
   if (!query) return events.value;
   return events.value.filter((item) =>
-    item.eventName.toLowerCase().includes(query),
+    [item.eventName, item.organiserName, item.organiserEmail]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(query)),
   );
 });
 
@@ -462,6 +473,10 @@ const ticketSummary = computed(() => [
   {
     label: "Used",
     value: tickets.value.filter((ticket) => ticket.used).length,
+  },
+  {
+    label: "Revenue collected",
+    value: formatAmount(selectedEvent.value?.totalAmount),
   },
 ]);
 

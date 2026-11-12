@@ -4,6 +4,7 @@ import { requireAuth } from "~~/server/utils/requireAuth.js";
 import { Event, getEventStartEnd } from "~~/server/models/Events.js";
 import { Ticket } from "~~/server/models/Ticket.js";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
+import { getEventTicketMetrics } from "~~/server/utils/getEventTicketMetrics.js";
 
 export default defineEventHandler(async (event) => {
   await connectDB();
@@ -28,13 +29,18 @@ export default defineEventHandler(async (event) => {
 
     const [eventDetails, tickets] = await Promise.all([
       Event.findById(eventId)
-        .select("title date startDate endDate startTime endTime location")
+        .select("title date startDate endDate startTime endTime location createdBy")
+        .populate("createdBy", "firstName lastName email")
         .lean(),
       Ticket.find({ eventId })
         .populate("userId", "firstName lastName email")
         .sort({ createdAt: -1 })
         .lean(),
     ]);
+
+    if (!eventDetails) {
+      throw createError({ statusCode: 404, statusMessage: "Event not found" });
+    }
 
     return {
       event: eventDetails,
@@ -70,57 +76,34 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  const groupedTickets = await Ticket.aggregate([
-    {
-      $group: {
-        _id: "$eventId",
-        eventName: { $first: "$eventName" },
-        totalTickets: { $sum: 1 },
-        totalAmount: { $sum: "$amount" },
-        activeTickets: {
-          $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
-        },
-
-        inactiveTickets: {
-          $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
-        },
-        usedTickets: {
-          $sum: { $cond: ["$used", 1, 0] },
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        eventId: "$_id",
-        eventName: 1,
-        totalTickets: 1,
-        totalAmount: 1,
-        activeTickets: 1,
-
-        inactiveTickets: 1,
-        usedTickets: 1,
-      },
-    },
-    { $sort: { totalTickets: -1, eventName: 1 } },
-  ]);
-
-  const eventIds = groupedTickets.map((item) => item.eventId);
-  const eventDetails = await Event.find({ _id: { $in: eventIds } })
-    .select("title date location")
+  const eventDetails = await Event.find()
+    .select("title date startDate location createdBy")
+    .populate("createdBy", "firstName lastName email")
+    .sort({ date: 1 })
     .lean();
-  const eventsById = new Map(
-    eventDetails.map((item) => [String(item._id), item]),
+  const summaryByEvent = await getEventTicketMetrics(
+    eventDetails.map((item) => item._id),
   );
 
   return {
-    events: groupedTickets.map((item) => {
-      const details = eventsById.get(String(item.eventId));
+    events: eventDetails.map((details) => {
+      const item = summaryByEvent.get(String(details._id));
+      const organiser = details.createdBy || {};
       return {
-        ...item,
-        eventName: details?.title || item.eventName,
-        eventDate: details?.date || null,
-        location: details?.location || "",
+        eventId: String(details._id),
+        eventName: details.title,
+        eventDate: details.startDate || details.date || null,
+        location: details.location || "",
+        organiserName:
+          `${organiser.firstName || ""} ${organiser.lastName || ""}`.trim() ||
+          organiser.email ||
+          "Unknown organiser",
+        organiserEmail: organiser.email || "",
+        totalTickets: item?.totalTickets || 0,
+        totalAmount: item?.revenueCollected || 0,
+        activeTickets: item?.activeTickets || 0,
+        inactiveTickets: item?.inactiveTickets || 0,
+        usedTickets: item?.usedTickets || 0,
       };
     }),
   };

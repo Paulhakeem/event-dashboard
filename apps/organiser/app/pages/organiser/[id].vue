@@ -63,7 +63,7 @@
             <li v-for="menu in sidebar" :key="menu.title">
               <button
                 @click="selectMenu(menu)"
-                class="flex w-full items-center gap-3 px-3 py-2 rounded-lg transition"
+                class="flex w-full items-center gap-3 px-3 py-2 rounded-lg transition cursor-pointer"
                 :class="
                   activeName === menu.component
                     ? 'bg-neutral-tertiary text-fg-brand'
@@ -110,7 +110,7 @@
           <li v-for="menu in sidebar" :key="menu.title">
             <button
               @click="selectMenu(menu)"
-              class="flex w-full items-center gap-3 px-3 py-2 rounded-lg transition"
+              class="flex w-full items-center gap-3 px-3 py-2 rounded-lg transition cursor-pointer"
               :class="
                 activeName === menu.component
                   ? 'bg-neutral-tertiary text-fg-brand'

@@ -5,6 +5,7 @@ import { TotalBooking } from "~~/server/models/totalBooking";
 import { Notification } from "~~/server/models/Notification";
 import { Ticket } from "~~/server/models/Ticket";
 import { PendingPayment } from "~~/server/models/PendingPayment";
+import { getEventTicketMetrics } from "~~/server/utils/getEventTicketMetrics.js";
 
 const requireAdmin = (event) => {
   const header = getHeader(event, "authorization");
@@ -28,36 +29,22 @@ export default defineEventHandler(async (event) => {
   await connectDB();
 
   if (event.node.req.method === "GET") {
-    const [events, bookings] = await Promise.all([
-      Event.find()
-        .populate("createdBy", "firstName lastName email")
-        .sort({ date: 1 }),
-      TotalBooking.aggregate([
-        { $match: { status: { $in: ["success", "confirmed"] } } },
-        {
-          $group: {
-            _id: "$eventName",
-            bookings: { $sum: 1 },
-            ticketsSold: { $sum: { $ifNull: ["$quantity", 1] } },
-            revenue: { $sum: "$amount" },
-          },
-        },
-      ]),
-    ]);
-    const metrics = Object.fromEntries(
-      bookings.map((item) => [item._id, item]),
-    );
+    const events = await Event.find()
+      .populate("createdBy", "firstName lastName email")
+      .sort({ date: 1 });
+    const metrics = await getEventTicketMetrics(events.map((item) => item._id));
     return {
       events: events.map((item) => {
         const obj = item.toObject();
-        const sold = metrics[item.title]?.ticketsSold || 0;
+        const eventMetrics = metrics.get(String(item._id));
+        const sold = eventMetrics?.totalTickets || 0;
         return {
           ...obj,
           organiser: item.createdBy,
-          bookings: metrics[item.title]?.bookings || 0,
+          bookings: eventMetrics?.bookings || 0,
           ticketsSold: sold,
           ticketsRemaining: Math.max(0, (item.TicketQuantity || 0) - sold),
-          revenue: metrics[item.title]?.revenue || 0,
+          revenue: eventMetrics?.revenueCollected || 0,
         };
       }),
     };

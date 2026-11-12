@@ -25,49 +25,57 @@ export default function useOrganiserTicketScanner() {
       heading: "Ready to scan",
       message: "Choose one of your events, then scan or enter a ticket code.",
       icon: "material-symbols:qr-code-scanner-rounded",
-      theme: "border-gray-200 bg-gray-50 text-gray-700",
+      theme:
+        "border-gray-200 bg-gray-50 text-gray-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100",
     },
     checking: {
       heading: "Checking ticket",
       message: "Verifying the ticket with the server...",
       icon: "svg-spinners:90-ring-with-bg",
-      theme: "border-amber-200 bg-amber-50 text-amber-800",
+      theme:
+        "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200",
     },
     success: {
       heading: "Entry allowed",
       message: "Ticket is valid. The holder may enter.",
       icon: "material-symbols:check-circle-rounded",
-      theme: "border-emerald-200 bg-emerald-50 text-emerald-800",
+      theme:
+        "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200",
     },
     used: {
       heading: "Ticket already used",
       message: "This ticket has already been scanned.",
       icon: "material-symbols:error-outline-rounded",
-      theme: "border-amber-200 bg-amber-50 text-amber-800",
+      theme:
+        "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200",
     },
     invalid: {
       heading: "Invalid ticket",
       message: "No ticket for this event matches the code.",
       icon: "material-symbols:cancel-outline-rounded",
-      theme: "border-red-200 bg-red-50 text-red-800",
+      theme:
+        "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200",
     },
     inactive: {
       heading: "Ticket not active",
       message: "This ticket cannot be used for entry.",
       icon: "material-symbols:block",
-      theme: "border-amber-200 bg-amber-50 text-amber-800",
+      theme:
+        "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200",
     },
     expired: {
       heading: "Event has ended",
       message: "This event has ended, so the ticket cannot be used.",
       icon: "material-symbols:event-busy-rounded",
-      theme: "border-red-200 bg-red-50 text-red-800",
+      theme:
+        "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200",
     },
     error: {
       heading: "Validation failed",
       message: "The ticket could not be checked. Try again.",
       icon: "material-symbols:warning-rounded",
-      theme: "border-red-200 bg-red-50 text-red-800",
+      theme:
+        "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200",
     },
   };
   const resultTheme = computed(() => {
