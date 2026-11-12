@@ -77,30 +77,64 @@
               ></textarea>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
+                >Location *</label
+              >
+              <input
+                v-model="form.location"
+                required
+                placeholder="Nairobi, Kenya"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
-                  >Location *</label
+                  >Start Date</label
                 >
                 <input
-                  v-model="form.location"
-                  required
-                  placeholder="Nairobi, Kenya"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
-                  >Date *</label
-                >
-                <input
-                  v-model="form.date"
-                  required
+                  v-model="form.startDate"
                   type="date"
                   class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
               </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
+                  >End Date</label
+                >
+                <input
+                  v-model="form.endDate"
+                  type="date"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
+                  >Start Time</label
+                >
+                <input
+                  v-model="form.startTime"
+                  type="time"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
+                  >End Time</label
+                >
+                <input
+                  v-model="form.endTime"
+                  type="time"
+                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                />
+              </div>
             </div>
+            <p class="text-xs text-gray-500 dark:text-neutral-400">
+              Start and end dates and times are optional. Provide at least one
+              date so the event can be scheduled.
+            </p>
 
             <div>
               <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
@@ -139,35 +173,53 @@
               <div
                 v-for="(ticket, index) in customTickets"
                 :key="index"
-                class="flex flex-col sm:flex-row items-center gap-3 p-3 border rounded-lg dark:border-neutral-700"
+                class="flex flex-col sm:flex-row sm:items-end gap-3 p-3 border rounded-lg dark:border-neutral-700"
               >
-                <input
-                  v-model="ticket.name"
-                  type="text"
-                  placeholder="Ticket name e.g. Gold"
-                  :disabled="freeEntry"
-                  class="flex-1 w-full min-w-0 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
-                <input
-                  v-model.number="ticket.price"
-                  type="number"
-                  min="0"
-                  placeholder="Price"
-                  :disabled="freeEntry"
-                  class="w-full sm:w-32 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
-                <input
-                  v-model.number="ticket.quantity"
-                  type="number"
-                  min="1"
-                  placeholder="Tickets"
-                  :disabled="freeEntry"
-                  class="w-full sm:w-32 p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
+                <div class="flex flex-1 flex-col gap-1 w-full min-w-0">
+                  <label
+                    class="text-xs font-semibold text-gray-500 dark:text-neutral-400"
+                    >Ticket Name</label
+                  >
+                  <input
+                    v-model="ticket.name"
+                    type="text"
+                    placeholder="Ticket name e.g. Gold"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  />
+                </div>
+                <div class="flex flex-col gap-1 w-full sm:w-32">
+                  <label
+                    class="text-xs font-semibold text-gray-500 dark:text-neutral-400"
+                    >Price (KES)</label
+                  >
+                  <input
+                    v-model.number="ticket.price"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  />
+                </div>
+                <div class="flex flex-col gap-1 w-full sm:w-32">
+                  <label
+                    class="text-xs font-semibold text-gray-500 dark:text-neutral-400"
+                    >Total Tickets</label
+                  >
+                  <input
+                    v-model.number="ticket.quantity"
+                    type="number"
+                    min="1"
+                    placeholder="0"
+                    :disabled="freeEntry"
+                    class="w-full p-2 border rounded outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  />
+                </div>
                 <button
                   type="button"
                   @click="removeTicketType(index)"
-                  class="self-end sm:self-auto text-red-500 hover:text-red-700 text-lg px-2"
+                  class="text-red-500 hover:text-red-700 text-lg px-2 pb-1"
                 >
                   ✕
                 </button>
@@ -182,18 +234,33 @@
               </button>
             </div>
 
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
-                  >Total Tickets</label
+                  >Max tickets per user (optional)</label
                 >
                 <input
-                  v-model.number="form.TicketQuantity"
-                  required
+                  v-model.number="form.maxTicketsPerUser"
                   type="number"
                   min="0"
+                  placeholder="e.g. 2"
                   class="w-full p-3 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
                 />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
+                  >Event status</label
+                >
+                <select
+                  v-model="form.status"
+                  class="w-full p-3 border rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="upcoming">Upcoming</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
@@ -206,6 +273,10 @@
                 />
               </div>
             </div>
+            <p class="mt-2 text-xs text-gray-500 dark:text-neutral-400">
+              New events are submitted as pending admin approval regardless of
+              the selected event status.
+            </p>
 
             <div class="mt-6 flex gap-4">
               <button
@@ -253,9 +324,7 @@
               {{ form.title || "Untitled Event" }}
             </h3>
             <p class="text-sm text-gray-500 dark:text-neutral-400 mt-2">
-              {{
-                form.date ? new Date(form.date).toDateString() : "Date not set"
-              }}
+              {{ scheduleLabel }}
             </p>
             <p class="mt-3 text-gray-700 dark:text-neutral-300 text-sm">
               {{
@@ -289,12 +358,70 @@
               </template>
               <div class="flex justify-between text-sm pt-2 border-t mt-2">
                 <span>Available</span
-                ><span>{{ form.TicketQuantity || 0 }}</span>
+                ><span>{{
+                  freeEntry
+                    ? "Free"
+                    : customTickets.reduce(
+                        (sum, t) => sum + (Number(t.quantity) || 0),
+                        0,
+                      )
+                }}</span>
               </div>
             </div>
           </div>
         </div>
       </aside>
+    </div>
+
+    <!-- Share Modal -->
+    <div
+      v-if="showShareModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      @click.self="closeShareModal"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 dark:bg-neutral-900"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-gray-900 dark:text-neutral-100">
+            Share Event Link
+          </h3>
+          <button
+            @click="closeShareModal"
+            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
+          >
+            <Icon name="mdi:close" />
+          </button>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-neutral-400 mb-4">
+          Your event has been submitted and is pending admin approval. Once
+          approved, share this link so people can view it. They will need to
+          login or sign up to book.
+        </p>
+        <div
+          class="flex items-center gap-2 border rounded-lg p-2 bg-gray-50 dark:bg-neutral-950 dark:border-neutral-700"
+        >
+          <input
+            :value="shareUrl"
+            readonly
+            class="flex-1 bg-transparent text-sm text-gray-700 dark:text-neutral-300 outline-none truncate"
+          />
+          <button
+            @click="copyShareUrl"
+            class="px-3 py-2 text-sm font-semibold bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition"
+          >
+            Copy
+          </button>
+        </div>
+        <div class="flex justify-end mt-6">
+          <button
+            @click="closeShareModal"
+            class="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+          >
+            Done
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -306,11 +433,16 @@ const {
   previewImage,
   freeEntry,
   customTickets,
+  scheduleLabel,
+  shareUrl,
+  showShareModal,
   clearForm,
   addTicketType,
   removeTicketType,
   onFileChange,
   toggleFreeEntry,
+  closeShareModal,
+  copyShareUrl,
   submitEvent,
 } = orgCreateEvent();
 </script>

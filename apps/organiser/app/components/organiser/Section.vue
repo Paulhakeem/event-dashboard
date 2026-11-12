@@ -56,6 +56,8 @@
 </template>
 
 <script setup>
+import getTickets from "~/composables/getTickets";
+
 const { events } = organiserEvents();
 const { token } = useAuth();
 const config = useRuntimeConfig();

@@ -235,6 +235,8 @@
 </template>
 
 <script setup>
+import getTickets from "~/composables/getTickets";
+
 const {
   loading,
   error,

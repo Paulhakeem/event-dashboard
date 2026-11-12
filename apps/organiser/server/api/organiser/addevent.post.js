@@ -39,6 +39,11 @@ export default defineEventHandler(async (event) => {
   const description = String(fields.description?.[0] || "");
   const location = String(fields.location?.[0] || "");
   const date = String(fields.date?.[0] || "");
+  const startDateRaw = String(fields.startDate?.[0] || "");
+  const endDateRaw = String(fields.endDate?.[0] || "");
+  const startTime = String(fields.startTime?.[0] || "").trim();
+  const endTime = String(fields.endTime?.[0] || "").trim();
+  const primaryDateRaw = startDateRaw || endDateRaw || date;
   const regular =
     fields.regular?.[0] !== undefined ? Number(fields.regular?.[0]) : undefined;
   const vip =
@@ -53,6 +58,15 @@ export default defineEventHandler(async (event) => {
     customTickets = [];
   }
   const TicketQuantityRaw = Number(fields.TicketQuantity?.[0] || 0);
+  const maxTicketsPerUserRaw = fields.maxTicketsPerUser?.[0];
+  const parsedMaxTicketsPerUser = Number(maxTicketsPerUserRaw);
+  const maxTicketsPerUser =
+    maxTicketsPerUserRaw == null ||
+    maxTicketsPerUserRaw === "" ||
+    !Number.isFinite(parsedMaxTicketsPerUser) ||
+    parsedMaxTicketsPerUser <= 0
+      ? null
+      : Math.floor(parsedMaxTicketsPerUser);
   const freeEntry = String(fields.freeEntry?.[0] || "false") === "true";
   // Force events created by organisers to be pending approval by admin
   const status = "pending";
@@ -62,14 +76,37 @@ export default defineEventHandler(async (event) => {
     !title ||
     !description ||
     !location ||
-    !date ||
+    !primaryDateRaw ||
     !eventType ||
     !status ||
     !files.image?.[0]
   ) {
     throw createError({
       statusCode: 400,
-      statusMessage: "All fields are required",
+      statusMessage:
+        "Title, description, location, event date, event type, status and image are required",
+    });
+  }
+
+  const startDate = startDateRaw ? new Date(startDateRaw) : null;
+  const endDate = endDateRaw ? new Date(endDateRaw) : null;
+  const eventDate = startDate || endDate || new Date(date);
+
+  if (
+    Number.isNaN(eventDate.getTime()) ||
+    (startDate && Number.isNaN(startDate.getTime())) ||
+    (endDate && Number.isNaN(endDate.getTime()))
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid event date",
+    });
+  }
+
+  if (startDate && endDate && endDate < startDate) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "End date cannot be before the start date",
     });
   }
 
@@ -125,12 +162,17 @@ export default defineEventHandler(async (event) => {
     description,
     freeEntry,
     location,
-    date,
+    date: eventDate,
+    startDate,
+    endDate,
+    startTime,
+    endTime,
     regular,
     vip,
     vvip,
     customTickets: normalizedTickets.length > 0 ? normalizedTickets : undefined,
     TicketQuantity,
+    maxTicketsPerUser,
     status,
     eventType,
     image: uploadResult.secure_url,
@@ -138,12 +180,22 @@ export default defineEventHandler(async (event) => {
     createdBy: user._id,
   });
 
+  const baseUrl = (
+    config.appUrl ||
+    config.public?.appUrl ||
+    process.env.APP_URL ||
+    "https://happitwineventslimited.co.ke"
+  ).replace(/\/$/, "");
+  const shareUrl = `${baseUrl}/events/${newEvent._id}`;
+  newEvent.shareUrl = shareUrl;
+
   await newEvent.save();
 
   try {
     return {
       message: "Event created successfully and pending admin approval",
       event: newEvent,
+      shareUrl,
       eventType,
       image: uploadResult.secure_url,
     };
@@ -151,6 +203,7 @@ export default defineEventHandler(async (event) => {
     return {
       message: "Event created but failed",
       event: newEvent,
+      shareUrl,
       error: err?.message || String(err),
       eventType,
       image: uploadResult.secure_url,

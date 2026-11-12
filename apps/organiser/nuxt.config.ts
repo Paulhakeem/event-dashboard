@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import tailwindcss from "@tailwindcss/vite";
+import { resolve } from "path";
 
 export default defineNuxtConfig({
   app: {
@@ -63,6 +64,11 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        striptags: resolve(import.meta.dirname, "shims/striptags.js"),
+      },
+    },
     optimizeDeps: {
       include: ["jwt-decode", "vue-chrts"],
     },
