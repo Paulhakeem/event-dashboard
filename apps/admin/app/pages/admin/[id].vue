@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-neutral-950">
     <!-- HEADER -->
     <header
-      class="sticky top-0 inset-x-0 z-30 w-full bg-white/90 backdrop-blur border-b border-gray-200 shadow-sm"
+      class="sticky top-0 inset-x-0 z-30 w-full bg-white/90 dark:bg-neutral-900/90 backdrop-blur border-b border-gray-200 dark:border-neutral-800 shadow-sm"
     >
       <nav class="flex items-center gap-3 px-4 sm:px-6 py-3">
         <!-- Toggle Button (Mobile Only) -->
@@ -19,6 +19,22 @@
 
         <!-- Search -->
         <Dashboard-search class="flex-1" />
+        <button
+          type="button"
+          class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-gray-600 transition hover:bg-gray-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          @click="toggleTheme"
+        >
+          <Icon
+            :name="
+              isDark
+                ? 'material-symbols:light-mode-outline-rounded'
+                : 'material-symbols:dark-mode-outline-rounded'
+            "
+            class="text-xl"
+          />
+        </button>
       </nav>
     </header>
 
@@ -49,7 +65,7 @@
     >
       <aside
         v-if="openMenu"
-        class="fixed inset-y-0 start-0 z-50 w-64 bg-white shadow-xl lg:hidden"
+        class="fixed inset-y-0 start-0 z-50 w-64 bg-white dark:bg-neutral-900 shadow-xl lg:hidden"
       >
         <Dashboard-sidebar v-model="itemSelected" />
       </aside>
@@ -57,7 +73,7 @@
 
     <!-- Sidebar (Desktop) -->
     <aside
-      class="hidden lg:block fixed inset-y-0 start-0 z-40 w-64 bg-white border-r border-gray-200 shadow-sm"
+      class="hidden lg:block fixed inset-y-0 start-0 z-40 w-64 bg-white dark:bg-neutral-900 border-r border-gray-200 dark:border-neutral-800 shadow-sm"
     >
       <Dashboard-sidebar v-model="itemSelected" />
     </aside>
@@ -78,6 +94,7 @@
 const openMenu = ref(false);
 const { sidebarMenu } = dashboardSidebar();
 const itemSelected = ref(sidebarMenu[0]);
+const { isDark, toggleTheme } = useTheme();
 
 const toggleMenu = () => {
   openMenu.value = !openMenu.value;

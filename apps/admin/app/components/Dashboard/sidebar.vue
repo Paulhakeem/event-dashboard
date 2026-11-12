@@ -4,7 +4,7 @@
       id="hs-application-sidebar"
       :class="[
         'fixed inset-y-0 start-0 z-40 transition-transform duration-300 transform',
-        'w-64 h-full bg-white border-e border-gray-200 shadow-lg',
+        'w-64 h-full bg-white dark:bg-neutral-900 border-e border-gray-200 dark:border-neutral-800 shadow-lg',
         'flex flex-col max-h-full',
         'flex lg:relative lg:z-auto',
       ]"
@@ -15,19 +15,19 @@
       <div class="relative flex flex-col h-screen">
         <!-- Header Section -->
         <div
-          class="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm"
+          class="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 shadow-sm"
         >
           <div
             class="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5"
           >
             <div class="flex-1">
               <p
-                class="text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                class="text-xs font-semibold text-gray-500 dark:text-neutral-400 uppercase tracking-wider"
               >
                 Dashboard
               </p>
               <h2
-                class="text-base sm:text-lg font-bold text-gray-900 capitalize truncate"
+                class="text-base sm:text-lg font-bold text-gray-900 dark:text-white capitalize truncate"
               >
                 {{ user?.role || '' }}
               </h2>
@@ -49,7 +49,7 @@
               <li>
                 <button
                   @click="handleMenuClick(menu)"
-                  class="group w-full flex items-center gap-3 px-3 sm:px-4 py-3 text-sm sm:text-base font-medium text-gray-700 rounded-lg transition duration-200 hover:bg-linear-to-r hover:from-[#9c4e8b]/10 hover:to-transparent hover:text-[#9c4e8b] hover:border-l-4 hover:border-[#9c4e8b] focus:outline-none focus:bg-linear-to-r focus:from-[#9c4e8b]/15 focus:to-transparent active:bg-linear-to-r active:from-[#9c4e8b]/20 active:to-transparent"
+                  class="group w-full flex items-center gap-3 px-3 sm:px-4 py-3 text-sm sm:text-base font-medium text-gray-700 dark:text-neutral-300 rounded-lg transition duration-200 hover:bg-linear-to-r hover:from-[#9c4e8b]/10 hover:to-transparent hover:text-[#9c4e8b] hover:border-l-4 hover:border-[#9c4e8b] focus:outline-none focus:bg-linear-to-r focus:from-[#9c4e8b]/15 focus:to-transparent active:bg-linear-to-r active:from-[#9c4e8b]/20 active:to-transparent"
                 >
                   <div class="relative flex-shrink-0">
                     <Icon :name="menu.icon" class="text-lg sm:text-xl" />
@@ -75,7 +75,7 @@
 
         <!-- Footer Section -->
         <div
-          class="sticky bottom-0 bg-white border-t border-gray-200 p-4 cursor-pointer"
+          class="sticky bottom-0 bg-white dark:bg-neutral-900 border-t border-gray-200 dark:border-neutral-800 p-4 cursor-pointer"
         >
           <ProfileInfo @click="openProfile" />
         </div>
@@ -88,18 +88,18 @@
             class="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm"
           >
             <div
-             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50"
+             class="relative w-full max-h-[90vh] overflow-y-auto bg-white/10 dark:bg-neutral-900/90 bg-opacity-90 backdrop-blur-xl rounded-t-3xl shadow-2xl p-5 sm:p-6 border border-gray-200/50 dark:border-neutral-700/50"
             >
               <button
                 @click="open = false"
-                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-500 transition shadow-sm cursor-pointer"
+                class=" absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-100 dark:bg-neutral-800 hover:bg-red-100 text-gray-600 dark:text-neutral-300 hover:text-red-500 transition shadow-sm cursor-pointer"
               >
                 ✕
               </button>
 
               <!-- Optional drag handle (nice UX) -->
               <div
-                class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"
+                class="w-12 h-1.5 bg-gray-300 dark:bg-neutral-600 rounded-full mx-auto mb-4"
               ></div>
 
               <!-- Content -->

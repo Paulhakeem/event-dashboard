@@ -49,6 +49,10 @@ html {
   scroll-padding-top: 5rem;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -126,6 +130,55 @@ html {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .dark [class~="bg-white"]:not([class*="dark:bg-"]),
+  .dark [class~="bg-white/60"]:not([class*="dark:bg-"]),
+  .dark [class~="bg-white/70"]:not([class*="dark:bg-"]),
+  .dark [class~="bg-white/80"]:not([class*="dark:bg-"]),
+  .dark [class~="bg-white/90"]:not([class*="dark:bg-"]),
+  .dark [class~="bg-white/95"]:not([class*="dark:bg-"]) {
+    background-color: var(--color-neutral-900);
+  }
+
+  .dark [class~="bg-gray-50"]:not([class*="dark:bg-"]) {
+    background-color: var(--color-neutral-950);
+  }
+
+  .dark [class~="bg-gray-100"]:not([class*="dark:bg-"]) {
+    background-color: var(--color-neutral-800);
+  }
+
+  .dark [class~="bg-gray-200"]:not([class*="dark:bg-"]) {
+    background-color: var(--color-neutral-700);
+  }
+
+  .dark [class~="text-gray-900"]:not([class*="dark:text-"]) {
+    color: var(--color-neutral-100);
+  }
+
+  .dark [class~="text-gray-800"]:not([class*="dark:text-"]) {
+    color: var(--color-neutral-200);
+  }
+
+  .dark [class~="text-gray-700"]:not([class*="dark:text-"]) {
+    color: var(--color-neutral-300);
+  }
+
+  .dark [class~="text-gray-600"]:not([class*="dark:text-"]),
+  .dark [class~="text-gray-500"]:not([class*="dark:text-"]) {
+    color: var(--color-neutral-400);
+  }
+
+  .dark [class~="text-gray-400"]:not([class*="dark:text-"]) {
+    color: var(--color-neutral-500);
+  }
+
+  .dark [class~="border-gray-100"]:not([class*="dark:border-"]),
+  .dark [class~="border-gray-200"]:not([class*="dark:border-"]) {
+    border-color: var(--color-neutral-700);
   }
 }
 

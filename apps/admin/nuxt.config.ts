@@ -22,6 +22,11 @@ export default defineNuxtConfig({
           href: "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap",
         },
       ],
+      script: [
+        {
+          innerHTML: `(function(){try{var t=localStorage.getItem("happitwin-theme");if(t!=="light"&&t!=="dark"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}if(t==="dark"){document.documentElement.classList.add("dark");}}catch(e){}})();`,
+        },
+      ],
     },
   },
 
