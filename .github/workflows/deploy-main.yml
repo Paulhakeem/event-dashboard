@@ -32,7 +32,7 @@ jobs:
             ENV_ADMIN_SAFE="$ENV_BACKUP_DIR/.env.admin"
             ENV_ORGANISER_SAFE="$ENV_BACKUP_DIR/.env.organiser"
 
-            echo "🔄 Starting zero-downtime deployment..."
+            echo "🔄 Starting deployment..."
             mkdir -p /var/www "$ENV_BACKUP_DIR"
 
             # ── 1. Backup .env files BEFORE anything ──
@@ -41,7 +41,7 @@ jobs:
               TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
               cp "$LIVE_DIR/apps/web/.env" "$ENV_SAFE"
               cp "$LIVE_DIR/apps/web/.env" "$ENV_BACKUP_DIR/.env.$TIMESTAMP"
-              ls -t "$ENV_BACKUP_DIR"/.env.* 2>/dev/null | tail -n +6 | xargs -r rm --
+              ls -t "$ENV_BACKUP_DIR"/.env.2* 2>/dev/null | tail -n +6 | xargs -r rm --
               echo "✅ Web .env backed up"
             elif [ -f "$ENV_SAFE" ]; then
               echo "⚠️  No live web .env found — existing backup will be used"
@@ -102,11 +102,11 @@ jobs:
             pnpm install --no-frozen-lockfile --ignore-scripts
             pnpm approve-builds --yes
             pnpm rebuild
-            echo "🏗️  Building web and admin apps..."
+            echo "🏗️  Building web, admin and organiser apps..."
             pnpm run build
             echo "✅ Build complete"
 
-            # ── 5. Swap live directory (zero-downtime) ───────────────────────
+            # ── 5. Swap live directory ───────────────────────────────────────
             echo "🔁 Swapping live directory..."
             rm -rf "$BACKUP_DIR"
             [ -d "$LIVE_DIR" ] && mv "$LIVE_DIR" "$BACKUP_DIR"
@@ -118,11 +118,13 @@ jobs:
             chmod -R 755 "$LIVE_DIR"
             chmod 600 "$LIVE_DIR/apps/web/.env"
             chmod 600 "$LIVE_DIR/apps/admin/.env"
+            chmod 600 "$LIVE_DIR/apps/organiser/.env"
 
-            # ── 7. Restart apps with PM2 ─────────────────────────────────────
+            # ── 7. Restart apps with PM2 (only the Velora apps) ──────────────
             echo "♻️  Restarting apps with PM2..."
             cd "$LIVE_DIR"
-            pm2 startOrReload ecosystem.config.cjs --update-env
+            pm2 delete velora-events velora-admin velora-organiser 2>/dev/null || true
+            pm2 start ecosystem.config.cjs
             pm2 save
             echo "✅ PM2 restarted"
 
