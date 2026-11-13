@@ -30,6 +30,7 @@ jobs:
             ENV_BACKUP_DIR="/root/.env-backups/velora-events"
             ENV_SAFE="$ENV_BACKUP_DIR/.env"
             ENV_ADMIN_SAFE="$ENV_BACKUP_DIR/.env.admin"
+            ENV_ORGANISER_SAFE="$ENV_BACKUP_DIR/.env.organiser"
 
             echo "🔄 Starting zero-downtime deployment..."
             mkdir -p /var/www "$ENV_BACKUP_DIR"
@@ -58,6 +59,15 @@ jobs:
               echo "⚠️  No admin .env found — will copy from web .env"
             fi
 
+            if [ -f "$LIVE_DIR/apps/organiser/.env" ]; then
+              cp "$LIVE_DIR/apps/organiser/.env" "$ENV_ORGANISER_SAFE"
+              echo "✅ Organiser .env backed up"
+            elif [ -f "$ENV_ORGANISER_SAFE" ]; then
+              echo "⚠️  No live organiser .env found — existing backup will be used"
+            else
+              echo "⚠️  No organiser .env found — will copy from web .env"
+            fi
+
             # ── 2. Clone fresh copy ──────────────────────────────────────────
             echo "📥 Cloning fresh copy..."
             rm -rf "$BUILD_DIR"
@@ -75,6 +85,14 @@ jobs:
             else
               cp "$ENV_SAFE" "$BUILD_DIR/apps/admin/.env"
               echo "✅ Admin .env copied from web .env"
+            fi
+
+            if [ -f "$ENV_ORGANISER_SAFE" ]; then
+              cp "$ENV_ORGANISER_SAFE" "$BUILD_DIR/apps/organiser/.env"
+              echo "✅ Organiser .env restored"
+            else
+              cp "$ENV_SAFE" "$BUILD_DIR/apps/organiser/.env"
+              echo "✅ Organiser .env copied from web .env"
             fi
 
             # ── 4. Install dependencies & build ─────────────────────────────
