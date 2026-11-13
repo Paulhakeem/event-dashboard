@@ -56,6 +56,7 @@ const totalBookingSchema = new mongoose.Schema(
     },
     attendeeEmailSentAt: { type: Date },
     adminEmailSentAt: { type: Date },
+    organiserEmailSentAt: { type: Date },
     mpesaReceiptNumber: {
       type: String,
     },

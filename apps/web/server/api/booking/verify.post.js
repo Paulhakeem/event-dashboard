@@ -25,7 +25,7 @@ async function sendBookingEmails({
   ticketCodeList,
   attachments,
 }) {
-  const delivery = { attendee: false, admins: false };
+  const delivery = { attendee: false, admins: false, organiser: false };
 
   if (
     !config.smtpHost ||
@@ -135,6 +135,90 @@ async function sendBookingEmails({
       }
     } catch (emailError) {
       console.error("Failed to send booking notification to admins:", {
+        bookingId: booking._id,
+        message: emailError.message,
+      });
+    }
+  }
+
+  if (booking.organiserEmailSentAt) {
+    delivery.organiser = true;
+  } else {
+    try {
+      // Only email the owner of the event that was booked. Both references
+      // point at that event's creator; a mismatch means this booking does not
+      // belong to the event's organiser, so no organiser email is sent.
+      const eventOrganiserRef =
+        eventData.createdBy?._id || eventData.createdBy || null;
+      const bookingOrganiserRef =
+        booking.organiserId?._id || booking.organiserId || null;
+
+      if (!eventOrganiserRef) {
+        console.error(
+          "Event has no organiser; skipping organiser booking notification.",
+          { bookingId: booking._id, eventId: eventData._id || null },
+        );
+      } else if (
+        bookingOrganiserRef &&
+        String(bookingOrganiserRef) !== String(eventOrganiserRef)
+      ) {
+        console.error(
+          "Booking organiser does not match the event organiser; skipping organiser booking notification.",
+          {
+            bookingId: booking._id,
+            eventId: eventData._id || null,
+            bookingOrganiserId: bookingOrganiserRef,
+            eventOrganiserId: eventOrganiserRef,
+          },
+        );
+      } else {
+        const organiser = await User.findById(eventOrganiserRef)
+          .select("firstName lastName email")
+          .lean();
+        const organiserEmail = String(organiser?.email || "").trim();
+
+        if (!organiserEmail) {
+          console.error(
+            "No organiser email is configured for booking notifications.",
+            {
+              bookingId: booking._id,
+              organiserId: eventOrganiserRef,
+            },
+          );
+        } else {
+          const organiserName =
+            `${organiser.firstName || ""} ${organiser.lastName || ""}`.trim() ||
+            "Organiser";
+          await transporter.sendMail({
+            from,
+            to: organiserEmail,
+            subject: `New Booking – ${eventData.title}`,
+            html: `
+              <div style="font-family:sans-serif;max-width:520px;margin:auto">
+                <h2>New Booking for Your Event</h2>
+                <p>Hi <strong>${organiserName}</strong>,</p>
+                <p>Your event <strong>${eventData.title}</strong> has a new booking.</p>
+                <p><strong>Attendee:</strong> ${holderName}</p>
+                <p><strong>Email:</strong> ${userData.email}</p>
+                <p><strong>Tickets:</strong> ${ticketSummary}</p>
+                <p><strong>Amount:</strong> KES ${expectedAmount}</p>
+                <p><strong>Payment reference:</strong> ${transactionId}</p>
+                <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
+              </div>
+            `,
+            attachments,
+          });
+          const sentAt = new Date();
+          await TotalBooking.updateOne(
+            { _id: booking._id },
+            { $set: { organiserEmailSentAt: sentAt } },
+          );
+          booking.organiserEmailSentAt = sentAt;
+          delivery.organiser = true;
+        }
+      }
+    } catch (emailError) {
+      console.error("Failed to send booking notification to organiser:", {
         bookingId: booking._id,
         message: emailError.message,
       });
@@ -910,24 +994,42 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    const bookingMeta = {
+      type: "booking_created",
+      bookerId: userData._id || null,
+      bookerName,
+      tickets: ticketLines.map((line) => ({
+        ticketType: line.ticketType,
+        quantity: Math.floor(Number(line.quantity) || 0),
+      })),
+      quantity: ticketCount,
+      amount: expectedAmount,
+    };
+
     notifications.push({
       title: "New event booking",
       message: `${bookerName} booked ${ticketSummary} for "${eventData.title}".`,
       recipientRole: "admin",
       event: eventData._id,
-      meta: {
-        type: "booking_created",
-        bookerId: userData._id || null,
-        bookerName,
-        tickets: ticketLines.map((line) => ({
-          ticketType: line.ticketType,
-          quantity: Math.floor(Number(line.quantity) || 0),
-        })),
-        quantity: ticketCount,
-        amount: expectedAmount,
-      },
+      meta: bookingMeta,
       read: false,
     });
+
+    // Only the organiser who owns the booked event is notified.
+    const eventOrganiserId =
+      eventData.createdBy?._id || eventData.createdBy || null;
+
+    if (eventOrganiserId) {
+      notifications.push({
+        title: "New Booking for Your Event",
+        message: `${bookerName} booked ${ticketSummary} for "${eventData.title}".`,
+        recipientUser: eventOrganiserId,
+        recipientRole: "organiser",
+        event: eventData._id,
+        meta: bookingMeta,
+        read: false,
+      });
+    }
 
     await Notification.insertMany(notifications);
   } catch (notificationError) {
