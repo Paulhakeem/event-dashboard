@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
   }
   const body = await readBody(event);
   const ticketCode = extractTicketCode(body?.ticketCode);
+  const eventId = String(body?.eventId || "").trim();
 
   await connectDB();
 
@@ -33,6 +34,13 @@ export default defineEventHandler(async (event) => {
   const existingTicket = await Ticket.findOne({ ticketCode });
   if (!existingTicket) {
     throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
+  }
+
+  if (eventId && String(existingTicket.eventId) !== eventId) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Ticket does not belong to the selected event",
+    });
   }
 
   if (existingTicket.used || existingTicket.status !== "active") {

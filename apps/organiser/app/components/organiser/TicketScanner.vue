@@ -60,28 +60,166 @@
     </div>
     <div v-else class="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
       <section class="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm dark:border-neutral-700 dark:bg-neutral-900 dark:shadow-none sm:p-5">
-        <label for="scan-event" class="block text-sm font-semibold text-gray-800 dark:text-neutral-100">
+        <label
+          id="scan-event-label"
+          class="block text-sm font-semibold text-gray-800 dark:text-neutral-100"
+        >
           Event to check in
         </label>
-        <select
-          id="scan-event"
-          v-model="selectedEventId"
-          class="mt-2 w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-[#9c4e8b] focus:ring-2 focus:ring-[#9c4e8b]/15 disabled:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:disabled:bg-neutral-800"
-          :disabled="starting || scanning || processing"
-        >
-          <option
-            v-for="eventItem in events"
-            :key="eventItem.eventId"
-            :value="eventItem.eventId"
+        <div ref="eventPickerRef" class="relative mt-2">
+          <button
+            id="scan-event"
+            type="button"
+            class="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-left shadow-sm outline-none transition hover:border-[#9c4e8b]/50 focus:border-[#9c4e8b] focus:ring-2 focus:ring-[#9c4e8b]/15 disabled:cursor-not-allowed disabled:bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800 dark:disabled:bg-neutral-800"
+            :disabled="eventPickerDisabled"
+            :aria-expanded="eventPickerOpen"
+            aria-haspopup="listbox"
+            aria-labelledby="scan-event-label"
+            @click="toggleEventPicker"
           >
-            {{ eventItem.eventName }}
-          </option>
-        </select>
-        <p v-if="selectedEvent" class="mt-2 text-xs text-gray-500 dark:text-neutral-400">
-          {{ selectedEvent.location || "Location not available" }}
-          <span class="mx-1">·</span>
-          {{ selectedEvent.totalTickets }} tickets
-        </p>
+            <span
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#9c4e8b]/10 text-[#9c4e8b] dark:bg-[#d78ac5]/15 dark:text-[#d78ac5]"
+            >
+              <Icon
+                name="material-symbols:event-available-rounded"
+                class="text-lg"
+              />
+            </span>
+            <span class="min-w-0 flex-1">
+              <span
+                class="block truncate text-sm font-semibold text-gray-900 dark:text-neutral-100"
+              >
+                {{ selectedEvent?.eventName || "Select an event" }}
+              </span>
+              <span
+                class="mt-0.5 block truncate text-xs text-gray-500 dark:text-neutral-400"
+              >
+                {{
+                  selectedEvent
+                    ? eventDateLabel(selectedEvent)
+                    : "Choose the event you are checking in"
+                }}
+              </span>
+            </span>
+            <Icon
+              name="material-symbols:expand-more-rounded"
+              class="shrink-0 text-xl text-gray-400 transition-transform duration-200 dark:text-neutral-500"
+              :class="{ 'rotate-180': eventPickerOpen }"
+            />
+          </button>
+
+          <Transition
+            enter-active-class="transition duration-150 ease-out"
+            enter-from-class="opacity-0 -translate-y-1"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-1"
+          >
+            <div
+              v-if="eventPickerOpen"
+              class="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl ring-1 ring-black/5 dark:border-neutral-700 dark:bg-neutral-900 dark:ring-white/10"
+            >
+              <div
+                class="max-h-72 overflow-y-auto p-1.5"
+                role="listbox"
+                aria-labelledby="scan-event-label"
+              >
+                <button
+                  v-for="eventItem in events"
+                  :key="eventItem.eventId"
+                  type="button"
+                  role="option"
+                  :aria-selected="eventItem.eventId === selectedEventId"
+                  class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition"
+                  :class="
+                    eventItem.eventId === selectedEventId
+                      ? 'bg-[#9c4e8b]/10 dark:bg-[#d78ac5]/15'
+                      : 'hover:bg-gray-50 dark:hover:bg-neutral-800'
+                  "
+                  @click="chooseEvent(eventItem.eventId)"
+                >
+                  <span
+                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    :class="eventStatusClass(eventItem.status)"
+                  >
+                    <Icon
+                      name="material-symbols:confirmation-number-outline-rounded"
+                      class="text-lg"
+                    />
+                  </span>
+                  <span class="min-w-0 flex-1">
+                    <span
+                      class="block truncate text-sm font-semibold text-gray-900 dark:text-neutral-100"
+                    >
+                      {{ eventItem.eventName }}
+                    </span>
+                    <span
+                      class="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-gray-500 dark:text-neutral-400"
+                    >
+                      <span>{{ eventDateLabel(eventItem) }}</span>
+                      <span aria-hidden="true">·</span>
+                      <span class="truncate">
+                        {{ eventItem.location || "Location TBA" }}
+                      </span>
+                    </span>
+                  </span>
+                  <span class="shrink-0 text-right">
+                    <span
+                      class="block text-xs font-semibold text-gray-700 dark:text-neutral-200"
+                    >
+                      {{ eventItem.totalTickets }} tickets
+                    </span>
+                    <span
+                      class="mt-0.5 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                      :class="eventStatusClass(eventItem.status)"
+                    >
+                      {{ eventItem.status || "unknown" }}
+                    </span>
+                  </span>
+                  <Icon
+                    v-if="eventItem.eventId === selectedEventId"
+                    name="material-symbols:check-circle-rounded"
+                    class="shrink-0 text-lg text-[#9c4e8b] dark:text-[#d78ac5]"
+                  />
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <div
+          v-if="selectedEvent"
+          class="mt-3 flex flex-wrap items-center gap-2 text-xs"
+        >
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 font-medium text-gray-600 dark:bg-neutral-800 dark:text-neutral-300"
+          >
+            <Icon
+              name="material-symbols:calendar-month-rounded"
+              class="text-sm"
+            />
+            {{ eventDateLabel(selectedEvent) }}
+          </span>
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-2.5 py-1 font-medium text-gray-600 dark:bg-neutral-800 dark:text-neutral-300"
+          >
+            <Icon
+              name="material-symbols:location-on-rounded"
+              class="text-sm"
+            />
+            {{ selectedEvent.location || "Location TBA" }}
+          </span>
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full bg-[#9c4e8b]/10 px-2.5 py-1 font-semibold text-[#9c4e8b] dark:bg-[#d78ac5]/15 dark:text-[#d78ac5]"
+          >
+            <Icon
+              name="material-symbols:confirmation-number-rounded"
+              class="text-sm"
+            />
+            {{ selectedEvent.totalTickets }} tickets
+          </span>
+        </div>
 
         <div class="mt-5 flex items-start justify-between gap-3">
           <div>
@@ -274,4 +412,76 @@ const {
   scanNext,
   formatDateTime,
 } = useOrganiserTicketScanner();
+
+const eventPickerRef = ref(null);
+const eventPickerOpen = ref(false);
+const eventPickerDisabled = computed(
+  () => starting.value || scanning.value || processing.value,
+);
+
+const toggleEventPicker = () => {
+  if (eventPickerDisabled.value) return;
+  eventPickerOpen.value = !eventPickerOpen.value;
+};
+
+const chooseEvent = (eventId) => {
+  selectedEventId.value = eventId;
+  eventPickerOpen.value = false;
+};
+
+const eventDateLabel = (eventItem) => {
+  const value = eventItem?.eventDate || eventItem?.date;
+  if (!value) return "Date TBA";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Date TBA"
+    : date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+};
+
+const eventStatusClass = (status) => {
+  switch (String(status || "").toLowerCase()) {
+    case "live":
+    case "ongoing":
+    case "upcoming":
+      return "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
+    case "pending":
+      return "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300";
+    case "cancelled":
+      return "bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300";
+    case "completed":
+    case "inactive":
+    case "archived":
+      return "bg-gray-100 text-gray-600 dark:bg-neutral-800 dark:text-neutral-300";
+    default:
+      return "bg-[#9c4e8b]/10 text-[#9c4e8b] dark:bg-[#d78ac5]/15 dark:text-[#d78ac5]";
+  }
+};
+
+const handleClickOutside = (event) => {
+  if (
+    eventPickerOpen.value &&
+    eventPickerRef.value &&
+    !eventPickerRef.value.contains(event.target)
+  ) {
+    eventPickerOpen.value = false;
+  }
+};
+
+const handleEscape = (event) => {
+  if (event.key === "Escape") eventPickerOpen.value = false;
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+  document.addEventListener("keydown", handleEscape);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener("keydown", handleEscape);
+});
 </script>

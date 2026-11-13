@@ -18,6 +18,47 @@ export default function useTicketScanner() {
     ticket: null,
   });
 
+  const events = ref([]);
+  const selectedEventId = ref("");
+  const loadingEvents = ref(false);
+  const eventsError = ref("");
+
+  const selectedEvent = computed(
+    () =>
+      events.value.find(
+        (eventItem) => eventItem.eventId === selectedEventId.value,
+      ) || null,
+  );
+
+  const loadEvents = async () => {
+    if (loadingEvents.value) return;
+    loadingEvents.value = true;
+    eventsError.value = "";
+    try {
+      const response = await $fetch("/api/events/fetch");
+      const list = Array.isArray(response?.events) ? response.events : [];
+      events.value = list.map((eventItem) => ({
+        eventId: String(eventItem._id || eventItem.id || ""),
+        eventName: eventItem.title || eventItem.eventName || "Untitled event",
+        eventDate: eventItem.date || eventItem.eventDate || null,
+        location: eventItem.location || eventItem.venue || "",
+        status: eventItem.status || "",
+        totalTickets:
+          eventItem.TicketQuantity ?? eventItem.totalTickets ?? 0,
+      }));
+      const stillExists = events.value.some(
+        (eventItem) => eventItem.eventId === selectedEventId.value,
+      );
+      if (!stillExists) {
+        selectedEventId.value = events.value[0]?.eventId || "";
+      }
+    } catch (error) {
+      eventsError.value = getErrorMessage(error, "Could not load events.");
+    } finally {
+      loadingEvents.value = false;
+    }
+  };
+
   const resultThemes = {
     idle: {
       icon: "material-symbols:qr-code-scanner-rounded",
@@ -111,6 +152,7 @@ export default function useTicketScanner() {
   const classifyError = (message, statusCode) => {
     const text = String(message || "").toLowerCase();
     if (statusCode === 404 || text.includes("invalid ticket")) return "invalid";
+    if (text.includes("selected event")) return "invalid";
     if (text.includes("already used")) return "used";
     if (text.includes("expired") || text.includes("has ended")) return "expired";
     if (text.includes("not active") || text.includes("inactive")) {
@@ -174,6 +216,15 @@ export default function useTicketScanner() {
   const startScanner = async () => {
     if (!import.meta.client) return;
     if (starting.value || scanning.value || processing.value) return;
+    if (!selectedEventId.value) {
+      result.value = {
+        status: "error",
+        code: "",
+        ticket: null,
+        message: "Select the event you are checking in before scanning.",
+      };
+      return;
+    }
 
     starting.value = true;
     cameraError.value = "";
@@ -237,6 +288,16 @@ export default function useTicketScanner() {
     const code = String(rawCode || "").trim();
     if (!code || processing.value) return;
 
+    if (!selectedEventId.value) {
+      result.value = {
+        status: "error",
+        code,
+        ticket: null,
+        message: "Select the event you are checking in first.",
+      };
+      return;
+    }
+
     if (!token.value) {
       result.value = {
         status: "error",
@@ -258,7 +319,7 @@ export default function useTicketScanner() {
       const response = await $fetch("/api/tickets/validate", {
         method: "POST",
         headers: { Authorization: `Bearer ${token.value}` },
-        body: { ticketCode: code },
+        body: { ticketCode: code, eventId: selectedEventId.value },
       });
       result.value = {
         status: "success",
@@ -287,6 +348,12 @@ export default function useTicketScanner() {
   });
 
   return {
+    events,
+    selectedEventId,
+    selectedEvent,
+    loadingEvents,
+    eventsError,
+    loadEvents,
     starting,
     scanning,
     processing,
