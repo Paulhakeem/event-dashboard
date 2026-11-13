@@ -98,15 +98,15 @@
             v-model="form.status"
             class="w-full rounded-lg border p-2.5 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
           >
-            <option value="pending">Pending</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="ongoing">Ongoing</option>
-            <option value="live">Live</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="inactive">Inactive</option>
-            <option value="archived">Archived</option>
+            <option :value="form.status">{{ form.status }}</option>
+            <option v-if="form.status !== 'cancelled'" value="cancelled">
+              Cancelled
+            </option>
           </select>
+          <p class="mt-1 text-xs text-gray-500 dark:text-neutral-400">
+            Publishing and approval are handled by an administrator. You can
+            cancel your own event.
+          </p>
         </div>
         <div>
           <label class="mb-1 block text-xs font-semibold text-gray-500 uppercase">

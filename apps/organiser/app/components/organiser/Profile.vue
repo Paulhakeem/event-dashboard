@@ -133,7 +133,9 @@
 import ProfileUpdateProfile from "../Profile/update-profile.vue";
 const { user, logout, token } = useAuth();
 const { events } = organiserEvents();
-const { pendingEvents } = usePendingEvent();
+const pendingEvents = computed(() =>
+  events.value.filter((event) => event.status === "pending"),
+);
 const cancelledEvents = ref([]);
 const initials = computed(() => {
   const first = user.value?.firstName?.[0] || "";
@@ -144,7 +146,7 @@ const initials = computed(() => {
 // total income
 const config = useRuntimeConfig();
 const total = ref({ total: 0 });
-const totalBookedEvents = ref([]);
+const totalBookedEvents = ref(0);
 
 // open update profile modal
 const open = ref(false);
@@ -171,7 +173,9 @@ watch(
         Authorization: `Bearer ${token._value}`,
       },
     });
-    totalBookedEvents.value = res.totalBookedEvents;
+    totalBookedEvents.value = Array.isArray(res?.bookings)
+      ? res.bookings.length
+      : (res?.totalBookedEvents ?? 0);
   },
   { immediate: true },
 );

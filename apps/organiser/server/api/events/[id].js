@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
     await connectDB();
 
     if (method === "GET") {
+      const authUser = await requireAuth(event);
       // make sure status is up-to-date before returning individual event
       await markPastEventsCompleted();
       const eventData = await Event.findById(id).exec();
@@ -21,6 +22,12 @@ export default defineEventHandler(async (event) => {
           statusCode: 404,
           statusMessage: "Event not found",
         });
+      }
+      if (
+        authUser.role !== "admin" &&
+        String(eventData.createdBy) !== String(authUser.id)
+      ) {
+        throw createError({ statusCode: 403, statusMessage: "Access denied" });
       }
       const config = useRuntimeConfig();
       const baseUrl = (config.appUrl || config.public?.appUrl || process.env.APP_URL || "https://happitwineventslimited.co.ke").replace(/\/$/, "");
@@ -92,6 +99,16 @@ export default defineEventHandler(async (event) => {
         String(currentEvent.createdBy) !== String(authUser.id)
       ) {
         throw createError({ statusCode: 403, statusMessage: "Access denied" });
+      }
+
+      // Organisers may cancel their own event but must not approve/publish it
+      // themselves; only an admin can move an event out of pending.
+      if (
+        authUser.role !== "admin" &&
+        Object.prototype.hasOwnProperty.call(update, "status") &&
+        String(update.status) !== "cancelled"
+      ) {
+        delete update.status;
       }
 
       const hasScheduleEdit = [
@@ -198,11 +215,20 @@ export default defineEventHandler(async (event) => {
       }
 
       const eventTitle = body.title || currentEvent?.title || "Event";
+      // Use the status that will actually be persisted, so a stripped
+      // organiser status change cannot trigger approval notifications.
+      const effectiveStatus = Object.prototype.hasOwnProperty.call(
+        update,
+        "status",
+      )
+        ? update.status
+        : undefined;
       // treat transition from 'pending' -> 'upcoming' as approval
       const isApproved =
-        body.status === "upcoming" && currentEvent?.status === "pending";
+        effectiveStatus === "upcoming" && currentEvent?.status === "pending";
       const isCancelled =
-        body.status === "cancelled" && currentEvent?.status !== "cancelled";
+        effectiveStatus === "cancelled" &&
+        currentEvent?.status !== "cancelled";
 
       const updatedEvent = await Event.findByIdAndUpdate(id, update, {
         new: true,
@@ -252,7 +278,10 @@ export default defineEventHandler(async (event) => {
         if (updatedEvent.createdBy) {
           await Notification.create({
             title: "Event Cancelled",
-            message: `Your event "${updatedEvent.title}" has been cancelled by an administrator.`,
+            message:
+              authUser.role === "admin"
+                ? `Your event "${updatedEvent.title}" has been cancelled by an administrator.`
+                : `Your event "${updatedEvent.title}" has been cancelled.`,
             recipientRole: "organiser",
             recipientUser: updatedEvent.createdBy,
             event: updatedEvent._id,
