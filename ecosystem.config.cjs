@@ -58,7 +58,7 @@ module.exports = {
       script: "./apps/organiser/.output/server/index.mjs",
       env: {
         NODE_ENV: "production",
-        PORT: 3007,
+        PORT: 3008,
         UV_THREADPOOL_SIZE: 128,
         NODE_OPTIONS: "--max-old-space-size=2048",
       },
