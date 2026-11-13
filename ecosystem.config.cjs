@@ -52,7 +52,7 @@ module.exports = {
     },
     {
       name: "velora-organiser",
-      port: 3007,
+      port: 3008,
       exec_mode: "cluster",
       instances: 1,
       script: "./apps/organiser/.output/server/index.mjs",
