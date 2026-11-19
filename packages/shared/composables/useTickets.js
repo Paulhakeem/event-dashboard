@@ -33,7 +33,10 @@ export default function useTickets() {
 
       const monthIndex = createdAt.getMonth();
 
-      months[monthIndex].tickets += 1;
+      months[monthIndex].tickets += Math.max(
+        1,
+        Math.floor(Number(ticket.quantity) || 1),
+      );
     });
 
     return months;
@@ -89,7 +92,13 @@ export default function useTickets() {
         body: { filter: "totalTickets" },
       });
       totalTicketCount.value = Array.isArray(res?.tickets)
-        ? res.tickets.filter((ticket) => ticket.status === "active").length
+        ? res.tickets
+            .filter((ticket) => ticket.status === "active")
+            .reduce(
+              (sum, ticket) =>
+                sum + Math.max(1, Math.floor(Number(ticket.quantity) || 1)),
+              0,
+            )
         : 0;
     } catch (err) {
       console.error("Error fetching total tickets:", err);

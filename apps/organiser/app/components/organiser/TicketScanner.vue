@@ -366,6 +366,15 @@
                 {{ result.ticket.ticketType || "—" }}
               </dd>
             </div>
+            <div
+              v-if="result.ticket.quantity > 1"
+              class="flex justify-between gap-3"
+            >
+              <dt class="text-gray-500 dark:text-neutral-400">Entries remaining</dt>
+              <dd class="text-right font-semibold text-gray-900 dark:text-white">
+                {{ result.ticket.entriesRemaining }} of {{ result.ticket.quantity }}
+              </dd>
+            </div>
             <div class="flex justify-between gap-3">
               <dt class="text-gray-500 dark:text-neutral-400">Checked in</dt>
               <dd class="text-right font-semibold text-gray-900 dark:text-white">

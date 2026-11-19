@@ -154,7 +154,7 @@
           <div>
             <h2 class="font-semibold text-gray-900 dark:text-white">Ticket holders</h2>
             <p class="mt-1 text-xs text-gray-500 dark:text-neutral-400">
-              {{ visibleTickets.length }} of {{ tickets.length }} tickets
+              {{ visibleTicketCount }} of {{ purchasedTicketCount }} tickets
             </p>
           </div>
           <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-neutral-300">
@@ -199,7 +199,7 @@
                   {{ ticket.ticketType }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-neutral-400">
-                  {{ formatAmount(ticket.amount) }}
+                  Qty {{ ticketQuantity(ticket) }} · {{ formatAmount(ticket.amount) }}
                 </p>
               </div>
               <span
@@ -250,6 +250,21 @@ const visibleTickets = computed(() => {
   }
   return tickets.value;
 });
+function ticketQuantity(ticket) {
+  return Math.max(1, Math.floor(Number(ticket?.quantity) || 1));
+}
+
+const purchasedTicketCount = computed(() =>
+  tickets.value.reduce((total, ticket) => total + ticketQuantity(ticket), 0),
+);
+
+const visibleTicketCount = computed(() =>
+  visibleTickets.value.reduce(
+    (total, ticket) => total + ticketQuantity(ticket),
+    0,
+  ),
+);
+
 const ticketSummary = computed(() => [
   { label: "Total tickets", value: selectedEvent.value?.totalTickets || 0 },
   { label: "Not checked in", value: selectedEvent.value?.activeTickets || 0 },

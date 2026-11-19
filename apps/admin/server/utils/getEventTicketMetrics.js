@@ -9,14 +9,44 @@ export async function getEventTicketMetrics(eventIds) {
     {
       $group: {
         _id: { eventId: "$eventId", bookingId: "$bookingId" },
-        totalTickets: { $sum: 1 },
+        totalTickets: { $sum: { $ifNull: ["$quantity", 1] } },
         activeTickets: {
-          $sum: { $cond: [{ $eq: ["$status", "active"] }, 1, 0] },
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "active"] },
+              {
+                $subtract: [
+                  { $ifNull: ["$quantity", 1] },
+                  { $ifNull: ["$usedQuantity", 0] },
+                ],
+              },
+              0,
+            ],
+          },
         },
         inactiveTickets: {
-          $sum: { $cond: [{ $eq: ["$status", "inactive"] }, 1, 0] },
+          $sum: {
+            $cond: [
+              { $eq: ["$status", "inactive"] },
+              { $ifNull: ["$quantity", 1] },
+              0,
+            ],
+          },
         },
-        usedTickets: { $sum: { $cond: ["$used", 1, 0] } },
+        usedTickets: {
+          $sum: {
+            $ifNull: [
+              "$usedQuantity",
+              {
+                $cond: [
+                  "$used",
+                  { $ifNull: ["$quantity", 1] },
+                  0,
+                ],
+              },
+            ],
+          },
+        },
       },
     },
     {

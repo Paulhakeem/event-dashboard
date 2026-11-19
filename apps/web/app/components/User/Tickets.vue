@@ -41,8 +41,8 @@
         <div>
           <h3 class="text-lg font-bold text-slate-900 dark:text-white">Your passes</h3>
           <p class="mt-1 text-sm text-slate-500 dark:text-neutral-400">
-            {{ filteredTickets.length }}
-            {{ filteredTickets.length === 1 ? "ticket" : "tickets" }}
+            {{ purchasedTicketCount }}
+            {{ purchasedTicketCount === 1 ? "ticket" : "tickets" }}
           </p>
         </div>
         <div
@@ -166,7 +166,7 @@
               </div>
             </div>
 
-            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-neutral-800">
                 <p
                   class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
@@ -189,7 +189,17 @@
                   {{ ticket.ticketType }}
                 </p>
               </div>
-              <div class="col-span-2 min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 sm:col-span-1 dark:bg-neutral-800">
+              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-neutral-800">
+                <p
+                  class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
+                >
+                  Quantity
+                </p>
+                <p class="mt-1 text-sm font-semibold text-slate-700 dark:text-neutral-300">
+                  {{ ticketQuantity(ticket) }}
+                </p>
+              </div>
+              <div class="min-w-0 rounded-xl bg-slate-50 px-3 py-2.5 dark:bg-neutral-800">
                 <p
                   class="text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-neutral-500"
                 >
@@ -264,7 +274,9 @@
           <p class="mt-1 break-all text-gray-600">
             {{ selectedTicket.ticketCode || selectedTicket._id }}
           </p>
-          <p class="mt-3 font-semibold">Amount</p>
+          <p class="mt-3 font-semibold">Quantity</p>
+          <p class="text-gray-600">{{ ticketQuantity(selectedTicket) }}</p>
+          <p class="mt-3 font-semibold">Total amount</p>
           <p class="text-gray-600">
             KES {{ Number(selectedTicket.amount || 0).toLocaleString() }}
           </p>
@@ -296,7 +308,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import QRCode from "qrcode";
 
 
@@ -312,6 +324,16 @@ const {
 const selectedTicket = ref(null);
 const ticketQr = ref("");
 
+const ticketQuantity = (ticket) =>
+  Math.max(1, Math.floor(Number(ticket?.quantity) || 1));
+
+const purchasedTicketCount = computed(() =>
+  filteredTickets.value.reduce(
+    (total, ticket) => total + ticketQuantity(ticket),
+    0,
+  ),
+);
+
 const openTicket = async (ticket) => {
   selectedTicket.value = ticket;
   const userName =
@@ -323,6 +345,7 @@ const openTicket = async (ticket) => {
     `Name: ${userName}`,
     `Event: ${ticket.eventName}`,
     `Ticket type: ${ticket.ticketType}`,
+    `Quantity: ${ticketQuantity(ticket)}`,
     `Ticket code: ${ticket.ticketCode || ticket._id}`,
   ].join("\n");
   ticketQr.value = await QRCode.toDataURL(qrPayload, {

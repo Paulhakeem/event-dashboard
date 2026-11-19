@@ -87,7 +87,12 @@ export default defineEventHandler(async (event) => {
 
     const tickets = await Ticket.find(filter).sort({ createdAt: -1 }).lean();
 
-    return { success: true, tickets, total: tickets.length };
+    const total = tickets.reduce(
+      (sum, ticket) => sum + Math.max(1, Number(ticket.quantity) || 1),
+      0,
+    );
+
+    return { success: true, tickets, total };
   } catch (err) {
     throw createError({
       statusCode: err.statusCode || 500,

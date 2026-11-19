@@ -49,13 +49,23 @@ export default function getTotalTickets() {
         return d.getFullYear() === currentYear && d.getMonth() === i;
       });
       return {
-        tickets: bucket.length,
+        tickets: bucket.reduce(
+          (sum, ticket) =>
+            sum + Math.max(1, Math.floor(Number(ticket.quantity) || 1)),
+          0,
+        ),
         revenue: bucket.reduce((s, t) => s + (t.amount || 0), 0),
       };
     }),
   );
 
-  const totalTickets = computed(() => rawTickets.value.length);
+  const totalTickets = computed(() =>
+    rawTickets.value.reduce(
+      (sum, ticket) =>
+        sum + Math.max(1, Math.floor(Number(ticket.quantity) || 1)),
+      0,
+    ),
+  );
   const totalRevenue = computed(() =>
     rawTickets.value.reduce((s, t) => s + (t.amount || 0), 0),
   );

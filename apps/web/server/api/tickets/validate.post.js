@@ -35,10 +35,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: "Invalid ticket" });
   }
 
-  if (existingTicket.used || existingTicket.status !== "active") {
+  const ticketQuantity = Math.max(1, Number(existingTicket.quantity) || 1);
+  const usedQuantity = Number(existingTicket.usedQuantity) || 0;
+
+  if (
+    existingTicket.used ||
+    usedQuantity >= ticketQuantity ||
+    existingTicket.status !== "active"
+  ) {
     throw createError({
       statusCode: 400,
-      statusMessage: existingTicket.used
+      statusMessage: existingTicket.used || usedQuantity >= ticketQuantity
         ? "Ticket already used; ticket is inactive"
         : "Ticket is not active",
     });
@@ -60,8 +67,42 @@ export default defineEventHandler(async (event) => {
   }
 
   const ticket = await Ticket.findOneAndUpdate(
-    { ticketCode, used: false, status: "active" },
-    { $set: { used: true, usedAt: new Date(), status: "inactive" } },
+    {
+      ticketCode,
+      used: false,
+      status: "active",
+      $expr: {
+        $lt: [
+          { $ifNull: ["$usedQuantity", 0] },
+          { $ifNull: ["$quantity", 1] },
+        ],
+      },
+    },
+    [
+      {
+        $set: {
+          usedQuantity: { $add: [{ $ifNull: ["$usedQuantity", 0] }, 1] },
+          usedAt: new Date(),
+        },
+      },
+      {
+        $set: {
+          used: {
+            $gte: [
+              "$usedQuantity",
+              { $ifNull: ["$quantity", 1] },
+            ],
+          },
+          status: {
+            $cond: [
+              { $gte: ["$usedQuantity", { $ifNull: ["$quantity", 1] }] },
+              "inactive",
+              "active",
+            ],
+          },
+        },
+      },
+    ],
     { new: true },
   ).populate("userId", "firstName lastName");
 
@@ -81,6 +122,9 @@ export default defineEventHandler(async (event) => {
         ticket.userEmail,
       eventName: ticket.eventName,
       ticketType: ticket.ticketType,
+      quantity: ticket.quantity || 1,
+      usedQuantity: ticket.usedQuantity || 0,
+      entriesRemaining: (ticket.quantity || 1) - (ticket.usedQuantity || 0),
       usedAt: ticket.usedAt,
     },
   };

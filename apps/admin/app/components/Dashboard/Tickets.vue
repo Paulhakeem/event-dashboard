@@ -258,8 +258,8 @@
         >
           <h2 class="font-semibold text-gray-900">Event tickets</h2>
           <p class="text-xs text-gray-500">
-            {{ tickets.length }}
-            {{ tickets.length === 1 ? "ticket" : "tickets" }}
+            {{ purchasedTicketCount }}
+            {{ purchasedTicketCount === 1 ? "ticket" : "tickets" }}
           </p>
         </div>
 
@@ -325,6 +325,12 @@
                 }}</span>
               </p>
               <p>
+                Quantity:
+                <span class="font-medium text-gray-800">{{
+                  ticketQuantity(ticket)
+                }}</span>
+              </p>
+              <p>
                 Code:
                 <span class="font-mono font-medium text-gray-800">{{
                   ticket.ticketCode
@@ -381,6 +387,9 @@
                 </td>
                 <td class="px-5 py-3.5">
                   <p class="font-medium text-gray-800">{{ ticket.ticketType }}</p>
+                  <p class="mt-0.5 text-xs text-gray-500">
+                    Qty {{ ticketQuantity(ticket) }}
+                  </p>
                   <p class="mt-0.5 font-mono text-xs text-gray-400">
                     {{ ticket.ticketCode }}
                   </p>
@@ -458,21 +467,50 @@ const filteredEvents = computed(() => {
   );
 });
 
+function ticketQuantity(ticket) {
+  return Math.max(1, Math.floor(Number(ticket?.quantity) || 1));
+}
+
+function usedTicketQuantity(ticket) {
+  const fallback = ticket?.used ? ticketQuantity(ticket) : 0;
+  return Math.min(
+    ticketQuantity(ticket),
+    Math.max(0, Number(ticket?.usedQuantity) || fallback),
+  );
+}
+
+function remainingTicketQuantity(ticket) {
+  if (ticketStatus(ticket) !== "active") return 0;
+  return ticketQuantity(ticket) - usedTicketQuantity(ticket);
+}
+
+const purchasedTicketCount = computed(() =>
+  tickets.value.reduce((total, ticket) => total + ticketQuantity(ticket), 0),
+);
+
 const ticketSummary = computed(() => [
-  { label: "Total tickets", value: tickets.value.length },
+  { label: "Total tickets", value: purchasedTicketCount.value },
   {
     label: "Active",
-    value: tickets.value.filter((ticket) => ticketStatus(ticket) === "active")
-      .length,
+    value: tickets.value.reduce(
+      (total, ticket) => total + remainingTicketQuantity(ticket),
+      0,
+    ),
   },
   {
     label: "Inactive",
-    value: tickets.value.filter((ticket) => ticketStatus(ticket) === "inactive")
-      .length,
+    value: purchasedTicketCount.value -
+      tickets.value.reduce(
+        (total, ticket) => total + remainingTicketQuantity(ticket),
+        0,
+      ),
   },
   {
     label: "Used",
-    value: tickets.value.filter((ticket) => ticket.used).length,
+    value: tickets.value.reduce(
+      (total, ticket) => total + usedTicketQuantity(ticket),
+      0,
+    ),
   },
   {
     label: "Revenue collected",

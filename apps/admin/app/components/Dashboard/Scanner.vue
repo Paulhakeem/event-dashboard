@@ -17,8 +17,8 @@
           </p>
           <h1 class="mt-1 text-xl font-bold text-gray-900">Scan ticket QR</h1>
           <p class="mt-1 max-w-2xl text-sm text-gray-500">
-            Scan each ticket once to admit the holder. A ticket is marked used
-            immediately and cannot be scanned again.
+            Scan each ticket once per attendee. A multi-ticket pass stays active
+            until its full quantity has been checked in.
           </p>
         </div>
       </div>
@@ -383,6 +383,15 @@
               <dt class="text-gray-500">Ticket type</dt>
               <dd class="text-right font-semibold text-gray-900">
                 {{ result.ticket.ticketType || "—" }}
+              </dd>
+            </div>
+            <div
+              v-if="result.ticket.quantity > 1"
+              class="flex items-start justify-between gap-3"
+            >
+              <dt class="text-gray-500">Entries remaining</dt>
+              <dd class="text-right font-semibold text-gray-900">
+                {{ result.ticket.entriesRemaining }} of {{ result.ticket.quantity }}
               </dd>
             </div>
             <div class="flex items-start justify-between gap-3">

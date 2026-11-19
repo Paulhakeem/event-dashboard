@@ -22,8 +22,10 @@ const TicketSchema = new mongoose.Schema(
       required: true,
     },
     ticketType: { type: String, required: true },
+    quantity: { type: Number, default: 1, min: 1 },
     amount: { type: Number, required: true },
     used: { type: Boolean, default: false },
+    usedQuantity: { type: Number, default: 0, min: 0 },
     usedAt: { type: Date, default: null },
     status: {
       type: String,

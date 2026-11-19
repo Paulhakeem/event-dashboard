@@ -47,6 +47,7 @@ async function sendBookingEmails({
   const holderName =
     `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
     userData.email;
+  const passCount = attachments.length;
 
   if (booking.attendeeEmailSentAt) {
     delivery.attendee = true;
@@ -67,7 +68,7 @@ async function sendBookingEmails({
             <p><strong>Amount paid:</strong> KES ${expectedAmount}</p>
             <p><strong>Payment reference:</strong> ${transactionId}</p>
             <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
-            <p>Your ticket PDF${ticketCount === 1 ? " is" : "s are"} attached. Present ${ticketCount === 1 ? "it" : "them"} at the entrance.</p>
+            <p>Your ticket PDF${passCount === 1 ? " is" : "s are"} attached. Present the QR code${passCount === 1 ? "" : "s"} at the entrance.</p>
           </div>
         `,
         attachments,
@@ -614,43 +615,39 @@ export default defineEventHandler(async (event) => {
         for (const line of ticketLines) {
           const lineCount = Math.floor(Number(line.quantity) || 0);
           if (lineCount < 1) continue;
-          const unitAmount = Math.round(
-            (Number(line.amount) || 0) / lineCount,
-          );
 
-          for (let i = 0; i < lineCount; i++) {
-            let ticketCode;
-            let created = false;
+          let ticketCode;
+          let created = false;
 
-            for (let retries = 3; retries > 0; retries--) {
-              ticketCode = generateTicketCode();
-              const exists = await Ticket.findOne({ ticketCode });
-              if (!exists) {
-                created = true;
-                break;
-              }
+          for (let retries = 3; retries > 0; retries--) {
+            ticketCode = generateTicketCode();
+            const exists = await Ticket.findOne({ ticketCode });
+            if (!exists) {
+              created = true;
+              break;
             }
+          }
 
-            if (!created) {
-              throw createError({
-                statusCode: 500,
-                statusMessage: "Failed to generate unique ticket code",
-              });
-            }
-
-            await Ticket.create({
-              ticketCode,
-              eventName: eventData.title,
-              eventId: eventData._id,
-              userEmail: userData.email,
-              userId: userData._id || null,
-              firstName: userData.firstName || "",
-              lastName: userData.lastName || "",
-              bookingId: existingBooking._id,
-              ticketType: line.ticketType,
-              amount: unitAmount,
+          if (!created) {
+            throw createError({
+              statusCode: 500,
+              statusMessage: "Failed to generate unique ticket code",
             });
           }
+
+          await Ticket.create({
+            ticketCode,
+            eventName: eventData.title,
+            eventId: eventData._id,
+            userEmail: userData.email,
+            userId: userData._id || null,
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            bookingId: existingBooking._id,
+            ticketType: line.ticketType,
+            quantity: lineCount,
+            amount: Math.round(Number(line.amount) || 0),
+          });
         }
       }
 
@@ -673,6 +670,7 @@ export default defineEventHandler(async (event) => {
         `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
         `Event: ${eventData.title}`,
         `Ticket type: ${ticket.ticketType}`,
+        `Quantity: ${ticket.quantity || 1}`,
         `Ticket code: ${ticket.ticketCode}`,
       ].join("\n");
       const qrBuffer = await QRCode.toBuffer(qrPayload, {
@@ -688,6 +686,7 @@ export default defineEventHandler(async (event) => {
         location: eventData.location,
         ticketCode: ticket.ticketCode,
         ticketType: ticket.ticketType,
+        quantity: ticket.quantity || 1,
         amount: ticket.amount,
         reference: existingBooking.transactionId || transactionId,
         name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
@@ -899,79 +898,82 @@ export default defineEventHandler(async (event) => {
     organiserId: eventData.createdBy,
   });
 
-  /* ── GENERATE TICKETS (one per person, per ticket line) ─── */
+  /* ── GENERATE TICKETS (one per ticket line, with its quantity) ─ */
   const tickets = [];
 
   for (const line of ticketLines) {
     const lineCount = Math.floor(Number(line.quantity) || 0);
-    const unitAmount = Math.round((Number(line.amount) || 0) / lineCount);
+    if (lineCount < 1) continue;
 
-    for (let i = 0; i < lineCount; i++) {
-      /* ── Generate unique ticket code ─────────────────────────── */
-      let ticketCode;
-      let created = false;
+    /* ── Generate unique ticket code ───────────────────────────── */
+    let ticketCode;
+    let created = false;
 
-      for (let retries = 3; retries > 0; retries--) {
-        ticketCode = generateTicketCode();
-        const exists = await Ticket.findOne({ ticketCode });
-        if (!exists) {
-          created = true;
-          break;
-        }
+    for (let retries = 3; retries > 0; retries--) {
+      ticketCode = generateTicketCode();
+      const exists = await Ticket.findOne({ ticketCode });
+      if (!exists) {
+        created = true;
+        break;
       }
-
-      if (!created) {
-        throw createError({
-          statusCode: 500,
-          statusMessage: "Failed to generate unique ticket code",
-        });
-      }
-
-      const ticket = await Ticket.create({
-        ticketCode,
-        eventName: eventData.title,
-        eventId: eventData._id,
-        userEmail: userData.email,
-        userId: userData._id || null,
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        bookingId: booking._id,
-        ticketType: line.ticketType,
-        amount: unitAmount,
-      });
-
-      /* ── Generate this ticket's QR + PDF ─────────────────────── */
-      const qrPayload = [
-        `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
-        `Event: ${eventData.title}`,
-        `Ticket type: ${line.ticketType}`,
-        `Ticket code: ${ticketCode}`,
-      ].join("\n");
-
-      // Pure black on white = maximum contrast = easiest to scan
-      const qrBuffer = await QRCode.toBuffer(qrPayload, {
-        type: "png",
-        width: 200,
-        margin: 2,
-        errorCorrectionLevel: "L",
-        color: { dark: "#000000", light: "#ffffff" },
-      });
-
-      const pdfBuffer = await generateTicketPdf({
-        eventTitle: eventData.title,
-        eventDate: new Date(eventData.date).toDateString(),
-        location: eventData.location,
-        ticketCode,
-        ticketType: line.ticketType,
-        amount: unitAmount,
-        reference: transactionId,
-        name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
-        email: userData.email,
-        qrBuffer,
-      });
-
-      tickets.push({ ticketCode, pdfBuffer });
     }
+
+    if (!created) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Failed to generate unique ticket code",
+      });
+    }
+
+    const lineAmount = Math.round(Number(line.amount) || 0);
+
+    await Ticket.create({
+      ticketCode,
+      eventName: eventData.title,
+      eventId: eventData._id,
+      userEmail: userData.email,
+      userId: userData._id || null,
+      firstName: userData.firstName || "",
+      lastName: userData.lastName || "",
+      bookingId: booking._id,
+      ticketType: line.ticketType,
+      quantity: lineCount,
+      amount: lineAmount,
+    });
+
+    /* ── Generate this ticket's QR + PDF ───────────────────────── */
+    const qrPayload = [
+      `Name: ${`${userData.firstName || ""} ${userData.lastName || ""}`.trim()}`,
+      `Event: ${eventData.title}`,
+      `Ticket type: ${line.ticketType}`,
+      `Quantity: ${lineCount}`,
+      `Ticket code: ${ticketCode}`,
+    ].join("\n");
+
+    // Pure black on white = maximum contrast = easiest to scan
+    const qrBuffer = await QRCode.toBuffer(qrPayload, {
+      type: "png",
+      width: 200,
+      margin: 2,
+      errorCorrectionLevel: "L",
+      color: { dark: "#000000", light: "#ffffff" },
+    });
+
+    const pdfBuffer = await generateTicketPdf({
+      eventTitle: eventData.title,
+      eventDate: new Date(eventData.date).toDateString(),
+      location: eventData.location,
+      ticketCode,
+      ticketType: line.ticketType,
+      quantity: lineCount,
+      amount: lineAmount,
+      reference: transactionId,
+      name: `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
+      email: userData.email,
+      qrBuffer,
+    });
+
+    tickets.push({ ticketCode, pdfBuffer });
   }
 
   try {
@@ -1093,11 +1095,12 @@ export default defineEventHandler(async (event) => {
             .fontSize(6)
             .fillColor("#111827")
             .text(value, LX, LY + 7, { width: 150 });
-          LY += 16;
+          LY += 13;
         };
 
         row("TICKET HOLDER", details.name || "—");
         row("TICKET TYPE", details.ticketType.toUpperCase());
+        row("QUANTITY", String(details.quantity || 1));
         row("AMOUNT PAID", `KES ${details.amount}`);
         row("REFERENCE", details.reference);
 

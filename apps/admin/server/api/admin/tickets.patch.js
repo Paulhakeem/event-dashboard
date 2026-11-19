@@ -51,6 +51,8 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const ticketQuantity = Math.max(1, Number(ticket.quantity) || 1);
+
   const eventDetails = await Event.findById(ticket.eventId)
     .select("date startDate endDate startTime endTime")
     .lean();
@@ -69,6 +71,7 @@ export default defineEventHandler(async (event) => {
     {
       $set: {
         used: true,
+        usedQuantity: ticketQuantity,
         usedAt: new Date(),
         status: "inactive",
       },
