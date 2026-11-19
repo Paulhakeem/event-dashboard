@@ -311,11 +311,7 @@
               <p class="col-span-2">
                 Username:
                 <span class="font-medium text-gray-800">{{
-                  ticket.holderName ||
-                  ticket.userId?.firstName ||
-                  ticket.userId?.lastName
-                    ? `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim()
-                    : ticket.userEmail || "Guest"
+                  ticket.holderName || "Guest"
                 }}</span>
               </p>
               <p>
@@ -374,12 +370,7 @@
                 </td>
                 <td class="px-5 py-3.5">
                   <p class="font-medium text-gray-800">
-                    {{
-                      ticket.holderName ||
-                      (ticket.userId?.firstName || ticket.userId?.lastName
-                        ? `${ticket.userId?.firstName || ""} ${ticket.userId?.lastName || ""}`.trim()
-                        : ticket.userEmail || "Guest")
-                    }}
+                    {{ ticket.holderName || "Guest" }}
                   </p>
                   <p class="mt-0.5 text-xs text-gray-400">
                     {{ ticket.holderEmail || ticket.userId?.email || ticket.userEmail || "—" }}

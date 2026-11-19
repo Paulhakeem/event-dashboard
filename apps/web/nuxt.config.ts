@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     head: {
       title:
         "Digital Online Events Booking Platform, Discover, Book, and Manage Events",
-      titleTemplate: "%s | Happitwin events",
+      titleTemplate: "%s Happitwin events",
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },

@@ -182,16 +182,11 @@ export default defineEventHandler(async (event) => {
     const ticketType = String(line.ticketType || "").trim();
     const quantity = Number(line.quantity);
 
-    if (
-      !ticketType ||
-      !Number.isInteger(quantity) ||
-      quantity < 1 ||
-      quantity > 20
-    ) {
+    if (!ticketType || !Number.isInteger(quantity) || quantity < 1) {
       throw createError({
         statusCode: 400,
         statusMessage:
-          "Each ticket must have a valid ticket type and a quantity between 1 and 20.",
+          "Each ticket must have a valid ticket type and a quantity of at least 1.",
       });
     }
 
@@ -246,18 +241,20 @@ export default defineEventHandler(async (event) => {
           statusMessage: `Not enough "${ticket.ticketType}" tickets available.`,
         });
       }
-    } else if (
-      Number.isFinite(Number(eventData.TicketQuantity)) &&
-      eventData.TicketQuantity >= 0
-    ) {
-      // fallback
-      if (Number(eventData.TicketQuantity) < ticketCount) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Not enough tickets are available.",
-        });
-      }
     }
+  }
+
+  const eventTotal = Number(eventData.TicketQuantity);
+  if (
+    customTicketsAvail.length === 0 &&
+    Number.isFinite(eventTotal) &&
+    eventTotal >= 0 &&
+    ticketCount > eventTotal
+  ) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Not enough tickets are available.",
+    });
   }
 
   const normalizedPhone = normalizePhone(phone);

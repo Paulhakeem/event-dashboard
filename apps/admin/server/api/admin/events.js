@@ -124,6 +124,7 @@ export default defineEventHandler(async (event) => {
     "endTime",
     "location",
     "TicketQuantity",
+    "maxTicketsPerUser",
     "customTickets",
     "status",
     "eventType",
@@ -132,6 +133,15 @@ export default defineEventHandler(async (event) => {
   const changes = Object.fromEntries(
     Object.entries(update).filter(([key]) => allowed.includes(key)),
   );
+
+  if ("maxTicketsPerUser" in changes) {
+    const raw = changes.maxTicketsPerUser;
+    const parsed = Number(raw);
+    changes.maxTicketsPerUser =
+      raw == null || raw === "" || !Number.isFinite(parsed) || parsed <= 0
+        ? null
+        : Math.floor(parsed);
+  }
 
   // Normalize ticket edits so availableQuantity is never reset to 0 and
   // TicketQuantity stays in sync with the per-type quantities.

@@ -351,7 +351,7 @@
             <div class="flex justify-between gap-3">
               <dt class="text-gray-500 dark:text-neutral-400">Holder</dt>
               <dd class="text-right font-semibold text-gray-900 dark:text-white">
-                {{ result.ticket.userName || "—" }}
+                {{ result.ticket.userName || result.ticket.holderName || "Guest" }}
               </dd>
             </div>
             <div class="flex justify-between gap-3">
@@ -364,6 +364,12 @@
               <dt class="text-gray-500 dark:text-neutral-400">Ticket type</dt>
               <dd class="text-right font-semibold text-gray-900 dark:text-white">
                 {{ result.ticket.ticketType || "—" }}
+              </dd>
+            </div>
+            <div class="flex justify-between gap-3">
+              <dt class="text-gray-500 dark:text-neutral-400">Quantity</dt>
+              <dd class="text-right font-semibold text-gray-900 dark:text-white">
+                {{ result.ticket.quantity || 1 }}
               </dd>
             </div>
             <div

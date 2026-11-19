@@ -114,21 +114,41 @@
                 <label class="block text-sm font-semibold text-gray-700 mb-2"
                   >Start Time</label
                 >
-                <input
-                  v-model="form.startTime"
-                  type="time"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="startTimeInput"
+                    type="time"
+                    class="min-w-0 flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                  <select
+                    v-model="startPeriod"
+                    aria-label="Start time AM or PM"
+                    class="w-20 p-3 border rounded-lg font-semibold focus:ring-2 focus:ring-purple-400 outline-none"
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2"
                   >End Time</label
                 >
-                <input
-                  v-model="form.endTime"
-                  type="time"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="endTimeInput"
+                    type="time"
+                    class="min-w-0 flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-purple-400 outline-none"
+                  />
+                  <select
+                    v-model="endPeriod"
+                    aria-label="End time AM or PM"
+                    class="w-20 p-3 border rounded-lg font-semibold focus:ring-2 focus:ring-purple-400 outline-none"
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
               </div>
             </div>
             <p class="text-xs text-gray-500">
@@ -408,6 +428,11 @@
 </template>
 
 <script setup>
+import {
+  formatEventTimeRange,
+  useTimeField,
+} from "@velora/shared/composables/useEventTime";
+
 const { token } = useAuth();
 const config = useRuntimeConfig();
 const form = reactive({
@@ -427,6 +452,27 @@ const form = reactive({
   status: "upcoming",
   image: null,
 });
+
+const {
+  time: startTimeInput,
+  period: startPeriod,
+  reset: resetStartTime,
+} = useTimeField(
+  () => form.startTime,
+  (value) => {
+    form.startTime = value;
+  },
+);
+const {
+  time: endTimeInput,
+  period: endPeriod,
+  reset: resetEndTime,
+} = useTimeField(
+  () => form.endTime,
+  (value) => {
+    form.endTime = value;
+  },
+);
 
 const isLoading = ref(false);
 const previewImage = ref(null);
@@ -464,10 +510,7 @@ const scheduleLabel = computed(() => {
     dateLabel = end;
   }
 
-  const timeLabel =
-    form.startTime && form.endTime
-      ? `${form.startTime} - ${form.endTime}`
-      : form.startTime || form.endTime || "";
+  const timeLabel = formatEventTimeRange(form.startTime, form.endTime);
 
   return timeLabel ? `${dateLabel} · ${timeLabel}` : dateLabel;
 });
@@ -499,6 +542,8 @@ const clearForm = () => {
     status: "upcoming",
     image: null,
   });
+  resetStartTime();
+  resetEndTime();
   freeEntry.value = false;
   customTickets.value = [];
   previewImage.value = null;

@@ -10,6 +10,20 @@ const extractTicketCode = (value) => {
   return match ? match[0].toUpperCase() : text;
 };
 
+const resolveHolderName = (ticket) => {
+  const parts = [ticket?.firstName, ticket?.lastName].filter(Boolean);
+  return (
+    parts.join(" ").trim() ||
+    String(ticket?.holderName || ticket?.name || "").trim() ||
+    [ticket?.userId?.firstName, ticket?.userId?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() ||
+    String(ticket?.userEmail || "").trim() ||
+    "Guest"
+  );
+};
+
 export default defineEventHandler(async (event) => {
   const scanner = await requireAuth(event);
   if (!scanner || !["admin", "organiser"].includes(scanner.role)) {
@@ -122,9 +136,7 @@ export default defineEventHandler(async (event) => {
     message: "Ticket valid ✅ Entry allowed",
     ticket: {
       ticketCode: ticket.ticketCode,
-      userName:
-        `${ticket.userId?.firstName || ticket.firstName || ""} ${ticket.userId?.lastName || ticket.lastName || ""}`.trim() ||
-        ticket.userEmail,
+      userName: resolveHolderName(ticket),
       eventName: ticket.eventName,
       ticketType: ticket.ticketType,
       quantity: ticket.quantity || 1,

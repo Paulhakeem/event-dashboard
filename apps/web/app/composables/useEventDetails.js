@@ -45,7 +45,7 @@ export default function useEventDetails() {
   const firstName = ref("");
   const lastName = ref("");
   const email = ref("");
-  const ticketLines = ref([{ ticketType: "", quantity: 1 }]);
+  const ticketSelections = ref([]);
 
   // Logged-in users book with their account details by default; guests type
   // their own. The fields stay editable either way.
@@ -60,11 +60,39 @@ export default function useEventDetails() {
     { immediate: true },
   );
 
+  const ticketName = (ticket) =>
+    String(
+      ticket?.name || ticket?.ticketType || ticket?.type || "",
+    ).trim();
+
+  watch(
+    () => event.value?.customTickets,
+    (tickets) => {
+      const previous = new Map(
+        ticketSelections.value.map((line) => [line.ticketType, line.quantity]),
+      );
+
+      ticketSelections.value = (Array.isArray(tickets) ? tickets : [])
+        .map(ticketName)
+        .filter(Boolean)
+        .map((ticketType) => ({
+          ticketType,
+          quantity: previous.get(ticketType) || 0,
+        }));
+    },
+    { immediate: true },
+  );
+
   const isEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value).trim());
 
-  const priceOf = (name) =>
-    event.value?.customTickets?.find((t) => t.name === name)?.price ?? 0;
+  const priceOf = (name) => {
+    const match = event.value?.customTickets?.find(
+      (t) =>
+        ticketName(t).toLowerCase() === String(name || "").trim().toLowerCase(),
+    );
+    return Number(match?.price) || 0;
+  };
 
   const ticketAvailable = (ticket) => {
     const available = Number(ticket?.availableQuantity ?? ticket?.quantity ?? 0);
@@ -76,84 +104,105 @@ export default function useEventDetails() {
   const isEventSoldOut = computed(() => {
     const ev = event.value;
     if (!ev || ev.freeEntry) return false;
-    if (Math.floor(Number(ev.TicketQuantity) || 0) <= 0) return true;
 
     if (Array.isArray(ev.customTickets) && ev.customTickets.length > 0) {
       return ev.customTickets.every((ticket) => isTicketTypeSoldOut(ticket));
     }
 
-    return false;
+    return Math.floor(Number(ev.TicketQuantity) || 0) <= 0;
   });
 
   const lineTotal = (line) => priceOf(line.ticketType) * (line.quantity || 0);
 
   const totalQuantity = computed(() =>
-    ticketLines.value.reduce((sum, line) => sum + (line.quantity || 0), 0),
+    ticketSelections.value.reduce(
+      (sum, line) => sum + (line.quantity || 0),
+      0,
+    ),
   );
 
   const totalPrice = computed(() =>
-    ticketLines.value.reduce((sum, line) => sum + lineTotal(line), 0),
+    ticketSelections.value.reduce((sum, line) => sum + lineTotal(line), 0),
   );
 
-  const maxQuantity = computed(() => {
-    const eventTotal = event.value?.TicketQuantity || 0;
-    const maxPerUser = Math.floor(Number(event.value?.maxTicketsPerUser) || 0);
-    if (maxPerUser > 0) return Math.min(eventTotal || maxPerUser, maxPerUser);
-    return eventTotal;
+  const totalAvailable = computed(() => {
+    const tickets = event.value?.customTickets;
+    if (Array.isArray(tickets) && tickets.length > 0) {
+      return tickets.reduce((sum, ticket) => sum + ticketAvailable(ticket), 0);
+    }
+    return Math.max(0, Math.floor(Number(event.value?.TicketQuantity) || 0));
   });
 
+  const maxQuantity = computed(() => {
+    const maxPerUser = Math.floor(Number(event.value?.maxTicketsPerUser) || 0);
+    if (maxPerUser > 0) {
+      return Math.min(maxPerUser, totalAvailable.value || maxPerUser);
+    }
+    return totalAvailable.value;
+  });
+
+  const remainingQuantity = computed(() =>
+    Math.max(0, maxQuantity.value - totalQuantity.value),
+  );
+
   const selectedTickets = computed(() =>
-    ticketLines.value
+    ticketSelections.value
       .filter((line) => line.ticketType && Number(line.quantity) > 0)
       .map((line) => ({
         ticketType: line.ticketType,
-        quantity: Number(line.quantity),
+        quantity: Math.floor(Number(line.quantity)),
       })),
   );
 
-  const addTicketLine = () => {
-    if (totalQuantity.value >= maxQuantity.value) return;
-    ticketLines.value.push({ ticketType: "", quantity: 1 });
-  };
-
-  const removeTicketLine = (index) => {
-    if (ticketLines.value.length <= 1) return;
-    ticketLines.value.splice(index, 1);
-  };
-
-  const getTypeAvailability = (typeName) => {
-    if (!typeName) return Infinity;
-    const t = event.value?.customTickets?.find(
-      (c) =>
-        String(c.name || c.ticketType || c.type).toLowerCase() ===
-        String(typeName).toLowerCase(),
+  const quantityOf = (ticket) => {
+    const name = ticketName(ticket);
+    return (
+      ticketSelections.value.find(
+        (line) => line.ticketType.toLowerCase() === name.toLowerCase(),
+      )?.quantity || 0
     );
-    if (t) {
-      const avail = Number(t.availableQuantity ?? t.quantity ?? 0);
-      if (Number.isFinite(avail) && avail >= 0) return avail;
+  };
+
+  const maxForTicket = (ticket) => {
+    const name = ticketName(ticket);
+    if (!name) return 0;
+
+    const current = quantityOf(ticket);
+    const other = totalQuantity.value - current;
+    const orderRemaining = Math.max(0, maxQuantity.value - other);
+
+    return Math.max(
+      0,
+      Math.min(Math.floor(ticketAvailable(ticket)), orderRemaining),
+    );
+  };
+
+  const remainingForTicket = (ticket) =>
+    Math.max(0, maxForTicket(ticket) - quantityOf(ticket));
+
+  const setTicketQuantity = (ticket, value) => {
+    const name = ticketName(ticket);
+    if (!name) return;
+
+    const line = ticketSelections.value.find(
+      (selection) => selection.ticketType.toLowerCase() === name.toLowerCase(),
+    );
+    if (!line) return;
+
+    const parsed = Math.floor(Number(value) || 0);
+    line.quantity = Math.max(0, Math.min(parsed, maxForTicket(ticket)));
+  };
+
+  const increaseTicketQuantity = (ticket) => {
+    if (quantityOf(ticket) < maxForTicket(ticket)) {
+      setTicketQuantity(ticket, quantityOf(ticket) + 1);
     }
-    return maxQuantity.value;
   };
 
-  const remainingForLine = (index) => {
-    const line = ticketLines.value[index];
-    const avail = getTypeAvailability(line?.ticketType);
-    if (!Number.isFinite(avail)) {
-      const other = totalQuantity.value - (line?.quantity || 0);
-      return Math.max(0, maxQuantity.value - other);
+  const decreaseTicketQuantity = (ticket) => {
+    if (quantityOf(ticket) > 0) {
+      setTicketQuantity(ticket, quantityOf(ticket) - 1);
     }
-    return Math.max(0, avail);
-  };
-
-  const increaseLineQuantity = (index) => {
-    const line = ticketLines.value[index];
-    if (!line?.ticketType) return;
-    if (line.quantity < remainingForLine(index)) line.quantity++;
-  };
-
-  const decreaseLineQuantity = (index) => {
-    const line = ticketLines.value[index];
-    if (line?.quantity > 0) line.quantity--;
   };
 
   const isBookable = computed(() => {
@@ -171,13 +220,16 @@ export default function useEventDetails() {
       ev.status !== "cancelled" &&
       ev.status !== "completed" &&
       !isEventSoldOut.value &&
-      ev.TicketQuantity > 0 &&
+      totalQuantity.value > 0 &&
       totalQuantity.value <= maxQuantity.value &&
       selectedTickets.value.every((t) => {
-        const match = ev.customTickets?.find((c) => c.name === t.ticketType);
+        const match = ev.customTickets?.find(
+          (c) =>
+            ticketName(c).toLowerCase() === String(t.ticketType).toLowerCase(),
+        );
         return (
           !!match &&
-          !!match.price &&
+          !!Number(match.price) &&
           ticketAvailable(match) >= Number(t.quantity)
         );
       })
@@ -224,20 +276,24 @@ export default function useEventDetails() {
     firstName,
     lastName,
     email,
-    ticketLines,
+    ticketSelections,
     priceOf,
+    ticketAvailable,
     isTicketTypeSoldOut,
     isEventSoldOut,
     lineTotal,
     totalQuantity,
     totalPrice,
+    totalAvailable,
     maxQuantity,
+    remainingQuantity,
     selectedTickets,
-    addTicketLine,
-    removeTicketLine,
-    remainingForLine,
-    increaseLineQuantity,
-    decreaseLineQuantity,
+    quantityOf,
+    maxForTicket,
+    remainingForTicket,
+    setTicketQuantity,
+    increaseTicketQuantity,
+    decreaseTicketQuantity,
     isBookable,
     copyShareLink,
     handleBooking,

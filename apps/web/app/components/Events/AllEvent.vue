@@ -178,6 +178,16 @@
                     }}
                   </p>
                 </div>
+                <div
+                  v-if="formatEventTimeRange(event.startTime, event.endTime)"
+                  class="flex items-center text-gray-600 dark:text-neutral-300 text-sm"
+                >
+                  <Icon
+                    name="mdi:clock-outline"
+                    class="mr-2 text-base text-[#13284b] dark:text-white"
+                  />
+                  <p>{{ formatEventTimeRange(event.startTime, event.endTime) }}</p>
+                </div>
                 <div class="pt-1">
                   <CountdownTimer
                     :date="event.date"
@@ -370,6 +380,8 @@
 </template>
 
 <script setup>
+import { formatEventTimeRange } from "@velora/shared/composables/useEventTime";
+
 const events = ref([]);
 const loading = ref(true);
 const loadingMore = ref(false);

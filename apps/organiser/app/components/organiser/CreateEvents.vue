@@ -114,21 +114,41 @@
                 <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >Start Time</label
                 >
-                <input
-                  v-model="form.startTime"
-                  type="time"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="startTimeInput"
+                    type="time"
+                    class="min-w-0 flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  />
+                  <select
+                    v-model="startPeriod"
+                    aria-label="Start time AM or PM"
+                    class="w-20 p-3 border rounded-lg font-semibold focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 dark:text-neutral-300 mb-2"
                   >End Time</label
                 >
-                <input
-                  v-model="form.endTime"
-                  type="time"
-                  class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="endTimeInput"
+                    type="time"
+                    class="min-w-0 flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  />
+                  <select
+                    v-model="endPeriod"
+                    aria-label="End time AM or PM"
+                    class="w-20 p-3 border rounded-lg font-semibold focus:ring-2 focus:ring-amber-400 outline-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-300"
+                  >
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                  </select>
+                </div>
               </div>
             </div>
             <p class="text-xs text-gray-500 dark:text-neutral-400">
@@ -433,6 +453,10 @@ const {
   previewImage,
   freeEntry,
   customTickets,
+  startTimeInput,
+  startPeriod,
+  endTimeInput,
+  endPeriod,
   scheduleLabel,
   shareUrl,
   showShareModal,

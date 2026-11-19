@@ -13,16 +13,58 @@ import { Notification } from "../../models/Notification";
 import { getOptionalAuth } from "../../utils/requireAuth.js";
 import { parseBody } from "../../utils/parseBody.js";
 
+function bookingEmailTemplate({ preheader, eyebrow, heading, greeting, message, note }) {
+  return `
+    <!doctype html>
+    <html lang="en">
+      <body style="margin:0;padding:0;background:#eef2f7;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+        <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${preheader}</div>
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td align="center" style="padding:32px 16px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 32px rgba(19,40,75,0.12);">
+                <tr>
+                  <td style="background:#13284b;background:linear-gradient(135deg,#13284b 0%,#1e3a6b 100%);padding:30px 36px;text-align:center;">
+                    <p style="margin:0;color:#f6c66f;font-size:12px;font-weight:700;letter-spacing:4px;">HAPPITWIN</p>
+                    <p style="margin:6px 0 0;color:#ffffff;font-size:20px;font-weight:700;letter-spacing:1px;">EVENTS</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:40px 36px 28px;background:#ffffff;">
+                    <p style="margin:0 0 10px;color:#b7791f;font-size:11px;font-weight:700;letter-spacing:2px;">${eyebrow}</p>
+                    <h1 style="margin:0 0 20px;color:#13284b;font-size:28px;line-height:1.25;">${heading}</h1>
+                    ${greeting ? `<p style="margin:0 0 16px;color:#374151;font-size:15px;line-height:1.6;">${greeting}</p>` : ""}
+                    <p style="margin:0 0 18px;color:#4b5563;font-size:15px;line-height:1.7;">${message}</p>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="background:#fff8e8;border-left:4px solid #d99a2b;border-radius:10px;padding:16px 18px;">
+                          <p style="margin:0;color:#6b4a10;font-size:13px;line-height:1.6;">${note}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background:#f8fafc;padding:20px 36px;text-align:center;color:#94a3b8;font-size:11px;line-height:1.6;">
+                    Official communication from Happitwin Events.<br />
+                    This message was sent automatically. Please do not reply.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+}
+
 async function sendBookingEmails({
   config,
   booking,
   eventData,
   userData,
   ticketCount,
-  ticketSummary,
-  expectedAmount,
-  transactionId,
-  ticketCodeList,
   attachments,
 }) {
   const delivery = { attendee: false, admins: false, organiser: false };
@@ -43,7 +85,7 @@ async function sendBookingEmails({
     secure: Number(config.smtpPort) === 465,
     auth: { user: config.emailUsername, pass: config.emailPass },
   });
-  const from = `"Happitwin events" <${config.emailUsername}>`;
+  const from = `"Happitwin Events" <${config.emailUsername}>`;
   const holderName =
     `${userData.firstName || ""} ${userData.lastName || ""}`.trim() ||
     userData.email;
@@ -57,20 +99,14 @@ async function sendBookingEmails({
         from,
         to: userData.email,
         subject: `Booking Confirmed – ${eventData.title}`,
-        html: `
-          <div style="font-family:sans-serif;max-width:520px;margin:auto">
-            <h2>Booking Confirmed!</h2>
-            <p>Hi <strong>${holderName}</strong>,</p>
-            <p>Your <strong>${ticketCount}</strong> ${ticketCount === 1 ? "ticket" : "tickets"} for <strong>${eventData.title}</strong> ${ticketCount === 1 ? "is" : "are"} confirmed.</p>
-            <p><strong>Date:</strong> ${new Date(eventData.date).toDateString()}</p>
-            <p><strong>Location:</strong> ${eventData.location}</p>
-            <p><strong>Tickets:</strong> ${ticketSummary}</p>
-            <p><strong>Amount paid:</strong> KES ${expectedAmount}</p>
-            <p><strong>Payment reference:</strong> ${transactionId}</p>
-            <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
-            <p>Your ticket PDF${passCount === 1 ? " is" : "s are"} attached. Present the QR code${passCount === 1 ? "" : "s"} at the entrance.</p>
-          </div>
-        `,
+        html: bookingEmailTemplate({
+          preheader: "Your Happitwin Events booking is confirmed.",
+          eyebrow: "OFFICIAL BOOKING CONFIRMATION",
+          heading: "You're all set!",
+          greeting: `Hi ${holderName},`,
+          message: `Your ${ticketCount} ${ticketCount === 1 ? "ticket" : "tickets"} with Happitwin Events ${ticketCount === 1 ? "has" : "have"} been confirmed. Your official ticket PDF${passCount === 1 ? " is" : "s are"} attached to this email.`,
+          note: `Keep the attached PDF${passCount === 1 ? "" : "s"} handy. Event details, ticket codes and payment information are all included there, and the QR code${passCount === 1 ? "" : "s"} should be presented at the entrance.`,
+        }),
         attachments,
       });
       const sentAt = new Date();
@@ -112,18 +148,14 @@ async function sendBookingEmails({
           from,
           to: adminEmails,
           subject: `New Booking – ${eventData.title}`,
-          html: `
-            <div style="font-family:sans-serif;max-width:520px;margin:auto">
-              <h2>New Booking Alert</h2>
-              <p><strong>Event:</strong> ${eventData.title}</p>
-              <p><strong>User:</strong> ${holderName}</p>
-              <p><strong>Email:</strong> ${userData.email}</p>
-              <p><strong>Tickets:</strong> ${ticketSummary}</p>
-              <p><strong>Amount:</strong> KES ${expectedAmount}</p>
-              <p><strong>Payment reference:</strong> ${transactionId}</p>
-              <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
-            </div>
-          `,
+          html: bookingEmailTemplate({
+            preheader: "A new booking was recorded on Happitwin Events.",
+            eyebrow: "INTERNAL BOOKING NOTIFICATION",
+            heading: "New Booking Recorded",
+            greeting: "Hello Admin Team,",
+            message: `A new booking has been completed on Happitwin Events. The attached ticket PDF${passCount === 1 ? "" : "s"} contain${passCount === 1 ? "s" : ""} the complete booking record.`,
+            note: `Please use the attached PDF${passCount === 1 ? "" : "s"} for attendee, event, ticket and payment details. Sensitive booking information is intentionally not repeated in this email.`,
+          }),
           attachments,
         });
         const sentAt = new Date();
@@ -194,19 +226,14 @@ async function sendBookingEmails({
             from,
             to: organiserEmail,
             subject: `New Booking – ${eventData.title}`,
-            html: `
-              <div style="font-family:sans-serif;max-width:520px;margin:auto">
-                <h2>New Booking for Your Event</h2>
-                <p>Hi <strong>${organiserName}</strong>,</p>
-                <p>Your event <strong>${eventData.title}</strong> has a new booking.</p>
-                <p><strong>Attendee:</strong> ${holderName}</p>
-                <p><strong>Email:</strong> ${userData.email}</p>
-                <p><strong>Tickets:</strong> ${ticketSummary}</p>
-                <p><strong>Amount:</strong> KES ${expectedAmount}</p>
-                <p><strong>Payment reference:</strong> ${transactionId}</p>
-                <p><strong>Ticket codes:</strong> <code>${ticketCodeList}</code></p>
-              </div>
-            `,
+            html: bookingEmailTemplate({
+              preheader: "A new booking was completed for your event.",
+              eyebrow: "ORGANISER BOOKING ALERT",
+              heading: "New Booking for Your Event",
+              greeting: `Hi ${organiserName},`,
+              message: `Good news — a new booking has been completed for your event on Happitwin Events. The official ticket PDF${passCount === 1 ? " is" : "s are"} attached.`,
+              note: `All attendee, ticket and payment details are included in the attached PDF${passCount === 1 ? "" : "s"}. Keep ${passCount === 1 ? "it" : "them"} for your records.`,
+            }),
             attachments,
           });
           const sentAt = new Date();
@@ -436,18 +463,19 @@ export default defineEventHandler(async (event) => {
   }
 
   /* ── RESOLVE THE TICKET HOLDER ────────────────────────────── */
-  // Registered accounts keep their account link; guests book with the name
-  // and email captured when the STK push was initiated.
+  // Names captured at checkout are authoritative; the account is only a fallback.
   const holderEmail = pending.userEmail;
   const registeredUser = pending.userId
     ? await User.findById(pending.userId)
     : await User.findOne({ email: holderEmail });
+  const accountData = registeredUser?.toObject?.() || registeredUser || {};
 
-  const userData = registeredUser || {
-    firstName: pending.firstName || "",
-    lastName: pending.lastName || "",
-    email: holderEmail,
-    _id: null,
+  const userData = {
+    ...accountData,
+    firstName: String(pending.firstName || "").trim() || accountData.firstName || "",
+    lastName: String(pending.lastName || "").trim() || accountData.lastName || "",
+    email: holderEmail || accountData.email || "",
+    _id: accountData._id || null,
   };
 
   /* ── TICKET LINES & PRICE FROM THE PENDING PAYMENT ─────────*/
@@ -707,12 +735,6 @@ export default defineEventHandler(async (event) => {
       eventData,
       userData,
       ticketCount,
-      ticketSummary,
-      expectedAmount: existingBooking.amount,
-      transactionId: existingBooking.transactionId || transactionId,
-      ticketCodeList: emailTickets
-        .map((ticket) => ticket.ticketCode)
-        .join(", "),
       attachments,
     });
 
@@ -1143,7 +1165,7 @@ export default defineEventHandler(async (event) => {
           .fontSize(5)
           .fillColor("#9ca3af")
           .text(
-            "Present this ticket at the entrance · Not transferable · Volora Events",
+            "Present this ticket at the entrance · Not transferable · Happitwin Events",
             0,
             133,
             { width: 252, align: "center" },
@@ -1163,17 +1185,12 @@ export default defineEventHandler(async (event) => {
     contentType: "application/pdf",
   }));
 
-  const ticketCodeList = tickets.map((t) => t.ticketCode).join(", ");
   const emailDelivery = await sendBookingEmails({
     config,
     booking,
     eventData,
     userData,
     ticketCount,
-    ticketSummary,
-    expectedAmount,
-    transactionId,
-    ticketCodeList,
     attachments,
   });
 

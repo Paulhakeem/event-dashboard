@@ -1,3 +1,8 @@
+import {
+  formatEventTimeRange,
+  useTimeField,
+} from "@velora/shared/composables/useEventTime";
+
 export const orgCreateEvent = () => {
   const { token } = useAuth();
   const config = useRuntimeConfig();
@@ -18,6 +23,19 @@ export const orgCreateEvent = () => {
     status: "upcoming",
     image: null,
   });
+
+  const startTimeField = useTimeField(
+    () => form.startTime,
+    (value) => {
+      form.startTime = value;
+    },
+  );
+  const endTimeField = useTimeField(
+    () => form.endTime,
+    (value) => {
+      form.endTime = value;
+    },
+  );
 
   const isLoading = ref(false);
   const previewImage = ref(null);
@@ -51,10 +69,7 @@ export const orgCreateEvent = () => {
       dateLabel = end;
     }
 
-    const timeLabel =
-      form.startTime && form.endTime
-        ? `${form.startTime} - ${form.endTime}`
-        : form.startTime || form.endTime || "";
+    const timeLabel = formatEventTimeRange(form.startTime, form.endTime);
 
     return timeLabel ? `${dateLabel} · ${timeLabel}` : dateLabel;
   });
@@ -83,6 +98,8 @@ export const orgCreateEvent = () => {
       maxTicketsPerUser: null,
       status: "upcoming",
     });
+    startTimeField.reset();
+    endTimeField.reset();
     freeEntry.value = false;
     customTickets.value = [];
     previewImage.value = null;
@@ -190,6 +207,10 @@ export const orgCreateEvent = () => {
     previewImage,
     freeEntry,
     customTickets,
+    startTimeInput: startTimeField.time,
+    startPeriod: startTimeField.period,
+    endTimeInput: endTimeField.time,
+    endPeriod: endTimeField.period,
     scheduleLabel,
     shareUrl,
     showShareModal,

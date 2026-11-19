@@ -50,21 +50,41 @@
           <label class="mb-1 block text-xs font-semibold text-gray-500 uppercase">
             Start Time
           </label>
-          <input
-            v-model="form.startTime"
-            type="time"
-            class="w-full rounded-lg border p-2.5 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-          />
+          <div class="flex gap-2">
+            <input
+              v-model="startTimeInput"
+              type="time"
+              class="min-w-0 flex-1 rounded-lg border p-2.5 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            />
+            <select
+              v-model="startPeriod"
+              aria-label="Start time AM or PM"
+              class="w-20 rounded-lg border p-2.5 font-semibold dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
         </div>
         <div>
           <label class="mb-1 block text-xs font-semibold text-gray-500 uppercase">
             End Time
           </label>
-          <input
-            v-model="form.endTime"
-            type="time"
-            class="w-full rounded-lg border p-2.5 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-          />
+          <div class="flex gap-2">
+            <input
+              v-model="endTimeInput"
+              type="time"
+              class="min-w-0 flex-1 rounded-lg border p-2.5 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            />
+            <select
+              v-model="endPeriod"
+              aria-label="End time AM or PM"
+              class="w-20 rounded-lg border p-2.5 font-semibold dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
         </div>
 
         <div>
@@ -222,6 +242,8 @@
 </template>
 
 <script setup>
+import { useTimeField } from "@velora/shared/composables/useEventTime";
+
 const props = defineProps({
   editingEvent: { type: [String, Number], default: null },
   editForm: { type: Object, default: null },
@@ -229,6 +251,28 @@ const props = defineProps({
 const emit = defineEmits(["close", "save"]);
 const localEditor = updateEvent();
 const form = computed(() => props.editForm || localEditor.editForm.value);
+const startTimeField = useTimeField(
+  () => form.value.startTime,
+  (value) => {
+    form.value.startTime = value;
+  },
+);
+const endTimeField = useTimeField(
+  () => form.value.endTime,
+  (value) => {
+    form.value.endTime = value;
+  },
+);
+const { time: startTimeInput, period: startPeriod } = startTimeField;
+const { time: endTimeInput, period: endPeriod } = endTimeField;
+
+watch(
+  () => [props.editForm?.startTime, props.editForm?.endTime],
+  () => {
+    startTimeField.reset();
+    endTimeField.reset();
+  },
+);
 
 const addTicket = () => {
   if (!Array.isArray(form.value.customTickets)) form.value.customTickets = [];

@@ -6,6 +6,20 @@ import { Ticket } from "~~/server/models/Ticket.js";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 import { getEventTicketMetrics } from "~~/server/utils/getEventTicketMetrics.js";
 
+const resolveHolderName = (ticket) => {
+  const parts = [ticket?.firstName, ticket?.lastName].filter(Boolean);
+  return (
+    parts.join(" ").trim() ||
+    String(ticket?.holderName || ticket?.name || "").trim() ||
+    [ticket?.userId?.firstName, ticket?.userId?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() ||
+    String(ticket?.userEmail || ticket?.email || "").trim() ||
+    "Guest"
+  );
+};
+
 export default defineEventHandler(async (event) => {
   await connectDB();
   const user = await requireAuth(event);
@@ -53,9 +67,7 @@ export default defineEventHandler(async (event) => {
       tickets: tickets.map((ticket) => {
         const base = ticket.toObject ? ticket.toObject() : ticket;
         const user = base.userId || {};
-        const firstName = user.firstName || base.firstName || "";
-        const lastName = user.lastName || base.lastName || "";
-        const holderName = `${firstName} ${lastName}`.trim() || base.holderName || "";
+        const holderName = resolveHolderName(base);
         const holderEmail = user.email || base.userEmail || base.email || base.holderEmail || "";
         return {
           _id: base._id,

@@ -5,6 +5,20 @@ import { Event } from "~~/server/models/Events.js";
 import { Ticket } from "~~/server/models/Ticket.js";
 import { syncTicketStatuses } from "~~/server/utils/syncTicketStatuses.js";
 
+const resolveHolderName = (ticket) => {
+  const parts = [ticket?.firstName, ticket?.lastName].filter(Boolean);
+  return (
+    parts.join(" ").trim() ||
+    String(ticket?.holderName || ticket?.name || "").trim() ||
+    [ticket?.userId?.firstName, ticket?.userId?.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() ||
+    String(ticket?.userEmail || ticket?.email || "").trim() ||
+    "Guest"
+  );
+};
+
 export default defineEventHandler(async (event) => {
   await connectDB();
   const user = await requireAuth(event);
@@ -116,15 +130,10 @@ export default defineEventHandler(async (event) => {
 
   return {
     events,
-    tickets: tickets.map((ticket) => {
-      const firstName = ticket.userId?.firstName || ticket.firstName || "";
-      const lastName = ticket.userId?.lastName || ticket.lastName || "";
-      return {
-        ...ticket,
-        holderName:
-          `${firstName} ${lastName}`.trim() || ticket.userEmail || "—",
-        holderEmail: ticket.userId?.email || ticket.userEmail || "",
-      };
-    }),
+    tickets: tickets.map((ticket) => ({
+      ...ticket,
+      holderName: resolveHolderName(ticket),
+      holderEmail: ticket.userId?.email || ticket.userEmail || "",
+    })),
   };
 });

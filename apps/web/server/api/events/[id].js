@@ -62,6 +62,7 @@ export default defineEventHandler(async (event) => {
         "date",
         "location",
         "TicketQuantity",
+        "maxTicketsPerUser",
         "customTickets",
         "status",
         "eventType",
@@ -72,6 +73,15 @@ export default defineEventHandler(async (event) => {
         if (Object.prototype.hasOwnProperty.call(body, key)) {
           update[key] = body[key];
         }
+      }
+
+      if ("maxTicketsPerUser" in update) {
+        const raw = update.maxTicketsPerUser;
+        const parsed = Number(raw);
+        update.maxTicketsPerUser =
+          raw == null || raw === "" || !Number.isFinite(parsed) || parsed <= 0
+            ? null
+            : Math.floor(parsed);
       }
 
       // Get the current event to check if status is changing
